@@ -94,7 +94,10 @@ fn adapt_image_emits_exact_canonical_ir_without_invented_semantics() {
     assert_eq!(ir["canvases"][0]["size"]["height"], 200.0);
     assert_eq!(ir["canvases"][0]["unit"], "devicePixel");
     assert_eq!(ir["nodes"][0]["kind"]["value"], "image");
-    assert_eq!(ir["nodes"][0]["geometry"]["renderBox"]["rect"]["width"], 320.0);
+    assert_eq!(
+        ir["nodes"][0]["geometry"]["renderBox"]["rect"]["width"],
+        320.0
+    );
     assert!(ir["nodes"][0]["geometry"].get("inkBox").is_none());
     assert!(ir["nodes"][0].get("role").is_none());
     assert!(ir["nodes"][0].get("name").is_none());
@@ -104,10 +107,7 @@ fn adapt_image_emits_exact_canonical_ir_without_invented_semantics() {
         "sightlint-adapter-png"
     );
     assert_eq!(ir["evidence"][0]["source"]["externalProcessing"], false);
-    assert_eq!(
-        ir["extensions"]["org.sightlint.adapter.png"]["bitDepth"],
-        8
-    );
+    assert_eq!(ir["extensions"]["org.sightlint.adapter.png"]["bitDepth"], 8);
     assert_eq!(
         ir["extensions"]["org.sightlint.adapter.png"]["colorType"],
         6

@@ -5,6 +5,7 @@
 
 #![forbid(unsafe_code)]
 
+use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
 
@@ -17,6 +18,7 @@ use sightlint_ir::{
 
 const PNG_SIGNATURE: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 const IHDR_DATA_LENGTH: u32 = 13;
+const REQUIRED_HEADER_BYTES: usize = 8 + 4 + 4 + 13 + 4;
 const MAX_DIMENSION: u32 = 100_000;
 const MAX_PIXELS: u64 = 100_000_000;
 const ADAPTER_NAME: &str = "sightlint-adapter-png";
@@ -57,13 +59,28 @@ pub enum PngAdapterError {
     /// Width or height is zero.
     ZeroDimension,
     /// A dimension exceeds the adapter safety cap.
-    DimensionTooLarge { width: u32, height: u32 },
+    DimensionTooLarge {
+        /// Width declared by IHDR.
+        width: u32,
+        /// Height declared by IHDR.
+        height: u32,
+    },
     /// Total pixel count exceeds the adapter safety cap.
-    PixelCountTooLarge { width: u32, height: u32 },
+    PixelCountTooLarge {
+        /// Width declared by IHDR.
+        width: u32,
+        /// Height declared by IHDR.
+        height: u32,
+    },
     /// PNG color type is not one of the defined values.
     InvalidColorType(u8),
     /// Bit depth is not legal for the declared PNG color type.
-    InvalidBitDepth { bit_depth: u8, color_type: u8 },
+    InvalidBitDepth {
+        /// Bit depth declared by IHDR.
+        bit_depth: u8,
+        /// Color type declared by IHDR.
+        color_type: u8,
+    },
     /// PNG compression method is unsupported or invalid.
     InvalidCompressionMethod(u8),
     /// PNG filter method is unsupported or invalid.
@@ -77,14 +94,20 @@ pub enum PngAdapterError {
 impl fmt::Display for PngAdapterError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Truncated => formatter.write_str("PNG input is truncated before a complete IHDR chunk"),
+            Self::Truncated => {
+                formatter.write_str("PNG input is truncated before a complete IHDR chunk")
+            }
             Self::InvalidSignature => formatter.write_str("input does not have the PNG signature"),
             Self::MissingIhdr => formatter.write_str("PNG first chunk must be IHDR"),
             Self::InvalidIhdrLength(length) => {
                 write!(formatter, "PNG IHDR length must be 13 bytes, got {length}")
             }
-            Self::InvalidIhdrCrc => formatter.write_str("PNG IHDR CRC-32 does not match the header data"),
-            Self::ZeroDimension => formatter.write_str("PNG width and height must both be non-zero"),
+            Self::InvalidIhdrCrc => {
+                formatter.write_str("PNG IHDR CRC-32 does not match the header data")
+            }
+            Self::ZeroDimension => {
+                formatter.write_str("PNG width and height must both be non-zero")
+            }
             Self::DimensionTooLarge { width, height } => write!(
                 formatter,
                 "PNG dimensions {width}x{height} exceed the {MAX_DIMENSION}-pixel per-axis safety limit"
@@ -113,7 +136,10 @@ impl fmt::Display for PngAdapterError {
                 write!(formatter, "PNG interlace method {method} is invalid")
             }
             Self::InvalidArtifactIr(message) => {
-                write!(formatter, "PNG adapter produced invalid Artifact IR: {message}")
+                write!(
+                    formatter,
+                    "PNG adapter produced invalid Artifact IR: {message}"
+                )
             }
         }
     }
@@ -136,7 +162,6 @@ pub fn inspect_png_header(input: &[u8]) -> Result<PngHeader, PngAdapterError> {
     }
 
     // Signature + length + type + 13 data bytes + CRC.
-    const REQUIRED_HEADER_BYTES: usize = 8 + 4 + 4 + 13 + 4;
     if input.len() < REQUIRED_HEADER_BYTES {
         return Err(PngAdapterError::Truncated);
     }
@@ -248,11 +273,11 @@ pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr
                 ink_box: None,
                 hit_box: None,
             },
-            extensions: Default::default(),
+            extensions: BTreeMap::default(),
         }],
         relations: Vec::new(),
         evidence: vec![evidence],
-        extensions: Default::default(),
+        extensions: BTreeMap::default(),
     };
 
     document.extensions.insert(
@@ -405,7 +430,10 @@ mod tests {
     #[test]
     fn rejects_zero_and_oversized_dimensions() {
         let zero = png_header(0, 1, 8, 6, 0, 0, 0);
-        assert_eq!(inspect_png_header(&zero), Err(PngAdapterError::ZeroDimension));
+        assert_eq!(
+            inspect_png_header(&zero),
+            Err(PngAdapterError::ZeroDimension)
+        );
 
         let huge = png_header(100_001, 1, 8, 6, 0, 0, 0);
         assert!(matches!(

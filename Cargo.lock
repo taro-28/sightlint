@@ -252,11 +252,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "sightlint-adapter-png"
+version = "0.1.0-alpha.1"
+dependencies = [
+ "serde_json",
+ "sightlint-ir",
+]
+
+[[package]]
 name = "sightlint-cli"
 version = "0.1.0-alpha.1"
 dependencies = [
  "clap",
  "serde_json",
+ "sightlint-adapter-png",
  "sightlint-engine",
  "sightlint-ir",
 ]

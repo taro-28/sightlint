@@ -138,9 +138,7 @@ fn run_adapt_image(input: &Path) -> ExitCode {
     };
     match document.to_canonical_json() {
         Ok(output) => write_success(&output),
-        Err(error) => fail(format!(
-            "failed to serialize adapted Artifact IR: {error}"
-        )),
+        Err(error) => fail(format!("failed to serialize adapted Artifact IR: {error}")),
     }
 }
 
