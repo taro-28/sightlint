@@ -48,4 +48,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m 'feat: implement M2 visual geometry rules and E2E corpus'
-          git push origin HEAD:${{ github.head_ref }}
+          git fetch --unshallow origin 2>/dev/null || true
+          git fetch origin "+refs/heads/${{ github.head_ref }}:refs/remotes/origin/${{ github.head_ref }}"
+          git push --no-thin origin HEAD:refs/heads/${{ github.head_ref }}
