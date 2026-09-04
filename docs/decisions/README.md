@@ -19,6 +19,7 @@ Accepted decisions:
 - [0006 — Local-first process adapters](0006-local-first-process-adapters.md)
 - [0008 — Development and release gates](0008-development-and-release-gates.md)
 - [0009 — Initial workspace boundaries](0009-initial-workspace-boundaries.md)
+- [0010 — Schema and rule compatibility](0010-schema-and-rule-compatibility.md)
 
 Proposed decisions:
 
