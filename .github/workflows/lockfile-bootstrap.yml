@@ -1,4 +1,4 @@
-name: Lockfile bootstrap
+name: Workspace bootstrap
 
 on:
   pull_request:
@@ -8,20 +8,26 @@ permissions:
 
 jobs:
   generate:
-    name: Generate Cargo.lock for review branch
+    name: Format remote workspace for review branch
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install minimum Rust
-        run: rustup toolchain install 1.85.0 --profile minimal
-      - name: Generate lockfile
-        run: cargo +1.85.0 generate-lockfile
-      - name: Upload lockfile
+      - name: Install minimum and stable Rust tooling
+        run: |
+          rustup toolchain install 1.85.0 --profile minimal
+          rustup toolchain install stable --profile minimal --component rustfmt
+      - name: Generate lockfile and format sources
+        run: |
+          cargo +1.85.0 generate-lockfile
+          cargo +stable fmt --all
+      - name: Upload formatted workspace
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: cargo-lock
-          path: Cargo.lock
+          name: formatted-workspace
+          path: |
+            Cargo.lock
+            crates/**/*.rs
           if-no-files-found: error
           retention-days: 1
