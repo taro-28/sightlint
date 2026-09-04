@@ -177,8 +177,8 @@ fn write_stdout(bytes: &[u8]) -> io::Result<()> {
     stdout.flush()
 }
 
-fn fail(message: String) -> ExitCode {
-    let _ = writeln!(io::stderr().lock(), "sightlint: {message}");
+fn fail(message: impl AsRef<str>) -> ExitCode {
+    let _ = writeln!(io::stderr().lock(), "sightlint: {}", message.as_ref());
     ExitCode::from(EXIT_ERROR)
 }
 
