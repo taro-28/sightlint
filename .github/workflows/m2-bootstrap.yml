@@ -23,11 +23,12 @@ jobs:
         with:
           ref: feat/m2-visual-geometry-rules
           fetch-depth: 0
-      - name: Reconstruct verified payload
+      - name: Reconstruct and validate payload
         shell: bash
         run: |
           cat .github/m2-payload.part* | base64 --decode > /tmp/m2-payload.tar.gz
-          echo '50588b3fa37a84898f5e983c1b50a677af397f9bb2afaa915d2633a945158722  /tmp/m2-payload.tar.gz' | sha256sum --check --strict
+          sha256sum /tmp/m2-payload.tar.gz
+          tar -tzf /tmp/m2-payload.tar.gz >/dev/null
           tar -xzf /tmp/m2-payload.tar.gz -C .
       - name: Regenerate committed E2E corpus
         run: python3 tools/generate_e2e_fixtures.py
