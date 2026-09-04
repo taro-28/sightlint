@@ -1,4 +1,4 @@
-//! Deterministic execution boundary for SightLint.
+//! Deterministic execution boundary for `SightLint`.
 //!
 //! Milestone M1 will add queries, rules, and evidence-linked outcomes. Perception and artifact
 //! acquisition do not belong in this crate.
