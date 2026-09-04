@@ -1,19 +1,24 @@
-//! Version anchor for `SightLint`'s language-neutral Artifact IR.
+//! Versioned, medium-neutral contracts for the `SightLint` Artifact IR.
 //!
-//! The actual serialized data model is introduced in milestone M1. This crate exists in the
-//! foundation milestone to establish ownership and dependency direction before implementation.
+//! This crate contains data and validation only. Artifact acquisition, perception, geometry
+//! queries, policy, and rule verdicts belong outside this boundary.
 
 #![forbid(unsafe_code)]
 
-/// The first planned schema family for the `SightLint` Artifact IR.
+mod json;
+mod model;
+mod schema;
+mod validation;
+
+pub use json::{serialize_canonical, LoadError};
+pub use model::{
+    ArtifactDescriptor, ArtifactIr, ArtifactKind, Axis, BoxKind, Canvas,
+    CategoricalAlternative, Evidence, EvidenceClass, EvidenceSource, Geometry,
+    HorizontalDirection, Identifier, Node, NodeKind, Observed, ObservedRect, Rect, Relation,
+    Selector, Size, Uncertainty, Unit, VerticalDirection,
+};
+pub use schema::artifact_ir_schema_json;
+pub use validation::{ValidationCode, ValidationErrors, ValidationIssue};
+
+/// Current serialized Artifact IR schema version.
 pub const SCHEMA_VERSION: &str = "0.1.0";
-
-#[cfg(test)]
-mod tests {
-    use super::SCHEMA_VERSION;
-
-    #[test]
-    fn schema_version_is_explicit() {
-        assert_eq!(SCHEMA_VERSION, "0.1.0");
-    }
-}
