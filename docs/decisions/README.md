@@ -23,6 +23,7 @@ Accepted decisions:
 - [0011 — Evidence grading and CI policy](0011-evidence-grading-and-ci-policy.md)
 - [0012 — Rule authoring lifecycle](0012-rule-authoring-lifecycle.md)
 - [0013 — Observation provenance](0013-observation-provenance.md)
+- [0014 — Units and coordinate spaces](0014-units-and-coordinate-spaces.md)
 
 Proposed decisions:
 
