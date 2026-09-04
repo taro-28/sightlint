@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fmt;
 
-use crate::{PngHeader, crc32, inspect_png_header};
+use crate::{PngAdapterError, PngHeader, crc32, inspect_png_header};
 
 pub(crate) const MAX_PNG_INPUT_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CHUNKS: usize = 10_000;
@@ -21,7 +21,7 @@ pub struct PngStructure {
     pub has_palette: bool,
 }
 
-/// Failure while validating the complete PNG chunk stream.
+/// Failure while validating the complete PNG chunk stream after a valid `IHDR`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PngStructureError {
     /// Adapter input exceeds the library-level binary safety limit.
@@ -36,8 +36,8 @@ pub enum PngStructureError {
     InvalidReservedBit,
     /// A critical chunk type is not defined by the PNG specification.
     UnknownCriticalChunk(String),
-    /// A non-`IHDR` chunk appeared before the required first `IHDR`, or another `IHDR` appeared.
-    InvalidIhdrPosition,
+    /// A second `IHDR` chunk appeared after the required first chunk.
+    DuplicateIhdr,
     /// A chunk CRC-32 does not match its type and payload.
     InvalidChunkCrc(String),
     /// More than one `PLTE` chunk is present.
@@ -83,9 +83,7 @@ impl fmt::Display for PngStructureError {
             Self::UnknownCriticalChunk(kind) => {
                 write!(formatter, "PNG contains unknown critical chunk {kind}")
             }
-            Self::InvalidIhdrPosition => {
-                formatter.write_str("PNG must contain exactly one IHDR chunk and it must be first")
-            }
+            Self::DuplicateIhdr => formatter.write_str("PNG contains more than one IHDR chunk"),
             Self::InvalidChunkCrc(kind) => {
                 write!(formatter, "PNG {kind} chunk CRC-32 does not match its payload")
             }
@@ -121,16 +119,25 @@ impl Error for PngStructureError {}
 ///
 /// # Errors
 ///
-/// Returns a structural error for unsafe sizes, malformed chunk framing or types, CRC mismatch,
-/// invalid critical-chunk ordering, palette contract violations, missing image data, or invalid
-/// termination. Header-level failures are returned separately by the caller before this function
-/// is entered.
-pub fn inspect_png_structure(input: &[u8]) -> Result<PngStructure, PngStructureError> {
+/// Returns the existing header-level [`PngAdapterError`] unchanged when `IHDR` is invalid, and a
+/// wrapped structural error for unsafe sizes, malformed later chunk framing or types, CRC
+/// mismatch, invalid critical-chunk ordering, palette contract violations, missing image data,
+/// or invalid termination.
+pub fn inspect_png_structure(input: &[u8]) -> Result<PngStructure, PngAdapterError> {
     if input.len() > MAX_PNG_INPUT_BYTES {
-        return Err(PngStructureError::InputTooLarge);
+        return Err(PngAdapterError::InvalidStructure(
+            PngStructureError::InputTooLarge,
+        ));
     }
 
-    let header = inspect_png_header(input).map_err(|_| PngStructureError::InvalidIhdrPosition)?;
+    let header = inspect_png_header(input)?;
+    inspect_png_structure_after_header(input, header).map_err(PngAdapterError::InvalidStructure)
+}
+
+fn inspect_png_structure_after_header(
+    input: &[u8],
+    header: PngHeader,
+) -> Result<PngStructure, PngStructureError> {
     let mut offset = 8_usize;
     let mut chunk_count = 0_usize;
     let mut idat_chunk_count = 0_u32;
@@ -186,7 +193,7 @@ pub fn inspect_png_structure(input: &[u8]) -> Result<PngStructure, PngStructureE
         match kind {
             "IHDR" => {
                 if chunk_count != 1 {
-                    return Err(PngStructureError::InvalidIhdrPosition);
+                    return Err(PngStructureError::DuplicateIhdr);
                 }
             }
             "PLTE" => {
@@ -235,9 +242,6 @@ pub fn inspect_png_structure(input: &[u8]) -> Result<PngStructure, PngStructureE
                 if kind_bytes[0].is_ascii_uppercase() {
                     return Err(PngStructureError::UnknownCriticalChunk(kind.to_owned()));
                 }
-                if saw_idat {
-                    idat_closed = true;
-                }
             }
         }
 
@@ -255,7 +259,7 @@ pub fn inspect_png_structure(input: &[u8]) -> Result<PngStructure, PngStructureE
 }
 
 fn validate_palette_length(data_length: usize, header: PngHeader) -> Result<(), PngStructureError> {
-    if data_length == 0 || data_length > 256 * 3 || !data_length.is_multiple_of(3) {
+    if data_length == 0 || data_length > 256 * 3 || data_length % 3 != 0 {
         return Err(PngStructureError::InvalidPaletteLength);
     }
     if header.color_type == 3 {
