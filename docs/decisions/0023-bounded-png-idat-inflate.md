@@ -18,15 +18,16 @@ The stage must:
 - run only after the complete chunk stream passes ADR 0022 validation;
 - feed consecutive `IDAT` payload slices to one zlib stream in file order without concatenating the compressed payload into a second large buffer;
 - validate the zlib wrapper and Adler-32 checksum;
+- require the zlib terminator to consume all non-empty bytes in the concatenated `IDAT` stream, rejecting trailing compressed payload;
 - calculate the exact expected decompressed scanline byte count from `IHDR`, including one filter byte per scanline;
 - support both non-interlaced data and all seven Adam7 passes when calculating the expected byte count;
-- allocate no more than the exact expected scanline byte count;
 - reject an expected decompressed stream larger than 256 MiB before allocating it;
-- reject compressed streams that fail inflation, require more output than the exact expected size, or produce fewer bytes than expected;
+- allocate the exact expected scanline byte count plus one sentinel byte so valid split trailers can complete and any decoded-byte overflow is observable;
+- reject compressed streams that fail inflation, produce the sentinel byte, or produce fewer bytes than expected;
 - expose the exact validated decompressed byte count in the namespaced PNG extension;
 - keep the decompressed scanline bytes inside the adapter boundary for later deterministic filter reconstruction.
 
-Use `miniz_oxide` as the initial inflater. It is a pure-Rust DEFLATE/zlib implementation and provides bounded/slice-oriented decompression primitives. Pin its direct workspace dependency exactly and keep it outside the deterministic rule kernel.
+Use `miniz_oxide` as the initial inflater. It is a pure-Rust DEFLATE/zlib implementation. SightLint uses its low-level decompressor rather than the convenience slice helper so that consumed compressed bytes remain observable. Pin the direct workspace dependency exactly and keep it outside the deterministic rule kernel.
 
 ## Scanline sizing
 
@@ -53,7 +54,9 @@ This decision does **not** reconstruct PNG filters, unpack sub-byte samples, exp
 Tests must cover at least:
 
 - valid zlib-wrapped scanline data through the public `adapt-image` and `check-image` paths;
-- a zlib stream split across multiple consecutive `IDAT` chunks;
+- a zlib stream split across multiple consecutive `IDAT` chunks, including a split immediately before Adler-32;
+- empty `IDAT` chunks around an otherwise complete stream where structurally legal;
+- rejection of non-empty bytes after the complete zlib stream, both within one `IDAT` and in a following `IDAT`;
 - each PNG color type and legal bit-depth class used by current M3 fixtures;
 - Adam7 expected-size calculation, including small images with empty passes;
 - corrupt DEFLATE data and corrupt Adler-32;
