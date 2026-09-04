@@ -49,6 +49,7 @@ impl ArtifactIr {
     }
 
     /// Returns a clone with all unordered top-level collections in canonical order.
+    #[must_use]
     pub fn canonicalized(&self) -> Self {
         let mut canonical = self.clone();
         canonical
