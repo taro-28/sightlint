@@ -1,13 +1,42 @@
 //! Deterministic execution boundary for `SightLint`.
 //!
-//! Milestone M1 will add queries, rules, and evidence-linked outcomes. Perception and artifact
-//! acquisition do not belong in this crate.
+//! This crate accepts validated, medium-neutral Artifact IR and produces evidence-linked rule
+//! outcomes. Artifact acquisition, browser automation, parsing, and probabilistic perception do
+//! not belong in this boundary.
 
 #![forbid(unsafe_code)]
 
-/// Returns the Artifact IR schema version understood by this engine foundation.
+mod geometry;
+mod report;
+mod rules;
+
+pub use geometry::{
+    QueryContext, QueryError, ResolvedRect, bottom, ensure_comparable, ordered_gap,
+    overlap_extents, right, within_canvas,
+};
+pub use report::{
+    CheckReport, Measurement, REPORT_SCHEMA_VERSION, ReportSummary, RuleKind, RuleMaturity,
+    RuleOutcome, RuleResult, Target, TargetKind,
+};
+pub use rules::{AtomicRule, InputAspect, RuleDefinition, run_default_rules};
+
+use sightlint_ir::{ArtifactIr, ValidationErrors};
+
+/// Returns the Artifact IR schema version understood by this engine.
 pub const fn supported_schema_version() -> &'static str {
     sightlint_ir::SCHEMA_VERSION
+}
+
+/// Validates and checks one Artifact IR document with the built-in rule pack.
+///
+/// # Errors
+///
+/// Returns semantic validation errors before any rule executes. Rules therefore operate over a
+/// document whose identifiers, references, numbers, and provenance satisfy the core contract.
+pub fn check(document: &ArtifactIr) -> Result<CheckReport, ValidationErrors> {
+    document.validate()?;
+    let context = QueryContext::new(document);
+    Ok(CheckReport::new(document, run_default_rules(&context)))
 }
 
 #[cfg(test)]
