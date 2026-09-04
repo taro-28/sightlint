@@ -76,6 +76,24 @@ fn result_outcome<'a>(report: &'a Value, rule_id: &str) -> Option<&'a str> {
     })
 }
 
+fn result_outcomes<'a>(report: &'a Value, rule_id: &str) -> Vec<&'a str> {
+    report["results"]
+        .as_array()
+        .expect("report results are an array")
+        .iter()
+        .filter(|result| result["ruleId"] == rule_id)
+        .filter_map(|result| result["outcome"].as_str())
+        .collect()
+}
+
+fn assert_rule_has_outcome(report: &Value, rule_id: &str, expected: &str) {
+    let outcomes = result_outcomes(report, rule_id);
+    assert!(
+        outcomes.contains(&expected),
+        "rule {rule_id} did not contain outcome {expected}; observed {outcomes:?}"
+    );
+}
+
 #[test]
 fn clean_fixture_runs_the_complete_pipeline_in_both_report_formats() {
     let json = check_json("pass-web.json", &[]);
@@ -261,7 +279,21 @@ fn schema_and_version_commands_expose_machine_and_human_contract_versions() {
     assert_code(&version, EXIT_SUCCESS);
     let version = String::from_utf8(version.stdout).expect("version output is UTF-8");
     assert!(version.contains("Artifact IR schema 0.1.0"));
-    assert!(version.contains("Report schema 0.1.0"));
+    assert!(version.contains("Visual extension 0.1.0"));
+    assert!(version.contains("Report schema 0.2.0"));
+
+    let mut visual_schema_command = binary();
+    visual_schema_command
+        .arg("schema")
+        .arg("--kind")
+        .arg("visual");
+    let visual_schema = run(&mut visual_schema_command, None);
+    assert_code(&visual_schema, EXIT_SUCCESS);
+    let visual_schema_json = parse_stdout(&visual_schema);
+    assert_eq!(
+        visual_schema_json["$id"],
+        "urn:sightlint:schema:visual-extension:0.1.0"
+    );
 }
 
 #[test]
@@ -284,4 +316,275 @@ fn safety_and_usage_failures_return_exit_two() {
     let usage = run(&mut usage_command, None);
     assert_code(&usage, EXIT_ERROR);
     assert!(String::from_utf8_lossy(&usage.stderr).contains("Usage:"));
+}
+
+#[test]
+fn m2_visual_contracts_run_across_every_static_artifact_kind() {
+    for kind in [
+        "web", "mobile", "slide", "document", "pdf", "image", "other",
+    ] {
+        let output = check_json(&format!("m2-pass-{kind}.json"), &[]);
+        assert_code(&output, EXIT_SUCCESS);
+        let report = parse_stdout(&output);
+        assert_eq!(report["artifactKind"], kind);
+        assert_eq!(report["summary"]["failed"], 0);
+        assert_eq!(report["summary"]["cantTell"], 0);
+        assert_eq!(report["extensionVersions"]["org.sightlint.visual"], "0.1.0");
+        for rule_id in [
+            "visual.alignment.peer-consistency",
+            "visual.extent.peer-consistency",
+            "visual.typography.peer-font-size",
+            "visual.typography.minimum-font-size",
+        ] {
+            assert_rule_has_outcome(&report, rule_id, "passed");
+        }
+        assert_rule_has_outcome(
+            &report,
+            "visual.geometry.parent-containment",
+            "inapplicable",
+        );
+    }
+}
+
+#[test]
+fn m2_mutation_fixtures_kill_each_visual_rule_independently() {
+    for (fixture_name, expected_rule) in [
+        (
+            "m2-fail-parent-containment.json",
+            "visual.geometry.parent-containment",
+        ),
+        (
+            "m2-fail-alignment.json",
+            "visual.alignment.peer-consistency",
+        ),
+        ("m2-fail-extent.json", "visual.extent.peer-consistency"),
+        (
+            "m2-fail-peer-font-size.json",
+            "visual.typography.peer-font-size",
+        ),
+        (
+            "m2-fail-minimum-font-size.json",
+            "visual.typography.minimum-font-size",
+        ),
+    ] {
+        let output = check_json(fixture_name, &[]);
+        assert_code(&output, EXIT_FINDINGS);
+        let report = parse_stdout(&output);
+        assert_rule_has_outcome(&report, expected_rule, "failed");
+        assert_eq!(
+            report["summary"]["failed"], 1,
+            "fixture {fixture_name} introduced an unrelated failure"
+        );
+    }
+}
+
+#[test]
+fn m2_direction_and_tolerance_boundaries_are_honored() {
+    for (fixture_name, expected_rule) in [
+        (
+            "m2-pass-parent-boundary.json",
+            "visual.geometry.parent-containment",
+        ),
+        (
+            "m2-pass-alignment-tolerance.json",
+            "visual.alignment.peer-consistency",
+        ),
+        (
+            "m2-pass-alignment-rtl.json",
+            "visual.alignment.peer-consistency",
+        ),
+        (
+            "m2-pass-alignment-vertical-up.json",
+            "visual.alignment.peer-consistency",
+        ),
+        (
+            "m2-pass-extent-tolerance.json",
+            "visual.extent.peer-consistency",
+        ),
+        (
+            "m2-pass-peer-font-size-tolerance.json",
+            "visual.typography.peer-font-size",
+        ),
+        (
+            "m2-pass-minimum-font-size-boundary.json",
+            "visual.typography.minimum-font-size",
+        ),
+    ] {
+        let output = check_json(fixture_name, &[]);
+        assert_code(&output, EXIT_SUCCESS);
+        let report = parse_stdout(&output);
+        assert_eq!(report["summary"]["failed"], 0, "fixture {fixture_name}");
+        assert_rule_has_outcome(&report, expected_rule, "passed");
+    }
+}
+
+#[test]
+fn m2_ambiguous_visual_evidence_abstains_and_strict_policy_is_explicit() {
+    for (fixture_name, expected_rule) in [
+        (
+            "m2-cant-tell-parent-missing-box.json",
+            "visual.geometry.parent-containment",
+        ),
+        (
+            "m2-cant-tell-alignment-missing-box.json",
+            "visual.alignment.peer-consistency",
+        ),
+        (
+            "m2-cant-tell-alignment-cross-canvas.json",
+            "visual.alignment.peer-consistency",
+        ),
+        (
+            "m2-cant-tell-extent-missing-box.json",
+            "visual.extent.peer-consistency",
+        ),
+        (
+            "m2-cant-tell-extent-cross-canvas.json",
+            "visual.extent.peer-consistency",
+        ),
+        (
+            "m2-cant-tell-peer-font-size-missing.json",
+            "visual.typography.peer-font-size",
+        ),
+        (
+            "m2-cant-tell-peer-font-size-units.json",
+            "visual.typography.peer-font-size",
+        ),
+        (
+            "m2-cant-tell-minimum-font-size-missing.json",
+            "visual.typography.minimum-font-size",
+        ),
+        (
+            "m2-cant-tell-minimum-font-size-units.json",
+            "visual.typography.minimum-font-size",
+        ),
+    ] {
+        let advisory = check_json(fixture_name, &[]);
+        assert_code(&advisory, EXIT_SUCCESS);
+        let report = parse_stdout(&advisory);
+        assert_rule_has_outcome(&report, expected_rule, "cantTell");
+        assert_ne!(report["summary"]["cantTell"], 0);
+
+        let strict = check_json(fixture_name, &["--deny-cant-tell"]);
+        assert_code(&strict, EXIT_FINDINGS);
+        assert_eq!(advisory.stdout, strict.stdout);
+    }
+}
+
+#[test]
+fn m2_rules_are_explicitly_inapplicable_without_visual_targets() {
+    let output = check_json("m2-inapplicable-visual.json", &[]);
+    assert_code(&output, EXIT_SUCCESS);
+    let report = parse_stdout(&output);
+    for rule_id in [
+        "visual.geometry.parent-containment",
+        "visual.alignment.peer-consistency",
+        "visual.extent.peer-consistency",
+        "visual.typography.peer-font-size",
+        "visual.typography.minimum-font-size",
+    ] {
+        assert_eq!(result_outcomes(&report, rule_id), vec!["inapplicable"]);
+    }
+}
+
+#[test]
+fn malformed_official_visual_extensions_are_rejected_before_rules_run() {
+    for (fixture_name, expected_code) in [
+        (
+            "m2-invalid-visual-version.json",
+            "UnsupportedExtensionVersion",
+        ),
+        ("m2-invalid-visual-payload.json", "InvalidExtensionPayload"),
+        (
+            "m2-invalid-visual-node-reference.json",
+            "InvalidNodeReference",
+        ),
+        (
+            "m2-invalid-visual-evidence-reference.json",
+            "InvalidEvidenceReference",
+        ),
+        (
+            "m2-invalid-visual-duplicate-member.json",
+            "DuplicateContractMember",
+        ),
+        (
+            "m2-invalid-visual-negative-tolerance.json",
+            "NegativeTolerance",
+        ),
+        ("m2-invalid-visual-zero-font.json", "NonPositiveLength"),
+        (
+            "m2-invalid-visual-normalized-minimum.json",
+            "InvalidTypographyUnit",
+        ),
+        ("m2-invalid-visual-empty-style.json", "EmptyStyle"),
+        (
+            "m2-invalid-visual-insufficient-members.json",
+            "InsufficientContractMembers",
+        ),
+        (
+            "m2-invalid-visual-empty-contract-id.json",
+            "EmptyContractIdentifier",
+        ),
+    ] {
+        let output = check_json(fixture_name, &[]);
+        assert_code(&output, EXIT_ERROR);
+        assert!(output.stdout.is_empty());
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains(expected_code),
+            "fixture {fixture_name} did not report {expected_code}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+}
+
+#[test]
+fn m2_normalization_is_order_independent_and_preserves_unknown_extensions() {
+    let mut canonical_command = binary();
+    canonical_command
+        .arg("normalize")
+        .arg(fixture("m2-pass-web.json"));
+    let canonical = run(&mut canonical_command, None);
+    assert_code(&canonical, EXIT_SUCCESS);
+
+    let mut shuffled_command = binary();
+    shuffled_command
+        .arg("normalize")
+        .arg(fixture("m2-pass-web-shuffled.json"));
+    let shuffled = run(&mut shuffled_command, None);
+    assert_code(&shuffled, EXIT_SUCCESS);
+    assert_eq!(canonical.stdout, shuffled.stdout);
+
+    let mut unknown_command = binary();
+    unknown_command
+        .arg("normalize")
+        .arg(fixture("m2-unknown-extension.json"));
+    let unknown = run(&mut unknown_command, None);
+    assert_code(&unknown, EXIT_SUCCESS);
+    let document = parse_stdout(&unknown);
+    assert_eq!(
+        document["extensions"]["com.example.opaque"]["nested"]["message"],
+        "preserve me"
+    );
+    assert_eq!(
+        document["extensions"]["com.example.opaque"]["z"],
+        serde_json::json!([3, 2, 1])
+    );
+}
+
+#[test]
+fn m2_report_bytes_are_deterministic_across_ordering_and_repeated_runs() {
+    let expected = check_json("m2-pass-web.json", &[]);
+    assert_code(&expected, EXIT_SUCCESS);
+
+    let shuffled = check_json("m2-pass-web-shuffled.json", &[]);
+    assert_code(&shuffled, EXIT_SUCCESS);
+    assert_eq!(expected.stdout, shuffled.stdout);
+
+    for iteration in 0..20 {
+        let actual = check_json("m2-pass-web.json", &[]);
+        assert_code(&actual, EXIT_SUCCESS);
+        assert_eq!(
+            expected.stdout, actual.stdout,
+            "M2 run {iteration} was not byte-identical"
+        );
+    }
 }

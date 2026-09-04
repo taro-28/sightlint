@@ -22,6 +22,10 @@ pub enum InputAspect {
     DeclaredRelations,
     /// Evidence provenance records.
     Evidence,
+    /// Exact or inferred visual-style observations from an official extension.
+    VisualStyle,
+    /// Explicit visual expectations from an official extension.
+    DeclaredVisualContracts,
 }
 
 /// Static, inspectable definition of an executable rule.

@@ -7,9 +7,7 @@ use serde::Serialize;
 use serde_json::Value;
 
 use crate::visual::canonicalize_visual_extension;
-use crate::{
-    ArtifactIr, Relation, VISUAL_EXTENSION_KEY, ValidationErrors, VisualExtensionErrors,
-};
+use crate::{ArtifactIr, Relation, VISUAL_EXTENSION_KEY, ValidationErrors, VisualExtensionErrors};
 
 /// Failure while decoding or validating an Artifact IR JSON document.
 #[derive(Debug)]

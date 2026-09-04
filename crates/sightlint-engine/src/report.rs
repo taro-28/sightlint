@@ -10,7 +10,7 @@ use sightlint_ir::{
 };
 
 /// Current serialized report schema version.
-pub const REPORT_SCHEMA_VERSION: &str = "0.1.0";
+pub const REPORT_SCHEMA_VERSION: &str = "0.2.0";
 
 /// ACT-inspired result of evaluating one applicable target.
 #[derive(
@@ -183,6 +183,9 @@ pub struct CheckReport {
     pub artifact_id: Identifier,
     /// Artifact medium.
     pub artifact_kind: ArtifactKind,
+    /// Independently versioned official extensions consumed by the engine.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub extension_versions: BTreeMap<String, String>,
     /// Outcome counts.
     pub summary: ReportSummary,
     /// Results in stable rule and target order.
@@ -191,7 +194,11 @@ pub struct CheckReport {
 
 impl CheckReport {
     /// Builds a canonical report and derives its summary.
-    pub fn new(document: &ArtifactIr, mut results: Vec<RuleResult>) -> Self {
+    pub fn new(
+        document: &ArtifactIr,
+        extension_versions: BTreeMap<String, String>,
+        mut results: Vec<RuleResult>,
+    ) -> Self {
         for result in &mut results {
             result.evidence_ids.sort();
             result.evidence_ids.dedup();
@@ -220,6 +227,7 @@ impl CheckReport {
             engine_version: env!("CARGO_PKG_VERSION").to_owned(),
             artifact_id: document.artifact.id.clone(),
             artifact_kind: document.artifact.kind,
+            extension_versions,
             summary,
             results,
         }
@@ -248,6 +256,15 @@ impl CheckReport {
             self.summary.inapplicable,
             self.summary.untested
         );
+        if !self.extension_versions.is_empty() {
+            let extensions = self
+                .extension_versions
+                .iter()
+                .map(|(key, version)| format!("{key}@{version}"))
+                .collect::<Vec<_>>()
+                .join(", ");
+            let _ = writeln!(output, "extensions: {extensions}");
+        }
 
         for result in &self.results {
             let aspect = result
