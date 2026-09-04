@@ -6,10 +6,11 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand, ValueEnum};
-use sightlint_engine::RuleOutcome;
+use sightlint_engine::{CheckReport, RuleOutcome};
 use sightlint_ir::ArtifactIr;
 
 const MAX_INPUT_BYTES: u64 = 16 * 1024 * 1024;
+const MAX_BINARY_INPUT_BYTES: u64 = 64 * 1024 * 1024;
 const EXIT_FINDINGS: u8 = 1;
 const EXIT_ERROR: u8 = 2;
 
@@ -29,6 +30,22 @@ enum Command {
     /// Validate an Artifact IR document and run the built-in rules.
     Check {
         /// Artifact IR JSON file, or `-` for standard input.
+        input: PathBuf,
+        /// Report representation written to standard output.
+        #[arg(long, value_enum, default_value_t = OutputFormat::Human)]
+        format: OutputFormat,
+        /// Treat any `cantTell` result as a failing quality gate.
+        #[arg(long)]
+        deny_cant_tell: bool,
+    },
+    /// Adapt a supported image file into canonical Artifact IR JSON.
+    AdaptImage {
+        /// PNG file, or `-` for binary standard input.
+        input: PathBuf,
+    },
+    /// Adapt a supported image and run the built-in rules.
+    CheckImage {
+        /// PNG file, or `-` for binary standard input.
         input: PathBuf,
         /// Report representation written to standard output.
         #[arg(long, value_enum, default_value_t = OutputFormat::Human)]
@@ -75,6 +92,12 @@ fn run(cli: Cli) -> ExitCode {
             format,
             deny_cant_tell,
         } => run_check(&input, format, deny_cant_tell),
+        Command::AdaptImage { input } => run_adapt_image(&input),
+        Command::CheckImage {
+            input,
+            format,
+            deny_cant_tell,
+        } => run_check_image(&input, format, deny_cant_tell),
         Command::Normalize { input } => run_normalize(&input),
         Command::Schema { kind } => {
             let schema = match kind {
@@ -88,11 +111,12 @@ fn run(cli: Cli) -> ExitCode {
         }
         Command::Version => {
             let output = format!(
-                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nReport schema {}\n",
+                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nReport schema {}\nPNG adapter {}\n",
                 env!("CARGO_PKG_VERSION"),
                 sightlint_engine::supported_schema_version(),
                 sightlint_engine::supported_visual_extension_version(),
-                sightlint_engine::REPORT_SCHEMA_VERSION
+                sightlint_engine::REPORT_SCHEMA_VERSION,
+                env!("CARGO_PKG_VERSION")
             );
             write_success(&output)
         }
@@ -104,11 +128,41 @@ fn run_check(input: &Path, format: OutputFormat, deny_cant_tell: bool) -> ExitCo
         Ok(document) => document,
         Err(error) => return fail(error),
     };
-    let report = match sightlint_engine::check(&document) {
+    run_document_check(&document, format, deny_cant_tell)
+}
+
+fn run_adapt_image(input: &Path) -> ExitCode {
+    let document = match load_png_document(input) {
+        Ok(document) => document,
+        Err(error) => return fail(error),
+    };
+    match document.to_canonical_json() {
+        Ok(output) => write_success(&output),
+        Err(error) => fail(format!("failed to serialize adapted Artifact IR: {error}")),
+    }
+}
+
+fn run_check_image(input: &Path, format: OutputFormat, deny_cant_tell: bool) -> ExitCode {
+    let document = match load_png_document(input) {
+        Ok(document) => document,
+        Err(error) => return fail(error),
+    };
+    run_document_check(&document, format, deny_cant_tell)
+}
+
+fn run_document_check(
+    document: &ArtifactIr,
+    format: OutputFormat,
+    deny_cant_tell: bool,
+) -> ExitCode {
+    let report = match sightlint_engine::check(document) {
         Ok(report) => report,
         Err(error) => return fail(error.to_string()),
     };
+    write_report(&report, format, deny_cant_tell)
+}
 
+fn write_report(report: &CheckReport, format: OutputFormat, deny_cant_tell: bool) -> ExitCode {
     let output = match format {
         OutputFormat::Human => report.to_human(),
         OutputFormat::Json => match report.to_canonical_json() {
@@ -152,33 +206,50 @@ fn run_normalize(input: &Path) -> ExitCode {
 }
 
 fn load_document(path: &Path) -> Result<ArtifactIr, String> {
-    let input = read_input(path)?;
+    let input = read_text_input(path)?;
     ArtifactIr::from_json_str(&input).map_err(|error| error.to_string())
 }
 
-fn read_input(path: &Path) -> Result<String, String> {
+fn load_png_document(path: &Path) -> Result<ArtifactIr, String> {
+    let input = read_binary_input(path)?;
+    let source_name = if path.as_os_str() == "-" {
+        None
+    } else {
+        path.file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+    };
+    sightlint_adapter_png::adapt_png(&input, source_name).map_err(|error| error.to_string())
+}
+
+fn read_text_input(path: &Path) -> Result<String, String> {
+    let bytes = read_input_bytes(path, MAX_INPUT_BYTES)?;
+    String::from_utf8(bytes).map_err(|error| format!("input is not valid UTF-8: {error}"))
+}
+
+fn read_binary_input(path: &Path) -> Result<Vec<u8>, String> {
+    read_input_bytes(path, MAX_BINARY_INPUT_BYTES)
+}
+
+fn read_input_bytes(path: &Path, limit: u64) -> Result<Vec<u8>, String> {
     let mut bytes = Vec::new();
     if path.as_os_str() == "-" {
         io::stdin()
             .lock()
-            .take(MAX_INPUT_BYTES + 1)
+            .take(limit + 1)
             .read_to_end(&mut bytes)
             .map_err(|error| format!("failed to read standard input: {error}"))?;
     } else {
         File::open(path)
             .map_err(|error| format!("failed to open {}: {error}", path.display()))?
-            .take(MAX_INPUT_BYTES + 1)
+            .take(limit + 1)
             .read_to_end(&mut bytes)
             .map_err(|error| format!("failed to read {}: {error}", path.display()))?;
     }
 
-    if bytes.len() as u64 > MAX_INPUT_BYTES {
-        return Err(format!(
-            "input exceeds the {MAX_INPUT_BYTES}-byte safety limit"
-        ));
+    if bytes.len() as u64 > limit {
+        return Err(format!("input exceeds the {limit}-byte safety limit"));
     }
-
-    String::from_utf8(bytes).map_err(|error| format!("input is not valid UTF-8: {error}"))
+    Ok(bytes)
 }
 
 fn write_success(output: &str) -> ExitCode {
@@ -201,12 +272,13 @@ fn fail(message: impl AsRef<str>) -> ExitCode {
 
 #[cfg(test)]
 mod tests {
-    use super::{EXIT_ERROR, EXIT_FINDINGS, MAX_INPUT_BYTES};
+    use super::{EXIT_ERROR, EXIT_FINDINGS, MAX_BINARY_INPUT_BYTES, MAX_INPUT_BYTES};
 
     #[test]
-    fn public_exit_code_contract_is_stable() {
+    fn public_exit_code_and_input_limit_contract_is_stable() {
         assert_eq!(EXIT_FINDINGS, 1);
         assert_eq!(EXIT_ERROR, 2);
         assert_eq!(MAX_INPUT_BYTES, 16 * 1024 * 1024);
+        assert_eq!(MAX_BINARY_INPUT_BYTES, 64 * 1024 * 1024);
     }
 }

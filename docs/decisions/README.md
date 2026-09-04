@@ -28,6 +28,9 @@ Accepted decisions:
 - [0016 — Pixels as common observation layer](0016-pixels-as-common-observation-layer.md)
 - [0017 — Derived relations, not redundant facts](0017-derived-relations-not-redundant-facts.md)
 - [0018 — Fixture-driven binary E2E](0018-fixture-driven-binary-e2e.md)
+- [0019 — Version official IR extensions](0019-version-official-ir-extensions.md)
+- [0020 — Explicit visual consistency contracts](0020-explicit-visual-consistency-contracts.md)
+- [0021 — Deterministic PNG adapter boundary](0021-deterministic-png-adapter.md)
 
 Proposed decisions:
 
