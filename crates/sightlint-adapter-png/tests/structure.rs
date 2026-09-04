@@ -122,8 +122,5 @@ fn library_enforces_binary_input_limit_before_chunk_walk() {
     const MAX_PNG_INPUT_BYTES: usize = 64 * 1024 * 1024;
     let mut bytes = png_prefix(8, 6);
     bytes.resize(MAX_PNG_INPUT_BYTES + 1, 0);
-    assert_eq!(
-        structural_error(&bytes),
-        PngStructureError::InputTooLarge
-    );
+    assert_eq!(structural_error(&bytes), PngStructureError::InputTooLarge);
 }
