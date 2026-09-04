@@ -17,6 +17,7 @@ Accepted decisions:
 - [0004 — Isolate probabilistic perception](0004-isolate-probabilistic-perception.md)
 - [0005 — ACT-inspired rule outcomes](0005-act-inspired-rule-outcomes.md)
 - [0006 — Local-first process adapters](0006-local-first-process-adapters.md)
+- [0008 — Development and release gates](0008-development-and-release-gates.md)
 
 Proposed decisions:
 
