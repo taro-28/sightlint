@@ -39,6 +39,9 @@ win. Do not silently reinterpret them.
    user explicitly selects an external adapter.
 10. **Unsafe Rust is forbidden in the trusted kernel** unless an accepted ADR defines a
     tightly bounded exception and its verification plan.
+11. **Public behavior requires fixture-driven binary E2E.** Unit tests alone cannot complete a
+    command, rule, adapter, schema, report, or exit-code change. Execute the built `sightlint`
+    binary against committed pass, fail, ambiguity, and malformed-input fixtures as applicable.
 
 ## Change protocol
 
@@ -47,8 +50,10 @@ win. Do not silently reinterpret them.
 - Describe architectural changes in an ADR before implementing them.
 - A new rule must define its input aspects, applicability, expected outcome, evidence,
   false-positive risks, and fixtures.
+- Every executable rule must include a passing fixture and a targeted mutation fixture. Add
+  `cantTell` and `inapplicable` fixtures whenever those outcomes are meaningful.
 - A new adapter must document trust level, failure modes, units, coordinate transforms,
-  evidence mapping, and privacy behavior.
+  evidence mapping, privacy behavior, and native-input-to-IR E2E fixtures.
 - Do not expand scope merely because a library makes it easy. Follow milestone exit criteria
   in `docs/roadmap.md`.
 - Do not add an LLM, hosted service, database, GUI, or plugin runtime to solve a problem that
@@ -56,13 +61,15 @@ win. Do not silently reinterpret them.
 
 ## Engineering requirements
 
-Before considering a change complete, run or make CI run:
+Before considering a change complete, run or make required CI run:
 
 ```bash
+python3 tools/generate_e2e_fixtures.py --check
 cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-cargo test --workspace --all-features
-RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo test --locked -p sightlint-cli --test e2e
+RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --all-features --no-deps
 ```
 
 Tests must demonstrate behavior, not merely execute code. Prefer:
@@ -72,6 +79,11 @@ Tests must demonstrate behavior, not merely execute code. Prefer:
 - property tests for mathematical invariants
 - mutation fixtures proving a rule can detect its target defect
 - differential tests when two adapters observe the same artifact
+- public-binary E2E for file and standard input, reports, policies, and exit codes
+- byte-for-byte determinism checks across repeated runs and irrelevant input ordering
+
+Generated fixtures remain committed for review. Do not hand-edit them. Change the generator,
+regenerate the corpus, inspect the diff, and keep `--check` green.
 
 ## API and data-model discipline
 
