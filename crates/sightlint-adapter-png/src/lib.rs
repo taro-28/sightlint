@@ -1,12 +1,15 @@
 //! Deterministic PNG metadata adapter for `SightLint`.
 //!
-//! This crate deliberately inspects only the PNG signature and `IHDR` chunk. It does not decode
-//! pixel samples and therefore does not infer ink bounds, text, components, or semantic roles.
+//! This crate validates PNG metadata, the complete chunk stream, and bounded zlib inflation.
+//! Inflated bytes remain PNG-filtered; the adapter does not yet derive pixel colors, ink bounds,
+//! text, components, or semantic roles.
 
 #![forbid(unsafe_code)]
 
+mod inflate;
 mod structure;
 
+pub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};
 pub use structure::{PngStructure, PngStructureError, inspect_png_structure};
 
 use std::collections::BTreeMap;
@@ -93,6 +96,8 @@ pub enum PngAdapterError {
     InvalidInterlaceMethod(u8),
     /// The header is valid but the complete PNG chunk stream is not.
     InvalidStructure(PngStructureError),
+    /// The PNG chunk stream is valid but its compressed image data is not.
+    InvalidImageData(PngInflateError),
     /// The adapter produced IR that violates the current core contract.
     InvalidArtifactIr(String),
 }
@@ -142,6 +147,7 @@ impl fmt::Display for PngAdapterError {
                 write!(formatter, "PNG interlace method {method} is invalid")
             }
             Self::InvalidStructure(error) => error.fmt(formatter),
+            Self::InvalidImageData(error) => error.fmt(formatter),
             Self::InvalidArtifactIr(message) => {
                 write!(
                     formatter,
@@ -213,7 +219,9 @@ pub fn inspect_png_header(input: &[u8]) -> Result<PngHeader, PngAdapterError> {
 /// Returns [`PngAdapterError`] for invalid PNG metadata or if the constructed document fails the
 /// current Artifact IR validation contract.
 pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
-    let structure = inspect_png_structure(input)?;
+    let inflated = inflate_png_scanlines(input)?;
+    let structure = inflated.structure;
+    let inflated_scanline_bytes = inflated.scanline_bytes.len();
     let header = structure.header;
     let evidence_id = Identifier::from("evidence:png-header");
     let canvas_id = Identifier::from("canvas");
@@ -300,7 +308,8 @@ pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr
             "chunkCount": structure.chunk_count,
             "idatChunkCount": structure.idat_chunk_count,
             "idatBytes": structure.idat_bytes,
-            "hasPalette": structure.has_palette
+            "hasPalette": structure.has_palette,
+            "inflatedScanlineBytes": inflated_scanline_bytes
         }),
     );
 
@@ -373,6 +382,35 @@ fn crc32(bytes: &[u8]) -> u32 {
 mod tests {
     use super::{PngAdapterError, adapt_png, crc32, inspect_png_header};
     use sightlint_ir::{ArtifactKind, EvidenceClass, NodeKind, Unit};
+
+    fn adler32(bytes: &[u8]) -> u32 {
+        const MOD_ADLER: u32 = 65_521;
+        let mut a = 1_u32;
+        let mut b = 0_u32;
+        for &byte in bytes {
+            a = (a + u32::from(byte)) % MOD_ADLER;
+            b = (b + a) % MOD_ADLER;
+        }
+        (b << 16) | a
+    }
+
+    fn zlib_stored(bytes: &[u8]) -> Vec<u8> {
+        let mut output = vec![0x78, 0x01];
+        if bytes.is_empty() {
+            output.extend_from_slice(&[0x01, 0x00, 0x00, 0xff, 0xff]);
+        } else {
+            let chunk_count = bytes.len().div_ceil(65_535);
+            for (index, chunk) in bytes.chunks(65_535).enumerate() {
+                output.push(u8::from(index + 1 == chunk_count));
+                let length = u16::try_from(chunk.len()).expect("stored block fits u16");
+                output.extend_from_slice(&length.to_le_bytes());
+                output.extend_from_slice(&(!length).to_le_bytes());
+                output.extend_from_slice(chunk);
+            }
+        }
+        output.extend_from_slice(&adler32(bytes).to_be_bytes());
+        output
+    }
 
     fn append_chunk(bytes: &mut Vec<u8>, kind: [u8; 4], data: &[u8]) {
         let length = u32::try_from(data.len()).expect("test chunk length fits u32");
@@ -477,7 +515,11 @@ mod tests {
 
     #[test]
     fn emits_exact_source_ir_without_invented_ink_or_semantics() {
-        let bytes = png_header(320, 200, 8, 6, 0, 0, 0);
+        let mut bytes = png_header(320, 200, 8, 6, 0, 0, 0);
+        bytes.truncate(33);
+        let decoded = vec![0_u8; 200 * (1 + 320 * 4)];
+        append_chunk(&mut bytes, *b"IDAT", &zlib_stored(&decoded));
+        append_chunk(&mut bytes, *b"IEND", &[]);
         let document = adapt_png(&bytes, Some("sample.png".to_owned())).expect("valid IR");
         assert_eq!(document.artifact.kind, ArtifactKind::Image);
         assert_eq!(document.artifact.source_name.as_deref(), Some("sample.png"));

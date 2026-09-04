@@ -61,6 +61,90 @@ fn crc32(bytes: &[u8]) -> u32 {
     !crc
 }
 
+fn adler32(bytes: &[u8]) -> u32 {
+    const MOD_ADLER: u32 = 65_521;
+    let mut a = 1_u32;
+    let mut b = 0_u32;
+    for &byte in bytes {
+        a = (a + u32::from(byte)) % MOD_ADLER;
+        b = (b + a) % MOD_ADLER;
+    }
+    (b << 16) | a
+}
+
+fn zlib_stored(bytes: &[u8]) -> Vec<u8> {
+    let mut output = vec![0x78, 0x01];
+    if bytes.is_empty() {
+        output.extend_from_slice(&[0x01, 0x00, 0x00, 0xff, 0xff]);
+    } else {
+        let chunk_count = bytes.len().div_ceil(65_535);
+        for (index, chunk) in bytes.chunks(65_535).enumerate() {
+            output.push(u8::from(index + 1 == chunk_count));
+            let length = u16::try_from(chunk.len()).expect("stored block fits u16");
+            output.extend_from_slice(&length.to_le_bytes());
+            output.extend_from_slice(&(!length).to_le_bytes());
+            output.extend_from_slice(chunk);
+        }
+    }
+    output.extend_from_slice(&adler32(bytes).to_be_bytes());
+    output
+}
+
+fn channels(color_type: u8) -> Option<u64> {
+    match color_type {
+        0 | 3 => Some(1),
+        2 => Some(3),
+        4 => Some(2),
+        6 => Some(4),
+        _ => None,
+    }
+}
+
+fn pass_extent(size: u32, start: u32, step: u32) -> u32 {
+    if size <= start {
+        0
+    } else {
+        1 + (size - start - 1) / step
+    }
+}
+
+fn expected_bytes(
+    width: u32,
+    height: u32,
+    depth: u8,
+    color_type: u8,
+    interlace: u8,
+) -> Option<usize> {
+    if width > 1_000 || height > 1_000 || interlace > 1 {
+        return None;
+    }
+    let bits = channels(color_type)? * u64::from(depth);
+    let pass = |w: u32, h: u32| -> u64 {
+        if w == 0 || h == 0 {
+            0
+        } else {
+            u64::from(h) * (1 + (u64::from(w) * bits).div_ceil(8))
+        }
+    };
+    let total = if interlace == 0 {
+        pass(width, height)
+    } else {
+        [
+            (0, 0, 8, 8),
+            (4, 0, 8, 8),
+            (0, 4, 4, 8),
+            (2, 0, 4, 4),
+            (0, 2, 2, 4),
+            (1, 0, 2, 2),
+            (0, 1, 1, 2),
+        ]
+        .into_iter()
+        .map(|(sx, sy, dx, dy)| pass(pass_extent(width, sx, dx), pass_extent(height, sy, dy)))
+        .sum()
+    };
+    usize::try_from(total).ok()
+}
+
 fn append_chunk(bytes: &mut Vec<u8>, kind: [u8; 4], data: &[u8]) {
     let length = u32::try_from(data.len()).expect("test chunk length fits u32");
     bytes.extend_from_slice(&length.to_be_bytes());
@@ -91,7 +175,9 @@ fn png_header(
     if color_type == 3 {
         append_chunk(&mut bytes, *b"PLTE", &[0, 0, 0]);
     }
-    append_chunk(&mut bytes, *b"IDAT", &[]);
+    let decoded = expected_bytes(width, height, bit_depth, color_type, interlace)
+        .map_or_else(Vec::new, |length| vec![0_u8; length]);
+    append_chunk(&mut bytes, *b"IDAT", &zlib_stored(&decoded));
     append_chunk(&mut bytes, *b"IEND", &[]);
     bytes
 }

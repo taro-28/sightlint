@@ -32,6 +32,7 @@ Accepted decisions:
 - [0020 — Explicit visual consistency contracts](0020-explicit-visual-consistency-contracts.md)
 - [0021 — Deterministic PNG adapter boundary](0021-deterministic-png-adapter.md)
 - [0022 — Bounded full-stream PNG chunk validation](0022-bounded-png-chunk-validation.md)
+- [0023 — Bounded PNG IDAT inflation](0023-bounded-png-idat-inflate.md)
 
 Proposed decisions:
 

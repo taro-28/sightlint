@@ -119,7 +119,7 @@ fn channels(color_type: u8) -> u64 {
         2 => 3,
         4 => 2,
         6 => 4,
-        _ => 1,
+        _ => unreachable!("validated test color type"),
     }
 }
 
@@ -193,15 +193,7 @@ fn accepts_exact_zlib_scanline_lengths_and_split_idat() {
     ] {
         let expected = expected_bytes(width, height, depth, color_type, interlace);
         let decoded = vec![0_u8; expected];
-        let png = png_with_data(
-            width,
-            height,
-            depth,
-            color_type,
-            interlace,
-            &decoded,
-            true,
-        );
+        let png = png_with_data(width, height, depth, color_type, interlace, &decoded, true);
         let output = run_stdin(&["adapt-image", "-"], &png);
         assert_eq!(
             output.status.code(),
