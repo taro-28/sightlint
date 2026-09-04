@@ -1,0 +1,5 @@
+[alias]
+check-all = "check --workspace --all-targets --all-features"
+lint = "clippy --workspace --all-targets --all-features -- -D warnings"
+test-all = "test --workspace --all-features"
+docs = "doc --workspace --all-features --no-deps"
