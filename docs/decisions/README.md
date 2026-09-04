@@ -31,6 +31,7 @@ Accepted decisions:
 - [0019 — Version official IR extensions](0019-version-official-ir-extensions.md)
 - [0020 — Explicit visual consistency contracts](0020-explicit-visual-consistency-contracts.md)
 - [0021 — Deterministic PNG adapter boundary](0021-deterministic-png-adapter.md)
+- [0022 — Bounded full-stream PNG chunk validation](0022-bounded-png-chunk-validation.md)
 
 Proposed decisions:
 

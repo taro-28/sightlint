@@ -5,6 +5,10 @@
 
 #![forbid(unsafe_code)]
 
+mod structure;
+
+pub use structure::{PngStructure, PngStructureError, inspect_png_structure};
+
 use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
@@ -87,6 +91,8 @@ pub enum PngAdapterError {
     InvalidFilterMethod(u8),
     /// PNG interlace method is unsupported or invalid.
     InvalidInterlaceMethod(u8),
+    /// The header is valid but the complete PNG chunk stream is not.
+    InvalidStructure(PngStructureError),
     /// The adapter produced IR that violates the current core contract.
     InvalidArtifactIr(String),
 }
@@ -135,6 +141,7 @@ impl fmt::Display for PngAdapterError {
             Self::InvalidInterlaceMethod(method) => {
                 write!(formatter, "PNG interlace method {method} is invalid")
             }
+            Self::InvalidStructure(error) => error.fmt(formatter),
             Self::InvalidArtifactIr(message) => {
                 write!(
                     formatter,
@@ -206,7 +213,8 @@ pub fn inspect_png_header(input: &[u8]) -> Result<PngHeader, PngAdapterError> {
 /// Returns [`PngAdapterError`] for invalid PNG metadata or if the constructed document fails the
 /// current Artifact IR validation contract.
 pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
-    let header = inspect_png_header(input)?;
+    let structure = inspect_png_structure(input)?;
+    let header = structure.header;
     let evidence_id = Identifier::from("evidence:png-header");
     let canvas_id = Identifier::from("canvas");
 
@@ -288,7 +296,11 @@ pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr
             "colorType": header.color_type,
             "compressionMethod": header.compression_method,
             "filterMethod": header.filter_method,
-            "interlaceMethod": header.interlace_method
+            "interlaceMethod": header.interlace_method,
+            "chunkCount": structure.chunk_count,
+            "idatChunkCount": structure.idat_chunk_count,
+            "idatBytes": structure.idat_bytes,
+            "hasPalette": structure.has_palette
         }),
     );
 
@@ -362,6 +374,16 @@ mod tests {
     use super::{PngAdapterError, adapt_png, crc32, inspect_png_header};
     use sightlint_ir::{ArtifactKind, EvidenceClass, NodeKind, Unit};
 
+    fn append_chunk(bytes: &mut Vec<u8>, kind: [u8; 4], data: &[u8]) {
+        let length = u32::try_from(data.len()).expect("test chunk length fits u32");
+        bytes.extend_from_slice(&length.to_be_bytes());
+        bytes.extend_from_slice(&kind);
+        bytes.extend_from_slice(data);
+        let crc_start = bytes.len() - data.len() - 4;
+        let crc = crc32(&bytes[crc_start..]);
+        bytes.extend_from_slice(&crc.to_be_bytes());
+    }
+
     fn png_header(
         width: u32,
         height: u32,
@@ -379,6 +401,11 @@ mod tests {
         bytes.extend_from_slice(&[bit_depth, color_type, compression, filter, interlace]);
         let crc = crc32(&bytes[12..29]);
         bytes.extend_from_slice(&crc.to_be_bytes());
+        if color_type == 3 {
+            append_chunk(&mut bytes, *b"PLTE", &[0, 0, 0]);
+        }
+        append_chunk(&mut bytes, *b"IDAT", &[]);
+        append_chunk(&mut bytes, *b"IEND", &[]);
         bytes
     }
 
