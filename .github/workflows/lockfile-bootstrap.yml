@@ -21,21 +21,11 @@ jobs:
         run: |
           rustup toolchain install 1.85.0 --profile minimal
           rustup toolchain install stable --profile minimal --component rustfmt
-      - name: Apply reviewed source corrections
+      - name: Remove obsolete query shim
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
-          model = Path("crates/sightlint-ir/src/model.rs")
-          text = model.read_text(encoding="utf-8")
-          old = '#[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]'
-          new = '#[serde(tag = "type", rename_all = "camelCase", rename_all_fields = "camelCase", deny_unknown_fields)]'
-          if old in text:
-              text = text.replace(old, new)
-          elif new not in text:
-              raise SystemExit("expected serde enum contract was not found")
-          model.write_text(text, encoding="utf-8", newline="\n")
 
           rules = Path("crates/sightlint-engine/src/rules.rs")
           text = rules.read_text(encoding="utf-8")
