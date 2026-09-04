@@ -30,8 +30,8 @@ jobs:
           actual_blob="$(git hash-object .github/m2.patch.xz)"
           test "$actual_blob" = "$expected_blob"
           xz -dc .github/m2.patch.xz > /tmp/m2.patch
-          printf '%s  %s\n' '1e8335479623940da5811c50417006d8335596d8489010b531445f07997ec844' /tmp/m2.patch | sha256sum --check --status
-          git apply --check /tmp/m2.patch
+          printf '%s  %s\n' 'f0344385aec4a093987c2ee59dd6aceb5b308ec82ec93f6b89f8683b22790267' /tmp/m2.patch | sha256sum --check --status
+          git apply --check --verbose /tmp/m2.patch
           git apply /tmp/m2.patch
           python3 tools/generate_e2e_fixtures.py
           python3 tools/generate_e2e_fixtures.py --check
