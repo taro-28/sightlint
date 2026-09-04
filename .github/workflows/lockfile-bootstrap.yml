@@ -16,11 +16,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install minimum Rust
         run: rustup toolchain install 1.85.0 --profile minimal
-      - name: Generate and print lockfile
-        shell: bash
-        run: |
-          cargo +1.85.0 generate-lockfile
-          echo 'SIGHTLINT_LOCKFILE_BEGIN'
-          base64 -w0 Cargo.lock
-          echo
-          echo 'SIGHTLINT_LOCKFILE_END'
+      - name: Generate lockfile
+        run: cargo +1.85.0 generate-lockfile
+      - name: Upload lockfile
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cargo-lock
+          path: Cargo.lock
+          if-no-files-found: error
+          retention-days: 1
