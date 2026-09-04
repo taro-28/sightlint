@@ -224,10 +224,7 @@ impl VisualExtension {
                     "contract identifiers must not be empty",
                 );
             }
-            validator.require_evidence(
-                contract.evidence_id(),
-                &format!("{path}/evidenceId"),
-            );
+            validator.require_evidence(contract.evidence_id(), &format!("{path}/evidenceId"));
             validate_contract(contract, &path, &mut validator);
         }
 
@@ -237,16 +234,7 @@ impl VisualExtension {
 
 /// Stable category for one official visual extension problem.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    JsonSchema,
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum VisualValidationCode {
@@ -362,9 +350,10 @@ impl ArtifactIr {
         let Some(value) = self.extensions.get(VISUAL_EXTENSION_KEY) else {
             return Ok(None);
         };
-        let extension: VisualExtension = serde_json::from_value(value.clone()).map_err(|error| {
-            VisualExtensionErrors::decode(format!("failed to decode visual extension: {error}"))
-        })?;
+        let extension: VisualExtension =
+            serde_json::from_value(value.clone()).map_err(|error| {
+                VisualExtensionErrors::decode(format!("failed to decode visual extension: {error}"))
+            })?;
         extension.validate(self)?;
         Ok(Some(extension.canonicalized()))
     }
@@ -469,11 +458,7 @@ impl VisualValidator {
     }
 }
 
-fn validate_contract(
-    contract: &VisualContract,
-    path: &str,
-    validator: &mut VisualValidator,
-) {
+fn validate_contract(contract: &VisualContract, path: &str, validator: &mut VisualValidator) {
     let minimum_members = match contract {
         VisualContract::MinimumFontSize { .. } => 1,
         VisualContract::PeerAlignment { .. }
