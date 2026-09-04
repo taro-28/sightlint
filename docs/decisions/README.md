@@ -25,6 +25,7 @@ Accepted decisions:
 - [0013 — Observation provenance](0013-observation-provenance.md)
 - [0014 — Units and coordinate spaces](0014-units-and-coordinate-spaces.md)
 - [0015 — Layout, render, and hit bounds](0015-layout-render-and-hit-bounds.md)
+- [0016 — Pixels as common observation layer](0016-pixels-as-common-observation-layer.md)
 
 Proposed decisions:
 
