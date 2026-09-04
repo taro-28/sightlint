@@ -115,6 +115,24 @@ impl fmt::Display for PngStructureError {
 
 impl Error for PngStructureError {}
 
+#[derive(Debug, Clone, Copy)]
+struct ParsedChunk {
+    kind: [u8; 4],
+    length: u32,
+    data_length: usize,
+    end: usize,
+}
+
+#[derive(Debug, Default)]
+struct StructureState {
+    chunk_count: usize,
+    idat_chunk_count: u32,
+    idat_bytes: u64,
+    saw_palette: bool,
+    saw_idat: bool,
+    idat_closed: bool,
+}
+
 /// Validates the complete PNG chunk stream without decoding compressed image samples.
 ///
 /// # Errors
@@ -139,122 +157,158 @@ fn inspect_png_structure_after_header(
     header: PngHeader,
 ) -> Result<PngStructure, PngStructureError> {
     let mut offset = 8_usize;
-    let mut chunk_count = 0_usize;
-    let mut idat_chunk_count = 0_u32;
-    let mut idat_bytes = 0_u64;
-    let mut saw_palette = false;
-    let mut saw_idat = false;
-    let mut idat_closed = false;
+    let mut state = StructureState::default();
 
     while offset < input.len() {
-        if chunk_count >= MAX_CHUNKS {
+        if state.chunk_count >= MAX_CHUNKS {
             return Err(PngStructureError::TooManyChunks);
         }
-        if input.len() - offset < 12 {
-            return Err(PngStructureError::TruncatedChunk);
+        let chunk = parse_chunk(input, offset)?;
+        state.chunk_count += 1;
+        if let Some(structure) = state.consume(chunk, header, input.len())? {
+            return Ok(structure);
         }
-
-        let length = u32::from_be_bytes(
-            input[offset..offset + 4]
-                .try_into()
-                .expect("four-byte slice"),
-        );
-        let data_length = usize::try_from(length).expect("u32 fits usize on supported platforms");
-        let chunk_end = offset
-            .checked_add(12)
-            .and_then(|value| value.checked_add(data_length))
-            .ok_or(PngStructureError::TruncatedChunk)?;
-        if chunk_end > input.len() {
-            return Err(PngStructureError::TruncatedChunk);
-        }
-
-        let kind_bytes: [u8; 4] = input[offset + 4..offset + 8]
-            .try_into()
-            .expect("four-byte slice");
-        if !kind_bytes.iter().all(u8::is_ascii_alphabetic) {
-            return Err(PngStructureError::InvalidChunkType);
-        }
-        if kind_bytes[2].is_ascii_lowercase() {
-            return Err(PngStructureError::InvalidReservedBit);
-        }
-        let kind = std::str::from_utf8(&kind_bytes).expect("ASCII chunk type");
-        let data_start = offset + 8;
-        let data_end = data_start + data_length;
-        let expected_crc = u32::from_be_bytes(
-            input[data_end..data_end + 4]
-                .try_into()
-                .expect("four-byte slice"),
-        );
-        if crc32(&input[offset + 4..data_end]) != expected_crc {
-            return Err(PngStructureError::InvalidChunkCrc(kind.to_owned()));
-        }
-
-        chunk_count += 1;
-        match kind {
-            "IHDR" => {
-                if chunk_count != 1 {
-                    return Err(PngStructureError::DuplicateIhdr);
-                }
-            }
-            "PLTE" => {
-                if saw_palette {
-                    return Err(PngStructureError::DuplicatePalette);
-                }
-                if saw_idat {
-                    return Err(PngStructureError::PaletteAfterImageData);
-                }
-                if matches!(header.color_type, 0 | 4) {
-                    return Err(PngStructureError::PaletteForbidden);
-                }
-                validate_palette_length(data_length, header)?;
-                saw_palette = true;
-            }
-            "IDAT" => {
-                if idat_closed {
-                    return Err(PngStructureError::NonConsecutiveImageData);
-                }
-                if header.color_type == 3 && !saw_palette {
-                    return Err(PngStructureError::PaletteRequired);
-                }
-                saw_idat = true;
-                idat_chunk_count = idat_chunk_count.saturating_add(1);
-                idat_bytes = idat_bytes.saturating_add(u64::from(length));
-            }
-            "IEND" => {
-                if length != 0 {
-                    return Err(PngStructureError::InvalidIendLength);
-                }
-                if !saw_idat {
-                    return Err(PngStructureError::MissingImageData);
-                }
-                if chunk_end != input.len() {
-                    return Err(PngStructureError::TrailingBytes);
-                }
-                return Ok(PngStructure {
-                    header,
-                    chunk_count: u32::try_from(chunk_count).expect("chunk budget fits u32"),
-                    idat_chunk_count,
-                    idat_bytes,
-                    has_palette: saw_palette,
-                });
-            }
-            _ => {
-                if kind_bytes[0].is_ascii_uppercase() {
-                    return Err(PngStructureError::UnknownCriticalChunk(kind.to_owned()));
-                }
-            }
-        }
-
-        if saw_idat && kind != "IDAT" {
-            idat_closed = true;
-        }
-        offset = chunk_end;
+        offset = chunk.end;
     }
 
-    if !saw_idat {
-        Err(PngStructureError::MissingImageData)
-    } else {
+    if state.saw_idat {
         Err(PngStructureError::MissingIend)
+    } else {
+        Err(PngStructureError::MissingImageData)
+    }
+}
+
+fn parse_chunk(input: &[u8], offset: usize) -> Result<ParsedChunk, PngStructureError> {
+    if input.len() - offset < 12 {
+        return Err(PngStructureError::TruncatedChunk);
+    }
+
+    let length = u32::from_be_bytes(
+        input[offset..offset + 4]
+            .try_into()
+            .expect("four-byte slice"),
+    );
+    let data_length = usize::try_from(length).expect("u32 fits usize on supported platforms");
+    let end = offset
+        .checked_add(12)
+        .and_then(|value| value.checked_add(data_length))
+        .ok_or(PngStructureError::TruncatedChunk)?;
+    if end > input.len() {
+        return Err(PngStructureError::TruncatedChunk);
+    }
+
+    let kind: [u8; 4] = input[offset + 4..offset + 8]
+        .try_into()
+        .expect("four-byte slice");
+    if !kind.iter().all(u8::is_ascii_alphabetic) {
+        return Err(PngStructureError::InvalidChunkType);
+    }
+    if kind[2].is_ascii_lowercase() {
+        return Err(PngStructureError::InvalidReservedBit);
+    }
+
+    let data_end = offset + 8 + data_length;
+    let expected_crc = u32::from_be_bytes(
+        input[data_end..data_end + 4]
+            .try_into()
+            .expect("four-byte slice"),
+    );
+    if crc32(&input[offset + 4..data_end]) != expected_crc {
+        return Err(PngStructureError::InvalidChunkCrc(chunk_name(kind)));
+    }
+
+    Ok(ParsedChunk {
+        kind,
+        length,
+        data_length,
+        end,
+    })
+}
+
+impl StructureState {
+    fn consume(
+        &mut self,
+        chunk: ParsedChunk,
+        header: PngHeader,
+        input_length: usize,
+    ) -> Result<Option<PngStructure>, PngStructureError> {
+        let kind = chunk_name(chunk.kind);
+        match kind.as_str() {
+            "IHDR" if self.chunk_count != 1 => return Err(PngStructureError::DuplicateIhdr),
+            "IHDR" => {}
+            "PLTE" => self.consume_palette(chunk, header)?,
+            "IDAT" => self.consume_image_data(chunk, header)?,
+            "IEND" => return self.finish(chunk, header, input_length).map(Some),
+            _ if chunk.kind[0].is_ascii_uppercase() => {
+                return Err(PngStructureError::UnknownCriticalChunk(kind));
+            }
+            _ => {}
+        }
+
+        if self.saw_idat && chunk.kind != *b"IDAT" {
+            self.idat_closed = true;
+        }
+        Ok(None)
+    }
+
+    fn consume_palette(
+        &mut self,
+        chunk: ParsedChunk,
+        header: PngHeader,
+    ) -> Result<(), PngStructureError> {
+        if self.saw_palette {
+            return Err(PngStructureError::DuplicatePalette);
+        }
+        if self.saw_idat {
+            return Err(PngStructureError::PaletteAfterImageData);
+        }
+        if matches!(header.color_type, 0 | 4) {
+            return Err(PngStructureError::PaletteForbidden);
+        }
+        validate_palette_length(chunk.data_length, header)?;
+        self.saw_palette = true;
+        Ok(())
+    }
+
+    fn consume_image_data(
+        &mut self,
+        chunk: ParsedChunk,
+        header: PngHeader,
+    ) -> Result<(), PngStructureError> {
+        if self.idat_closed {
+            return Err(PngStructureError::NonConsecutiveImageData);
+        }
+        if header.color_type == 3 && !self.saw_palette {
+            return Err(PngStructureError::PaletteRequired);
+        }
+        self.saw_idat = true;
+        self.idat_chunk_count = self.idat_chunk_count.saturating_add(1);
+        self.idat_bytes = self.idat_bytes.saturating_add(u64::from(chunk.length));
+        Ok(())
+    }
+
+    fn finish(
+        &self,
+        chunk: ParsedChunk,
+        header: PngHeader,
+        input_length: usize,
+    ) -> Result<PngStructure, PngStructureError> {
+        if chunk.length != 0 {
+            return Err(PngStructureError::InvalidIendLength);
+        }
+        if !self.saw_idat {
+            return Err(PngStructureError::MissingImageData);
+        }
+        if chunk.end != input_length {
+            return Err(PngStructureError::TrailingBytes);
+        }
+        Ok(PngStructure {
+            header,
+            chunk_count: u32::try_from(self.chunk_count).expect("chunk budget fits u32"),
+            idat_chunk_count: self.idat_chunk_count,
+            idat_bytes: self.idat_bytes,
+            has_palette: self.saw_palette,
+        })
     }
 }
 
@@ -270,4 +324,10 @@ fn validate_palette_length(data_length: usize, header: PngHeader) -> Result<(), 
         }
     }
     Ok(())
+}
+
+fn chunk_name(kind: [u8; 4]) -> String {
+    std::str::from_utf8(&kind)
+        .expect("validated ASCII chunk type")
+        .to_owned()
 }
