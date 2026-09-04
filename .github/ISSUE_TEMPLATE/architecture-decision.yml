@@ -1,7 +1,7 @@
 name: Architecture decision
- description: Propose a durable change to a project invariant or subsystem boundary
- title: "adr: "
- body:
+description: Propose a durable change to a project invariant or subsystem boundary
+title: "adr: "
+body:
   - type: textarea
     id: context
     attributes:
