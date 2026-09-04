@@ -85,7 +85,10 @@ impl fmt::Display for PngStructureError {
             }
             Self::DuplicateIhdr => formatter.write_str("PNG contains more than one IHDR chunk"),
             Self::InvalidChunkCrc(kind) => {
-                write!(formatter, "PNG {kind} chunk CRC-32 does not match its payload")
+                write!(
+                    formatter,
+                    "PNG {kind} chunk CRC-32 does not match its payload"
+                )
             }
             Self::DuplicatePalette => formatter.write_str("PNG contains more than one PLTE chunk"),
             Self::PaletteAfterImageData => {

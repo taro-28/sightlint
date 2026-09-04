@@ -61,6 +61,16 @@ fn crc32(bytes: &[u8]) -> u32 {
     !crc
 }
 
+fn append_chunk(bytes: &mut Vec<u8>, kind: [u8; 4], data: &[u8]) {
+    let length = u32::try_from(data.len()).expect("test chunk length fits u32");
+    bytes.extend_from_slice(&length.to_be_bytes());
+    bytes.extend_from_slice(&kind);
+    bytes.extend_from_slice(data);
+    let crc_start = bytes.len() - data.len() - 4;
+    let crc = crc32(&bytes[crc_start..]);
+    bytes.extend_from_slice(&crc.to_be_bytes());
+}
+
 fn png_header(
     width: u32,
     height: u32,
@@ -78,6 +88,11 @@ fn png_header(
     bytes.extend_from_slice(&[bit_depth, color_type, compression, filter, interlace]);
     let crc = crc32(&bytes[12..29]);
     bytes.extend_from_slice(&crc.to_be_bytes());
+    if color_type == 3 {
+        append_chunk(&mut bytes, *b"PLTE", &[0, 0, 0]);
+    }
+    append_chunk(&mut bytes, *b"IDAT", &[]);
+    append_chunk(&mut bytes, *b"IEND", &[]);
     bytes
 }
 
