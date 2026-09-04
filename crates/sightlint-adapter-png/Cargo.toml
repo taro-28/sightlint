@@ -1,0 +1,15 @@
+[package]
+name = "sightlint-adapter-png"
+description = "Deterministic PNG metadata adapter for SightLint"
+publish = false
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde_json.workspace = true
+sightlint-ir = { path = "../sightlint-ir" }
+
+[lints]
+workspace = true
