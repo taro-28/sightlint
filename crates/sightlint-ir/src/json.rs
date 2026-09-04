@@ -6,7 +6,10 @@ use std::fmt;
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::{ArtifactIr, Relation, ValidationErrors};
+use crate::visual::canonicalize_visual_extension;
+use crate::{
+    ArtifactIr, Relation, VISUAL_EXTENSION_KEY, ValidationErrors, VisualExtensionErrors,
+};
 
 /// Failure while decoding or validating an Artifact IR JSON document.
 #[derive(Debug)]
@@ -15,6 +18,8 @@ pub enum LoadError {
     Json(serde_json::Error),
     /// Input decoded successfully but violates Artifact IR invariants.
     Validation(ValidationErrors),
+    /// The recognized official visual extension is malformed or invalid.
+    VisualExtension(VisualExtensionErrors),
 }
 
 impl fmt::Display for LoadError {
@@ -22,6 +27,7 @@ impl fmt::Display for LoadError {
         match self {
             Self::Json(error) => write!(formatter, "failed to decode Artifact IR JSON: {error}"),
             Self::Validation(errors) => errors.fmt(formatter),
+            Self::VisualExtension(errors) => errors.fmt(formatter),
         }
     }
 }
@@ -31,24 +37,29 @@ impl Error for LoadError {
         match self {
             Self::Json(error) => Some(error),
             Self::Validation(errors) => Some(errors),
+            Self::VisualExtension(errors) => Some(errors),
         }
     }
 }
 
 impl ArtifactIr {
-    /// Parses and validates a JSON Artifact IR document.
+    /// Parses and validates a JSON Artifact IR document and every recognized official extension.
     ///
     /// # Errors
     ///
-    /// Returns [`LoadError::Json`] for decoding failures and
-    /// [`LoadError::Validation`] for structural or provenance failures.
+    /// Returns [`LoadError::Json`] for decoding failures, [`LoadError::Validation`] for core
+    /// structural or provenance failures, and [`LoadError::VisualExtension`] for invalid official
+    /// visual-extension data.
     pub fn from_json_str(input: &str) -> Result<Self, LoadError> {
         let document: Self = serde_json::from_str(input).map_err(LoadError::Json)?;
         document.validate().map_err(LoadError::Validation)?;
+        document
+            .visual_extension()
+            .map_err(LoadError::VisualExtension)?;
         Ok(document)
     }
 
-    /// Returns a clone with all unordered top-level collections in canonical order.
+    /// Returns a clone with all unordered collections in canonical order.
     #[must_use]
     pub fn canonicalized(&self) -> Self {
         let mut canonical = self.clone();
@@ -69,6 +80,10 @@ impl ArtifactIr {
             if let Relation::NonOverlapping { node_ids, .. } = relation {
                 node_ids.sort();
             }
+        }
+
+        if let Some(extension) = canonical.extensions.get_mut(VISUAL_EXTENSION_KEY) {
+            canonicalize_visual_extension(extension);
         }
 
         canonical
