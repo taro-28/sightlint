@@ -1034,13 +1034,11 @@ mod tests {
             evidence_id: &evidence,
             canvas: &canvas,
         };
-        assert_eq!(
-            alignment_coordinate(
-                rect,
-                sightlint_ir::Axis::Horizontal,
-                sightlint_ir::AlignmentAnchor::Start
-            ),
-            100.0
+        let coordinate = alignment_coordinate(
+            rect,
+            sightlint_ir::Axis::Horizontal,
+            sightlint_ir::AlignmentAnchor::Start,
         );
+        assert!((coordinate - 100.0).abs() < f64::EPSILON);
     }
 }
