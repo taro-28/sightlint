@@ -1,3 +1,5 @@
+//! Integration tests for bounded complete PNG chunk-stream validation.
+
 use sightlint_adapter_png::{PngAdapterError, PngStructureError, inspect_png_structure};
 
 fn crc32(bytes: &[u8]) -> u32 {
