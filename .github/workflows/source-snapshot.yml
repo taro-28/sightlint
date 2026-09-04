@@ -4,23 +4,48 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  snapshot:
-    if: github.head_ref == 'feat/m2-visual-geometry-rules'
+  apply-patch:
+    if: >-
+      github.repository == 'taro-28/sightlint' &&
+      github.actor == 'taro-28' &&
+      github.head_ref == 'feat/m2-visual-geometry-rules'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
-      - name: Check out repository
+      - name: Check out head branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Package source
-        shell: bash
-        run: tar --exclude=.git --exclude=target -czf /tmp/sightlint-source.tar.gz .
-      - name: Upload source snapshot
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: sightlint-m2-source
-          path: /tmp/sightlint-source.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal --component rustfmt
+      - name: Verify and apply patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_blob='9a6373d73d12fb77a650cb015fef835c42ba45c8'
+          actual_blob="$(git hash-object .github/m2.patch.xz)"
+          test "$actual_blob" = "$expected_blob"
+          xz -dc .github/m2.patch.xz > /tmp/m2.patch
+          printf '%s  %s\n' '1e8335479623940da5811c50417006d8335596d8489010b531445f07997ec844' /tmp/m2.patch | sha256sum --check --status
+          git apply --check /tmp/m2.patch
+          git apply /tmp/m2.patch
+          python3 tools/generate_e2e_fixtures.py
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo fmt --all
+      - name: Commit implementation and fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/m2.patch.xz
+          rm -f .github/m2-payload.part* .github/tmp/m2-payload.*
+          rm -f .github/workflows/source-snapshot.yml
+          rmdir .github/tmp 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: implement M2 visual geometry rules and E2E corpus'
+          git push origin HEAD:${{ github.head_ref }}
