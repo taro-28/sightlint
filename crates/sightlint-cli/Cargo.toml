@@ -12,7 +12,10 @@ name = "sightlint"
 path = "src/main.rs"
 
 [dependencies]
+clap.workspace = true
+serde_json.workspace = true
 sightlint-engine = { path = "../sightlint-engine" }
+sightlint-ir = { path = "../sightlint-ir" }
 
 [lints]
 workspace = true
