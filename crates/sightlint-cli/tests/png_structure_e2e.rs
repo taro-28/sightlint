@@ -109,6 +109,23 @@ fn complete_stream_metadata_is_exposed_deterministically() {
 }
 
 #[test]
+fn accepts_structurally_valid_unknown_ancillary_chunks() {
+    let mut png = png_prefix(8, 6);
+    append_chunk(&mut png, *b"vpAg", &[9, 8, 7]);
+    append_chunk(&mut png, *b"IDAT", &[]);
+    append_chunk(&mut png, *b"IEND", &[]);
+
+    let output = run_stdin(&png);
+    assert_eq!(output.status.code(), Some(EXIT_SUCCESS));
+    assert!(output.stderr.is_empty());
+    let ir: Value = serde_json::from_slice(&output.stdout).expect("canonical IR JSON");
+    assert_eq!(
+        ir["extensions"]["org.sightlint.adapter.png"]["chunkCount"],
+        4
+    );
+}
+
+#[test]
 fn rejects_missing_or_invalid_termination() {
     let mut missing_iend = png_prefix(8, 6);
     append_chunk(&mut missing_iend, *b"IDAT", &[]);
