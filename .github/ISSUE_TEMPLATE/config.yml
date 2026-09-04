@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Architecture discussion
+    url: https://github.com/taro-28/sightlint/discussions
+    about: Discuss broad ideas before proposing a new subsystem.

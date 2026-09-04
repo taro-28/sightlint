@@ -1,0 +1,11 @@
+[package]
+name = "sightlint-ir"
+description = "Language-neutral intermediate representation contracts for SightLint"
+publish = false
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
