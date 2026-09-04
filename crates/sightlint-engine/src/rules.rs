@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use sightlint_ir::{Axis, BoxKind, Identifier, Relation, Unit};
 
 use crate::geometry::{
-    QueryContext, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
+    QueryContext, ResolvedRect, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
 };
 use crate::report::{
     Measurement, RuleKind, RuleMaturity, RuleOutcome, RuleResult, Target, TargetKind,
@@ -88,95 +88,84 @@ impl AtomicRule for BoundsWithinCanvasRule {
 
         for node in nodes {
             for box_kind in [BoxKind::Layout, BoxKind::Render, BoxKind::Ink, BoxKind::Hit] {
-                let Ok(Some(observed)) = context.rect(&node.id, box_kind) else {
-                    continue;
-                };
-                let tolerance = 0.0;
-                let passed = within_canvas(observed.rect, observed.canvas, tolerance);
-                let message = if passed {
-                    format!(
-                        "{} is fully contained by canvas {}",
-                        box_kind.as_str(),
-                        observed.canvas.id
-                    )
-                } else {
-                    format!(
-                        "{} extends outside canvas {}",
-                        box_kind.as_str(),
-                        observed.canvas.id
-                    )
-                };
-                let mut measurements = BTreeMap::new();
-                insert_measurement(&mut measurements, "x", observed.rect.x, observed.unit);
-                insert_measurement(&mut measurements, "y", observed.rect.y, observed.unit);
-                insert_measurement(
-                    &mut measurements,
-                    "width",
-                    observed.rect.width,
-                    observed.unit,
-                );
-                insert_measurement(
-                    &mut measurements,
-                    "height",
-                    observed.rect.height,
-                    observed.unit,
-                );
-                insert_measurement(
-                    &mut measurements,
-                    "canvasWidth",
-                    observed.canvas.size.width,
-                    observed.unit,
-                );
-                insert_measurement(
-                    &mut measurements,
-                    "canvasHeight",
-                    observed.canvas.size.height,
-                    observed.unit,
-                );
-
-                results.push(build_result(
-                    self.definition(),
-                    Target {
-                        kind: TargetKind::Node,
-                        id: node.id.clone(),
-                        aspect: Some(box_kind.as_str().to_owned()),
-                    },
-                    if passed {
-                        RuleOutcome::Passed
-                    } else {
-                        RuleOutcome::Failed
-                    },
-                    message,
-                    vec![
-                        observed.evidence_id.clone(),
-                        observed.canvas.evidence_id.clone(),
-                    ],
-                    vec![node.id.clone()],
-                    measurements,
-                    context,
-                ));
+                if let Ok(Some(observed)) = context.rect(&node.id, box_kind) {
+                    results.push(evaluate_bound(
+                        self.definition(),
+                        context,
+                        &node.id,
+                        box_kind,
+                        observed,
+                    ));
+                }
             }
         }
 
         if results.is_empty() {
-            results.push(build_result(
+            results.push(inapplicable_result(
                 self.definition(),
-                Target {
-                    kind: TargetKind::Artifact,
-                    id: context.document().artifact.id.clone(),
-                    aspect: None,
-                },
-                RuleOutcome::Inapplicable,
-                "the artifact contains no observed node bounds".to_owned(),
-                Vec::new(),
-                Vec::new(),
-                BTreeMap::new(),
                 context,
+                "the artifact contains no observed node bounds",
             ));
         }
 
         results
     }
+}
+
+fn evaluate_bound(
+    definition: &RuleDefinition,
+    context: &QueryContext<'_>,
+    node_id: &Identifier,
+    box_kind: BoxKind,
+    observed: ResolvedRect<'_>,
+) -> RuleResult {
+    let passed = within_canvas(observed.rect, observed.canvas, 0.0);
+    let message = if passed {
+        format!(
+            "{} is fully contained by canvas {}",
+            box_kind.as_str(),
+            observed.canvas.id
+        )
+    } else {
+        format!(
+            "{} extends outside canvas {}",
+            box_kind.as_str(),
+            observed.canvas.id
+        )
+    };
+    let mut measurements = BTreeMap::new();
+    for (name, value) in [
+        ("x", observed.rect.x),
+        ("y", observed.rect.y),
+        ("width", observed.rect.width),
+        ("height", observed.rect.height),
+        ("canvasWidth", observed.canvas.size.width),
+        ("canvasHeight", observed.canvas.size.height),
+    ] {
+        insert_measurement(&mut measurements, name, value, observed.unit);
+    }
+
+    build_result(
+        definition,
+        Target {
+            kind: TargetKind::Node,
+            id: node_id.clone(),
+            aspect: Some(box_kind.as_str().to_owned()),
+        },
+        if passed {
+            RuleOutcome::Passed
+        } else {
+            RuleOutcome::Failed
+        },
+        message,
+        vec![
+            observed.evidence_id.clone(),
+            observed.canvas.evidence_id.clone(),
+        ],
+        vec![node_id.clone()],
+        measurements,
+        context,
+    )
 }
 
 struct DeclaredNonOverlapRule;
@@ -199,155 +188,199 @@ impl AtomicRule for DeclaredNonOverlapRule {
     }
 
     fn evaluate(&self, context: &QueryContext<'_>) -> Vec<RuleResult> {
-        let mut results = Vec::new();
         let mut relations = context
             .document()
             .relations
             .iter()
-            .filter_map(|relation| match relation {
-                Relation::NonOverlapping { .. } => Some(relation),
-                Relation::PeerSequence { .. } => None,
-            })
+            .filter(|relation| matches!(relation, Relation::NonOverlapping { .. }))
             .collect::<Vec<_>>();
         relations.sort_by(|left, right| left.id().cmp(right.id()));
 
-        for relation in relations {
-            let Relation::NonOverlapping {
-                id,
-                node_ids,
-                box_kind,
-                tolerance,
-                evidence_id,
-            } = relation
-            else {
-                unreachable!("relation was filtered by variant")
-            };
-
-            let mut evidence_ids = vec![evidence_id.clone()];
-            let mut ambiguous = Vec::new();
-            let mut overlaps = Vec::new();
-            let mut maximum_horizontal: f64 = 0.0;
-            let mut maximum_vertical: f64 = 0.0;
-            let mut unit = None;
-
-            for first_index in 0..node_ids.len() {
-                for second_index in (first_index + 1)..node_ids.len() {
-                    let first_id = &node_ids[first_index];
-                    let second_id = &node_ids[second_index];
-                    let pair = format!("{first_id} and {second_id}");
-                    let first = context.rect(first_id, *box_kind);
-                    let second = context.rect(second_id, *box_kind);
-                    match (first, second) {
-                        (Ok(Some(first)), Ok(Some(second))) => {
-                            evidence_ids.push(first.evidence_id.clone());
-                            evidence_ids.push(second.evidence_id.clone());
-                            if let Err(error) = ensure_comparable(first, second) {
-                                ambiguous.push(format!("{pair}: {error}"));
-                                continue;
-                            }
-                            unit.get_or_insert(first.unit);
-                            let (horizontal, vertical) = overlap_extents(first.rect, second.rect);
-                            maximum_horizontal = maximum_horizontal.max(horizontal);
-                            maximum_vertical = maximum_vertical.max(vertical);
-                            if horizontal > *tolerance && vertical > *tolerance {
-                                overlaps.push(format!(
-                                    "{pair} overlap by {horizontal} × {vertical} {}",
-                                    unit_label(first.unit)
-                                ));
-                            }
-                        }
-                        (Ok(None), _) | (_, Ok(None)) => ambiguous.push(format!(
-                            "{pair}: {} is missing for at least one node",
-                            box_kind.as_str()
-                        )),
-                        (Err(error), _) | (_, Err(error)) => {
-                            ambiguous.push(format!("{pair}: {error}"));
-                        }
-                    }
-                }
-            }
-
-            let (outcome, message) = if !overlaps.is_empty() {
-                (
-                    RuleOutcome::Failed,
-                    format!(
-                        "{} declared pair(s) overlap; first violation: {}",
-                        overlaps.len(),
-                        overlaps[0]
-                    ),
-                )
-            } else if !ambiguous.is_empty() {
-                (
-                    RuleOutcome::CantTell,
-                    format!(
-                        "non-overlap could not be established for {} pair(s); first reason: {}",
-                        ambiguous.len(),
-                        ambiguous[0]
-                    ),
-                )
-            } else {
-                (
-                    RuleOutcome::Passed,
-                    format!(
-                        "all {} declared node pair(s) stay within the {} tolerance",
-                        pair_count(node_ids.len()),
-                        tolerance
-                    ),
-                )
-            };
-
-            let mut measurements = BTreeMap::new();
-            if let Some(unit) = unit {
-                insert_measurement(
-                    &mut measurements,
-                    "maximumHorizontalOverlap",
-                    maximum_horizontal,
-                    unit,
-                );
-                insert_measurement(
-                    &mut measurements,
-                    "maximumVerticalOverlap",
-                    maximum_vertical,
-                    unit,
-                );
-                insert_measurement(&mut measurements, "tolerance", *tolerance, unit);
-            }
-
-            results.push(build_result(
-                self.definition(),
-                Target {
-                    kind: TargetKind::Relation,
-                    id: id.clone(),
-                    aspect: Some(box_kind.as_str().to_owned()),
-                },
-                outcome,
-                message,
-                evidence_ids,
-                node_ids.clone(),
-                measurements,
-                context,
-            ));
-        }
+        let mut results = relations
+            .into_iter()
+            .map(|relation| evaluate_non_overlap_relation(self.definition(), context, relation))
+            .collect::<Vec<_>>();
 
         if results.is_empty() {
-            results.push(build_result(
+            results.push(inapplicable_result(
                 self.definition(),
-                Target {
-                    kind: TargetKind::Artifact,
-                    id: context.document().artifact.id.clone(),
-                    aspect: None,
-                },
-                RuleOutcome::Inapplicable,
-                "the artifact declares no non-overlap relation".to_owned(),
-                Vec::new(),
-                Vec::new(),
-                BTreeMap::new(),
                 context,
+                "the artifact declares no non-overlap relation",
             ));
         }
 
         results
     }
+}
+
+#[derive(Debug, Default)]
+struct NonOverlapAnalysis {
+    evidence_ids: Vec<Identifier>,
+    ambiguous: Vec<String>,
+    overlaps: Vec<String>,
+    maximum_horizontal: f64,
+    maximum_vertical: f64,
+    unit: Option<Unit>,
+}
+
+fn evaluate_non_overlap_relation(
+    definition: &RuleDefinition,
+    context: &QueryContext<'_>,
+    relation: &Relation,
+) -> RuleResult {
+    let Relation::NonOverlapping {
+        id,
+        node_ids,
+        box_kind,
+        tolerance,
+        evidence_id,
+    } = relation
+    else {
+        unreachable!("relation was filtered by variant")
+    };
+
+    let analysis = analyze_non_overlap(context, node_ids, *box_kind, *tolerance, evidence_id);
+    let (outcome, message) = non_overlap_outcome(&analysis, node_ids.len(), *tolerance);
+    let measurements = non_overlap_measurements(&analysis, *tolerance);
+
+    build_result(
+        definition,
+        Target {
+            kind: TargetKind::Relation,
+            id: id.clone(),
+            aspect: Some(box_kind.as_str().to_owned()),
+        },
+        outcome,
+        message,
+        analysis.evidence_ids,
+        node_ids.clone(),
+        measurements,
+        context,
+    )
+}
+
+fn analyze_non_overlap(
+    context: &QueryContext<'_>,
+    node_ids: &[Identifier],
+    box_kind: BoxKind,
+    tolerance: f64,
+    relation_evidence_id: &Identifier,
+) -> NonOverlapAnalysis {
+    let mut analysis = NonOverlapAnalysis {
+        evidence_ids: vec![relation_evidence_id.clone()],
+        ..NonOverlapAnalysis::default()
+    };
+
+    for first_index in 0..node_ids.len() {
+        for second_index in (first_index + 1)..node_ids.len() {
+            analyze_non_overlap_pair(
+                context,
+                &node_ids[first_index],
+                &node_ids[second_index],
+                box_kind,
+                tolerance,
+                &mut analysis,
+            );
+        }
+    }
+
+    analysis
+}
+
+fn analyze_non_overlap_pair(
+    context: &QueryContext<'_>,
+    first_id: &Identifier,
+    second_id: &Identifier,
+    box_kind: BoxKind,
+    tolerance: f64,
+    analysis: &mut NonOverlapAnalysis,
+) {
+    let pair = format!("{first_id} and {second_id}");
+    let first = context.rect(first_id, box_kind);
+    let second = context.rect(second_id, box_kind);
+
+    match (first, second) {
+        (Ok(Some(first)), Ok(Some(second))) => {
+            analysis.evidence_ids.push(first.evidence_id.clone());
+            analysis.evidence_ids.push(second.evidence_id.clone());
+            if let Err(error) = ensure_comparable(first, second) {
+                analysis.ambiguous.push(format!("{pair}: {error}"));
+                return;
+            }
+            analysis.unit.get_or_insert(first.unit);
+            let (horizontal, vertical) = overlap_extents(first.rect, second.rect);
+            analysis.maximum_horizontal = analysis.maximum_horizontal.max(horizontal);
+            analysis.maximum_vertical = analysis.maximum_vertical.max(vertical);
+            if horizontal > tolerance && vertical > tolerance {
+                analysis.overlaps.push(format!(
+                    "{pair} overlap by {horizontal} × {vertical} {}",
+                    unit_label(first.unit)
+                ));
+            }
+        }
+        (Ok(None), _) | (_, Ok(None)) => analysis.ambiguous.push(format!(
+            "{pair}: {} is missing for at least one node",
+            box_kind.as_str()
+        )),
+        (Err(error), _) | (_, Err(error)) => {
+            analysis.ambiguous.push(format!("{pair}: {error}"));
+        }
+    }
+}
+
+fn non_overlap_outcome(
+    analysis: &NonOverlapAnalysis,
+    member_count: usize,
+    tolerance: f64,
+) -> (RuleOutcome, String) {
+    if let Some(first) = analysis.overlaps.first() {
+        return (
+            RuleOutcome::Failed,
+            format!(
+                "{} declared pair(s) overlap; first violation: {first}",
+                analysis.overlaps.len()
+            ),
+        );
+    }
+    if let Some(first) = analysis.ambiguous.first() {
+        return (
+            RuleOutcome::CantTell,
+            format!(
+                "non-overlap could not be established for {} pair(s); first reason: {first}",
+                analysis.ambiguous.len()
+            ),
+        );
+    }
+    (
+        RuleOutcome::Passed,
+        format!(
+            "all {} declared node pair(s) stay within the {tolerance} tolerance",
+            pair_count(member_count)
+        ),
+    )
+}
+
+fn non_overlap_measurements(
+    analysis: &NonOverlapAnalysis,
+    tolerance: f64,
+) -> BTreeMap<String, Measurement> {
+    let mut measurements = BTreeMap::new();
+    if let Some(unit) = analysis.unit {
+        insert_measurement(
+            &mut measurements,
+            "maximumHorizontalOverlap",
+            analysis.maximum_horizontal,
+            unit,
+        );
+        insert_measurement(
+            &mut measurements,
+            "maximumVerticalOverlap",
+            analysis.maximum_vertical,
+            unit,
+        );
+        insert_measurement(&mut measurements, "tolerance", tolerance, unit);
+    }
+    measurements
 }
 
 struct PeerSpacingConsistencyRule;
@@ -370,166 +403,213 @@ impl AtomicRule for PeerSpacingConsistencyRule {
     }
 
     fn evaluate(&self, context: &QueryContext<'_>) -> Vec<RuleResult> {
-        let mut results = Vec::new();
         let mut relations = context
             .document()
             .relations
             .iter()
-            .filter_map(|relation| match relation {
-                Relation::PeerSequence { .. } => Some(relation),
-                Relation::NonOverlapping { .. } => None,
-            })
+            .filter(|relation| matches!(relation, Relation::PeerSequence { .. }))
             .collect::<Vec<_>>();
         relations.sort_by(|left, right| left.id().cmp(right.id()));
 
-        for relation in relations {
-            let Relation::PeerSequence {
-                id,
-                node_ids,
-                axis,
-                box_kind,
-                expected_gap,
-                tolerance,
-                evidence_id,
-            } = relation
-            else {
-                unreachable!("relation was filtered by variant")
-            };
-
-            let mut evidence_ids = vec![evidence_id.clone()];
-            let mut resolved = Vec::with_capacity(node_ids.len());
-            let mut reason = None;
-            for node_id in node_ids {
-                match context.rect(node_id, *box_kind) {
-                    Ok(Some(rect)) => {
-                        evidence_ids.push(rect.evidence_id.clone());
-                        resolved.push(rect);
-                    }
-                    Ok(None) => {
-                        reason = Some(format!(
-                            "node {node_id} has no {} observation",
-                            box_kind.as_str()
-                        ));
-                        break;
-                    }
-                    Err(error) => {
-                        reason = Some(error.to_string());
-                        break;
-                    }
-                }
-            }
-
-            let mut gaps = Vec::new();
-            if reason.is_none() {
-                for pair in resolved.windows(2) {
-                    match ordered_gap(pair[0], pair[1], *axis) {
-                        Ok(gap) => gaps.push(gap),
-                        Err(error) => {
-                            reason = Some(error.to_string());
-                            break;
-                        }
-                    }
-                }
-            }
-
-            let unit = resolved.first().map(|rect| rect.unit);
-            let (outcome, message, baseline) = if let Some(reason) = reason {
-                (
-                    RuleOutcome::CantTell,
-                    format!("peer spacing cannot be compared: {reason}"),
-                    None,
-                )
-            } else if expected_gap.is_none() && gaps.len() < 2 {
-                (
-                    RuleOutcome::CantTell,
-                    "at least three peers or an explicit expectedGap are required".to_owned(),
-                    None,
-                )
-            } else {
-                let baseline = expected_gap.unwrap_or_else(|| median(&gaps));
-                let maximum_deviation = gaps
-                    .iter()
-                    .map(|gap| (gap - baseline).abs())
-                    .fold(0.0_f64, f64::max);
-                if maximum_deviation > *tolerance {
-                    (
-                        RuleOutcome::Failed,
-                        format!(
-                            "maximum gap deviation {maximum_deviation} exceeds tolerance {tolerance}"
-                        ),
-                        Some(baseline),
-                    )
-                } else {
-                    (
-                        RuleOutcome::Passed,
-                        format!(
-                            "all {} adjacent gap(s) are within tolerance {tolerance}",
-                            gaps.len()
-                        ),
-                        Some(baseline),
-                    )
-                }
-            };
-
-            let mut measurements = BTreeMap::new();
-            if let Some(unit) = unit {
-                if let Some(baseline) = baseline {
-                    insert_measurement(&mut measurements, "baselineGap", baseline, unit);
-                    let maximum_deviation = gaps
-                        .iter()
-                        .map(|gap| (gap - baseline).abs())
-                        .fold(0.0_f64, f64::max);
-                    insert_measurement(
-                        &mut measurements,
-                        "maximumDeviation",
-                        maximum_deviation,
-                        unit,
-                    );
-                }
-                if let Some(minimum) = gaps.iter().copied().reduce(f64::min) {
-                    insert_measurement(&mut measurements, "minimumGap", minimum, unit);
-                }
-                if let Some(maximum) = gaps.iter().copied().reduce(f64::max) {
-                    insert_measurement(&mut measurements, "maximumGap", maximum, unit);
-                }
-                insert_measurement(&mut measurements, "tolerance", *tolerance, unit);
-            }
-
-            results.push(build_result(
-                self.definition(),
-                Target {
-                    kind: TargetKind::Relation,
-                    id: id.clone(),
-                    aspect: Some(format!("{}:{}", axis_label(*axis), box_kind.as_str())),
-                },
-                outcome,
-                message,
-                evidence_ids,
-                node_ids.clone(),
-                measurements,
-                context,
-            ));
-        }
+        let mut results = relations
+            .into_iter()
+            .map(|relation| evaluate_peer_sequence(self.definition(), context, relation))
+            .collect::<Vec<_>>();
 
         if results.is_empty() {
-            results.push(build_result(
+            results.push(inapplicable_result(
                 self.definition(),
-                Target {
-                    kind: TargetKind::Artifact,
-                    id: context.document().artifact.id.clone(),
-                    aspect: None,
-                },
-                RuleOutcome::Inapplicable,
-                "the artifact declares no peer sequence".to_owned(),
-                Vec::new(),
-                Vec::new(),
-                BTreeMap::new(),
                 context,
+                "the artifact declares no peer sequence",
             ));
         }
 
         results
     }
+}
+
+#[derive(Debug, Default)]
+struct PeerSpacingAnalysis<'a> {
+    evidence_ids: Vec<Identifier>,
+    rects: Vec<ResolvedRect<'a>>,
+    gaps: Vec<f64>,
+    reason: Option<String>,
+}
+
+fn evaluate_peer_sequence(
+    definition: &RuleDefinition,
+    context: &QueryContext<'_>,
+    relation: &Relation,
+) -> RuleResult {
+    let Relation::PeerSequence {
+        id,
+        node_ids,
+        axis,
+        box_kind,
+        expected_gap,
+        tolerance,
+        evidence_id,
+    } = relation
+    else {
+        unreachable!("relation was filtered by variant")
+    };
+
+    let analysis = analyze_peer_spacing(context, node_ids, *axis, *box_kind, evidence_id);
+    let (outcome, message, baseline) =
+        peer_spacing_outcome(&analysis, *expected_gap, *tolerance);
+    let measurements = peer_spacing_measurements(&analysis, baseline, *tolerance);
+
+    build_result(
+        definition,
+        Target {
+            kind: TargetKind::Relation,
+            id: id.clone(),
+            aspect: Some(format!("{}:{}", axis_label(*axis), box_kind.as_str())),
+        },
+        outcome,
+        message,
+        analysis.evidence_ids,
+        node_ids.clone(),
+        measurements,
+        context,
+    )
+}
+
+fn analyze_peer_spacing<'a>(
+    context: &QueryContext<'a>,
+    node_ids: &[Identifier],
+    axis: Axis,
+    box_kind: BoxKind,
+    relation_evidence_id: &Identifier,
+) -> PeerSpacingAnalysis<'a> {
+    let mut analysis = PeerSpacingAnalysis {
+        evidence_ids: vec![relation_evidence_id.clone()],
+        ..PeerSpacingAnalysis::default()
+    };
+
+    for node_id in node_ids {
+        match context.rect(node_id, box_kind) {
+            Ok(Some(rect)) => {
+                analysis.evidence_ids.push(rect.evidence_id.clone());
+                analysis.rects.push(rect);
+            }
+            Ok(None) => {
+                analysis.reason = Some(format!(
+                    "node {node_id} has no {} observation",
+                    box_kind.as_str()
+                ));
+                return analysis;
+            }
+            Err(error) => {
+                analysis.reason = Some(error.to_string());
+                return analysis;
+            }
+        }
+    }
+
+    for pair in analysis.rects.windows(2) {
+        match ordered_gap(pair[0], pair[1], axis) {
+            Ok(gap) => analysis.gaps.push(gap),
+            Err(error) => {
+                analysis.reason = Some(error.to_string());
+                break;
+            }
+        }
+    }
+
+    analysis
+}
+
+fn peer_spacing_outcome(
+    analysis: &PeerSpacingAnalysis<'_>,
+    expected_gap: Option<f64>,
+    tolerance: f64,
+) -> (RuleOutcome, String, Option<f64>) {
+    if let Some(reason) = &analysis.reason {
+        return (
+            RuleOutcome::CantTell,
+            format!("peer spacing cannot be compared: {reason}"),
+            None,
+        );
+    }
+    if expected_gap.is_none() && analysis.gaps.len() < 2 {
+        return (
+            RuleOutcome::CantTell,
+            "at least three peers or an explicit expectedGap are required".to_owned(),
+            None,
+        );
+    }
+
+    let baseline = expected_gap.unwrap_or_else(|| median(&analysis.gaps));
+    let maximum_deviation = maximum_deviation(&analysis.gaps, baseline);
+    if maximum_deviation > tolerance {
+        (
+            RuleOutcome::Failed,
+            format!(
+                "maximum gap deviation {maximum_deviation} exceeds tolerance {tolerance}"
+            ),
+            Some(baseline),
+        )
+    } else {
+        (
+            RuleOutcome::Passed,
+            format!(
+                "all {} adjacent gap(s) are within tolerance {tolerance}",
+                analysis.gaps.len()
+            ),
+            Some(baseline),
+        )
+    }
+}
+
+fn peer_spacing_measurements(
+    analysis: &PeerSpacingAnalysis<'_>,
+    baseline: Option<f64>,
+    tolerance: f64,
+) -> BTreeMap<String, Measurement> {
+    let mut measurements = BTreeMap::new();
+    let Some(unit) = analysis.rects.first().map(|rect| rect.unit) else {
+        return measurements;
+    };
+
+    if let Some(baseline) = baseline {
+        insert_measurement(&mut measurements, "baselineGap", baseline, unit);
+        insert_measurement(
+            &mut measurements,
+            "maximumDeviation",
+            maximum_deviation(&analysis.gaps, baseline),
+            unit,
+        );
+    }
+    if let Some(minimum) = analysis.gaps.iter().copied().reduce(f64::min) {
+        insert_measurement(&mut measurements, "minimumGap", minimum, unit);
+    }
+    if let Some(maximum) = analysis.gaps.iter().copied().reduce(f64::max) {
+        insert_measurement(&mut measurements, "maximumGap", maximum, unit);
+    }
+    insert_measurement(&mut measurements, "tolerance", tolerance, unit);
+    measurements
+}
+
+fn inapplicable_result(
+    definition: &RuleDefinition,
+    context: &QueryContext<'_>,
+    message: &str,
+) -> RuleResult {
+    build_result(
+        definition,
+        Target {
+            kind: TargetKind::Artifact,
+            id: context.document().artifact.id.clone(),
+            aspect: None,
+        },
+        RuleOutcome::Inapplicable,
+        message.to_owned(),
+        Vec::new(),
+        Vec::new(),
+        BTreeMap::new(),
+        context,
+    )
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -585,10 +665,17 @@ fn median(values: &[f64]) -> f64 {
     values.sort_by(f64::total_cmp);
     let middle = values.len() / 2;
     if values.len() % 2 == 0 {
-        (values[middle - 1] + values[middle]) / 2.0
+        values[middle - 1] / 2.0 + values[middle] / 2.0
     } else {
         values[middle]
     }
+}
+
+fn maximum_deviation(values: &[f64], baseline: f64) -> f64 {
+    values
+        .iter()
+        .map(|value| (value - baseline).abs())
+        .fold(0.0_f64, f64::max)
 }
 
 const fn pair_count(member_count: usize) -> usize {
@@ -620,8 +707,10 @@ mod tests {
 
     #[test]
     fn median_is_stable_for_even_and_odd_inputs() {
-        assert_eq!(median(&[9.0, 1.0, 5.0]), 5.0);
-        assert_eq!(median(&[9.0, 1.0, 5.0, 3.0]), 4.0);
+        let odd = median(&[9.0, 1.0, 5.0]);
+        let even = median(&[9.0, 1.0, 5.0, 3.0]);
+        assert!((odd - 5.0).abs() <= f64::EPSILON);
+        assert!((even - 4.0).abs() <= f64::EPSILON);
     }
 
     #[test]
