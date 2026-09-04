@@ -1,0 +1,39 @@
+name: M3 bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-deterministic-png-adapter
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-lock:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-deterministic-png-adapter
+          fetch-depth: 0
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+      - name: Update lockfile and verify implementation
+        run: |
+          cargo generate-lockfile
+          cargo fmt --all
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified lockfile and formatting
+        shell: bash
+        run: |
+          rm .github/workflows/m3-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'build: lock and format deterministic PNG adapter'
+          git push origin HEAD:feat/m3-deterministic-png-adapter
