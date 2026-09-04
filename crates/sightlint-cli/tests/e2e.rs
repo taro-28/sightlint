@@ -115,10 +115,7 @@ fn clean_fixture_runs_the_complete_pipeline_in_both_report_formats() {
 fn mutation_fixtures_kill_each_initial_rule() {
     for (fixture_name, expected_rule) in [
         ("fail-bounds.json", "visual.bounds.within-canvas"),
-        (
-            "fail-overlap.json",
-            "visual.geometry.declared-non-overlap",
-        ),
+        ("fail-overlap.json", "visual.geometry.declared-non-overlap"),
         ("fail-spacing.json", "visual.spacing.peer-consistency"),
     ] {
         let output = check_json(fixture_name, &[]);
@@ -135,10 +132,7 @@ fn mutation_fixtures_kill_each_initial_rule() {
 
 #[test]
 fn ambiguous_evidence_abstains_and_only_fails_under_explicit_strict_policy() {
-    for name in [
-        "cant-tell-missing-box.json",
-        "cant-tell-cross-canvas.json",
-    ] {
+    for name in ["cant-tell-missing-box.json", "cant-tell-cross-canvas.json"] {
         let advisory = check_json(name, &[]);
         assert_code(&advisory, EXIT_SUCCESS);
         let report = parse_stdout(&advisory);
@@ -154,24 +148,15 @@ fn ambiguous_evidence_abstains_and_only_fails_under_explicit_strict_policy() {
 fn invalid_and_malformed_inputs_are_rejected_with_stable_error_exit_code() {
     for (name, expected_message) in [
         ("invalid-json.json", "failed to decode Artifact IR JSON"),
-        (
-            "invalid-schema-version.json",
-            "UnsupportedSchemaVersion",
-        ),
+        ("invalid-schema-version.json", "UnsupportedSchemaVersion"),
         ("invalid-reference.json", "InvalidReference"),
         ("invalid-cycle.json", "HierarchyCycle"),
         ("invalid-confidence.json", "InvalidConfidence"),
         ("invalid-uncertainty.json", "InvalidUncertainty"),
         ("invalid-negative-geometry.json", "NegativeDimension"),
-        (
-            "invalid-missing-confidence.json",
-            "MissingConfidence",
-        ),
+        ("invalid-missing-confidence.json", "MissingConfidence"),
         ("invalid-empty-identifier.json", "EmptyIdentifier"),
-        (
-            "invalid-duplicate-identifier.json",
-            "DuplicateIdentifier",
-        ),
+        ("invalid-duplicate-identifier.json", "DuplicateIdentifier"),
     ] {
         let output = check_json(name, &[]);
         assert_code(&output, EXIT_ERROR);
@@ -241,13 +226,7 @@ fn report_bytes_are_deterministic_across_ordering_stdin_and_repeated_runs() {
 #[test]
 fn the_same_core_contract_accepts_every_planned_static_artifact_kind() {
     for kind in [
-        "web",
-        "mobile",
-        "slide",
-        "document",
-        "pdf",
-        "image",
-        "other",
+        "web", "mobile", "slide", "document", "pdf", "image", "other",
     ] {
         let output = check_json(&format!("pass-{kind}.json"), &[]);
         assert_code(&output, EXIT_SUCCESS);
@@ -274,10 +253,7 @@ fn schema_and_version_commands_expose_machine_and_human_contract_versions() {
     let schema = run(&mut schema_command, None);
     assert_code(&schema, EXIT_SUCCESS);
     let schema_json = parse_stdout(&schema);
-    assert_eq!(
-        schema_json["$id"],
-        "urn:sightlint:schema:artifact-ir:0.1.0"
-    );
+    assert_eq!(schema_json["$id"], "urn:sightlint:schema:artifact-ir:0.1.0");
 
     let mut version_command = binary();
     version_command.arg("version");
