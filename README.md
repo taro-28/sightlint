@@ -108,6 +108,7 @@ The corpus includes:
 - missing and incomparable evidence that must return `cantTell`
 - inapplicable rule cases
 - zero and non-zero tolerance boundaries for declared visual contracts
+- explicit right-to-left and vertical-up logical alignment cases
 - malformed JSON, malformed official visual extensions, and semantically invalid IR
 - reordered but semantically equivalent documents and visual contracts
 - preservation of unknown extension payloads while the official visual extension is validated and canonicalized
