@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "0.1.0",
+  "artifact": {
+    "id": "artifact-inapplicable",
+    "kind": "image",
+    "title": "Fixture artifact",
+    "sourceName": "artifact-inapplicable.json"
+  },
+  "canvases": [
+    {
+      "id": "canvas-main",
+      "size": {
+        "width": 400.0,
+        "height": 300.0
+      },
+      "unit": "devicePixel",
+      "horizontalDirection": "right",
+      "verticalDirection": "down",
+      "evidenceId": "e-render"
+    }
+  ],
+  "nodes": [],
+  "relations": [],
+  "evidence": [
+    {
+      "id": "e-source",
+      "class": "exactSource",
+      "source": {
+        "adapter": "fixture-native",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-render",
+      "class": "exactRender",
+      "source": {
+        "adapter": "fixture-renderer",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-contract",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "fixture-contract",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    }
+  ]
+}

@@ -27,6 +27,7 @@ Accepted decisions:
 - [0015 — Layout, render, and hit bounds](0015-layout-render-and-hit-bounds.md)
 - [0016 — Pixels as common observation layer](0016-pixels-as-common-observation-layer.md)
 - [0017 — Derived relations, not redundant facts](0017-derived-relations-not-redundant-facts.md)
+- [0018 — Fixture-driven binary E2E](0018-fixture-driven-binary-e2e.md)
 
 Proposed decisions:
 
