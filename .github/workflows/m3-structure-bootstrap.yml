@@ -59,11 +59,11 @@ jobs:
           if text.count(marker) != 1:
               raise SystemExit('unit png_header marker mismatch')
           text = text.replace(marker, helper + marker)
-          old_tail = '''        let crc = crc32(&bytes[12..29]);\n        bytes.extend_from_slice(&crc.to_be_bytes());\n        bytes\n    }\n'''
-          new_tail = '''        let crc = crc32(&bytes[12..29]);\n        bytes.extend_from_slice(&crc.to_be_bytes());\n        if color_type == 3 {\n            append_chunk(&mut bytes, b"PLTE", &[0, 0, 0]);\n        }\n        append_chunk(&mut bytes, b"IDAT", &[]);\n        append_chunk(&mut bytes, b"IEND", &[]);\n        bytes\n    }\n'''
-          if text.count(old_tail) != 1:
-              raise SystemExit(f'unit png tail mismatch: {text.count(old_tail)}')
-          lib.write_text(text.replace(old_tail, new_tail))
+          unit_old_tail = '''        let crc = crc32(&bytes[12..29]);\n        bytes.extend_from_slice(&crc.to_be_bytes());\n        bytes\n    }\n'''
+          unit_new_tail = '''        let crc = crc32(&bytes[12..29]);\n        bytes.extend_from_slice(&crc.to_be_bytes());\n        if color_type == 3 {\n            append_chunk(&mut bytes, b"PLTE", &[0, 0, 0]);\n        }\n        append_chunk(&mut bytes, b"IDAT", &[]);\n        append_chunk(&mut bytes, b"IEND", &[]);\n        bytes\n    }\n'''
+          if text.count(unit_old_tail) != 1:
+              raise SystemExit(f'unit png tail mismatch: {text.count(unit_old_tail)}')
+          lib.write_text(text.replace(unit_old_tail, unit_new_tail))
 
           e2e = Path('crates/sightlint-cli/tests/png_e2e.rs')
           text = e2e.read_text()
@@ -72,9 +72,11 @@ jobs:
           if text.count(marker) != 1:
               raise SystemExit('e2e png_header marker mismatch')
           text = text.replace(marker, helper + marker)
-          if text.count(old_tail) != 1:
-              raise SystemExit(f'e2e png tail mismatch: {text.count(old_tail)}')
-          e2e.write_text(text.replace(old_tail, new_tail))
+          e2e_old_tail = '''    let crc = crc32(&bytes[12..29]);\n    bytes.extend_from_slice(&crc.to_be_bytes());\n    bytes\n}\n'''
+          e2e_new_tail = '''    let crc = crc32(&bytes[12..29]);\n    bytes.extend_from_slice(&crc.to_be_bytes());\n    if color_type == 3 {\n        append_chunk(&mut bytes, b"PLTE", &[0, 0, 0]);\n    }\n    append_chunk(&mut bytes, b"IDAT", &[]);\n    append_chunk(&mut bytes, b"IEND", &[]);\n    bytes\n}\n'''
+          if text.count(e2e_old_tail) != 1:
+              raise SystemExit(f'e2e png tail mismatch: {text.count(e2e_old_tail)}')
+          e2e.write_text(text.replace(e2e_old_tail, e2e_new_tail))
           PY
       - name: Verify all current behavior
         run: |
