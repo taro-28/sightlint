@@ -2,9 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use sightlint_ir::{
-    Axis, BoxKind, EvidenceClass, Identifier, Relation, Unit,
-};
+use sightlint_ir::{Axis, BoxKind, EvidenceClass, Identifier, Relation, Unit};
 
 use crate::geometry::{
     QueryContext, QueryError, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
@@ -89,12 +87,7 @@ impl AtomicRule for BoundsWithinCanvasRule {
         nodes.sort_by(|left, right| left.id.cmp(&right.id));
 
         for node in nodes {
-            for box_kind in [
-                BoxKind::Layout,
-                BoxKind::Render,
-                BoxKind::Ink,
-                BoxKind::Hit,
-            ] {
+            for box_kind in [BoxKind::Layout, BoxKind::Render, BoxKind::Ink, BoxKind::Hit] {
                 let Ok(Some(observed)) = context.rect(&node.id, box_kind) else {
                     continue;
                 };
@@ -154,7 +147,10 @@ impl AtomicRule for BoundsWithinCanvasRule {
                         RuleOutcome::Failed
                     },
                     message,
-                    vec![observed.evidence_id.clone(), observed.canvas.evidence_id.clone()],
+                    vec![
+                        observed.evidence_id.clone(),
+                        observed.canvas.evidence_id.clone(),
+                    ],
                     vec![node.id.clone()],
                     measurements,
                     context,
@@ -250,8 +246,7 @@ impl AtomicRule for DeclaredNonOverlapRule {
                                 continue;
                             }
                             unit.get_or_insert(first.unit);
-                            let (horizontal, vertical) =
-                                overlap_extents(first.rect, second.rect);
+                            let (horizontal, vertical) = overlap_extents(first.rect, second.rect);
                             maximum_horizontal = maximum_horizontal.max(horizontal);
                             maximum_vertical = maximum_vertical.max(vertical);
                             if horizontal > *tolerance && vertical > *tolerance {

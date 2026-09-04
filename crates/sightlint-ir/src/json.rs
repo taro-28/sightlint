@@ -54,7 +54,9 @@ impl ArtifactIr {
         canonical
             .canvases
             .sort_by(|left, right| left.id.cmp(&right.id));
-        canonical.nodes.sort_by(|left, right| left.id.cmp(&right.id));
+        canonical
+            .nodes
+            .sort_by(|left, right| left.id.cmp(&right.id));
         canonical
             .relations
             .sort_by(|left, right| left.id().cmp(right.id()));

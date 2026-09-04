@@ -10,12 +10,12 @@ mod model;
 mod schema;
 mod validation;
 
-pub use json::{serialize_canonical, LoadError};
+pub use json::{LoadError, serialize_canonical};
 pub use model::{
-    ArtifactDescriptor, ArtifactIr, ArtifactKind, Axis, BoxKind, Canvas,
-    CategoricalAlternative, Evidence, EvidenceClass, EvidenceSource, Geometry,
-    HorizontalDirection, Identifier, Node, NodeKind, Observed, ObservedRect, Rect, Relation,
-    Selector, Size, Uncertainty, Unit, VerticalDirection,
+    ArtifactDescriptor, ArtifactIr, ArtifactKind, Axis, BoxKind, Canvas, CategoricalAlternative,
+    Evidence, EvidenceClass, EvidenceSource, Geometry, HorizontalDirection, Identifier, Node,
+    NodeKind, Observed, ObservedRect, Rect, Relation, Selector, Size, Uncertainty, Unit,
+    VerticalDirection,
 };
 pub use schema::artifact_ir_schema_json;
 pub use validation::{ValidationCode, ValidationErrors, ValidationIssue};

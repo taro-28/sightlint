@@ -464,17 +464,16 @@ impl Relation {
     /// Returns the evidence supporting the relation.
     pub fn evidence_id(&self) -> &Identifier {
         match self {
-            Self::NonOverlapping { evidence_id, .. }
-            | Self::PeerSequence { evidence_id, .. } => evidence_id,
+            Self::NonOverlapping { evidence_id, .. } | Self::PeerSequence { evidence_id, .. } => {
+                evidence_id
+            }
         }
     }
 
     /// Returns relation member identifiers.
     pub fn node_ids(&self) -> &[Identifier] {
         match self {
-            Self::NonOverlapping { node_ids, .. } | Self::PeerSequence { node_ids, .. } => {
-                node_ids
-            }
+            Self::NonOverlapping { node_ids, .. } | Self::PeerSequence { node_ids, .. } => node_ids,
         }
     }
 }

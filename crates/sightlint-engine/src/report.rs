@@ -14,16 +14,7 @@ pub const REPORT_SCHEMA_VERSION: &str = "0.1.0";
 
 /// ACT-inspired result of evaluating one applicable target.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    JsonSchema,
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum RuleOutcome {
@@ -76,16 +67,7 @@ pub enum RuleMaturity {
 
 /// Stable kind of target evaluated by a rule.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    JsonSchema,
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum TargetKind {
@@ -213,7 +195,9 @@ impl CheckReport {
         for result in &mut results {
             result.evidence_ids.sort();
             result.evidence_ids.dedup();
-            result.evidence_classes.sort_by_key(|class| evidence_class_order(*class));
+            result
+                .evidence_classes
+                .sort_by_key(|class| evidence_class_order(*class));
             result.evidence_classes.dedup();
             result.related_node_ids.sort();
             result.related_node_ids.dedup();

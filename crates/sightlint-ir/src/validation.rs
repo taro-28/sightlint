@@ -14,16 +14,7 @@ use crate::{
 
 /// Stable category for one Artifact IR validation problem.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    JsonSchema,
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum ValidationCode {
@@ -309,12 +300,7 @@ struct Validator {
 }
 
 impl Validator {
-    fn issue(
-        &mut self,
-        code: ValidationCode,
-        path: impl Into<String>,
-        message: impl Into<String>,
-    ) {
+    fn issue(&mut self, code: ValidationCode, path: impl Into<String>, message: impl Into<String>) {
         self.issues.push(ValidationIssue {
             code,
             path: path.into(),
