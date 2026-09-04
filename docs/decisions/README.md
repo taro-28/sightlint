@@ -24,6 +24,7 @@ Accepted decisions:
 - [0012 — Rule authoring lifecycle](0012-rule-authoring-lifecycle.md)
 - [0013 — Observation provenance](0013-observation-provenance.md)
 - [0014 — Units and coordinate spaces](0014-units-and-coordinate-spaces.md)
+- [0015 — Layout, render, and hit bounds](0015-layout-render-and-hit-bounds.md)
 
 Proposed decisions:
 
