@@ -455,8 +455,7 @@ fn evaluate_peer_sequence(
     };
 
     let analysis = analyze_peer_spacing(context, node_ids, *axis, *box_kind, evidence_id);
-    let (outcome, message, baseline) =
-        peer_spacing_outcome(&analysis, *expected_gap, *tolerance);
+    let (outcome, message, baseline) = peer_spacing_outcome(&analysis, *expected_gap, *tolerance);
     let measurements = peer_spacing_measurements(&analysis, baseline, *tolerance);
 
     build_result(
@@ -545,9 +544,7 @@ fn peer_spacing_outcome(
     if maximum_deviation > tolerance {
         (
             RuleOutcome::Failed,
-            format!(
-                "maximum gap deviation {maximum_deviation} exceeds tolerance {tolerance}"
-            ),
+            format!("maximum gap deviation {maximum_deviation} exceeds tolerance {tolerance}"),
             Some(baseline),
         )
     } else {
