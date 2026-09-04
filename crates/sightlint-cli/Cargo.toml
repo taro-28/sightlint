@@ -1,0 +1,18 @@
+[package]
+name = "sightlint-cli"
+description = "Command-line interface for SightLint"
+publish = false
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "sightlint"
+path = "src/main.rs"
+
+[dependencies]
+sightlint-engine = { path = "../sightlint-engine" }
+
+[lints]
+workspace = true
