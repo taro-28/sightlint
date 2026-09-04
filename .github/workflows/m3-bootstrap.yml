@@ -20,6 +20,52 @@ jobs:
           fetch-depth: 0
       - name: Install Rust toolchain
         run: rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+      - name: Apply lint corrections
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = path.read_text()
+
+          replacements = [
+              (
+                  'use std::error::Error;\nuse std::fmt;\n',
+                  'use std::collections::BTreeMap;\nuse std::error::Error;\nuse std::fmt;\n',
+              ),
+              (
+                  'const IHDR_DATA_LENGTH: u32 = 13;\n',
+                  'const IHDR_DATA_LENGTH: u32 = 13;\nconst REQUIRED_HEADER_BYTES: usize = 8 + 4 + 4 + 13 + 4;\n',
+              ),
+              (
+                  '    // Signature + length + type + 13 data bytes + CRC.\n    const REQUIRED_HEADER_BYTES: usize = 8 + 4 + 4 + 13 + 4;\n',
+                  '    // Signature + length + type + 13 data bytes + CRC.\n',
+              ),
+              (
+                  '    DimensionTooLarge { width: u32, height: u32 },',
+                  '''    DimensionTooLarge {\n        /// Width declared by IHDR.\n        width: u32,\n        /// Height declared by IHDR.\n        height: u32,\n    },''',
+              ),
+              (
+                  '    PixelCountTooLarge { width: u32, height: u32 },',
+                  '''    PixelCountTooLarge {\n        /// Width declared by IHDR.\n        width: u32,\n        /// Height declared by IHDR.\n        height: u32,\n    },''',
+              ),
+              (
+                  '    InvalidBitDepth { bit_depth: u8, color_type: u8 },',
+                  '''    InvalidBitDepth {\n        /// Bit depth declared by IHDR.\n        bit_depth: u8,\n        /// Color type declared by IHDR.\n        color_type: u8,\n    },''',
+              ),
+              ('            extensions: Default::default(),', '            extensions: BTreeMap::default(),'),
+              ('        extensions: Default::default(),', '        extensions: BTreeMap::default(),'),
+          ]
+
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected one occurrence, got {count}: {old!r}')
+              text = text.replace(old, new)
+
+          path.write_text(text)
+          PY
       - name: Update lockfile and verify implementation
         run: |
           cargo generate-lockfile
@@ -27,7 +73,7 @@ jobs:
           cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
           cargo test --locked --workspace --all-features
           RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
-      - name: Commit verified lockfile and formatting
+      - name: Commit verified implementation and lockfile
         shell: bash
         run: |
           rm .github/workflows/m3-bootstrap.yml
@@ -35,5 +81,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git diff --cached --check
-          git commit -m 'build: lock and format deterministic PNG adapter'
+          git commit -m 'fix: verify deterministic PNG adapter and lockfile'
           git push origin HEAD:feat/m3-deterministic-png-adapter
