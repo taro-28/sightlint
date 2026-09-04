@@ -30,16 +30,20 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal --component clippy --component rustfmt
           rustup default stable
+      - name: Verify committed E2E fixtures
+        run: python3 tools/generate_e2e_fixtures.py --check
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run Clippy
-        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Run tests
-        run: cargo test --workspace --all-features
+        run: cargo test --locked --workspace --all-features
+      - name: Run fixture-driven CLI E2E explicitly
+        run: cargo test --locked -p sightlint-cli --test e2e
       - name: Build documentation
         env:
           RUSTDOCFLAGS: -D warnings
-        run: cargo doc --workspace --all-features --no-deps
+        run: cargo doc --locked --workspace --all-features --no-deps
 
   msrv:
     name: Minimum Rust 1.85.0
@@ -71,5 +75,5 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal
           rustup default stable
-      - name: Run tests
+      - name: Run tests, including CLI E2E
         run: cargo test --workspace --all-features --locked
