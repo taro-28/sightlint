@@ -349,7 +349,12 @@ pub struct EvidenceSource {
 
 /// Source selector identifying where evidence originated.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
+#[serde(
+    tag = "type",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase",
+    deny_unknown_fields
+)]
 pub enum Selector {
     /// JSON Pointer into a structured source document.
     JsonPointer {
@@ -379,7 +384,12 @@ pub enum Selector {
 
 /// Explicit representation of uncertainty in an evidence record.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
+#[serde(
+    tag = "type",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase",
+    deny_unknown_fields
+)]
 pub enum Uncertainty {
     /// Closed numeric interval.
     ScalarRange {
@@ -418,7 +428,12 @@ pub struct CategoricalAlternative {
 
 /// Source-declared or inferred relationship between nodes.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
+#[serde(
+    tag = "type",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase",
+    deny_unknown_fields
+)]
 pub enum Relation {
     /// Nodes expected not to overlap under the selected geometry kind.
     NonOverlapping {

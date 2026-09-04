@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use sightlint_ir::{Axis, BoxKind, EvidenceClass, Identifier, Relation, Unit};
+use sightlint_ir::{Axis, BoxKind, Identifier, Relation, Unit};
 
 use crate::geometry::{
     QueryContext, QueryError, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
