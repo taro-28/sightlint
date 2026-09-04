@@ -40,9 +40,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git restore --source=HEAD -- .github/workflows/ci.yml
           rm -f .github/m2.patch.xz
           rm -f .github/m2-payload.part* .github/tmp/m2-payload.*
-          rm -f .github/workflows/source-snapshot.yml
           rmdir .github/tmp 2>/dev/null || true
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
