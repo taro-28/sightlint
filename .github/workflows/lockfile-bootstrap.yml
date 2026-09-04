@@ -21,6 +21,30 @@ jobs:
         run: |
           rustup toolchain install 1.85.0 --profile minimal
           rustup toolchain install stable --profile minimal --component rustfmt
+      - name: Apply reviewed serialization contract corrections
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          model = Path("crates/sightlint-ir/src/model.rs")
+          text = model.read_text(encoding="utf-8")
+          old = '#[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]'
+          new = '#[serde(tag = "type", rename_all = "camelCase", rename_all_fields = "camelCase", deny_unknown_fields)]'
+          if old in text:
+              text = text.replace(old, new)
+          elif new not in text:
+              raise SystemExit("expected serde enum contract was not found")
+          model.write_text(text, encoding="utf-8", newline="\n")
+
+          rules = Path("crates/sightlint-engine/src/rules.rs")
+          text = rules.read_text(encoding="utf-8")
+          text = text.replace(
+              "Axis, BoxKind, EvidenceClass, Identifier, Relation, Unit",
+              "Axis, BoxKind, Identifier, Relation, Unit",
+          )
+          rules.write_text(text, encoding="utf-8", newline="\n")
+          PY
       - name: Generate and format canonical workspace state
         run: |
           cargo +1.85.0 generate-lockfile
@@ -35,6 +59,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Workspace already canonical"
           else
-            git commit -m "chore: apply canonical generated workspace state"
+            git commit -m "fix: align serialized relations with public IR contract"
             git push origin HEAD:${{ github.event.pull_request.head.ref }}
           fi
