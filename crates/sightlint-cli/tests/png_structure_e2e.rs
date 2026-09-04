@@ -40,7 +40,10 @@ fn assert_error_contains(input: &[u8], expected: &str) {
     );
     assert!(output.stdout.is_empty());
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains(expected), "expected {expected:?} in {stderr:?}");
+    assert!(
+        stderr.contains(expected),
+        "expected {expected:?} in {stderr:?}"
+    );
 }
 
 fn crc32(bytes: &[u8]) -> u32 {
