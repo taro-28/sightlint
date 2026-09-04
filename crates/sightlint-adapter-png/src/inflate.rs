@@ -1,7 +1,12 @@
 use std::error::Error;
 use std::fmt;
 
-use miniz_oxide::inflate::{TINFLStatus, decompress_slice_iter_to_slice};
+use miniz_oxide::inflate::TINFLStatus;
+use miniz_oxide::inflate::core::inflate_flags::{
+    TINFL_FLAG_HAS_MORE_INPUT, TINFL_FLAG_PARSE_ZLIB_HEADER,
+    TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF,
+};
+use miniz_oxide::inflate::core::{DecompressorOxide, decompress};
 
 use crate::{PngAdapterError, PngHeader, PngStructure, inspect_png_structure};
 
@@ -35,6 +40,8 @@ pub enum PngInflateError {
     },
     /// The zlib/DEFLATE stream, wrapper, or Adler-32 checksum is invalid.
     InvalidZlibStream,
+    /// The zlib stream ended before all non-empty `IDAT` payload bytes were consumed.
+    TrailingCompressedData,
     /// The stream produced more bytes than the declared PNG raster permits.
     DecodedDataTooLong {
         /// Exact maximum byte count permitted by the declared raster geometry.
@@ -61,6 +68,9 @@ impl fmt::Display for PngInflateError {
             Self::InvalidZlibStream => formatter.write_str(
                 "PNG IDAT payload is not a valid zlib stream with a matching Adler-32 checksum",
             ),
+            Self::TrailingCompressedData => formatter.write_str(
+                "PNG IDAT payload contains bytes after the complete zlib stream",
+            ),
             Self::DecodedDataTooLong { expected } => write!(
                 formatter,
                 "PNG IDAT stream expands beyond the exact {expected}-byte scanline size declared by IHDR"
@@ -86,8 +96,9 @@ impl Error for PngInflateError {}
 /// # Errors
 ///
 /// Returns existing header/structure errors unchanged, or a wrapped [`PngInflateError`] when the
-/// decoded raster exceeds the memory budget, zlib validation fails, or the decoded byte count
-/// does not exactly match the raster declared by `IHDR`.
+/// decoded raster exceeds the memory budget, zlib validation fails, compressed bytes remain after
+/// the zlib terminator, or the decoded byte count does not exactly match the raster declared by
+/// `IHDR`.
 pub fn inflate_png_scanlines(input: &[u8]) -> Result<InflatedPng, PngAdapterError> {
     let structure = inspect_png_structure(input)?;
     let expected_u64 = expected_scanline_bytes(structure.header);
@@ -104,17 +115,14 @@ pub fn inflate_png_scanlines(input: &[u8]) -> Result<InflatedPng, PngAdapterErro
         })
     })?;
     let payloads = idat_payloads(input).map_err(PngAdapterError::InvalidImageData)?;
-    let mut scanline_bytes = vec![0_u8; expected];
-    let written =
-        decompress_slice_iter_to_slice(&mut scanline_bytes, payloads.into_iter(), true, false)
-            .map_err(|status| {
-                let error = if status == TINFLStatus::HasMoreOutput {
-                    PngInflateError::DecodedDataTooLong { expected }
-                } else {
-                    PngInflateError::InvalidZlibStream
-                };
-                PngAdapterError::InvalidImageData(error)
-            })?;
+    let mut scanline_bytes = vec![0_u8; expected + 1];
+    let written = inflate_exact(&payloads, &mut scanline_bytes, expected)
+        .map_err(PngAdapterError::InvalidImageData)?;
+    if written > expected {
+        return Err(PngAdapterError::InvalidImageData(
+            PngInflateError::DecodedDataTooLong { expected },
+        ));
+    }
     if written != expected {
         return Err(PngAdapterError::InvalidImageData(
             PngInflateError::DecodedLengthMismatch {
@@ -123,6 +131,7 @@ pub fn inflate_png_scanlines(input: &[u8]) -> Result<InflatedPng, PngAdapterErro
             },
         ));
     }
+    scanline_bytes.truncate(expected);
 
     Ok(InflatedPng {
         structure,
@@ -145,6 +154,53 @@ pub fn expected_scanline_bytes(header: PngHeader) -> u64 {
             pass_bytes(width, height, bits_per_pixel)
         })
         .sum()
+}
+
+fn inflate_exact(
+    payloads: &[&[u8]],
+    output: &mut [u8],
+    expected: usize,
+) -> Result<usize, PngInflateError> {
+    let mut decompressor = DecompressorOxide::new();
+    let mut output_position = 0_usize;
+
+    for (index, payload) in payloads.iter().enumerate() {
+        let more_non_empty_input = payloads[index + 1..]
+            .iter()
+            .any(|remaining| !remaining.is_empty());
+        let mut flags = TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF | TINFL_FLAG_PARSE_ZLIB_HEADER;
+        if more_non_empty_input {
+            flags |= TINFL_FLAG_HAS_MORE_INPUT;
+        }
+        let (status, consumed, produced) = decompress(
+            &mut decompressor,
+            payload,
+            output,
+            output_position,
+            flags,
+        );
+        output_position += produced;
+
+        match status {
+            TINFLStatus::NeedsMoreInput => {
+                if consumed != payload.len() {
+                    return Err(PngInflateError::InvalidZlibStream);
+                }
+            }
+            TINFLStatus::Done => {
+                if consumed != payload.len() || more_non_empty_input {
+                    return Err(PngInflateError::TrailingCompressedData);
+                }
+                return Ok(output_position);
+            }
+            TINFLStatus::HasMoreOutput => {
+                return Err(PngInflateError::DecodedDataTooLong { expected });
+            }
+            _ => return Err(PngInflateError::InvalidZlibStream),
+        }
+    }
+
+    Err(PngInflateError::InvalidZlibStream)
 }
 
 fn channels(color_type: u8) -> u8 {
