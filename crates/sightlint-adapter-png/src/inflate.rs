@@ -104,152 +104,148 @@ pub fn inflate_png_scanlines(input: &[u8]) -> Result<InflatedPng, PngAdapterErro
         })
     })?;
     let payloads = idat_payloads(input).map_err(PngAdapterError::InvalidImageData)?;
-+    let mut scanline_bytes = vec![0_u8; expected];
-+    let written = decompress_slice_iter_to_slice(
-+        &mut scanline_bytes,
-+        payloads.into_iter(),
-+        true,
-+        false,
-+    )
-+    .map_err(|status| {
-+        let error = if status == TINFLStatus::HasMoreOutput {
-+            PngInflateError::DecodedDataTooLong { expected }
-+        } else {
-+            PngInflateError::InvalidZlibStream
-+        };
-+        PngAdapterError::InvalidImageData(error)
-+    })?;
-+    if written != expected {
-+        return Err(PngAdapterError::InvalidImageData(
-+            PngInflateError::DecodedLengthMismatch {
-+                expected,
-+                actual: written,
-+            },
-+        ));
-+    }
-+
-+    Ok(InflatedPng {
-+        structure,
-+        scanline_bytes,
-+    })
-+}
-+
-+/// Returns the exact decompressed scanline byte count required by a validated PNG header.
-+pub fn expected_scanline_bytes(header: PngHeader) -> u64 {
-+    let bits_per_pixel = u64::from(channels(header.color_type)) * u64::from(header.bit_depth);
-+    if header.interlace_method == 0 {
-+        return pass_bytes(header.width, header.height, bits_per_pixel);
-+    }
-+
-+    ADAM7_PASSES
-+        .into_iter()
-+        .map(|(start_x, start_y, step_x, step_y)| {
-+            let width = pass_extent(header.width, start_x, step_x);
-+            let height = pass_extent(header.height, start_y, step_y);
-+            pass_bytes(width, height, bits_per_pixel)
-+        })
-+        .sum()
-+}
-+
-+fn channels(color_type: u8) -> u8 {
-+    match color_type {
-+        0 | 3 => 1,
-+        2 => 3,
-+        4 => 2,
-+        6 => 4,
-+        _ => unreachable!("validated PNG color type"),
-+    }
-+}
-+
-+fn pass_extent(size: u32, start: u32, step: u32) -> u32 {
-+    if size <= start {
-+        0
-+    } else {
-+        1 + (size - start - 1) / step
-+    }
-+}
-+
-+fn pass_bytes(width: u32, height: u32, bits_per_pixel: u64) -> u64 {
-+    if width == 0 || height == 0 {
-+        return 0;
-+    }
-+    let row_bits = u64::from(width) * bits_per_pixel;
-+    let row_bytes = row_bits.div_ceil(8);
-+    u64::from(height) * (1 + row_bytes)
-+}
-+
-+fn idat_payloads(input: &[u8]) -> Result<Vec<&[u8]>, PngInflateError> {
-+    let mut offset = 8_usize;
-+    let mut payloads = Vec::new();
-+    while offset < input.len() {
-+        let length_bytes = input
-+            .get(offset..offset + 4)
-+            .ok_or(PngInflateError::InternalStructureMismatch)?;
-+        let length = u32::from_be_bytes(
-+            length_bytes
-+                .try_into()
-+                .map_err(|_| PngInflateError::InternalStructureMismatch)?,
-+        );
-+        let data_length =
-+            usize::try_from(length).map_err(|_| PngInflateError::InternalStructureMismatch)?;
-+        let kind = input
-+            .get(offset + 4..offset + 8)
-+            .ok_or(PngInflateError::InternalStructureMismatch)?;
-+        let data_start = offset
-+            .checked_add(8)
-+            .ok_or(PngInflateError::InternalStructureMismatch)?;
-+        let data_end = data_start
-+            .checked_add(data_length)
-+            .ok_or(PngInflateError::InternalStructureMismatch)?;
-+        let next = data_end
-+            .checked_add(4)
-+            .ok_or(PngInflateError::InternalStructureMismatch)?;
-+        let data = input
-+            .get(data_start..data_end)
-+            .ok_or(PngInflateError::InternalStructureMismatch)?;
-+        if kind == b"IDAT" {
-+            payloads.push(data);
-+        }
-+        if kind == b"IEND" {
-+            return Ok(payloads);
-+        }
-+        if next > input.len() {
-+            return Err(PngInflateError::InternalStructureMismatch);
-+        }
-+        offset = next;
-+    }
-+    Err(PngInflateError::InternalStructureMismatch)
-+}
-+
-+#[cfg(test)]
-+mod tests {
-+    use super::{expected_scanline_bytes, pass_extent};
-+    use crate::PngHeader;
-+
-+    fn header(width: u32, height: u32, depth: u8, color_type: u8, interlace: u8) -> PngHeader {
-+        PngHeader {
-+            width,
-+            height,
-+            bit_depth: depth,
-+            color_type,
-+            compression_method: 0,
-+            filter_method: 0,
-+            interlace_method: interlace,
-+        }
-+    }
-+
-+    #[test]
-+    fn calculates_packed_non_interlaced_scanline_sizes() {
-+        assert_eq!(expected_scanline_bytes(header(8, 2, 1, 0, 0)), 4);
-+        assert_eq!(expected_scanline_bytes(header(3, 2, 8, 2, 0)), 20);
-+        assert_eq!(expected_scanline_bytes(header(3, 2, 16, 6, 0)), 50);
-+    }
-+
-+    #[test]
-+    fn calculates_adam7_passes_without_counting_empty_rows() {
-+        assert_eq!(pass_extent(1, 4, 8), 0);
-+        assert_eq!(pass_extent(9, 0, 8), 2);
-+        assert_eq!(expected_scanline_bytes(header(1, 1, 8, 6, 1)), 5);
-+        assert_eq!(expected_scanline_bytes(header(8, 8, 8, 6, 1)), 271);
-+    }
-+}
+    let mut scanline_bytes = vec![0_u8; expected];
+    let written =
+        decompress_slice_iter_to_slice(&mut scanline_bytes, payloads.into_iter(), true, false)
+            .map_err(|status| {
+                let error = if status == TINFLStatus::HasMoreOutput {
+                    PngInflateError::DecodedDataTooLong { expected }
+                } else {
+                    PngInflateError::InvalidZlibStream
+                };
+                PngAdapterError::InvalidImageData(error)
+            })?;
+    if written != expected {
+        return Err(PngAdapterError::InvalidImageData(
+            PngInflateError::DecodedLengthMismatch {
+                expected,
+                actual: written,
+            },
+        ));
+    }
+
+    Ok(InflatedPng {
+        structure,
+        scanline_bytes,
+    })
+}
+
+/// Returns the exact decompressed scanline byte count required by a validated PNG header.
+pub fn expected_scanline_bytes(header: PngHeader) -> u64 {
+    let bits_per_pixel = u64::from(channels(header.color_type)) * u64::from(header.bit_depth);
+    if header.interlace_method == 0 {
+        return pass_bytes(header.width, header.height, bits_per_pixel);
+    }
+
+    ADAM7_PASSES
+        .into_iter()
+        .map(|(start_x, start_y, step_x, step_y)| {
+            let width = pass_extent(header.width, start_x, step_x);
+            let height = pass_extent(header.height, start_y, step_y);
+            pass_bytes(width, height, bits_per_pixel)
+        })
+        .sum()
+}
+
+fn channels(color_type: u8) -> u8 {
+    match color_type {
+        0 | 3 => 1,
+        2 => 3,
+        4 => 2,
+        6 => 4,
+        _ => unreachable!("validated PNG color type"),
+    }
+}
+
+fn pass_extent(size: u32, start: u32, step: u32) -> u32 {
+    if size <= start {
+        0
+    } else {
+        1 + (size - start - 1) / step
+    }
+}
+
+fn pass_bytes(width: u32, height: u32, bits_per_pixel: u64) -> u64 {
+    if width == 0 || height == 0 {
+        return 0;
+    }
+    let row_bits = u64::from(width) * bits_per_pixel;
+    let row_bytes = row_bits.div_ceil(8);
+    u64::from(height) * (1 + row_bytes)
+}
+
+fn idat_payloads(input: &[u8]) -> Result<Vec<&[u8]>, PngInflateError> {
+    let mut offset = 8_usize;
+    let mut payloads = Vec::new();
+    while offset < input.len() {
+        let length_bytes = input
+            .get(offset..offset + 4)
+            .ok_or(PngInflateError::InternalStructureMismatch)?;
+        let length = u32::from_be_bytes(
+            length_bytes
+                .try_into()
+                .map_err(|_| PngInflateError::InternalStructureMismatch)?,
+        );
+        let data_length =
+            usize::try_from(length).map_err(|_| PngInflateError::InternalStructureMismatch)?;
+        let kind = input
+            .get(offset + 4..offset + 8)
+            .ok_or(PngInflateError::InternalStructureMismatch)?;
+        let data_start = offset
+            .checked_add(8)
+            .ok_or(PngInflateError::InternalStructureMismatch)?;
+        let data_end = data_start
+            .checked_add(data_length)
+            .ok_or(PngInflateError::InternalStructureMismatch)?;
+        let next = data_end
+            .checked_add(4)
+            .ok_or(PngInflateError::InternalStructureMismatch)?;
+        let data = input
+            .get(data_start..data_end)
+            .ok_or(PngInflateError::InternalStructureMismatch)?;
+        if kind == b"IDAT" {
+            payloads.push(data);
+        }
+        if kind == b"IEND" {
+            return Ok(payloads);
+        }
+        if next > input.len() {
+            return Err(PngInflateError::InternalStructureMismatch);
+        }
+        offset = next;
+    }
+    Err(PngInflateError::InternalStructureMismatch)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{expected_scanline_bytes, pass_extent};
+    use crate::PngHeader;
+
+    fn header(width: u32, height: u32, depth: u8, color_type: u8, interlace: u8) -> PngHeader {
+        PngHeader {
+            width,
+            height,
+            bit_depth: depth,
+            color_type,
+            compression_method: 0,
+            filter_method: 0,
+            interlace_method: interlace,
+        }
+    }
+
+    #[test]
+    fn calculates_packed_non_interlaced_scanline_sizes() {
+        assert_eq!(expected_scanline_bytes(header(8, 2, 1, 0, 0)), 4);
+        assert_eq!(expected_scanline_bytes(header(3, 2, 8, 2, 0)), 20);
+        assert_eq!(expected_scanline_bytes(header(3, 2, 16, 6, 0)), 50);
+    }
+
+    #[test]
+    fn calculates_adam7_passes_without_counting_empty_rows() {
+        assert_eq!(pass_extent(1, 4, 8), 0);
+        assert_eq!(pass_extent(9, 0, 8), 2);
+        assert_eq!(expected_scanline_bytes(header(1, 1, 8, 6, 1)), 5);
+        assert_eq!(expected_scanline_bytes(header(8, 8, 8, 6, 1)), 271);
+    }
+}
