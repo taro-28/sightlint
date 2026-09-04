@@ -1,0 +1,47 @@
+name: Bug report
+description: Report reproducible incorrect behavior
+title: "bug: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include sensitive artifacts. Reduce the input or provide a synthetic fixture.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+      description: Include the command, outcome, and evidence reference.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: State the applicable rule or invariant when known.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide a synthetic IR fixture or exact steps.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SightLint version or commit
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: Evidence source
+      options:
+        - Exact source structure
+        - Rendered measurement
+        - Platform semantics
+        - Vision inference
+        - Unknown
+    validations:
+      required: true

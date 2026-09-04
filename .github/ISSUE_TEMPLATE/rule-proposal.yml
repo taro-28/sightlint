@@ -1,0 +1,51 @@
+name: Rule proposal
+description: Propose an atomic or composite lint rule
+title: "rule: "
+body:
+  - type: input
+    id: rule-id
+    attributes:
+      label: Proposed rule ID
+      placeholder: visual.spacing.peer-consistency
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: User-visible problem
+      description: Describe the concrete defect, not only a broad heuristic.
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Required input aspects and evidence
+      description: Geometry, semantics, pixels, interaction trace, native structure, and so on.
+    validations:
+      required: true
+  - type: textarea
+    id: applicability
+    attributes:
+      label: Applicability
+      description: Define exactly when the rule should run and when it is inapplicable.
+    validations:
+      required: true
+  - type: textarea
+    id: expectation
+    attributes:
+      label: Deterministic expectation
+      description: Define the assertion after inputs have been normalized.
+    validations:
+      required: true
+  - type: textarea
+    id: ambiguity
+    attributes:
+      label: cantTell and false-positive cases
+    validations:
+      required: true
+  - type: textarea
+    id: fixtures
+    attributes:
+      label: Passing, failing, and mutation fixtures
+    validations:
+      required: true

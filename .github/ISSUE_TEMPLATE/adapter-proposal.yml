@@ -1,0 +1,41 @@
+name: Adapter proposal
+description: Propose a new artifact or platform sensor
+title: "adapter: "
+body:
+  - type: input
+    id: medium
+    attributes:
+      label: Artifact or platform
+      placeholder: PPTX, Playwright, Android semantics, image, PDF
+    validations:
+      required: true
+  - type: textarea
+    id: exact-data
+    attributes:
+      label: Exact native data available
+    validations:
+      required: true
+  - type: textarea
+    id: inferred-data
+    attributes:
+      label: Inferred or probabilistic data
+    validations:
+      required: true
+  - type: textarea
+    id: transforms
+    attributes:
+      label: Units and coordinate transforms
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Trust, privacy, and resource-limit model
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation and differential-test plan
+    validations:
+      required: true
