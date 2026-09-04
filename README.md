@@ -59,11 +59,16 @@ Planned adapters include:
 
 The first functional milestone is deliberately narrow: load a versioned Artifact IR,
 execute deterministic geometry rules, and emit evidence-linked results from a Rust CLI.
+M2 extends that deterministic boundary with an official visual-contract extension for
+explicit containment, alignment, peer extent consistency, peer typography consistency, and
+project-supplied minimum font-size policies. These rules still consume declared,
+evidence-backed observations rather than inferring semantics from pixels.
 
-## Current M1 command surface
+## Current deterministic command surface
 
-M1 accepts the medium-neutral Artifact IR directly. Native image, browser, slide, PDF, and
-mobile adapters are intentionally deferred until the deterministic contract is stable.
+The current CLI accepts the medium-neutral Artifact IR directly. Native image, browser, slide,
+PDF, and mobile adapters remain separate acquisition layers so that probabilistic or
+medium-specific sensing cannot leak into deterministic rule verdicts.
 
 ```bash
 # Validate IR, run built-in atomic rules, and print a human report.
@@ -99,16 +104,20 @@ and then executes the real `sightlint` binary against it on Linux, macOS, and Wi
 The corpus includes:
 
 - clean web, mobile, slide, document, PDF, image, and other artifacts
-- targeted spacing, overlap, and out-of-canvas mutations
+- targeted spacing, overlap, out-of-canvas, containment, alignment, extent, and typography mutations
 - missing and incomparable evidence that must return `cantTell`
 - inapplicable rule cases
-- malformed JSON and semantically invalid IR
-- reordered but semantically equivalent documents
+- zero and non-zero tolerance boundaries for declared visual contracts
+- explicit right-to-left and vertical-up logical alignment cases
+- malformed JSON, malformed official visual extensions, and semantically invalid IR
+- reordered but semantically equivalent documents and visual contracts
+- preservation of unknown extension payloads while the official visual extension is validated and canonicalized
 - standard-input, output-format, normalization, safety-limit, and exit-code cases
 - repeated byte-for-byte determinism checks
 
 A new public rule or adapter is not complete without corresponding pass, fail/mutation,
-ambiguity, inapplicable, and malformed-input fixtures where those outcomes apply.
+ambiguity, inapplicable, malformed-input, boundary, and determinism fixtures where those
+outcomes apply.
 
 ## Architecture
 

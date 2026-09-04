@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "0.1.0",
+  "artifact": {
+    "id": "artifact-m2-cant-tell-extent-cross-canvas",
+    "kind": "web",
+    "title": "Fixture artifact",
+    "sourceName": "artifact-m2-cant-tell-extent-cross-canvas.json"
+  },
+  "canvases": [
+    {
+      "id": "canvas-main",
+      "size": {
+        "width": 400.0,
+        "height": 300.0
+      },
+      "unit": "cssPixel",
+      "horizontalDirection": "right",
+      "verticalDirection": "down",
+      "evidenceId": "e-render"
+    },
+    {
+      "id": "canvas-second",
+      "size": {
+        "width": 400.0,
+        "height": 300.0
+      },
+      "unit": "cssPixel",
+      "horizontalDirection": "right",
+      "verticalDirection": "down",
+      "evidenceId": "e-render"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node-a",
+      "kind": {
+        "value": "control",
+        "evidenceId": "e-source"
+      },
+      "coordinateSpaceId": "canvas-main",
+      "role": {
+        "value": "button",
+        "evidenceId": "e-source"
+      },
+      "name": {
+        "value": "First",
+        "evidenceId": "e-source"
+      },
+      "geometry": {
+        "renderBox": {
+          "rect": {
+            "x": 20.0,
+            "y": 20.0,
+            "width": 100.0,
+            "height": 30.0
+          },
+          "coordinateSpaceId": "canvas-main",
+          "evidenceId": "e-render"
+        },
+        "layoutBox": {
+          "rect": {
+            "x": 20.0,
+            "y": 20.0,
+            "width": 100.0,
+            "height": 30.0
+          },
+          "coordinateSpaceId": "canvas-main",
+          "evidenceId": "e-render"
+        }
+      }
+    },
+    {
+      "id": "node-b",
+      "kind": {
+        "value": "control",
+        "evidenceId": "e-source"
+      },
+      "coordinateSpaceId": "canvas-main",
+      "role": {
+        "value": "button",
+        "evidenceId": "e-source"
+      },
+      "name": {
+        "value": "Second",
+        "evidenceId": "e-source"
+      },
+      "geometry": {
+        "renderBox": {
+          "rect": {
+            "x": 20.0,
+            "y": 70.0,
+            "width": 100.0,
+            "height": 30.0
+          },
+          "coordinateSpaceId": "canvas-main",
+          "evidenceId": "e-render"
+        },
+        "layoutBox": {
+          "rect": {
+            "x": 20.0,
+            "y": 70.0,
+            "width": 100.0,
+            "height": 30.0
+          },
+          "coordinateSpaceId": "canvas-second",
+          "evidenceId": "e-render"
+        }
+      }
+    },
+    {
+      "id": "node-c",
+      "kind": {
+        "value": "control",
+        "evidenceId": "e-source"
+      },
+      "coordinateSpaceId": "canvas-main",
+      "role": {
+        "value": "button",
+        "evidenceId": "e-source"
+      },
+      "name": {
+        "value": "Third",
+        "evidenceId": "e-source"
+      },
+      "geometry": {
+        "renderBox": {
+          "rect": {
+            "x": 20.0,
+            "y": 120.0,
+            "width": 100.0,
+            "height": 30.0
+          },
+          "coordinateSpaceId": "canvas-main",
+          "evidenceId": "e-render"
+        }
+      }
+    }
+  ],
+  "relations": [
+    {
+      "type": "nonOverlapping",
+      "id": "relation-non-overlap",
+      "nodeIds": [
+        "node-a",
+        "node-b",
+        "node-c"
+      ],
+      "boxKind": "render",
+      "tolerance": 0.0,
+      "evidenceId": "e-contract"
+    },
+    {
+      "type": "peerSequence",
+      "id": "relation-spacing",
+      "nodeIds": [
+        "node-a",
+        "node-b",
+        "node-c"
+      ],
+      "axis": "vertical",
+      "boxKind": "render",
+      "expectedGap": 20.0,
+      "tolerance": 0.0,
+      "evidenceId": "e-contract"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e-source",
+      "class": "exactSource",
+      "source": {
+        "adapter": "fixture-native",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-render",
+      "class": "exactRender",
+      "source": {
+        "adapter": "fixture-renderer",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-contract",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "fixture-contract",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    }
+  ],
+  "extensions": {
+    "org.sightlint.visual": {
+      "extensionVersion": "0.1.0",
+      "nodeStyles": {},
+      "contracts": {
+        "contract-extent": {
+          "type": "peerExtent",
+          "nodeIds": [
+            "node-a",
+            "node-b"
+          ],
+          "dimension": "width",
+          "boxKind": "layout",
+          "tolerance": 0.0,
+          "evidenceId": "e-contract"
+        }
+      }
+    }
+  }
+}

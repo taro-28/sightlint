@@ -42,8 +42,12 @@ enum Command {
         /// Artifact IR JSON file, or `-` for standard input.
         input: PathBuf,
     },
-    /// Emit the current Artifact IR JSON Schema.
-    Schema,
+    /// Emit a current machine-readable JSON Schema.
+    Schema {
+        /// Schema contract to emit.
+        #[arg(long, value_enum, default_value = "artifact-ir")]
+        kind: SchemaKind,
+    },
     /// Print engine and schema versions.
     Version,
 }
@@ -52,6 +56,12 @@ enum Command {
 enum OutputFormat {
     Human,
     Json,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum SchemaKind {
+    ArtifactIr,
+    Visual,
 }
 
 fn main() -> ExitCode {
@@ -66,15 +76,22 @@ fn run(cli: Cli) -> ExitCode {
             deny_cant_tell,
         } => run_check(&input, format, deny_cant_tell),
         Command::Normalize { input } => run_normalize(&input),
-        Command::Schema => match sightlint_ir::artifact_ir_schema_json() {
-            Ok(schema) => write_success(&schema),
-            Err(error) => fail(format!("failed to generate Artifact IR schema: {error}")),
-        },
+        Command::Schema { kind } => {
+            let schema = match kind {
+                SchemaKind::ArtifactIr => sightlint_ir::artifact_ir_schema_json(),
+                SchemaKind::Visual => sightlint_ir::visual_extension_schema_json(),
+            };
+            match schema {
+                Ok(schema) => write_success(&schema),
+                Err(error) => fail(format!("failed to generate JSON Schema: {error}")),
+            }
+        }
         Command::Version => {
             let output = format!(
-                "SightLint {}\nArtifact IR schema {}\nReport schema {}\n",
+                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nReport schema {}\n",
                 env!("CARGO_PKG_VERSION"),
                 sightlint_engine::supported_schema_version(),
+                sightlint_engine::supported_visual_extension_version(),
                 sightlint_engine::REPORT_SCHEMA_VERSION
             );
             write_success(&output)

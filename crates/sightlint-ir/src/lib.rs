@@ -9,6 +9,7 @@ mod json;
 mod model;
 mod schema;
 mod validation;
+mod visual;
 
 pub use json::{LoadError, serialize_canonical};
 pub use model::{
@@ -19,6 +20,11 @@ pub use model::{
 };
 pub use schema::artifact_ir_schema_json;
 pub use validation::{ValidationCode, ValidationErrors, ValidationIssue};
+pub use visual::{
+    AlignmentAnchor, ExtentDimension, Length, VISUAL_EXTENSION_KEY, VISUAL_EXTENSION_VERSION,
+    VisualContract, VisualExtension, VisualExtensionErrors, VisualStyle, VisualValidationCode,
+    VisualValidationIssue, visual_extension_schema_json,
+};
 
-/// Current serialized Artifact IR schema version.
+/// Current serialized Artifact IR core schema version.
 pub const SCHEMA_VERSION: &str = "0.1.0";
