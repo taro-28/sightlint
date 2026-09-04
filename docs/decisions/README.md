@@ -21,6 +21,7 @@ Accepted decisions:
 - [0009 — Initial workspace boundaries](0009-initial-workspace-boundaries.md)
 - [0010 — Schema and rule compatibility](0010-schema-and-rule-compatibility.md)
 - [0011 — Evidence grading and CI policy](0011-evidence-grading-and-ci-policy.md)
+- [0012 — Rule authoring lifecycle](0012-rule-authoring-lifecycle.md)
 
 Proposed decisions:
 
