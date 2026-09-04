@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use sightlint_ir::{Axis, BoxKind, Identifier, Relation, Unit};
 
 use crate::geometry::{
-    QueryContext, QueryError, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
+    QueryContext, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
 };
 use crate::report::{
     Measurement, RuleKind, RuleMaturity, RuleOutcome, RuleResult, Target, TargetKind,
@@ -612,10 +612,6 @@ const fn unit_label(unit: Unit) -> &'static str {
         Unit::PdfPoint => "pdf-pt",
         Unit::Normalized => "normalized",
     }
-}
-
-fn _query_error_is_exhaustive(error: QueryError) -> String {
-    error.to_string()
 }
 
 #[cfg(test)]
