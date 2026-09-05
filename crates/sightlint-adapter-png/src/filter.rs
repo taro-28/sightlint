@@ -123,10 +123,10 @@ struct PassSpec {
 /// not match the exact pass layout derived from `IHDR`.
 pub fn reconstruct_png_scanlines(input: &[u8]) -> Result<ReconstructedPng, PngAdapterError> {
     let inflated = inflate_png_scanlines(input)?;
-    reconstruct_inflated(inflated).map_err(PngAdapterError::InvalidFilterData)
+    reconstruct_inflated(&inflated).map_err(PngAdapterError::InvalidFilterData)
 }
 
-fn reconstruct_inflated(inflated: InflatedPng) -> Result<ReconstructedPng, PngFilterError> {
+fn reconstruct_inflated(inflated: &InflatedPng) -> Result<ReconstructedPng, PngFilterError> {
     let specs = pass_specs(inflated.structure.header)?;
     let expected_input = filtered_input_length(&specs)?;
     let actual_input = inflated.scanline_bytes.len();
@@ -243,8 +243,7 @@ fn reconstruct_row(
 }
 
 fn average(left: u8, up: u8) -> u8 {
-    let value = (u16::from(left) + u16::from(up)) / 2;
-    u8::try_from(value).expect("average of two bytes fits u8")
+    left.midpoint(up)
 }
 
 fn paeth(left: u8, up: u8, upper_left: u8) -> u8 {
@@ -391,6 +390,12 @@ mod tests {
         }
     }
 
+    fn reference_average(left: u8, up: u8) -> u8 {
+        // Independent widened arithmetic: the sum is at most 510.
+        let sum: u16 = [left, up].map(u16::from).iter().sum();
+        u8::try_from(sum / 2).expect("byte average")
+    }
+
     fn reference_paeth(left: u8, up: u8, upper_left: u8) -> u8 {
         let estimate = i16::from(left) + i16::from(up) - i16::from(upper_left);
         let candidates = [left, up, upper_left];
@@ -422,7 +427,7 @@ mod tests {
                     0 => 0,
                     1 => left,
                     2 => up,
-                    3 => u8::try_from((u16::from(left) + u16::from(up)) / 2).expect("byte average"),
+                    3 => reference_average(left, up),
                     4 => reference_paeth(left, up, upper_left),
                     _ => unreachable!("test filter range"),
                 };
@@ -493,6 +498,15 @@ mod tests {
         assert_eq!(paeth(10, 20, 15), 15);
         assert_eq!(paeth(100, 10, 10), 100);
         assert_eq!(paeth(5, 5, 0), 5);
+    }
+
+    #[test]
+    fn average_matches_independent_arithmetic_for_every_byte_pair() {
+        for left in 0..=u8::MAX {
+            for up in 0..=u8::MAX {
+                assert_eq!(average(left, up), reference_average(left, up));
+            }
+        }
     }
 
     #[test]
