@@ -15,9 +15,10 @@ do not depend on an earlier chat, private scratchpad, branch name, or agent memo
 7. `docs/artifact-ir.md`
 8. `docs/rules.md`
 9. `docs/testing-strategy.md`
-10. `docs/roadmap.md`
-11. the selected GitHub issue and linked accepted files in `docs/decisions/`
-12. `docs/development.md`
+10. `docs/evaluation-strategy.md`
+11. `docs/roadmap.md`
+12. the selected GitHub issue and linked accepted files in `docs/decisions/`
+13. `docs/development.md`
 
 When instructions conflict, current `main`, accepted architecture decisions, and the hard
 invariants below win. An issue may propose a future design; it does not override accepted ADRs or
@@ -131,8 +132,8 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
   changes start with an ADR. New ADR numbers continue at 0032 or later unless the index says
   otherwise.
-- Implement the smallest vertical path that reaches a real user command and can be exercised end
-  to end.
+- Implement the smallest user-visible path that reaches the real command and can be tested end to
+  end.
 - A new rule defines its problem, input aspects, applicability, expectation, policy source,
   tolerance/units, evidence threshold, valid alternatives, severity inputs, false positives,
   false negatives, maturity, and fixtures.
