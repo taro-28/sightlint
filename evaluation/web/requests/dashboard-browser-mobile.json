@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../adapters/playwright/schemas/capture-request.schema.json",
+  "protocolVersion": "0.1.0",
+  "artifact": { "id": "web-dashboard-browser-mobile", "title": "Atlas dashboard — mobile clean" },
+  "fixture": {
+    "entrypoint": "evaluation/web/fixture-app/index.html",
+    "state": "peer-spacing-clean",
+    "readinessSelector": "html[data-fixture-ready=\"true\"]"
+  },
+  "environment": {
+    "viewport": { "width": 390, "height": 844, "unit": "cssPixel" },
+    "deviceScaleFactor": 1,
+    "textScale": 1,
+    "locale": "en-US",
+    "timezoneId": "UTC",
+    "colorScheme": "light",
+    "reducedMotion": "reduce"
+  },
+  "privacy": { "accessibleNameMode": "selectedNodes", "externalProcessing": false },
+  "network": { "mode": "deny" },
+  "screenshot": { "reference": "capture/dashboard-browser-mobile.png" }
+}

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:playwright-capture-response:0.1.0",
+  "title": "SightLint Playwright capture response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "status",
+    "adapter",
+    "requestDigest",
+    "sourceDigest",
+    "artifactIr",
+    "screenshot",
+    "capture",
+    "limitations"
+  ],
+  "properties": {
+    "protocolVersion": { "const": "0.1.0" },
+    "status": { "const": "captured" },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "nodeVersion", "platform", "architecture", "playwrightVersion", "browserName", "browserVersion"],
+      "properties": {
+        "name": { "const": "sightlint-playwright" },
+        "version": { "const": "0.1.0" },
+        "nodeVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "platform": { "$ref": "#/$defs/nonEmptyString" },
+        "architecture": { "$ref": "#/$defs/nonEmptyString" },
+        "playwrightVersion": { "const": "1.63.0" },
+        "browserName": { "const": "chromium" },
+        "browserVersion": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "requestDigest": { "$ref": "#/$defs/digest" },
+    "sourceDigest": { "$ref": "#/$defs/digest" },
+    "artifactIr": { "$ref": "#/$defs/fileRecord" },
+    "screenshot": { "$ref": "#/$defs/screenshotRecord" },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pageCount", "frameCount", "nodeCount", "externalRequests", "deterministicOptions"],
+      "properties": {
+        "pageCount": { "const": 1 },
+        "frameCount": { "const": 1 },
+        "nodeCount": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "externalRequests": { "type": "array", "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "deterministicOptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headless", "offline", "serviceWorkers", "wait", "screenshot"],
+          "properties": {
+            "headless": { "const": true },
+            "offline": { "const": true },
+            "serviceWorkers": { "const": "block" },
+            "wait": {
+              "type": "array",
+              "minItems": 3,
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            },
+            "screenshot": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["animations", "caret", "format", "scale"],
+              "properties": {
+                "animations": { "const": "disabled" },
+                "caret": { "const": "hide" },
+                "format": { "const": "png" },
+                "scale": { "const": "css" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "fileRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "byteLength"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/digest" },
+        "byteLength": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "screenshotRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "byteLength", "reference", "format", "pixelSize", "colorAssumptions"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/digest" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "reference": { "$ref": "#/$defs/nonEmptyString" },
+        "format": { "const": "png" },
+        "pixelSize": { "$ref": "#/$defs/size" },
+        "colorAssumptions": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}

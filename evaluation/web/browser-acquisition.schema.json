@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-browser-acquisition-oracle:0.1.0",
+  "title": "SightLint reviewed browser acquisition oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "provenance", "cases"],
+  "properties": {
+    "$schema": { "const": "../browser-acquisition.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "const": "browserAcquisitionOracle" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "relativePath": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9._/-]+$" },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewedAt", "qualification", "rationale"],
+      "properties": {
+        "status": { "enum": ["maintainerReviewed", "dualReviewed", "expertReviewed"] },
+        "reviewedAt": { "type": "string", "format": "date" },
+        "qualification": { "$ref": "#/$defs/nonEmptyString" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringBasis", "implementationOutputUsedAsOracle", "sourceId", "ownership", "license", "privacyReview", "externalAssets", "externalProcessing", "holdoutStatus"],
+      "properties": {
+        "authoringBasis": { "const": "humanReviewedFixtureContract" },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "sourceId": { "$ref": "#/$defs/nonEmptyString" },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "$ref": "#/$defs/nonEmptyString" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "externalAssets": { "const": false },
+        "externalProcessing": { "const": false },
+        "holdoutStatus": { "const": "publicDevelopmentData" }
+      }
+    },
+    "size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "unit"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "unit": { "const": "cssPixel" }
+      }
+    },
+    "renderOffset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "tolerance", "unit"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "tolerance": { "type": "number", "minimum": 0 },
+        "unit": { "const": "cssPixel" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "parentId", "accessibilityStatus", "role", "name", "display", "layoutRenderStatus", "screenshotGeometryCoverage"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "parentId": { "type": ["string", "null"] },
+        "accessibilityStatus": { "enum": ["observed", "cantTell"] },
+        "role": { "type": ["string", "null"] },
+        "name": { "type": ["string", "null"] },
+        "display": { "$ref": "#/$defs/nonEmptyString" },
+        "fontSize": { "$ref": "#/$defs/nonEmptyString" },
+        "layoutRenderStatus": { "enum": ["agreement", "conflict", "cantTell"] },
+        "screenshotGeometryCoverage": { "enum": ["zeroArea", "outsideScreenshot", "partiallyOutsideScreenshot", "insideScreenshotExtent"] },
+        "renderOffset": { "$ref": "#/$defs/renderOffset" }
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "axis", "value", "tolerance", "unit"],
+      "properties": {
+        "from": { "$ref": "#/$defs/nonEmptyString" },
+        "to": { "$ref": "#/$defs/nonEmptyString" },
+        "axis": { "enum": ["horizontal", "vertical"] },
+        "value": { "type": "number" },
+        "tolerance": { "type": "number", "minimum": 0 },
+        "unit": { "const": "cssPixel" }
+      }
+    },
+    "abstention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aspect", "outcome", "rationale"],
+      "properties": {
+        "aspect": { "$ref": "#/$defs/nonEmptyString" },
+        "outcome": { "enum": ["cantTell", "untested"] },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineRequest", "target", "changedProperty", "preservedProperties"],
+      "properties": {
+        "baselineRequest": { "$ref": "#/$defs/relativePath" },
+        "target": { "$ref": "#/$defs/nonEmptyString" },
+        "changedProperty": { "$ref": "#/$defs/nonEmptyString" },
+        "preservedProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } }
+      }
+    },
+    "hardNegative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "rationale"],
+      "properties": {
+        "category": { "$ref": "#/$defs/nonEmptyString" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "request", "split", "classification", "expectations", "abstentions", "review"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "request": { "$ref": "#/$defs/relativePath" },
+        "split": { "enum": ["smoke", "development", "challenge"] },
+        "classification": { "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous"] },
+        "expectations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceFiles", "viewport", "minimumDocumentHeight", "frameCount", "minimumNodeCount", "coreRelationCount", "screenshotViewport", "pixelContentComparison", "nodes", "gaps"],
+          "properties": {
+            "sourceFiles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/relativePath" } },
+            "viewport": { "$ref": "#/$defs/size" },
+            "minimumDocumentHeight": { "type": "number", "minimum": 1 },
+            "frameCount": { "const": 1 },
+            "minimumNodeCount": { "type": "integer", "minimum": 1 },
+            "coreRelationCount": { "const": 0 },
+            "screenshotViewport": { "const": "agreement" },
+            "pixelContentComparison": { "const": "cantTell" },
+            "nodes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/node" } },
+            "gaps": { "type": "array", "items": { "$ref": "#/$defs/gap" } }
+          }
+        },
+        "abstentions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/abstention" } },
+        "mutation": { "$ref": "#/$defs/mutation" },
+        "hardNegative": { "$ref": "#/$defs/hardNegative" },
+        "review": { "$ref": "#/$defs/review" }
+      }
+    }
+  }
+}

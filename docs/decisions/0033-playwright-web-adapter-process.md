@@ -49,9 +49,10 @@ unsupported query fields, and all non-`file:` top-level destinations are rejecte
 
 The browser context blocks service workers, starts offline, and aborts every `http:`, `https:`,
 `ws:`, and `wss:` request. The response records attempted external requests without their bodies.
-One page is allowed. Child frames are counted and bounded but cross-origin or non-file frames are
-unsupported in this version. Arbitrary URLs and general hostile-site navigation require a later
-threat-model and protocol version.
+One page containing exactly one main frame is allowed. Child frames are counted and rejected in
+this version; supporting even repository-local frames requires a later protocol that assigns frame
+and document identity to every observation. Arbitrary URLs and general hostile-site navigation
+require a later threat-model and protocol version.
 
 No artifact content leaves the machine. `externalProcessing` is always false. The adapter never
 uploads screenshots, DOM content, accessibility data, or reports.
@@ -83,7 +84,7 @@ three systems.
 Version `0.1.0` enforces these hard limits before returning a successful capture:
 
 - request JSON: 1 MiB;
-- one page and at most four frames;
+- one page and exactly one main frame;
 - at most 200 captured nodes;
 - viewport dimensions from 1 through 4096 CSS pixels per axis;
 - device-pixel ratio from 1 through 2;
@@ -112,15 +113,22 @@ without copying an entire private subtree. Fixture data remains fictional and re
 
 ## Geometry and coordinate semantics
 
-The root canvas is the initial viewport in CSS pixels with origin at its top-left, positive x to
-the right, and positive y down. Scroll offsets are recorded separately.
+The adapter emits separate `document` and `viewport` canvases in CSS pixels, each with positive x
+to the right and positive y down. Core node geometry uses document coordinates. The viewport canvas,
+scroll offsets, and document-to-screenshot translation remain explicit in the Web extension.
+
+This distinction is required for ordinary scrollable pages. Treating the initial viewport as the
+core bounds canvas makes legitimate below-the-fold content fail `visual.bounds.within-canvas`.
+Conversely, silently expanding a viewport to the document extent makes viewport evidence false.
+The document canvas uses the maximum document/body scroll and client extents after readiness;
+viewport capture never substitutes for it.
 
 - `layoutBox` is the pre-local-transform border box accumulated through an untransformed
-  `offsetParent` chain and translated into viewport coordinates. If an ancestor transform or an
+  `offsetParent` chain and translated into document coordinates. If an ancestor transform or an
   unsupported layout condition prevents that mapping, the box is omitted and the extension
   records why.
-- `renderBox` is `getBoundingClientRect()` after transforms, expressed in viewport CSS pixels. It
-  is a browser geometry measurement, not a visible-ink or unoccluded-pixel box.
+- `renderBox` is `getBoundingClientRect()` after transforms, translated into document CSS pixels.
+  It is a browser geometry measurement, not a visible-ink or unoccluded-pixel box.
 - `hitBox` is recorded only for an interactive node whose center-point hit test resolves to the
   node or one of its descendants. It is not synthesized for noninteractive nodes or failed hit
   tests.
@@ -149,7 +157,8 @@ options, and input relationship are recorded. Raw pixels remain in the PNG file,
 Version `0.1.0` performs bounded reconciliation that it can prove:
 
 - screenshot dimensions versus declared viewport and screenshot scale;
-- each render rectangle's intersection with viewport/screenshot coordinates;
+- each document-space render rectangle translated by the captured scroll offset and intersected
+  with viewport/screenshot coordinates;
 - native visibility versus zero-area, clipping, off-viewport, and center hit-test observations;
 - layout/render differences caused by transforms.
 

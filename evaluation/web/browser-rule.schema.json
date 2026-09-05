@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-browser-rule-oracle:0.1.0",
+  "title": "SightLint reviewed browser rule oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "commandSurface", "cases"],
+  "properties": {
+    "$schema": { "const": "../browser-rule.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "const": "browserRuleOracle" },
+    "commandSurface": { "const": "sightlint check --format json" },
+    "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/case" } }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "relativePath": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9._/-]+$" },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewedAt", "qualification", "rationale"],
+      "properties": {
+        "status": { "enum": ["maintainerReviewed", "dualReviewed", "expertReviewed"] },
+        "reviewedAt": { "type": "string", "format": "date" },
+        "qualification": { "$ref": "#/$defs/nonEmptyString" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "expectedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "outcome", "targetKind", "targetId", "targetAspect"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] },
+        "targetKind": { "$ref": "#/$defs/nonEmptyString" },
+        "targetId": { "$ref": "#/$defs/nonEmptyString" },
+        "targetAspect": { "type": ["string", "null"] }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "request", "classification", "expectedExitCode", "expectedFailureCount", "expectedResults", "falsePositiveRisk", "nonClaim", "review"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "request": { "$ref": "#/$defs/relativePath" },
+        "classification": { "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous"] },
+        "expectedExitCode": { "enum": [0, 1] },
+        "expectedFailureCount": { "type": "integer", "minimum": 0 },
+        "expectedResults": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/expectedResult" } },
+        "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" },
+        "nonClaim": { "$ref": "#/$defs/nonEmptyString" },
+        "review": { "$ref": "#/$defs/review" }
+      }
+    }
+  }
+}
