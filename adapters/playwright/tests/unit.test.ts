@@ -81,6 +81,7 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ...requestFiles.map((name) => ["adapters/playwright/schemas/capture-request.schema.json", `evaluation/web/requests/${name}`] as const),
     ["evaluation/web/browser-acquisition.schema.json", "evaluation/web/annotations/browser-acquisition.json"],
     ["evaluation/web/browser-rule.schema.json", "evaluation/web/annotations/browser-rules.json"],
+    ["evaluation/web/agent-workflow.schema.json", "evaluation/web/annotations/agent-workflow.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {
@@ -88,6 +89,13 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     const validate = ajv.compile(await json(schemaPath) as AnySchema);
     assert.equal(validate(await json(documentPath)), true, `${documentPath}: ${ajv.errorsText(validate.errors)}`);
   }
+});
+
+test("workflow report schema compiles with the capture response compatibility surface", async () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  ajv.addSchema(await json("adapters/playwright/schemas/capture-response.schema.json") as AnySchema);
+  const validate = ajv.compile(await json("adapters/playwright/schemas/web-workflow-report.schema.json") as AnySchema);
+  assert.equal(typeof validate, "function");
 });
 
 test("previous strict schemas remain available and reject current documents", async () => {

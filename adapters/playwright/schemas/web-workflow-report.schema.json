@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-workflow-report:0.1.0",
+  "title": "SightLint local Web workflow report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "workflow", "capture", "sourceTargets", "checkReport", "limitations"],
+  "properties": {
+    "schemaVersion": { "const": "0.1.0" },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "version", "profile", "verdictOwner", "externalProcessing"],
+      "properties": {
+        "command": { "const": "sightlint-web-check" },
+        "version": { "const": "0.1.0" },
+        "profile": { "const": "sightlint:recommended" },
+        "verdictOwner": { "const": "sightlint-rust-kernel" },
+        "externalProcessing": { "const": false }
+      }
+    },
+    "capture": { "$ref": "urn:sightlint:schema:playwright-capture-response:0.1.0" },
+    "sourceTargets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/sourceTarget" }
+    },
+    "checkReport": { "$ref": "#/$defs/checkReport" },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "semanticVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "packageVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$" },
+    "identifier": { "type": "string", "minLength": 1 },
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"
+    },
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value", "selector"],
+      "properties": {
+        "type": { "enum": ["testId", "id", "css"] },
+        "value": { "$ref": "#/$defs/nonEmptyString" },
+        "selector": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "sourceTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeId", "locator", "sourceFiles", "evidenceIds"],
+      "properties": {
+        "nodeId": { "$ref": "#/$defs/identifier" },
+        "locator": { "$ref": "#/$defs/locator" },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/repositoryPath" }
+        },
+        "evidenceIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed", "inapplicable", "cantTell", "untested"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "inapplicable": { "type": "integer", "minimum": 0 },
+        "cantTell": { "type": "integer", "minimum": 0 },
+        "untested": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "sourceKind", "sourceId", "sourceVersion", "reference"],
+      "properties": {
+        "profile": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceKind": { "enum": ["declaredContract", "platformStandard", "conservativeBuiltIn"] },
+        "sourceId": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "reference": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["artifact", "canvas", "node", "relation"] },
+        "id": { "$ref": "#/$defs/identifier" },
+        "aspect": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit"],
+      "properties": {
+        "value": { "type": "number" },
+        "unit": { "enum": ["cssPixel", "devicePixel", "dp", "point", "emu", "pdfPoint", "normalized"] }
+      }
+    },
+    "ruleResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "title", "kind", "maturity", "policy", "enforcement", "target", "outcome", "message"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/semanticVersion" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "kind": { "enum": ["atomic", "composite"] },
+        "maturity": { "enum": ["experimental", "advisory", "blockingEligible"] },
+        "policy": { "$ref": "#/$defs/policy" },
+        "enforcement": { "enum": ["advisory", "blocking"] },
+        "target": { "$ref": "#/$defs/target" },
+        "outcome": { "enum": ["passed", "failed", "inapplicable", "cantTell", "untested"] },
+        "message": { "$ref": "#/$defs/nonEmptyString" },
+        "evidenceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "evidenceClasses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["exactSource", "exactRender", "platformSemantics", "visionMeasured", "visionInferred", "interactionTrace", "declaredContract", "unknown"] }
+        },
+        "relatedNodeIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "measurements": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/measurement" }
+        }
+      }
+    },
+    "checkReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reportSchemaVersion", "engineVersion", "artifactId", "artifactKind", "profiles", "summary", "results"],
+      "properties": {
+        "reportSchemaVersion": { "const": "0.3.0" },
+        "engineVersion": { "$ref": "#/$defs/packageVersion" },
+        "artifactId": { "$ref": "#/$defs/identifier" },
+        "artifactKind": { "enum": ["web", "mobile", "slide", "document", "pdf", "image", "other"] },
+        "extensionVersions": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/semanticVersion" }
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "summary": { "$ref": "#/$defs/summary" },
+        "results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ruleResult" }
+        }
+      }
+    }
+  }
+}

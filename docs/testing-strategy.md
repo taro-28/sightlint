@@ -308,6 +308,12 @@ grouping hard negative, and explicit deferred abstentions. ADRs 0033–0035 add 
 path and three narrow recommended Web rules. All three remain advisory because this public
 single-application corpus does not support strong UI/UX claims or blocking maturity.
 
+ADR 0036 adds the first agent-workflow product-path regression: one public combined command,
+canonical and human byte stability, exact node-to-native-locator joining, a human-authored edit in
+an isolated fixture copy, named-finding removal, no new failure, and retained ambiguous/dialog
+`cantTell` controls. Because the edit and oracle are visible, it does not estimate autonomous
+agent selection or real-world success.
+
 ## Layer 11 — Performance and resource tests
 
 Test bounded behavior at and around declared limits:

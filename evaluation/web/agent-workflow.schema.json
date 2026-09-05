@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-agent-workflow-oracle:0.1.0",
+  "title": "SightLint reviewed Web agent workflow oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "commandSurface", "provenance", "split", "cases", "limitations"],
+  "properties": {
+    "$schema": { "const": "../agent-workflow.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "const": "agentWorkflowOracle" },
+    "commandSurface": { "const": "sightlint-web-check" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "split": { "$ref": "#/$defs/split" },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/case" }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewedAt", "qualification", "rationale"],
+      "properties": {
+        "status": { "enum": ["maintainerReviewed", "dualReviewed", "expertReviewed"] },
+        "reviewedAt": { "type": "string", "format": "date" },
+        "qualification": { "$ref": "#/$defs/nonEmptyString" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringBasis", "implementationOutputUsedAsOracle", "sourceId", "ownership", "license", "redistribution", "privacyReview", "externalAssets", "externalProcessing"],
+      "properties": {
+        "authoringBasis": { "const": "humanReviewedFixtureAndRuleContracts" },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "sourceId": { "$ref": "#/$defs/nonEmptyString" },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "project-license-pending-repository-test-data" },
+        "redistribution": { "$ref": "#/$defs/nonEmptyString" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "externalAssets": { "const": false },
+        "externalProcessing": { "const": false }
+      }
+    },
+    "split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "visibility", "holdoutStatus", "leakageRisk"],
+      "properties": {
+        "name": { "enum": ["smoke", "development", "challenge"] },
+        "visibility": { "const": "public" },
+        "holdoutStatus": { "const": "notHoldout" },
+        "leakageRisk": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "expectedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "outcome", "enforcement", "targetKind", "targetId"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] },
+        "enforcement": { "enum": ["advisory", "blocking"] },
+        "targetKind": { "enum": ["artifact", "canvas", "node", "relation"] },
+        "targetId": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "sourceTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeId", "locatorType", "locatorValue", "selector", "sourceFiles", "attribution"],
+      "properties": {
+        "nodeId": { "$ref": "#/$defs/nonEmptyString" },
+        "locatorType": { "enum": ["testId", "id", "css"] },
+        "locatorValue": { "$ref": "#/$defs/nonEmptyString" },
+        "selector": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "attribution": { "const": "navigationHintNotExactSourceLine" }
+      }
+    },
+    "reviewedEdit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "description", "before", "after", "occurrences", "scope"],
+      "properties": {
+        "file": { "$ref": "#/$defs/relativePath" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "before": { "$ref": "#/$defs/nonEmptyString" },
+        "after": { "$ref": "#/$defs/nonEmptyString" },
+        "occurrences": { "const": 1 },
+        "scope": { "const": "temporaryFixtureCopyOnly" }
+      }
+    },
+    "postconditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["removedFinding", "maximumNewFailures", "doNotInferUnrelatedSuccess"],
+      "properties": {
+        "removedFinding": { "$ref": "#/$defs/expectedResult" },
+        "maximumNewFailures": { "const": 0 },
+        "doNotInferUnrelatedSuccess": { "const": true }
+      }
+    },
+    "abstentionControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request", "expectedResult", "rationale"],
+      "properties": {
+        "request": { "$ref": "#/$defs/relativePath" },
+        "expectedResult": { "$ref": "#/$defs/expectedResult" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "request", "classification", "initialResult", "sourceTarget", "reviewedEdit", "postconditions", "abstentionControl", "hardNegativeControl", "falsePositiveRisk", "hardNegativeCoverage", "nonClaim", "review"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "request": { "$ref": "#/$defs/relativePath" },
+        "classification": { "const": "targetedMutationFixRerun" },
+        "initialResult": { "$ref": "#/$defs/expectedResult" },
+        "sourceTarget": { "$ref": "#/$defs/sourceTarget" },
+        "reviewedEdit": { "$ref": "#/$defs/reviewedEdit" },
+        "postconditions": { "$ref": "#/$defs/postconditions" },
+        "abstentionControl": { "$ref": "#/$defs/abstentionControl" },
+        "hardNegativeControl": { "$ref": "#/$defs/abstentionControl" },
+        "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" },
+        "hardNegativeCoverage": { "$ref": "#/$defs/nonEmptyString" },
+        "nonClaim": { "$ref": "#/$defs/nonEmptyString" },
+        "review": { "$ref": "#/$defs/review" }
+      }
+    }
+  }
+}

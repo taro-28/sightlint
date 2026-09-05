@@ -93,8 +93,8 @@ Until it is complete, prefer the earliest unblocked step:
 1. #22 — realistic, human-reviewed evaluation corpus and hard negatives (complete);
 2. #23 — isolated Playwright native/pixel web adapter and acquisition evidence matrix (complete);
 3. #24 — first evaluated advisory recommended Web pack (complete);
-4. the local agent edit/check/fix/rerun loop defined by #34 (next);
-5. #33 — licensing, compatibility, packaging, and first alpha release.
+4. #42 — the local agent edit/check/fix/rerun loop defined by #34 (complete);
+5. #33 — licensing, compatibility, packaging, and first alpha release (next).
 
 Other work is preserved in #25–#32. It is not automatically higher priority because its code
 already exists on a stale branch. Explain any deviation from the sequence in the issue and PR.

@@ -18,7 +18,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix and first advisory recommended Web pack | portability characterization, broader representative evaluation, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
-| M7 — Ecosystem and release | not started | local development CLI only | agent workflow, MCP/GitHub/editor surfaces, packaging, license, release |
+| M7 — Ecosystem and release | active | local CLI plus bounded one-command Web agent workflow | MCP/GitHub/editor surfaces, packaging, license, release |
 
 The project is pre-alpha. The kernel and structured-IR path are much more mature than the ability
 to infer useful structure and applicability from an arbitrary screenshot.
@@ -53,11 +53,11 @@ Issue #34 owns this outcome.
      policy provenance;
    - `--profile base` is the explicit opt-out, and profile/enforcement are canonical report data;
    - all three rules remain advisory and preserve `cantTell` for unresolved alternatives.
-4. **Agent fix-and-rerun slice within #34**
+4. **#42 — Agent fix-and-rerun slice within #34 (complete)**
    - expose one local command and canonical machine report;
    - demonstrate Codex locating a source target, applying a focused edit, and rerunning SightLint;
    - verify the original finding disappears without hiding new failures.
-5. **#33 — First alpha release gate**
+5. **#33 — First alpha release gate (next)**
    - resolve license, compatibility surfaces, packaging, supply-chain checks, install, and release
      documentation only after the product path above has evidence.
 
@@ -65,7 +65,7 @@ Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by putting
 logic into the Rust kernel. Do not skip #24 by presenting raw measurements as a complete UI/UX
 reviewer.
 
-### Completed #22–#24 evaluation, acquisition, and first recommended-rule path
+### Completed #22–#24 evaluation/acquisition/rules and #42 agent path
 
 ADR 0032 establishes an independently versioned Web evaluation contract and one repository-owned
 dashboard fixture. Six reviewed records separate acquisition annotations from rule verdicts. Three
@@ -86,12 +86,20 @@ scale, and 45 explicit acquisition abstentions. The actual capture and built Rus
 exercised together on Linux with byte-stability, profile override, malformed-extension, and
 per-rule metric checks.
 
-This completes the bounded #22–#24 issue contracts, but it is not evidence of general Web
+ADR 0036 adds one `sightlint-web-check` invocation that keeps browser orchestration in Node and
+rule verdicts in the public Rust binary. Workflow report `0.1.0` retains capture/runtime
+provenance and the complete CheckReport while joining node results to native locators and
+source-bundle navigation hints. A public reviewed E2E performs the unnamed-control mutation,
+human-authored source edit in an isolated copy, and post-fix rerun; it checks byte stability,
+removal of the named finding, no new failure, and retained ambiguous/intentional-overlay
+`cantTell` behavior.
+
+This completes the bounded #22–#24 and #42 contracts, but it is not evidence of general Web
 accuracy. The corpus has one fictional application family, maintainer-only review, visible
 development labels, no private holdout, no pixel-content identity, no complete hit regions, no
 semantic peer inference, and no representative sampling. The three new rules therefore remain
-advisory; the next #34 slice must prove the local agent fix-and-rerun outcome without broadening
-their claims.
+advisory. The next required gate is #33; the scripted edit is not a claim about autonomous agent
+quality or arbitrary repositories.
 
 ## Scope-selection rules
 
@@ -379,6 +387,16 @@ Issue #31 covers:
 
 Issue #33 covers license, independent compatibility surfaces, binary/crate packaging, release
 provenance, supply-chain checks, install documentation, and the first public alpha.
+
+### First bounded slice
+
+- `sightlint-web-check` composes local Playwright capture with the existing public Rust check;
+- canonical workflow report `0.1.0` provides source/evidence navigation without changing verdicts;
+- a separately reviewed public oracle fixes one targeted mutation in a temporary fixture copy and
+  requires the named finding to disappear with no new failure;
+- ambiguity and intentional-overlay controls preserve `cantTell`;
+- temporary artifacts stay local and are removed; no hosted processor or automatic source editor
+  is introduced.
 
 ### Sequencing rule
 

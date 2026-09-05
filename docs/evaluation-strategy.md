@@ -141,6 +141,14 @@ complete hit regions, and semantic peer inference remain `cantTell`/`untested`. 
 regression evidence for one public fictional application, not real-world acquisition accuracy or
 representative rule precision.
 
+ADR 0036 adds a separate public agent-workflow oracle and E2E. The test runs one combined local
+capture/check command, joins the reviewed finding to a native selector and source bundle, applies
+one human-authored edit only in a temporary fixture copy, and requires the named finding to
+disappear without a new failure. It also preserves one ambiguous control and one intentional
+overlay as `cantTell`. Repeated JSON and human bytes are checked within the declared environment.
+This is a deterministic product-path regression, not representative agent user-outcome evidence:
+the task, locator, edit, and labels are public and visible to the implementation.
+
 ### PNG raster acquisition corpus
 
 `fixtures/png-raster/` contains 38 committed PNG byte cases:
@@ -173,7 +181,8 @@ a benchmark for rounded, shadowed, textual, photographic, or complex application
 
 ## Next evaluation expansion gates
 
-The first #22 evaluation foundation and #24 advisory rule slice are complete. Before promoting
+The first #22 evaluation foundation, #24 advisory rule slice, and #42 local-agent path are
+complete. Before promoting
 broader image inference, more Playwright-derived rules, or any rule to blocking maturity, expand
 the repository-owned Web applications, independent review, and protected-holdout process. The
 following records remain the required shape for those additions.

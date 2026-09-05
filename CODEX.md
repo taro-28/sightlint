@@ -41,11 +41,11 @@ Verify the corresponding `main` CI before planning.
 
 Issue #34 is the execution epic. Choose the earliest unblocked step:
 
-1. #22 — realistic, human-reviewed UI evaluation and hard negatives;
-2. #23 — isolated Playwright web adapter with native/pixel reconciliation;
-3. #24 — evaluated zero-setup recommended rule packs;
-4. Codex edit/check/fix/rerun demonstration within #34;
-5. #33 — license, compatibility, packaging, and first alpha release.
+1. #22 — realistic, human-reviewed UI evaluation and hard negatives (complete);
+2. #23 — isolated Playwright web adapter with native/pixel reconciliation (complete);
+3. #24 — evaluated zero-setup recommended rule packs (complete);
+4. #42 — Codex edit/check/fix/rerun demonstration within #34 (complete);
+5. #33 — license, compatibility, packaging, and first alpha release (next).
 
 Other preserved work is tracked in #25–#32. Existing stale code does not change priority.
 

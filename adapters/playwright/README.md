@@ -6,8 +6,8 @@ and accessibility observations, computed layout/render geometry, bounded clippin
 center-hit samples, and a synchronized viewport screenshot, then writes Artifact IR for the
 deterministic Rust `sightlint` binary.
 
-The adapter is governed by ADRs 0033–0035. It is not part of the Rust kernel and does not decide
-whether a UI is good or bad.
+The adapter and local orchestration command are governed by ADRs 0033–0036. They are not part of
+the Rust kernel and do not decide whether a UI is good or bad.
 
 ## Compatibility
 
@@ -15,11 +15,13 @@ whether a UI is good or bad.
   version in every capture.
 - Playwright: exactly `1.63.0` with its matching Chromium build.
 - Schema validation: AJV exactly `8.20.0` in development/E2E.
+- private adapter package: `0.4.0`.
 - capture request/response: `0.1.0`.
 - adapter implementation: `0.3.0`.
 - `org.sightlint.web` extension: `0.3.0`; strict `0.1.0` and `0.2.0` schemas remain available for
   version dispatch and historical validation.
 - Artifact IR: `0.1.0`.
+- local workflow report: `0.1.0`; it embeds CheckReport `0.3.0` without changing its verdicts.
 
 Install the locked dependencies and browser once:
 
@@ -29,6 +31,33 @@ npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run build
 cargo build --locked -p sightlint-cli
 ```
+
+## One-command local check
+
+After the preparation above, the bounded agent path captures the repository-owned fixture and
+runs the public Rust binary with one command. Human output is the default:
+
+```bash
+node adapters/playwright/dist/src/check-cli.js \
+  --request evaluation/web/requests/dashboard-browser-unnamed-control.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint
+```
+
+Use `--format json` for canonical machine output. The versioned envelope preserves the complete
+capture provenance and CheckReport and joins node results to captured native selectors and the
+source-bundle file list. A selector is a navigation hint, not an exact source-code line or proof
+of cause.
+
+Capture IR and screenshot bytes are held in private temporary storage and removed in all normal
+success/error paths. Temporary paths never appear in the report. Exit 0/1 comes from the Rust
+check's blocking policy; capture, spawn, usage, unsupported-report, and contract errors exit 2
+with empty stdout and one stable diagnostic. Advisory Web findings remain visible with exit 0.
+
+The reviewed E2E uses the same command on an isolated copy of the Atlas unnamed-control mutation,
+applies only the human-authored edit from `evaluation/web/annotations/agent-workflow.json`, and
+reruns it. It verifies that the named finding disappears and no new failure appears. This scripted
+public smoke case is not evidence of autonomous fix selection or representative agent accuracy.
 
 ## Public process path
 
@@ -104,11 +133,13 @@ cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run test:e2e
 ```
 
-The E2E executes the actual Node process and built Rust binary, validates current and historical
+The E2E executes the actual Node processes and built Rust binary, validates current and historical
 strict schemas, checks 23 reviewed clean/mutation/hard-negative/ambiguous/responsive/text-scale and
 evidence-matrix cases, exercises recommended/default/base profile behavior and stable
 malformed/resource errors, and compares repeated response, IR, screenshot, and rule-report bytes
-within one declared compatibility environment. It reports per-rule contract coverage, failure
+within one declared compatibility environment. It also checks the workflow report schema,
+source-target join, reviewed temporary fix/rerun, human format, operational errors, and retained
+abstention/hard-negative behavior. It reports per-rule contract coverage, failure
 precision, reviewed abstention, mutation kill rate, and hard-negative failures with explicit
 denominators. Linux is the required browser E2E platform; cross-platform screenshot byte identity
 is not claimed.

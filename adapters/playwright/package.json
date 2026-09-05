@@ -1,11 +1,12 @@
 {
   "name": "@sightlint/adapter-playwright",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
-  "description": "Process-isolated Playwright acquisition adapter for SightLint",
+  "description": "Process-isolated Playwright acquisition and local check orchestration for SightLint",
   "type": "module",
   "bin": {
-    "sightlint-web": "dist/src/cli.js"
+    "sightlint-web": "dist/src/cli.js",
+    "sightlint-web-check": "dist/src/check-cli.js"
   },
   "engines": {
     "node": ">=20 <25"
@@ -14,7 +15,7 @@
     "build": "tsc -p tsconfig.json",
     "check": "npm run build && node --test dist/tests/unit.test.js",
     "install:browser": "playwright install chromium",
-    "test:e2e": "npm run build && node --test dist/tests/e2e.test.js"
+    "test:e2e": "npm run build && node --test dist/tests/e2e.test.js dist/tests/workflow-e2e.test.js"
   },
   "dependencies": {
     "playwright": "1.63.0"
