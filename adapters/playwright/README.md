@@ -10,7 +10,8 @@ a UI is good or bad.
 
 ## Compatibility
 
-- Node.js: 20 through 24; CI uses Node 24.
+- Node.js: 20 through 24; CI verifies that the hosted runtime is in range and records its exact
+  version in every capture.
 - Playwright: exactly `1.63.0` with its matching Chromium build.
 - Schema validation: AJV exactly `8.20.0` in development/E2E.
 - capture request/response: `0.1.0`.
