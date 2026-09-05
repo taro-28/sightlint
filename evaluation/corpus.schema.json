@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:evaluation-corpus:0.1.0",
+  "title": "SightLint product evaluation corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "corpus",
+    "sources",
+    "gates",
+    "cases"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "description",
+        "defaultSplit"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "defaultSplit": {
+          "enum": [
+            "smoke",
+            "development",
+            "holdout"
+          ]
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/gate"
+      },
+      "required": [
+        "smoke"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "origin",
+        "license",
+        "reviewStatus"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "synthetic",
+            "human-reviewed",
+            "imported-benchmark"
+          ]
+        },
+        "origin": {
+          "type": "string",
+          "minLength": 1
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewStatus": {
+          "enum": [
+            "generated",
+            "maintainer-reviewed",
+            "dual-reviewed",
+            "expert-reviewed"
+          ]
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requireAllExpectations",
+        "requireAllMutationsKilled",
+        "determinismRuns"
+      ],
+      "properties": {
+        "requireAllExpectations": {
+          "type": "boolean"
+        },
+        "requireAllMutationsKilled": {
+          "type": "boolean"
+        },
+        "determinismRuns": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "artifactIr"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9._/-]+$"
+        }
+      }
+    },
+    "requiredOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "outcome"
+      ],
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "failed",
+            "inapplicable",
+            "cantTell",
+            "untested"
+          ]
+        }
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exitCode",
+        "forbidUnexpectedFailures",
+        "forbidUnexpectedCantTell",
+        "forbidUnexpectedUntested",
+        "requiredOutcomes"
+      ],
+      "properties": {
+        "exitCode": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "forbidUnexpectedFailures": {
+          "type": "boolean"
+        },
+        "forbidUnexpectedCantTell": {
+          "type": "boolean"
+        },
+        "requiredOutcomes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/requiredOutcome"
+          }
+        },
+        "forbidUnexpectedUntested": {
+          "type": "boolean"
+        }
+      }
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baselineCaseId",
+        "targetRuleId"
+      ],
+      "properties": {
+        "baselineCaseId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetRuleId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "split",
+        "medium",
+        "sourceId",
+        "input",
+        "expect"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "split": {
+          "enum": [
+            "smoke",
+            "development",
+            "holdout"
+          ]
+        },
+        "medium": {
+          "enum": [
+            "web",
+            "mobile",
+            "slide",
+            "document",
+            "pdf",
+            "image",
+            "other"
+          ]
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "$ref": "#/$defs/input"
+        },
+        "expect": {
+          "$ref": "#/$defs/expectation"
+        },
+        "mutation": {
+          "$ref": "#/$defs/mutation"
+        }
+      }
+    }
+  }
+}
