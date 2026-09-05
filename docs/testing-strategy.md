@@ -22,10 +22,23 @@ committed input bytes
   -> stdout, stderr, and exit code assertions
 ```
 
-## Committed fixture corpus
+## Two independent verification questions
 
-Synthetic fixtures live under `fixtures/e2e/`. They are generated deterministically by
-`tools/generate_e2e_fixtures.py`, committed for review, and checked for drift in required CI.
+SightLint keeps conformance and product evaluation separate:
+
+- **Conformance:** does the implementation obey its declared schemas, rule semantics, adapter
+  boundaries, safety limits, reports, determinism, and exit codes?
+- **Product evaluation:** do reviewed cases receive the outcomes that the intended visual or UX
+  quality oracle says they should receive?
+
+A green conformance suite can still encode the wrong product behavior. A green product evaluation
+cannot replace parser, safety, compatibility, or malformed-input testing. Both are required, and
+their results must not be collapsed into one score.
+
+## Committed conformance fixture corpus
+
+Synthetic conformance fixtures live under `fixtures/e2e/`. They are generated deterministically
+by `tools/generate_e2e_fixtures.py`, committed for review, and checked for drift in required CI.
 Generated files are not edited by hand.
 
 The corpus contains these categories:
@@ -41,6 +54,32 @@ A new rule must add passing and mutation fixtures. It must also add `cantTell` a
 `inapplicable` cases whenever those outcomes are part of its contract. A new adapter must add
 native-input-to-IR fixtures and, when possible, differential fixtures against another observation
 source.
+
+## Product evaluation corpus
+
+The versioned product oracle lives under `evaluation/`. Its manifest records case IDs, media,
+data sources, licenses, review status, splits, inputs, expected rule outcomes, and mutation
+relations. The evaluation runner executes the same built `sightlint` binary users invoke.
+
+The initial `0.1.0` corpus is a synthetic smoke suite over reviewed Artifact IR fixtures. It
+establishes the harness early, but it is not evidence of real-world precision or UX benefit.
+Future native and human-reviewed cases must be added before stronger accuracy claims or rule
+maturity changes.
+
+Evaluation splits have distinct purposes:
+
+- `smoke`: small, deterministic, and blocking on every pull request
+- `development`: reviewed data available during rule design and tuning
+- `holdout`: frozen data not consulted while tuning the evaluated rule
+
+Before a holdout split is introduced, its freeze, access, leakage-prevention, and release-reporting
+process must be documented. Updating an expected outcome requires semantic review; snapshots are
+not accepted merely because implementation output changed.
+
+Every evaluation source records origin, license status, and review status. Public artifacts must
+be redistributable and scrubbed of personal, customer, credential, and private information.
+Human-reviewed sources additionally require annotation guidance, reviewer qualifications,
+disagreement resolution, and known sampling limitations.
 
 ## Test layers
 
@@ -83,7 +122,9 @@ fixture. The rule must kill that mutation. Examples include:
 - hiding the affected count in a bulk action
 
 Mutation kill rate measures whether the checker can actually detect the failures it claims to
-cover.
+cover. In the product evaluation manifest, every synthetic mutation identifies a clean baseline
+and one target rule; required smoke CI verifies the baseline passes and the mutation fails that
+same rule.
 
 ### Metamorphic tests
 
@@ -117,8 +158,22 @@ Run the built CLI against committed data and cover at least:
 - canonical normalization idempotence
 - invariance under irrelevant input ordering
 
-The E2E suite runs on Linux, macOS, and Windows. Required CI also regenerates the fixture corpus
-in check mode before running tests.
+The E2E suite runs on Linux, macOS, and Windows. Required CI also regenerates the conformance
+fixture corpus in check mode before running tests.
+
+### Product-evaluation E2E
+
+Run every required smoke case through the public binary and verify:
+
+- safe, repository-contained input paths and valid manifest references
+- declared artifact medium and CLI exit code
+- all required rule outcomes
+- no undeclared failures, abstentions, or untested results when forbidden
+- byte-identical output for the configured number of runs
+- a passed baseline and failed mutant for every targeted mutation pair
+
+Malformed files belong in conformance tests rather than product evaluation because product cases
+represent valid artifacts whose quality verdict is being measured.
 
 ## Determinism testing
 
@@ -126,9 +181,14 @@ Run the same fixture repeatedly and compare canonical output bytes. Vary inserti
 and supported operating systems where possible. Any unstable field must be removed from the
 canonical report or explicitly isolated as non-canonical metadata.
 
+Product evaluation also repeats each smoke case independently. Determinism is a prerequisite for
+measuring quality: a case that changes outcome between runs cannot contribute a trustworthy
+precision or recall estimate.
+
 ## Precision and coverage
 
-Rule quality is evaluated per rule, not only by a global score:
+Rule quality is evaluated per rule, medium, evidence class, and dataset split, not only by a
+global score:
 
 - precision, recall, and false-positive rate
 - run-to-run agreement
@@ -139,6 +199,7 @@ Rule quality is evaluated per rule, not only by a global score:
 - expert agreement where relevant
 - real-user outcome validation for rules that claim behavioral value
 
-A rule begins experimental or advisory and earns blocking eligibility through rule-specific
-evidence. A green E2E suite proves conformance to the declared contract; it does not by itself
-prove that the contract improves real-user outcomes.
+SightLint must not collapse these measurements into a universal UX or design score. A rule begins
+experimental or advisory and earns blocking eligibility through rule-specific evidence. A green
+conformance suite proves conformance to the declared contract; a green synthetic smoke evaluation
+proves only regression stability. Neither alone proves improved real-user outcomes.
