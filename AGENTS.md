@@ -42,6 +42,9 @@ win. Do not silently reinterpret them.
 11. **Public behavior requires fixture-driven binary E2E.** Unit tests alone cannot complete a
     command, rule, adapter, schema, report, or exit-code change. Execute the built `sightlint`
     binary against committed pass, fail, ambiguity, and malformed-input fixtures as applicable.
+12. **Conformance is not product validity.** Changes affecting a claimed visual or UX capability
+    must keep the versioned product evaluation corpus correct. A green contract suite alone does
+    not prove that SightLint is detecting the intended problem.
 
 ## Change protocol
 
@@ -52,6 +55,8 @@ win. Do not silently reinterpret them.
   false-positive risks, and fixtures.
 - Every executable rule must include a passing fixture and a targeted mutation fixture. Add
   `cantTell` and `inapplicable` fixtures whenever those outcomes are meaningful.
+- A rule or adapter that changes an evaluated capability must add or update an applicable case in
+  `evaluation/corpus.json`. Do not change an oracle merely to make current output pass.
 - A new adapter must document trust level, failure modes, units, coordinate transforms,
   evidence mapping, privacy behavior, and native-input-to-IR E2E fixtures.
 - Do not expand scope merely because a library makes it easy. Follow milestone exit criteria
@@ -69,6 +74,7 @@ cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
+cargo test --locked -p sightlint-cli --test evaluation_corpus
 RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --all-features --no-deps
 ```
 
@@ -80,10 +86,13 @@ Tests must demonstrate behavior, not merely execute code. Prefer:
 - mutation fixtures proving a rule can detect its target defect
 - differential tests when two adapters observe the same artifact
 - public-binary E2E for file and standard input, reports, policies, and exit codes
+- versioned product-evaluation cases with reviewed outcomes and provenance
 - byte-for-byte determinism checks across repeated runs and irrelevant input ordering
 
-Generated fixtures remain committed for review. Do not hand-edit them. Change the generator,
-regenerate the corpus, inspect the diff, and keep `--check` green.
+Generated conformance fixtures remain committed for review. Do not hand-edit them. Change the
+generator, regenerate the corpus, inspect the diff, and keep `--check` green. Product-evaluation
+oracles are reviewed data: update them only with an explanation of why the expected behavior
+changed.
 
 ## API and data-model discipline
 
@@ -99,4 +108,5 @@ regenerate the corpus, inspect the diff, and keep `--check` green.
 ## Documentation discipline
 
 Update the relevant document and tests in the same PR when changing an invariant, schema,
-rule contract, command, or milestone. Explain deviations rather than hiding them.
+rule contract, command, milestone, or evaluated product claim. Explain deviations rather than
+hiding them.

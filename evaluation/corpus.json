@@ -1,0 +1,636 @@
+{
+  "$schema": "./corpus.schema.json",
+  "schemaVersion": "0.1.0",
+  "corpus": {
+    "id": "sightlint-product-evaluation",
+    "version": "0.1.0",
+    "description": "Required smoke evaluation for observable SightLint rule behavior.",
+    "defaultSplit": "smoke"
+  },
+  "sources": [
+    {
+      "id": "synthetic-artifact-ir-v0",
+      "kind": "synthetic",
+      "origin": "tools/generate_e2e_fixtures.py",
+      "license": "repository-test-data",
+      "reviewStatus": "maintainer-reviewed"
+    }
+  ],
+  "gates": {
+    "smoke": {
+      "requireAllExpectations": true,
+      "requireAllMutationsKilled": true,
+      "determinismRuns": 2
+    }
+  },
+  "cases": [
+    {
+      "id": "m1-cant-tell-missing-box",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/cant-tell-missing-box.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.declared-non-overlap",
+            "outcome": "cantTell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m1-clean-web",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/pass-web.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.bounds.within-canvas",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.geometry.declared-non-overlap",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.spacing.peer-consistency",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m1-mutant-bounds-outside",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/fail-bounds.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.bounds.within-canvas",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m1-clean-web",
+        "targetRuleId": "visual.bounds.within-canvas"
+      }
+    },
+    {
+      "id": "m1-mutant-overlap",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/fail-overlap.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.declared-non-overlap",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m1-clean-web",
+        "targetRuleId": "visual.geometry.declared-non-overlap"
+      }
+    },
+    {
+      "id": "m1-mutant-spacing",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/fail-spacing.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.spacing.peer-consistency",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m1-clean-web",
+        "targetRuleId": "visual.spacing.peer-consistency"
+      }
+    },
+    {
+      "id": "m2-cant-tell-alignment-missing-box",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-cant-tell-alignment-missing-box.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "cantTell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-document",
+      "split": "smoke",
+      "medium": "document",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-document.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-image",
+      "split": "smoke",
+      "medium": "image",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-image.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-mobile",
+      "split": "smoke",
+      "medium": "mobile",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-mobile.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-other",
+      "split": "smoke",
+      "medium": "other",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-other.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-pdf",
+      "split": "smoke",
+      "medium": "pdf",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-pdf.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-slide",
+      "split": "smoke",
+      "medium": "slide",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-slide.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-clean-web",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-web.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "passed"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-inapplicable-visual",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-inapplicable-visual.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "inapplicable"
+          },
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "inapplicable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m2-mutant-alignment",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-fail-alignment.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.alignment.peer-consistency",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m2-clean-web",
+        "targetRuleId": "visual.alignment.peer-consistency"
+      }
+    },
+    {
+      "id": "m2-mutant-extent",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-fail-extent.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.extent.peer-consistency",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m2-clean-web",
+        "targetRuleId": "visual.extent.peer-consistency"
+      }
+    },
+    {
+      "id": "m2-mutant-minimum-font-size",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-fail-minimum-font-size.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.typography.minimum-font-size",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m2-clean-web",
+        "targetRuleId": "visual.typography.minimum-font-size"
+      }
+    },
+    {
+      "id": "m2-mutant-parent-containment",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-fail-parent-containment.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m2-parent-contained",
+        "targetRuleId": "visual.geometry.parent-containment"
+      }
+    },
+    {
+      "id": "m2-mutant-peer-font-size",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-fail-peer-font-size.json"
+      },
+      "expect": {
+        "exitCode": 1,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.typography.peer-font-size",
+            "outcome": "failed"
+          }
+        ]
+      },
+      "mutation": {
+        "baselineCaseId": "m2-clean-web",
+        "targetRuleId": "visual.typography.peer-font-size"
+      }
+    },
+    {
+      "id": "m2-parent-contained",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "synthetic-artifact-ir-v0",
+      "input": {
+        "kind": "artifactIr",
+        "path": "fixtures/e2e/m2-pass-parent-boundary.json"
+      },
+      "expect": {
+        "exitCode": 0,
+        "forbidUnexpectedFailures": true,
+        "forbidUnexpectedCantTell": true,
+        "forbidUnexpectedUntested": true,
+        "requiredOutcomes": [
+          {
+            "ruleId": "visual.geometry.parent-containment",
+            "outcome": "passed"
+          }
+        ]
+      }
+    }
+  ]
+}
