@@ -1,61 +1,115 @@
 # Contributing to SightLint
 
-SightLint is pre-alpha and architecture-first. Contributions are welcome, but broad feature
-work should not outrun the contracts documented in this repository.
+SightLint is pre-alpha and architecture-first. Contributions are welcome, but implementation must
+not outrun the evidence, contracts, and sequencing recorded in this repository.
 
 ## Before opening code
 
-- Read `AGENTS.md` and the documents it references.
-- Search existing issues and architecture decisions.
-- For a new adapter, rule family, external service, or schema change, open an issue or ADR
-  first.
-- Keep pull requests focused and independently reviewable.
+1. Read [`CODEX.md`](CODEX.md), [`AGENTS.md`](AGENTS.md), and the documents in their required
+   order.
+2. Start from the latest green `main`; verify its exact CI run.
+3. Search current issues, accepted ADRs, and active PRs.
+4. Select one primary issue and the earliest appropriate roadmap slice.
+5. Do not use or revive closed Draft PRs #12–#17 or their legacy branches. Their remaining ideas
+   were transferred to issues #22–#27.
+6. For a new adapter, rule family, schema/protocol, trust boundary, compatibility policy,
+   external service, or durable resource model, open/accept an ADR before implementation.
+7. Define the user-visible claim, evidence, applicability, policy, uncertainty, fixtures,
+   evaluation, privacy/security/resource model, and explicit non-goals.
+
+Issue #34 is the canonical near-term execution epic. Its preferred sequence is realistic
+evaluation (#22), Playwright acquisition (#23), recommended rules (#24), a local agent fix/rerun
+loop, then the alpha release gate (#33).
 
 ## Development workflow
 
-1. Create a branch from `main`.
-2. Write or update the contract, fixture, or ADR before implementation when applicable.
-3. Implement the smallest vertical slice that satisfies the contract.
-4. Run the repository checks.
-5. Open a pull request using the provided template.
+1. Fetch/prune and update `main` with `--ff-only`.
+2. Create one focused branch for one coherent issue slice.
+3. Write or update the contract, fixture, evaluation plan, or ADR before implementation when
+   applicable.
+4. Implement the smallest complete vertical path through the real public command/process.
+5. Add independent conformance, acquisition, rule, mutation, hard-negative, and determinism
+   evidence as applicable.
+6. Run the complete gate in `AGENTS.md` and `docs/development.md`.
+7. Update `docs/handoff.md` and `docs/roadmap.md` when facts or priorities change.
+8. Open a pull request using the repository template and make its claims commit-specific.
+9. Verify all required CI jobs on the exact final head.
+10. After merge, verify the actual `main` tree and its own CI, then update issues and delete the
+    branch when repository settings permit.
 
-Common commands:
+Do not create placeholder/final/review/ready/bootstrap/repair/`v2` branch chains. Do not use
+self-writing GitHub Actions to assemble, format, repair, commit, or push feature code. Do not leave
+unconnected implementations or duplicate “next” modules.
+
+## Complete baseline commands
 
 ```bash
-cargo check-all
-cargo lint
-cargo test-all
-cargo docs
+python3 tools/generate_e2e_fixtures.py --check
+python3 tools/generate_raster_corpus.py --check
+python3 tools/generate_inspection_corpus.py --check
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo test --locked -p sightlint-cli --test e2e
+cargo test --locked -p sightlint-cli --test png_filter_e2e
+cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test evaluation_corpus
+RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```
+
+New public generators, adapters, or evaluation targets must be added to CI, `AGENTS.md`, the PR
+template, development guide, and handoff in the same change.
 
 ## Commit and pull-request style
 
 Use clear, imperative commit messages. Conventional prefixes are encouraged:
 
-- `feat:` user-visible functionality
-- `fix:` defect correction
-- `chore:` tooling or maintenance
-- `docs:` documentation only
-- `refactor:` behavior-preserving restructuring
-- `test:` test-only change
+- `feat:` user-visible functionality;
+- `fix:` defect correction;
+- `chore:` tooling or maintenance;
+- `docs:` documentation only;
+- `refactor:` behavior-preserving restructuring;
+- `test:` test/evaluation-only change.
 
 A pull request must explain:
 
-- which contract or milestone it advances
-- which evidence proves the behavior
-- how uncertainty and failure modes are represented
-- whether the serialized schema or compatibility surface changes
+- issue, milestone, exact base, and exact final head;
+- reachable user-visible behavior;
+- exact versus inferred evidence and trust boundary;
+- semantic applicability, policy source, units, tolerance, and alternatives;
+- `cantTell`, inapplicable, `untested`, and failure behavior;
+- fixtures, mutations, hard negatives, acquisition/rule evaluation, and non-claims;
+- privacy, security, resource, dependency, and compatibility effects;
+- exact final-head CI and post-merge verification.
 
-## Code quality
+Do not describe a capability from unconnected code, a historical branch, or an old CI run. Do not
+claim general UI/UX accuracy from synthetic data.
 
-- Rust code uses the 2024 edition and the workspace lint policy.
+## Code and data quality
+
+- Rust uses the 2024 edition and the workspace lint policy.
 - Unsafe Rust is forbidden by default.
-- Public APIs require documentation.
-- New dependencies require a reason in the pull request and must pass dependency policy
-  checks once those checks are enabled.
-- Generated files must identify their generator and source of truth.
+- Public APIs require documentation and stable error/version contracts.
+- Medium-specific acquisition stays outside the deterministic engine.
+- Exact facts, inferred observations, policy, outcome, severity, confidence, and maturity remain
+  separate.
+- New dependencies require an ownership, license, security, determinism, isolation, platform,
+  MSRV, and maintenance rationale.
+- Generated data identifies its generator and fails CI on drift.
+- Reviewed oracles are not snapshots; changes require a semantic reason.
+- Real fixtures require explicit provenance, redistribution rights, and privacy review.
+- The model/implementation under evaluation must not generate its own ground truth.
+
+## Repository administration
+
+Branch protection remains deferred in issue #19. Legacy branch cleanup and automatic branch
+deletion are issue #32. Their unresolved state does not relax PR or exact-head CI discipline.
 
 ## Licensing
 
-No contribution license has been selected yet. Until ADR 0007 is accepted and a repository
-license is added, external code contributions should be limited to discussion and review.
+No contribution/source license has been selected. Until proposed ADR 0007 and issue #33 are
+resolved and a repository license is added, external code contributions should remain discussion,
+review, or explicitly authorized work. Public visibility is not permission to use or redistribute
+the code or fixtures.
