@@ -43,6 +43,14 @@ enum Command {
         /// PNG file, or `-` for binary standard input.
         input: PathBuf,
     },
+    /// Inspect region and spacing candidates; advisory only, never a UX pass/fail verdict.
+    InspectImage {
+        /// PNG file, or `-` for binary standard input.
+        input: PathBuf,
+        /// Observation representation written to standard output.
+        #[arg(long, value_enum, default_value_t = OutputFormat::Human)]
+        format: OutputFormat,
+    },
     /// Adapt a supported image and run the built-in rules.
     CheckImage {
         /// PNG file, or `-` for binary standard input.
@@ -93,6 +101,7 @@ fn run(cli: Cli) -> ExitCode {
             deny_cant_tell,
         } => run_check(&input, format, deny_cant_tell),
         Command::AdaptImage { input } => run_adapt_image(&input),
+        Command::InspectImage { input, format } => run_inspect_image(&input, format),
         Command::CheckImage {
             input,
             format,
@@ -139,6 +148,24 @@ fn run_adapt_image(input: &Path) -> ExitCode {
     match document.to_canonical_json() {
         Ok(output) => write_success(&output),
         Err(error) => fail(format!("failed to serialize adapted Artifact IR: {error}")),
+    }
+}
+
+fn run_inspect_image(input: &Path, format: OutputFormat) -> ExitCode {
+    let bytes = match read_binary_input(input) {
+        Ok(bytes) => bytes,
+        Err(error) => return fail(error),
+    };
+    let inspection = match sightlint_adapter_png::inspection::inspect_png(&bytes) {
+        Ok(inspection) => inspection,
+        Err(error) => return fail(error.to_string()),
+    };
+    match format {
+        OutputFormat::Human => write_success(&inspection.to_human()),
+        OutputFormat::Json => match inspection.to_canonical_json() {
+            Ok(output) => write_success(&output),
+            Err(error) => fail(format!("failed to serialize image inspection: {error}")),
+        },
     }
 }
 

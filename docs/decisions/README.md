@@ -36,6 +36,7 @@ Accepted decisions:
 - [0024 — Separate conformance tests from product evaluation](0024-product-evaluation-corpus.md)
 - [0024 — Deterministic PNG filter reconstruction](0024-deterministic-png-filter-reconstruction.md)
 - [0030 — Verified staged raster and byte corpus](0030-verified-staged-raster-and-corpus.md)
+- [0031 — Advisory image-region inspection](0031-advisory-image-region-inspection.md)
 
 The two historical ADR 0024 files have distinct full paths. Preserve existing links rather than
 renumbering them silently. Earlier experimental branch decisions numbered 0025–0029 are not
