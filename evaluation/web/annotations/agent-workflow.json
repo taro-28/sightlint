@@ -1,0 +1,111 @@
+{
+  "$schema": "../agent-workflow.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "agentWorkflowOracle",
+  "commandSurface": "sightlint-web-check",
+  "provenance": {
+    "authoringBasis": "humanReviewedFixtureAndRuleContracts",
+    "implementationOutputUsedAsOracle": false,
+    "sourceId": "atlas-dashboard-repository-fixture-v0",
+    "ownership": "sightlintRepository",
+    "license": "project-license-pending-repository-test-data",
+    "redistribution": "No independent grant; redistribution follows the repository license decision in issue 33.",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "externalProcessing": false
+  },
+  "split": {
+    "name": "smoke",
+    "visibility": "public",
+    "holdoutStatus": "notHoldout",
+    "leakageRisk": "The fixture, defect, locator, edit, and expected postconditions are public and visible to implementers, so this case measures deterministic workflow regression only and cannot estimate agent generalization."
+  },
+  "cases": [
+    {
+      "caseId": "atlas-unnamed-control-fix-rerun",
+      "request": "evaluation/web/requests/dashboard-browser-unnamed-control.json",
+      "classification": "targetedMutationFixRerun",
+      "initialResult": {
+        "ruleId": "web.accessibility.interactive-name",
+        "ruleVersion": "0.1.0",
+        "outcome": "failed",
+        "enforcement": "advisory",
+        "targetKind": "node",
+        "targetId": "web-help-action"
+      },
+      "sourceTarget": {
+        "nodeId": "web-help-action",
+        "locatorType": "testId",
+        "locatorValue": "testid:help-action",
+        "selector": "[data-testid=\"help-action\"]",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "attribution": "navigationHintNotExactSourceLine"
+      },
+      "reviewedEdit": {
+        "file": "evaluation/web/fixture-app/app.js",
+        "description": "Preserve the existing source-declared programmatic name instead of removing it in the reviewed mutation state.",
+        "before": "  if (fixtureCase === \"unnamed-control-mutant\") {\n    document.querySelector(\"[data-testid='help-action']\")?.removeAttribute(\"aria-label\");\n  }",
+        "after": "  if (fixtureCase === \"unnamed-control-mutant\") {\n    document.querySelector(\"[data-testid='help-action']\")?.setAttribute(\"aria-label\", \"Open help center\");\n  }",
+        "occurrences": 1,
+        "scope": "temporaryFixtureCopyOnly"
+      },
+      "postconditions": {
+        "removedFinding": {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "enforcement": "advisory",
+          "targetKind": "node",
+          "targetId": "web-help-action"
+        },
+        "maximumNewFailures": 0,
+        "doNotInferUnrelatedSuccess": true
+      },
+      "abstentionControl": {
+        "request": "evaluation/web/requests/dashboard-browser-ambiguous-control.json",
+        "expectedResult": {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "outcome": "cantTell",
+          "enforcement": "advisory",
+          "targetKind": "node",
+          "targetId": "web-ambiguous-action"
+        },
+        "rationale": "A focusable generic surface has insufficient platform role semantics and must not be guessed into pass or failure."
+      },
+      "hardNegativeControl": {
+        "request": "evaluation/web/requests/dashboard-browser-intentional-overlay.json",
+        "expectedResult": {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "outcome": "cantTell",
+          "enforcement": "advisory",
+          "targetKind": "node",
+          "targetId": "web-review-action"
+        },
+        "rationale": "A source-declared dialog can intentionally cover the sampled center, so the static check must preserve uncertainty instead of emitting a false failure."
+      },
+      "falsePositiveRisk": "A missing or lossy accessibility snapshot could resemble an absent name; failure is reviewed only for the case where platform semantics expose a button role and an explicitly absent name.",
+      "hardNegativeCoverage": "The workflow rechecks one intentional dialog overlay and the existing browser corpus separately retains intentional grouping and scrollable clipping controls; this single case is not representative hard-negative precision.",
+      "nonClaim": "A scripted replay of one public reviewed edit does not prove autonomous source-fix selection, representative agent success, complete accessibility conformance, or general Web UI/UX accuracy.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The mutation removes only the icon button name, the captured test-id locator identifies the intended DOM node, and the reviewed temporary edit restores that same declaration without changing policy or unrelated layout."
+      }
+    }
+  ],
+  "limitations": [
+    "The corpus contains one fictional repository-owned application family and one source edit.",
+    "The oracle is maintainer-reviewed rather than independently or dually reviewed.",
+    "All data and labels are public and are not a frozen holdout.",
+    "A DOM selector plus source-bundle list is a navigation hint, not exact source-line causality.",
+    "The target rule remains advisory and does not make the process blocking.",
+    "No model, hosted service, private artifact, or external processing participates in the workflow."
+  ]
+}

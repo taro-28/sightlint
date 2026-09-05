@@ -49,6 +49,9 @@ establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
 - `browser-rule.schema.json` and `annotations/browser-rules.json`: independent public-binary
   verdict expectations, rule admission contracts, policy/enforcement provenance, metrics, and
   explicit non-claims. The current rule oracle is `0.2.0`; strict `0.1.0` is retained.
+- `agent-workflow.schema.json` and `annotations/agent-workflow.json`: the independent reviewed
+  source-navigation, fix/rerun, abstention, hard-negative, governance, and non-claim contract for
+  the one-command issue #42 path. It is public smoke data, not generated output or a holdout.
 - `requests/`: versioned deterministic capture requests for the Playwright adapter.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
 - `inputs/`: independently authored Artifact IR projections for currently runnable rule cases.

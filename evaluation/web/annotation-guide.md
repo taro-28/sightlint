@@ -114,6 +114,19 @@ photographs, skeletons, and loading/error/empty states.
 - Review related baseline, mutation, hard-negative, and future holdout effects together.
 - Increasing the case count does not by itself strengthen representativeness.
 
+## Agent workflow annotations
+
+`annotations/agent-workflow.json` is a third contract layer for the issue #42 orchestration path.
+It references, but does not replace, acquisition and rule ground truth. It records a reviewed
+initial finding, native locator, source-bundle navigation hints, one bounded source edit, and two
+separate postconditions: the named finding is absent and no new failure appears. The edit is
+applied only to an isolated temporary fixture copy during E2E.
+
+The workflow oracle must not contain captured report bytes or be regenerated from implementation
+output. A native selector does not prove an exact source-code line, and a successful scripted edit
+does not prove autonomous agent reasoning. Ambiguous and hard-negative controls remain explicit so
+the workflow cannot manufacture success by collapsing `cantTell` into `passed`.
+
 ## Holdout
 
 No holdout case exists. Public repository cases are development-visible. Before

@@ -49,6 +49,7 @@ background, alternatives, and disposition of historical experiments.
 - [0033 — Playwright web adapter process and capture protocol](0033-playwright-web-adapter-process.md)
 - [0034 — Web evidence matrix and extension evolution](0034-web-evidence-matrix-and-extension-evolution.md)
 - [0035 — Recommended Web profile and advisory enforcement](0035-recommended-web-profile-and-advisory-enforcement.md)
+- [0036 — Local Web check orchestration and agent report](0036-local-web-check-orchestration.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
