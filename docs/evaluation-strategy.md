@@ -129,11 +129,14 @@ peer-spacing mutation, and one intentional-grouping hard negative.
 Three smoke cases execute independently authored Artifact IR projections through the built
 `sightlint` binary and require byte-stable reports. Three development cases preserve ambiguous
 peer intent, a narrow viewport, and increased text scale as deferred abstentions. A separate
-seven-case ADR 0033 companion now exercises controlled local Playwright capture, selected DOM and
-accessibility observations, computed geometry, synchronized screenshot extent, and the built Rust
-binary against independent acquisition and rule oracles. Pixel-content identity and semantic peer
-inference remain `cantTell`/`untested`. The current counts are regression evidence for the
-evaluation contract, not real-world acquisition accuracy or representative rule precision.
+19-case ADR 0033/0034 companion now exercises controlled local Playwright capture, selected DOM and
+accessibility observations, computed geometry, overflow, clipping, center-hit samples, writing
+direction, synchronized screenshot extent, and the built Rust binary against independent
+acquisition and rule oracles. It reports 70 acquisition expectations, 37 acquisition abstentions,
+9/9 observed acquisition mutations, 3/3 current-rule mutation kills, and zero unexpected or
+hard-negative failures. Pixel-content identity, complete hit regions, and semantic peer inference
+remain `cantTell`/`untested`. These counts are regression evidence for the evaluation contract, not
+real-world acquisition accuracy or representative rule precision.
 
 ### PNG raster acquisition corpus
 

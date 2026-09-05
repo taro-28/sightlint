@@ -10,9 +10,10 @@
     "falsePositives": "emitted failed targets not present in the corresponding reviewed rule oracle",
     "mutationKillRate": "reviewed rule-eligible mutations producing the named failure / all reviewed rule-eligible mutations; acquisition-only mutations are reported separately",
     "limitations": [
-      "The seven public cases belong to one fictional application family and are visible during development.",
-      "One bounds failure is too small a denominator for a real-world precision estimate.",
-      "The spacing mutation is acquisition-only because protocol 0.1 does not emit semantic peer relations.",
+      "The nineteen public cases belong to one fictional application family and are visible during development.",
+      "Three reviewed bounds failures are too small a denominator for a real-world precision estimate.",
+      "Acquisition-only clipping, occlusion, overflow, peer-size, transformed-text, and direction cases do not gain rule verdicts without explicit applicability and policy.",
+      "Complete hit regions and pixel-content identity remain cantTell.",
       "No private holdout or independent dual review exists."
     ]
   },
@@ -24,11 +25,23 @@
       "expectedExitCode": 0,
       "expectedFailureCount": 0,
       "expectedResults": [
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-ambiguous", "targetAspect": null }
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-ambiguous",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "Inferring peer intent from repeated pixels or unequal gaps would manufacture an unsupported failure.",
       "nonClaim": "A zero exit code does not prove the ambiguous layout has good UX; it means no current deterministic rule has sufficient evidence to fail it.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The correct rule behavior is abstention through inapplicability because no peer relation is emitted." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The correct rule behavior is abstention through inapplicability because no peer relation is emitted."
+      }
     },
     {
       "caseId": "dashboard-browser-clean",
@@ -37,11 +50,106 @@
       "expectedExitCode": 0,
       "expectedFailureCount": 0,
       "expectedResults": [
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-clean", "targetAspect": null }
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-clean",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "Viewport bounds must not be substituted for document bounds, or legitimate below-the-fold content would fail.",
       "nonClaim": "Passing existing kernel rules is not a general visual-quality or UX judgment.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "All captured node render boxes remain within the document canvas; peer spacing is not evaluated without a relation." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "All captured node render boxes remain within the document canvas; peer spacing is not evaluated without a relation."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-clipping",
+      "request": "evaluation/web/requests/dashboard-browser-clipping.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-clipping",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Promoting rectangular ancestor clipping directly into a failure would ignore intentional carousels, masks, and reveal interactions.",
+      "nonClaim": "The adapter detects one acquisition conflict; no current rule determines whether this clipped content is harmful.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "Existing rules receive exact core geometry only and do not infer a clipping policy from the private Web extension."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-control-boundaries",
+      "request": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+      "classification": "clean",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-control-boundaries",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Treating a visual child rectangle as the complete hit target, or treating a disabled/hidden control as a geometry defect, would create unsupported failures.",
+      "nonClaim": "This case demonstrates separable native evidence and center samples, not touch-target conformance.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "All selected control geometry remains within the document and no exact hit region is asserted."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-control-offscreen",
+      "request": "evaluation/web/requests/dashboard-browser-control-offscreen.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 1,
+      "expectedFailureCount": 1,
+      "expectedResults": [
+        {
+          "ruleId": "visual.bounds.within-canvas",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-offscreen-action",
+          "targetAspect": "renderBox"
+        },
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-control-offscreen",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "A visibility-aware future policy must distinguish intentionally parked controls; the current exact bounds rule only proves the render box is outside the document.",
+      "nonClaim": "The one bounds failure does not prove why the control moved or establish general interaction quality.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source mutation moves the enabled export control beyond the document's left edge, which is sufficient for the existing exact bounds rule."
+      }
     },
     {
       "caseId": "dashboard-browser-intentional-grouping",
@@ -50,11 +158,48 @@
       "expectedExitCode": 0,
       "expectedFailureCount": 0,
       "expectedResults": [
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-intentional-grouping", "targetAspect": null }
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-intentional-grouping",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "Treating the adjacent complementary promotion as a metric peer would create a false-positive spacing verdict.",
       "nonClaim": "The hard negative establishes one protected valid asymmetry, not broad precision across real websites.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "Native hierarchy and complementary semantics are preserved, while no peer relation is invented." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "Native hierarchy and complementary semantics are preserved, while no peer relation is invented."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-intentional-overlay",
+      "request": "evaluation/web/requests/dashboard-browser-intentional-overlay.json",
+      "classification": "hardNegative",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-intentional-overlay",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "A geometry-only overlap rule could falsely fail valid dialogs and popovers without source intent, role, and interaction-state evidence.",
+      "nonClaim": "Zero failures protects one declared overlay example and is not broad overlay precision evidence.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The selected dialog is source-declared intentional, remains within document bounds, and does not create a supported current-rule failure."
+      }
     },
     {
       "caseId": "dashboard-browser-mobile",
@@ -63,11 +208,98 @@
       "expectedExitCode": 0,
       "expectedFailureCount": 0,
       "expectedResults": [
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-mobile", "targetAspect": null }
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-mobile",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "Using the screenshot viewport as the core canvas would falsely fail valid below-the-fold nodes.",
       "nonClaim": "Viewport extent coverage records what was captured; it does not label below-the-fold content as a UI defect.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The document canvas contains the responsive page even though one viewport screenshot is partial." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The document canvas contains the responsive page even though one viewport screenshot is partial."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-notification-clean",
+      "request": "evaluation/web/requests/dashboard-browser-notification-clean.json",
+      "classification": "clean",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-notification-clean",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Conflating below-fold document content with screenshot absence would fail a valid page even though this selected baseline is positioned in the captured viewport.",
+      "nonClaim": "The clean baseline proves only the reviewed acquisition facts and existing rule behavior.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The notification baseline has no overflow, clipping, transform conflict, or out-of-document geometry."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-occlusion",
+      "request": "evaluation/web/requests/dashboard-browser-occlusion.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-occlusion",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Failing every center occlusion could misclassify transient or intentional layers; issue #24 must define sufficient evidence and applicability.",
+      "nonClaim": "The adapter detects the sampled blocker, but the current kernel makes no occlusion verdict.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The acquisition oracle records the changed center-hit evidence while the rule oracle conservatively remains inapplicable."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-occlusion-clean",
+      "request": "evaluation/web/requests/dashboard-browser-occlusion-clean.json",
+      "classification": "clean",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-occlusion-clean",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "A center hit is only one sample and must not be generalized into a fully usable hit rectangle.",
+      "nonClaim": "The unobstructed sample does not establish complete interaction accessibility.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The selected action's center resolves to the action while all core geometry remains in bounds."
+      }
     },
     {
       "caseId": "dashboard-browser-out-of-viewport",
@@ -76,12 +308,139 @@
       "expectedExitCode": 1,
       "expectedFailureCount": 1,
       "expectedResults": [
-        { "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "outcome": "failed", "targetKind": "node", "targetId": "web-metric-revenue", "targetAspect": "renderBox" },
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-out-of-viewport", "targetAspect": null }
+        {
+          "ruleId": "visual.bounds.within-canvas",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-metric-revenue",
+          "targetAspect": "renderBox"
+        },
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-out-of-viewport",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "A viewport-only canvas or rounded transform delta could change the failure target; the oracle requires document-space exact render evidence.",
       "nonClaim": "The mutation kill proves one bounds path, not general browser acquisition accuracy or UX severity.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The targeted transform moves only the selected card's render box beyond the document's left edge." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The targeted transform moves only the selected card's render box beyond the document's left edge."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-overflow",
+      "request": "evaluation/web/requests/dashboard-browser-overflow.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-overflow",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Scroll/client overflow alone cannot distinguish harmful truncation from intentional ellipsis with an alternate disclosure path.",
+      "nonClaim": "The measured overflow does not establish that the user cannot recover the full text.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "No current deterministic rule consumes private Web overflow evidence, so the mutation is acquisition-only."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-peer-dimension",
+      "request": "evaluation/web/requests/dashboard-browser-peer-dimension.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-peer-dimension",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Repeated-card appearance must not be upgraded into semantic peer membership solely to produce a size-consistency failure.",
+      "nonClaim": "Unequal measured heights are not themselves proof of a UI defect.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The adapter preserves the dimensions but emits no exact peer relation required by a consistency rule."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-responsive-mobile-mutant",
+      "request": "evaluation/web/requests/dashboard-browser-responsive-mobile-mutant.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 1,
+      "expectedFailureCount": 1,
+      "expectedResults": [
+        {
+          "ruleId": "visual.bounds.within-canvas",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-metric-revenue",
+          "targetAspect": "renderBox"
+        },
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-responsive-mobile-mutant",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Using desktop expectations for the mobile layout could produce the wrong target; the oracle requires the mobile document-space render box.",
+      "nonClaim": "The failure kills one mobile bounds mutation, not responsive-design quality in general.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "At the declared mobile viewport, only the transformed revenue card crosses the document's left edge."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-rtl-vertical",
+      "request": "evaluation/web/requests/dashboard-browser-rtl-vertical.json",
+      "classification": "clean",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-rtl-vertical",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Assuming left-to-right or horizontal writing when interpreting geometry could create direction-dependent false positives.",
+      "nonClaim": "Passing current rules does not establish RTL localization or reading-order quality.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "Native direction and writing-mode evidence is retained while no direction-specific rule is admitted."
+      }
     },
     {
       "caseId": "dashboard-browser-spacing-mutant",
@@ -90,11 +449,23 @@
       "expectedExitCode": 0,
       "expectedFailureCount": 0,
       "expectedResults": [
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-spacing-mutant", "targetAspect": null }
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-spacing-mutant",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "A geometry-only adapter must not upgrade visual similarity into exact peer membership just to kill the spacing mutation.",
       "nonClaim": "The adapter measures the 16 CSS-pixel transform but protocol 0.1 deliberately does not prove the corresponding spacing defect.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "Acquisition truth records the transform conflict separately from the unavailable peer relation required by the rule." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "Acquisition truth records the transform conflict separately from the unavailable peer relation required by the rule."
+      }
     },
     {
       "caseId": "dashboard-browser-text-scale",
@@ -103,11 +474,48 @@
       "expectedExitCode": 0,
       "expectedFailureCount": 0,
       "expectedResults": [
-        { "ruleId": "visual.spacing.peer-consistency", "ruleVersion": "0.1.0", "outcome": "inapplicable", "targetKind": "artifact", "targetId": "web-dashboard-browser-text-scale", "targetAspect": null }
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-text-scale",
+          "targetAspect": null
+        }
       ],
       "falsePositiveRisk": "Reusing unscaled geometry or assuming increased document height is a defect would create false failures.",
       "nonClaim": "This case proves capture at one declared text scale only; it does not establish accessibility conformance.",
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "Scaled native geometry remains within the document canvas, and no peer relation is emitted." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "Scaled native geometry remains within the document canvas, and no peer relation is emitted."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-transformed-text",
+      "request": "evaluation/web/requests/dashboard-browser-transformed-text.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-transformed-text",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Using computed font size alone could miss rendered scaling, while treating every transform as harmful could fail legitimate emphasis or animation.",
+      "nonClaim": "The layout/render conflict is acquisition evidence, not a small-text conformance result.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "No current rule has visible-ink evidence or a transformed-text policy, so the correct present behavior is non-failure."
+      }
     }
   ]
 }

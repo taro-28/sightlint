@@ -21,16 +21,18 @@ Three development records preserve acquisition questions: ambiguous peer intent,
 viewport, and increased text scale. Their original declared-IR projections remain explicitly
 `untested`; they are not rewritten from browser output.
 
-ADR 0033 adds a separate browser-acquisition companion slice with seven reviewed requests. It runs
+ADRs 0033 and 0034 add a separate browser-acquisition companion with 19 reviewed requests. It runs
 the repository-owned fixture through the isolated `sightlint-web` process and covers clean,
-out-of-document mutation, spacing mutation, intentional-grouping hard negative, ambiguous,
-responsive, and 125% text-scale states. `annotations/browser-acquisition.json` records acquisition
-truth, while `annotations/browser-rules.json` independently records expected results from the
-built Rust binary. Captured Artifact IR and screenshots remain temporary test artifacts.
+out-of-document, clipping, overflow, occlusion, peer-dimension, transformed-text, control-state,
+responsive, RTL/vertical-writing, ambiguity, and intentional-asymmetry/overlay cases.
+`annotations/browser-acquisition.json` records acquisition truth, while
+`annotations/browser-rules.json` independently records expected results from the built Rust
+binary. Captured Artifact IR and screenshots remain temporary review/test artifacts and are never
+copied into either oracle.
 
 This corpus is realistic in structure, not representative in sampling. It contains one application
-family, one language, one theme, and one evaluated rule. It does not establish real-world UI/UX
-accuracy or recommended/blocking maturity.
+family, one language, one theme, and two explicitly reviewed current rule paths. It does not
+establish real-world UI/UX accuracy or recommended/blocking maturity.
 
 ## Files and authority
 
@@ -41,6 +43,8 @@ accuracy or recommended/blocking maturity.
 - `annotations/rules.json`: applicability, policy, expected rule outcomes, and false-positive risks.
 - `browser-acquisition.schema.json` and `annotations/browser-acquisition.json`: reviewed browser
   structure, geometry, reconciliation, mutation, hard-negative, and abstention expectations.
+- `browser-acquisition-0.1.schema.json`: retained strict previous schema for compatibility checks;
+  the current browser acquisition oracle is `0.2.0`.
 - `browser-rule.schema.json` and `annotations/browser-rules.json`: independent public-binary
   verdict expectations and explicit non-claims.
 - `requests/`: versioned deterministic capture requests for the Playwright adapter.
@@ -57,11 +61,12 @@ review-version decision, and review of related baseline, mutation, hard-negative
 
 ## Acquisition status
 
-Browser protocol `0.1.0` measures selected DOM/accessibility observations, computed
-layout/render geometry, center hit tests, viewport screenshot extent, and bounded native/screenshot
-reconciliation for the seven companion cases. Screenshot pixel-content identity remains
-`cantTell`, and semantic peer membership remains `untested`/`cantTell`; source-reviewed intent does
-not become an inferred fact.
+Browser protocol `0.1.0` and `org.sightlint.web@0.2.0` measure selected DOM/accessibility
+observations, computed layout/render geometry, client/scroll overflow, rectangular ancestor
+clipping, center hit samples, viewport screenshot extent, and bounded native/screenshot
+reconciliation for the 19 companion cases. Screenshot pixel-content identity and complete hit
+regions remain `cantTell`, and semantic peer membership remains `untested`/`cantTell`;
+source-reviewed intent does not become an inferred fact.
 
 The original six-case declared-IR corpus is retained unchanged except for source-digest drift. It
 continues to test the peer-spacing rule independently of acquisition. Missing or conflicting
@@ -98,6 +103,8 @@ cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run test:e2e
 ```
 
-Together they expose explicit cases for pass/fail coverage, false-positive protection,
-abstention, and mutation detection. Those small public-fixture counts are not a quality score or a
-real-world accuracy estimate.
+Together they currently report 19/19 case coverage, 70 reviewed acquisition expectations, 37
+reviewed acquisition abstentions, 9/9 acquisition mutations observed, 3/3 current-rule-eligible
+mutations killed, 3/3 matched emitted failures, zero unexpected failures, and zero hard-negative
+failures. Those small public-fixture counts are not a quality score or a real-world accuracy
+estimate.

@@ -32,7 +32,7 @@
             <h1>Good morning, Morgan</h1>
             <p class="lede">Track delivery signals without losing the context behind them.</p>
           </div>
-          <button class="primary-action" type="button">Create report</button>
+          <button class="primary-action" type="button" data-testid="create-report-action">Create report</button>
         </header>
 
         <section aria-labelledby="metrics-heading" data-testid="metrics-section">
@@ -67,7 +67,7 @@
                 data-testid="metric-retention"
               >
                 <p class="metric-label">Retention</p>
-                <p class="metric-value">91.7%</p>
+                <p class="metric-value" data-testid="metric-retention-value">91.7%</p>
                 <p class="metric-trend">Steady this month</p>
               </article>
             </div>
@@ -104,6 +104,51 @@
               <div><strong>Morgan</strong><p>Updated the workspace objectives.</p></div>
               <span class="activity-time">1 hr</span>
             </article>
+          </div>
+        </section>
+
+        <section class="operations-panel" aria-labelledby="operations-heading" data-testid="operations-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Delivery desk</p>
+              <h2 id="operations-heading">Review operations</h2>
+            </div>
+            <span class="queue-label" data-testid="queue-label">Queue 04</span>
+          </div>
+
+          <div class="operations-grid">
+            <div class="notification-viewport" data-testid="notification-viewport">
+              <article class="notification-card" data-testid="notification-card">
+                <p class="metric-label">Next checkpoint</p>
+                <h3 class="notification-title" data-testid="notification-title">
+                  Confirm onboarding evidence before the weekly delivery review
+                </h3>
+                <p class="notification-copy">Three owners have attached their supporting notes.</p>
+              </article>
+            </div>
+
+            <div class="control-boundaries" data-testid="control-boundaries">
+              <div class="compact-visual-card" data-testid="compact-visual-card">
+                <span>Review one flagged item</span>
+                <button class="compact-hit-action" type="button" data-testid="compact-hit-action">Open</button>
+              </div>
+              <button class="large-hit-action" type="button" data-testid="large-hit-action">
+                <span class="small-visual-glyph" data-testid="small-visual-glyph" aria-hidden="true">+</span>
+                <span class="visually-hidden">Add a review note</span>
+              </button>
+              <button type="button" data-testid="disabled-action" disabled>Publish summary</button>
+              <button class="disclosure-action" type="button" data-testid="hidden-action">Archive report</button>
+              <button class="offscreen-action" type="button" data-testid="offscreen-action">Export evidence</button>
+            </div>
+          </div>
+
+          <div class="review-action-wrap">
+            <button class="quiet-action" type="button" data-testid="review-action">Review queue</button>
+            <div class="accidental-blocker" data-testid="accidental-blocker" aria-hidden="true">Syncing</div>
+            <aside class="intentional-popover" role="dialog" aria-label="Review guidance" data-testid="intentional-popover">
+              <strong>Review guidance</strong>
+              <p>Compare the source note before publishing.</p>
+            </aside>
           </div>
         </section>
       </main>

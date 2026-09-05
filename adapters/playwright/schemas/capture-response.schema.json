@@ -24,7 +24,7 @@
       "required": ["name", "version", "nodeVersion", "platform", "architecture", "playwrightVersion", "browserName", "browserVersion"],
       "properties": {
         "name": { "const": "sightlint-playwright" },
-        "version": { "const": "0.1.0" },
+        "version": { "$ref": "#/$defs/semanticVersion" },
         "nodeVersion": { "$ref": "#/$defs/nonEmptyString" },
         "platform": { "$ref": "#/$defs/nonEmptyString" },
         "architecture": { "$ref": "#/$defs/nonEmptyString" },
@@ -82,6 +82,7 @@
   },
   "$defs": {
     "nonEmptyString": { "type": "string", "minLength": 1 },
+    "semanticVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
     "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "size": {
       "type": "object",

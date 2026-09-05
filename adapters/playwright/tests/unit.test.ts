@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -74,14 +74,11 @@ test("request parser enforces byte, viewport, and closed-environment limits", as
 });
 
 test("all protocol and oracle examples satisfy their versioned JSON Schemas", async () => {
+  const requestFiles = (await readdir(resolve(repositoryRoot, "evaluation/web/requests")))
+    .filter((name) => name.endsWith(".json"))
+    .sort();
   const pairs = [
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-ambiguous.json"],
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-clean.json"],
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-intentional-grouping.json"],
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-mobile.json"],
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-out-of-viewport.json"],
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-spacing-mutant.json"],
-    ["adapters/playwright/schemas/capture-request.schema.json", "evaluation/web/requests/dashboard-browser-text-scale.json"],
+    ...requestFiles.map((name) => ["adapters/playwright/schemas/capture-request.schema.json", `evaluation/web/requests/${name}`] as const),
     ["evaluation/web/browser-acquisition.schema.json", "evaluation/web/annotations/browser-acquisition.json"],
     ["evaluation/web/browser-rule.schema.json", "evaluation/web/annotations/browser-rules.json"],
   ] as const;
@@ -91,6 +88,17 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     const validate = ajv.compile(await json(schemaPath) as AnySchema);
     assert.equal(validate(await json(documentPath)), true, `${documentPath}: ${ajv.errorsText(validate.errors)}`);
   }
+});
+
+test("previous strict schemas remain available and reject current documents", async () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  const previousAcquisition = ajv.compile(await json("evaluation/web/browser-acquisition-0.1.schema.json") as AnySchema);
+  assert.equal(previousAcquisition(await json("evaluation/web/annotations/browser-acquisition.json")), false);
+  assert.match(ajv.errorsText(previousAcquisition.errors), /schemaVersion|must be equal to constant/u);
+
+  const previousExtension = await json("adapters/playwright/schemas/web-extension-0.1.schema.json") as Record<string, unknown>;
+  assert.equal(previousExtension["$id"], "urn:sightlint:schema:web-extension:0.1.0");
+  assert.deepEqual((previousExtension["properties"] as Record<string, unknown>)["extensionVersion"], { const: "0.1.0" });
 });
 
 test("protocol schemas reject extension fields", async () => {

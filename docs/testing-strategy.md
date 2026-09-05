@@ -261,8 +261,10 @@ Current examples:
 - the 30-case image-inspection corpus compares region bounds, groups, gaps, abstentions, evidence,
   and errors under the strict perimeter hypothesis.
 
-The initial Playwright example uses seven repository-owned states with selected
-DOM/accessibility/computed geometry and a synchronized screenshot. Broader Web fixtures and future
+The Playwright evidence matrix uses 19 repository-owned states with selected
+DOM/accessibility/computed geometry, overflow/clipping/center-hit reconciliation, and synchronized
+screenshots. Its acquisition and rule oracles are independently authored, and previous/current
+strict schemas remain distinguishable. Broader representative Web applications and future
 OCR/CV/VLM outputs still require comparison with independent reviewed annotations.
 
 Required acquisition controls include:

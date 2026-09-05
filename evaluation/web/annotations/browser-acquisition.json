@@ -1,11 +1,11 @@
 {
   "$schema": "../browser-acquisition.schema.json",
-  "schemaVersion": "0.1.0",
+  "schemaVersion": "0.2.0",
   "documentType": "browserAcquisitionOracle",
   "provenance": {
     "authoringBasis": "humanReviewedFixtureContract",
     "implementationOutputUsedAsOracle": false,
-    "sourceId": "atlas-dashboard-repository-fixture-v0",
+    "sourceId": "atlas-dashboard-repository-fixture-v1",
     "ownership": "sightlintRepository",
     "license": "project-license-pending-repository-test-data",
     "privacyReview": "syntheticNoPersonalData",
@@ -20,30 +20,102 @@
       "split": "development",
       "classification": "ambiguous",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+          {
+            "id": "web-metric-peer-group",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": "Product metrics",
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
         ],
         "gaps": [
-          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
-          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 40, "tolerance": 1, "unit": "cssPixel" }
+          {
+            "from": "web-metric-revenue",
+            "to": "web-metric-activation",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          },
+          {
+            "from": "web-metric-activation",
+            "to": "web-metric-retention",
+            "axis": "horizontal",
+            "value": 40,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          }
         ]
       },
       "abstentions": [
-        { "aspect": "semanticPeerMembership", "outcome": "cantTell", "rationale": "Source cues intentionally support more than one valid grouping interpretation." },
-        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "cantTell",
+          "rationale": "Source cues intentionally support more than one valid grouping interpretation."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching."
+        }
       ],
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The unequal visual intervals are measurable, while peer intent remains deliberately unresolved." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The unequal visual intervals are measurable, while peer intent remains deliberately unresolved."
+      }
     },
     {
       "caseId": "dashboard-browser-clean",
@@ -51,30 +123,512 @@
       "split": "smoke",
       "classification": "clean",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+          {
+            "id": "web-metric-peer-group",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": "Product metrics",
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
         ],
         "gaps": [
-          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
-          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" }
+          {
+            "from": "web-metric-revenue",
+            "to": "web-metric-activation",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          },
+          {
+            "from": "web-metric-activation",
+            "to": "web-metric-retention",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          }
         ]
       },
       "abstentions": [
-        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "Protocol 0.1 does not infer core peer relations from DOM similarity." },
-        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "untested",
+          "rationale": "Protocol 0.1 does not infer core peer relations from DOM similarity."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching."
+        }
       ],
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The fixture contract declares three source siblings with two 24 CSS-pixel grid gaps." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The fixture contract declares three source siblings with two 24 CSS-pixel grid gaps."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-clipping",
+      "request": "evaluation/web/requests/dashboard-browser-clipping.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-notification-viewport",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "overflowX": "hidden",
+            "overflowMeasurement": {
+              "horizontal": "present",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-notification-card",
+            "parentId": "web-notification-viewport",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "conflict",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "transform": "matrix(1, 0, 0, 1, 300, 0)",
+            "renderOffset": {
+              "x": 300,
+              "y": 0,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "partiallyClipped"
+          },
+          {
+            "id": "web-notification-title",
+            "parentId": "web-notification-card",
+            "accessibilityStatus": "observed",
+            "role": "heading",
+            "name": "Confirm onboarding evidence before the weekly delivery review",
+            "display": "block",
+            "layoutRenderStatus": "cantTell",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "overflowMeasurement": {
+              "horizontal": "absent",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "partiallyClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "pixelVisibilityFraction",
+          "outcome": "cantTell",
+          "rationale": "Rectangular ancestor intersection records clipping but does not segment visible pixels."
+        },
+        {
+          "aspect": "clippingDefectVerdict",
+          "outcome": "untested",
+          "rationale": "No admitted deterministic rule yet decides whether this clipping is a product defect."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-notification-clean.json",
+        "target": "web-notification-card",
+        "changedProperty": "transform translateX from none to 300 CSS pixels",
+        "preservedProperties": [
+          "fixture content",
+          "notification viewport size",
+          "computed font values",
+          "network and privacy policy"
+        ],
+        "evidenceExpectations": [
+          "layoutRenderConflict",
+          "renderOffset",
+          "ancestorClipping"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source mutation changes only the notification card transform; the adapter must retain both its render conflict and ancestor clipping."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-control-boundaries",
+      "request": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+      "split": "development",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-compact-visual-card",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "flex",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": false,
+            "renderSize": {
+              "width": 185,
+              "height": 72,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "centerHitSample": {
+              "outcome": "notInteractive",
+              "hitLocator": null
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-compact-hit-action",
+            "parentId": "web-compact-visual-card",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Open",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "renderSize": {
+              "width": 42,
+              "height": 30,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:compact-hit-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-large-hit-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Add a review note",
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "renderSize": {
+              "width": 52,
+              "height": 52,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:small-visual-glyph"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-small-visual-glyph",
+            "parentId": "web-large-hit-action",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": false,
+            "renderSize": {
+              "width": 18,
+              "height": 18,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-disabled-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Publish summary",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": true,
+            "accessibilityStates": [
+              "disabled"
+            ],
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:disabled-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-hidden-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "none",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "zeroArea",
+            "interactive": true,
+            "disabled": false,
+            "renderSize": {
+              "width": 0,
+              "height": 0,
+              "tolerance": 0,
+              "unit": "cssPixel"
+            },
+            "centerHitSample": {
+              "outcome": "zeroArea",
+              "hitLocator": null
+            },
+            "ancestorClipStatus": "cantTell"
+          },
+          {
+            "id": "web-offscreen-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Export evidence",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:offscreen-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "completeHitRegions",
+          "outcome": "cantTell",
+          "rationale": "Center samples do not establish complete activation rectangles for any control."
+        },
+        {
+          "aspect": "controlSizeDefectVerdict",
+          "outcome": "untested",
+          "rationale": "Nested visual and interactive extents are acquisition evidence, not an admitted policy threshold."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The clean control state deliberately includes nested visual and interactive extents plus hidden and disabled controls without treating their geometry as hit boxes."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-control-offscreen",
+      "request": "evaluation/web/requests/dashboard-browser-control-offscreen.json",
+      "split": "development",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-offscreen-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Export evidence",
+            "display": "block",
+            "layoutRenderStatus": "conflict",
+            "screenshotGeometryCoverage": "outsideScreenshot",
+            "interactive": true,
+            "disabled": false,
+            "transform": "matrix(1, 0, 0, 1, -1800, 0)",
+            "renderOffset": {
+              "x": -1800,
+              "y": 0,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "centerHitSample": {
+              "outcome": "offViewport",
+              "hitLocator": null
+            },
+            "ancestorClipStatus": "fullyClipped"
+          },
+          {
+            "id": "web-disabled-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Publish summary",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": true,
+            "accessibilityStates": [
+              "disabled"
+            ],
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:disabled-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "completeHitRegion",
+          "outcome": "cantTell",
+          "rationale": "The adapter records an off-viewport center sample but no full hit region."
+        },
+        {
+          "aspect": "offscreenIntent",
+          "outcome": "cantTell",
+          "rationale": "Acquisition cannot decide whether moving the export action offscreen was intentional."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+        "target": "web-offscreen-action",
+        "changedProperty": "transform translateX from none to -1800 CSS pixels",
+        "preservedProperties": [
+          "button role and name",
+          "disabled state",
+          "control panel geometry",
+          "other controls"
+        ],
+        "evidenceExpectations": [
+          "layoutRenderConflict",
+          "renderOffset",
+          "ancestorClipping",
+          "centerHitSample"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The transform moves one enabled control offscreen while preserving its native semantic identity and records the overflow-ancestor clip separately."
+      }
     },
     {
       "caseId": "dashboard-browser-intentional-grouping",
@@ -82,31 +636,192 @@
       "split": "challenge",
       "classification": "hardNegative",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "cantTell", "role": null, "name": null, "display": "none", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "zeroArea" },
-          { "id": "web-promotion-card", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "complementary", "name": "Prepare the next review", "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+          {
+            "id": "web-metric-peer-group",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": "Product metrics",
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "none",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "zeroArea"
+          },
+          {
+            "id": "web-promotion-card",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "complementary",
+            "name": "Prepare the next review",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
         ],
         "gaps": [
-          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" }
+          {
+            "from": "web-metric-revenue",
+            "to": "web-metric-activation",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          }
         ]
       },
       "abstentions": [
-        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "The adapter preserves hierarchy and platform semantics but does not synthesize a peer relation." },
-        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "untested",
+          "rationale": "The adapter preserves hierarchy and platform semantics but does not synthesize a peer relation."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching."
+        }
       ],
-      "hardNegative": { "category": "intentionalGrouping", "rationale": "A complementary promotion next to two metric peers is valid asymmetry and must not be promoted into a spacing defect." },
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "Source role and hierarchy distinguish the visible promotion from the metric group." }
+      "hardNegative": {
+        "category": "intentionalGrouping",
+        "rationale": "A complementary promotion next to two metric peers is valid asymmetry and must not be promoted into a spacing defect."
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "Source role and hierarchy distinguish the visible promotion from the metric group."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-intentional-overlay",
+      "request": "evaluation/web/requests/dashboard-browser-intentional-overlay.json",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-intentional-popover",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "observed",
+            "role": "dialog",
+            "name": "Review guidance",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": false,
+            "renderSize": {
+              "width": 240,
+              "height": 84,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-review-action",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Review queue",
+            "display": "inline-block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:review-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "overlayIntentGeneralization",
+          "outcome": "cantTell",
+          "rationale": "This fixture declares intent; the adapter cannot infer intent for arbitrary overlays."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Dialog geometry is synchronized with the screenshot but its pixels are not segmented."
+        }
+      ],
+      "hardNegative": {
+        "category": "intentionalOverlay",
+        "rationale": "A source-declared review guidance dialog may overlap background content without becoming an automatic overlap failure."
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The dialog role and stable hierarchy distinguish this intentional overlay from the accidental center blocker."
+      }
     },
     {
       "caseId": "dashboard-browser-mobile",
@@ -114,30 +829,391 @@
       "split": "development",
       "classification": "clean",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 390, "height": 844, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 844,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "partiallyOutsideScreenshot" },
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "partiallyOutsideScreenshot" }
+          {
+            "id": "web-metric-peer-group",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": "Product metrics",
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "partiallyOutsideScreenshot"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "partiallyOutsideScreenshot"
+          }
         ],
         "gaps": [
-          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "vertical", "value": 16, "tolerance": 1, "unit": "cssPixel" },
-          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "vertical", "value": 16, "tolerance": 1, "unit": "cssPixel" }
+          {
+            "from": "web-metric-revenue",
+            "to": "web-metric-activation",
+            "axis": "vertical",
+            "value": 16,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          },
+          {
+            "from": "web-metric-activation",
+            "to": "web-metric-retention",
+            "axis": "vertical",
+            "value": 16,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          }
         ]
       },
       "abstentions": [
-        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "Responsive geometry is acquired, but no semantic peer relation is inferred." },
-        { "aspect": "belowFoldPixelContent", "outcome": "cantTell", "rationale": "The viewport screenshot does not contain the complete below-the-fold retention card." }
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "untested",
+          "rationale": "Responsive geometry is acquired, but no semantic peer relation is inferred."
+        },
+        {
+          "aspect": "belowFoldPixelContent",
+          "outcome": "cantTell",
+          "rationale": "The viewport screenshot does not contain the complete below-the-fold retention card."
+        }
       ],
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The mobile contract changes the sequence axis and gap without changing metric identity." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The mobile contract changes the sequence axis and gap without changing metric identity."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-notification-clean",
+      "request": "evaluation/web/requests/dashboard-browser-notification-clean.json",
+      "split": "smoke",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-notification-viewport",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "clientSize": {
+              "width": 558,
+              "height": 164,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "scrollSize": {
+              "width": 558,
+              "height": 164,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "overflowMeasurement": {
+              "horizontal": "absent",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-notification-card",
+            "parentId": "web-notification-viewport",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "transform": "none",
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-notification-title",
+            "parentId": "web-notification-card",
+            "accessibilityStatus": "observed",
+            "role": "heading",
+            "name": "Confirm onboarding evidence before the weekly delivery review",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "overflowX": "hidden",
+            "whiteSpace": "nowrap",
+            "textOverflow": "ellipsis",
+            "clientSize": {
+              "width": 518,
+              "height": 22,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "scrollSize": {
+              "width": 518,
+              "height": 22,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "overflowMeasurement": {
+              "horizontal": "absent",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Extension 0.2 does not perform pixel segmentation or node identity matching."
+        },
+        {
+          "aspect": "notificationQuality",
+          "outcome": "untested",
+          "rationale": "The acquisition baseline records layout facts and does not judge notification UX."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The fixed-position clean baseline makes the notification region reviewable in the synchronized viewport without overflow or clipping."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-occlusion",
+      "request": "evaluation/web/requests/dashboard-browser-occlusion.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-review-action",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Review queue",
+            "display": "inline-block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "occluded",
+              "hitLocator": "testid:accidental-blocker"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-accidental-blocker",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": false,
+            "renderSize": {
+              "width": 145,
+              "height": 42,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "occludedAreaFraction",
+          "outcome": "cantTell",
+          "rationale": "Only the render-box center is sampled; the complete occluded fraction is unknown."
+        },
+        {
+          "aspect": "occlusionDefectVerdict",
+          "outcome": "untested",
+          "rationale": "Issue #24 must define whether and when an occluded control becomes a rule failure."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-occlusion-clean.json",
+        "target": "web-review-action",
+        "changedProperty": "selected blocker display from none to grid over the action",
+        "preservedProperties": [
+          "review action role and name",
+          "review action layout and render boxes",
+          "viewport",
+          "network and privacy policy"
+        ],
+        "evidenceExpectations": [
+          "centerHitSample"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The selected blocker covers the unchanged review action center, so the sampled hit locator must preserve the native conflict."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-occlusion-clean",
+      "request": "evaluation/web/requests/dashboard-browser-occlusion-clean.json",
+      "split": "development",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-review-action",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Review queue",
+            "display": "inline-block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:review-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-accidental-blocker",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "none",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "zeroArea",
+            "interactive": false,
+            "centerHitSample": {
+              "outcome": "notInteractive",
+              "hitLocator": null
+            },
+            "ancestorClipStatus": "cantTell"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "completeHitRegion",
+          "outcome": "cantTell",
+          "rationale": "The unobstructed center sample is not proof of the complete activation region."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The adapter does not match the button to segmented screenshot pixels."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The unobstructed baseline places the review action inside the viewport and records a selected-node center hit."
+      }
     },
     {
       "caseId": "dashboard-browser-out-of-viewport",
@@ -145,27 +1221,486 @@
       "split": "smoke",
       "classification": "targetedMutation",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "conflict", "screenshotGeometryCoverage": "partiallyOutsideScreenshot", "renderOffset": { "x": -320, "y": 0, "tolerance": 1, "unit": "cssPixel" } },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+          {
+            "id": "web-metric-peer-group",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": "Product metrics",
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "conflict",
+            "screenshotGeometryCoverage": "partiallyOutsideScreenshot",
+            "renderOffset": {
+              "x": -320,
+              "y": 0,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            }
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
         ],
         "gaps": []
       },
       "abstentions": [
-        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "The native rectangle proves a bounds conflict; protocol 0.1 does not claim pixel identity." }
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The native rectangle proves a bounds conflict; protocol 0.1 does not claim pixel identity."
+        }
       ],
-      "mutation": { "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json", "target": "web-metric-revenue", "changedProperty": "A local transform shifts the revenue card 320 CSS pixels left while layout geometry remains unchanged.", "preservedProperties": ["viewport", "DOM hierarchy", "accessibility role", "layout box", "other metric cards", "fixture content"] },
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The transform is a single targeted inverse of the clean baseline and visibly moves the card beyond document bounds." }
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json",
+        "target": "web-metric-revenue",
+        "changedProperty": "A local transform shifts the revenue card 320 CSS pixels left while layout geometry remains unchanged.",
+        "preservedProperties": [
+          "viewport",
+          "DOM hierarchy",
+          "accessibility role",
+          "layout box",
+          "other metric cards",
+          "fixture content"
+        ],
+        "evidenceExpectations": [
+          "layoutRenderConflict",
+          "renderOffset"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The transform is a single targeted inverse of the clean baseline and visibly moves the card beyond document bounds."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-overflow",
+      "request": "evaluation/web/requests/dashboard-browser-overflow.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-notification-title",
+            "parentId": "web-notification-card",
+            "accessibilityStatus": "observed",
+            "role": "heading",
+            "name": "Confirm onboarding evidence before the weekly delivery review",
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "whiteSpace": "nowrap",
+            "textOverflow": "ellipsis",
+            "clientSize": {
+              "width": 148,
+              "height": 22,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "scrollSize": {
+              "width": 485,
+              "height": 22,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "overflowMeasurement": {
+              "horizontal": "present",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-notification-viewport",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "overflowMeasurement": {
+              "horizontal": "absent",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "visibleEllipsisPixels",
+          "outcome": "cantTell",
+          "rationale": "Computed text-overflow and scroll dimensions do not prove the exact rendered glyph sequence."
+        },
+        {
+          "aspect": "overflowDefectVerdict",
+          "outcome": "untested",
+          "rationale": "The acquisition contract does not decide whether this authored truncation is harmful."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-notification-clean.json",
+        "target": "web-notification-title",
+        "changedProperty": "inline-size constrained from available width to 148 CSS pixels",
+        "preservedProperties": [
+          "text content",
+          "font size",
+          "white-space policy",
+          "text-overflow policy",
+          "container geometry"
+        ],
+        "evidenceExpectations": [
+          "overflowMeasurement"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source-authored width mutation creates horizontal client/scroll overflow while leaving layout and ancestor clipping unchanged."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-peer-dimension",
+      "request": "evaluation/web/requests/dashboard-browser-peer-dimension.json",
+      "split": "development",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "layoutSize": {
+              "width": 299,
+              "height": 160,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "renderSize": {
+              "width": 299,
+              "height": 160,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "layoutSize": {
+              "width": 299,
+              "height": 208,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "renderSize": {
+              "width": 299,
+              "height": 208,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "untested",
+          "rationale": "The adapter does not synthesize a core peer relation from repeated cards."
+        },
+        {
+          "aspect": "dimensionDefectVerdict",
+          "outcome": "untested",
+          "rationale": "Measured unequal heights do not prove a defect without admitted applicability and policy."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json",
+        "target": "web-metric-retention",
+        "changedProperty": "minimum block size from 160 to 208 CSS pixels",
+        "preservedProperties": [
+          "metric role and hierarchy",
+          "peer widths",
+          "font values",
+          "other metric minimum sizes"
+        ],
+        "evidenceExpectations": [
+          "peerDimensionDifference"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The fixture sets all cards to start alignment and changes only retention minimum height, preserving the measurable peer-size difference."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-responsive-mobile-mutant",
+      "request": "evaluation/web/requests/dashboard-browser-responsive-mobile-mutant.json",
+      "split": "development",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 844,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "conflict",
+            "screenshotGeometryCoverage": "partiallyOutsideScreenshot",
+            "transform": "matrix(1, 0, 0, 1, -360, 0)",
+            "renderOffset": {
+              "x": -360,
+              "y": 0,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "partiallyClipped"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "transform": "none",
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "belowFoldPixelContent",
+          "outcome": "cantTell",
+          "rationale": "One viewport screenshot does not include the entire mobile document."
+        },
+        {
+          "aspect": "responsiveRootCause",
+          "outcome": "cantTell",
+          "rationale": "The adapter measures the mobile transform conflict without inferring author intent."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-mobile.json",
+        "target": "web-metric-revenue",
+        "changedProperty": "mobile transform translateX from none to -360 CSS pixels",
+        "preservedProperties": [
+          "390 by 844 viewport",
+          "responsive single-column layout",
+          "card role and content",
+          "other metric geometry"
+        ],
+        "evidenceExpectations": [
+          "layoutRenderConflict",
+          "renderOffset",
+          "ancestorClipping"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The mobile-only transform moves one card beyond the left viewport/document boundary while the adjacent card remains unchanged."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-rtl-vertical",
+      "request": "evaluation/web/requests/dashboard-browser-rtl-vertical.json",
+      "split": "development",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "rtl",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-queue-label",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "direction": "rtl",
+            "writingMode": "vertical-rl",
+            "clientSize": {
+              "width": 34,
+              "height": 83,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "direction": "rtl",
+            "writingMode": "horizontal-tb",
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "readingOrderQuality",
+          "outcome": "untested",
+          "rationale": "Direction and writing mode acquisition do not establish a reading-order UX verdict."
+        },
+        {
+          "aspect": "verticalGlyphPixels",
+          "outcome": "cantTell",
+          "rationale": "The adapter records native writing mode but does not analyze glyph orientation in pixels."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The fixture explicitly sets document RTL direction and a selected vertical-rl queue label while preserving native observations."
+      }
     },
     {
       "caseId": "dashboard-browser-spacing-mutant",
@@ -173,30 +1708,115 @@
       "split": "development",
       "classification": "targetedMutation",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "conflict", "screenshotGeometryCoverage": "insideScreenshotExtent", "renderOffset": { "x": 16, "y": 0, "tolerance": 1, "unit": "cssPixel" } }
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "conflict",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "renderOffset": {
+              "x": 16,
+              "y": 0,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            }
+          }
         ],
         "gaps": [
-          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
-          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 40, "tolerance": 1, "unit": "cssPixel" }
+          {
+            "from": "web-metric-revenue",
+            "to": "web-metric-activation",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          },
+          {
+            "from": "web-metric-activation",
+            "to": "web-metric-retention",
+            "axis": "horizontal",
+            "value": 40,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          }
         ]
       },
       "abstentions": [
-        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "The adapter measures the offset but does not infer the peer relation required for a spacing verdict." },
-        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "untested",
+          "rationale": "The adapter measures the offset but does not infer the peer relation required for a spacing verdict."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching."
+        }
       ],
-      "mutation": { "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json", "target": "web-metric-retention", "changedProperty": "A local transform shifts the retention card 16 CSS pixels right while layout geometry remains unchanged.", "preservedProperties": ["viewport", "DOM hierarchy", "accessibility role", "layout box", "first two metric cards", "fixture content"] },
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The native acquisition must preserve the 16 CSS-pixel layout/render conflict without turning it into an unsupported peer verdict." }
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json",
+        "target": "web-metric-retention",
+        "changedProperty": "A local transform shifts the retention card 16 CSS pixels right while layout geometry remains unchanged.",
+        "preservedProperties": [
+          "viewport",
+          "DOM hierarchy",
+          "accessibility role",
+          "layout box",
+          "first two metric cards",
+          "fixture content"
+        ],
+        "evidenceExpectations": [
+          "layoutRenderConflict",
+          "renderOffset"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The native acquisition must preserve the 16 CSS-pixel layout/render conflict without turning it into an unsupported peer verdict."
+      }
     },
     {
       "caseId": "dashboard-browser-text-scale",
@@ -204,30 +1824,207 @@
       "split": "development",
       "classification": "clean",
       "expectations": {
-        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
-        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
         "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
         "frameCount": 1,
         "minimumNodeCount": 20,
         "coreRelationCount": 0,
         "screenshotViewport": "agreement",
         "pixelContentComparison": "cantTell",
         "nodes": [
-          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
-          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+          {
+            "id": "web-metric-peer-group",
+            "parentId": "web-metrics-stage",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": "Product metrics",
+            "display": "grid",
+            "fontSize": "20px",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-revenue",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "fontSize": "20px",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-activation",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "fontSize": "20px",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "fontSize": "20px",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
         ],
         "gaps": [
-          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
-          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" }
+          {
+            "from": "web-metric-revenue",
+            "to": "web-metric-activation",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          },
+          {
+            "from": "web-metric-activation",
+            "to": "web-metric-retention",
+            "axis": "horizontal",
+            "value": 24,
+            "tolerance": 1,
+            "unit": "cssPixel"
+          }
         ]
       },
       "abstentions": [
-        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "Scaled geometry is measured, but peer semantics remain outside protocol 0.1." },
-        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+        {
+          "aspect": "semanticPeerMembership",
+          "outcome": "untested",
+          "rationale": "Scaled geometry is measured, but peer semantics remain outside protocol 0.1."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching."
+        }
       ],
-      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The fixture applies a declared 1.25 root text scale, so inherited 16 CSS-pixel text becomes 20 CSS pixels." }
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The fixture applies a declared 1.25 root text scale, so inherited 16 CSS-pixel text becomes 20 CSS pixels."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-transformed-text",
+      "request": "evaluation/web/requests/dashboard-browser-transformed-text.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 35,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-metric-retention-value",
+            "parentId": "web-metric-retention",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "conflict",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "fontSize": "28px",
+            "transform": "matrix(0.65, 0, 0, 0.65, 0, 0)",
+            "layoutSize": {
+              "width": 253,
+              "height": 32,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "renderSize": {
+              "width": 164.23,
+              "height": 20.8,
+              "tolerance": 1,
+              "unit": "cssPixel"
+            },
+            "overflowMeasurement": {
+              "horizontal": "absent",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          },
+          {
+            "id": "web-metric-retention",
+            "parentId": "web-metric-peer-group",
+            "accessibilityStatus": "observed",
+            "role": "group",
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "transform": "none",
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "renderedGlyphSize",
+          "outcome": "cantTell",
+          "rationale": "The transformed render box conflicts with layout, but no visible-ink or glyph segmentation exists."
+        },
+        {
+          "aspect": "smallTextDefectVerdict",
+          "outcome": "untested",
+          "rationale": "Computed font size and rendered scale remain evidence inputs, not a current blocking rule."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json",
+        "target": "web-metric-retention-value",
+        "changedProperty": "transform scale from none to 0.65",
+        "preservedProperties": [
+          "computed font size 28px",
+          "text content",
+          "parent card geometry",
+          "accessibility evidence availability"
+        ],
+        "evidenceExpectations": [
+          "layoutRenderConflict"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-05",
+        "qualification": "repository maintainer product review",
+        "rationale": "The text transform preserves computed font size while shrinking the render rectangle, so both observations must remain in conflict."
+      }
     }
   ]
 }

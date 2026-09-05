@@ -195,7 +195,9 @@ Do not merge by choosing one source globally. Represent:
 - transform/capture-state conflicts;
 - unresolved conflicts that force `cantTell`.
 
-Issue #23 uses Playwright as the first structured adapter and reconciliation proving ground.
+Issue #23 uses Playwright as the first structured adapter and reconciliation proving ground. ADRs
+0033 and 0034 implement its local-fixture process boundary and versioned acquisition evidence
+matrix without adding browser dependencies to the Rust kernel.
 
 ## Artifact IR boundaries
 

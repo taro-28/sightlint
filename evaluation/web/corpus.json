@@ -69,7 +69,7 @@
           "evaluation/web/fixture-app/index.html",
           "evaluation/web/fixture-app/styles.css"
         ],
-        "sourceDigest": "sha256:04c421e1c117b9ff4b494e6250ef3dd0e69d9b6e44d92e39419f8122deeea9a4"
+        "sourceDigest": "sha256:7396be40bf8716e8bdbed7c780d1f0b1f8d925bbf31b123945127cec4118caf9"
       },
       "environment": {
         "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
@@ -112,7 +112,7 @@
           "evaluation/web/fixture-app/index.html",
           "evaluation/web/fixture-app/styles.css"
         ],
-        "sourceDigest": "sha256:04c421e1c117b9ff4b494e6250ef3dd0e69d9b6e44d92e39419f8122deeea9a4"
+        "sourceDigest": "sha256:7396be40bf8716e8bdbed7c780d1f0b1f8d925bbf31b123945127cec4118caf9"
       },
       "environment": {
         "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
@@ -160,7 +160,7 @@
           "evaluation/web/fixture-app/index.html",
           "evaluation/web/fixture-app/styles.css"
         ],
-        "sourceDigest": "sha256:04c421e1c117b9ff4b494e6250ef3dd0e69d9b6e44d92e39419f8122deeea9a4"
+        "sourceDigest": "sha256:7396be40bf8716e8bdbed7c780d1f0b1f8d925bbf31b123945127cec4118caf9"
       },
       "environment": {
         "viewport": { "width": 390, "height": 844, "unit": "cssPixel" },
@@ -203,7 +203,7 @@
           "evaluation/web/fixture-app/index.html",
           "evaluation/web/fixture-app/styles.css"
         ],
-        "sourceDigest": "sha256:04c421e1c117b9ff4b494e6250ef3dd0e69d9b6e44d92e39419f8122deeea9a4"
+        "sourceDigest": "sha256:7396be40bf8716e8bdbed7c780d1f0b1f8d925bbf31b123945127cec4118caf9"
       },
       "environment": {
         "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
@@ -247,7 +247,7 @@
           "evaluation/web/fixture-app/index.html",
           "evaluation/web/fixture-app/styles.css"
         ],
-        "sourceDigest": "sha256:04c421e1c117b9ff4b494e6250ef3dd0e69d9b6e44d92e39419f8122deeea9a4"
+        "sourceDigest": "sha256:7396be40bf8716e8bdbed7c780d1f0b1f8d925bbf31b123945127cec4118caf9"
       },
       "environment": {
         "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
@@ -303,7 +303,7 @@
           "evaluation/web/fixture-app/index.html",
           "evaluation/web/fixture-app/styles.css"
         ],
-        "sourceDigest": "sha256:04c421e1c117b9ff4b494e6250ef3dd0e69d9b6e44d92e39419f8122deeea9a4"
+        "sourceDigest": "sha256:7396be40bf8716e8bdbed7c780d1f0b1f8d925bbf31b123945127cec4118caf9"
       },
       "environment": {
         "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },

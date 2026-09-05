@@ -1,7 +1,7 @@
 # Web evaluation annotation guide
 
 - Guide version: `0.1.0`
-- Governing decision: ADR 0032
+- Governing decisions: ADR 0032; browser companion evolution in ADRs 0033 and 0034
 - Initial reviewer qualification: repository maintainer product review
 
 ## Purpose
@@ -29,10 +29,13 @@ rendered rectangle. Until a browser protocol captures the page, the following st
 - clipping, occlusion, transforms, and visible ink;
 - native/pixel agreement or conflict.
 
-The ADR 0033 companion oracle may label those browser observations only when adapter E2E captures
+The ADR 0033/0034 companion oracle may label those browser observations only when adapter E2E captures
 them in one synchronized run. It uses tolerances for authored CSS relationships rather than
 snapshot-blessing exact platform coordinates. It must keep semantic peer membership and
-pixel-content identity as `untested` or `cantTell` when protocol `0.1.0` does not observe them.
+pixel-content identity as `untested` or `cantTell` when the current protocol does not observe them.
+Browser acquisition oracle `0.2.0` may separately assert client/scroll overflow, rectangular
+ancestor clipping, computed writing mode, and render-box-center hit samples. It must keep complete
+hit regions `cantTell`; a center sample is never annotated as an exact hit rectangle.
 
 Browser acquisition annotations and browser rule annotations are separate documents. A measured
 layout/render transform is acquisition truth. Whether an existing deterministic rule can act on
@@ -69,13 +72,16 @@ A targeted mutation must:
 1. reference a clean baseline;
 2. change one named property;
 3. record properties intended to remain stable;
-4. identify the exact target rule;
-5. preserve a valid inverse/fix;
-6. avoid deriving its expected outcome from SightLint output.
+4. identify the acquisition evidence expected to change;
+5. identify the exact target rule when the mutation is rule-eligible;
+6. preserve a valid inverse/fix;
+7. avoid deriving its expected outcome from SightLint output.
 
-The initial mutation changes only the third card's rendered offset in the reviewed Artifact IR
-projection. Content, peer identity, viewport, expected gap, tolerance, and other card geometry stay
-fixed.
+The browser companion's targeted mutations each reference a clean browser request and name one
+source change. Their `evidenceExpectations` identify layout/render conflict, offset, clipping,
+overflow, center hit, or peer-dimension evidence that must expose the change. Acquisition-only
+mutations may remain rule-inapplicable; a test must not invent semantic relations simply to raise a
+mutation-kill count.
 
 ## Hard negatives
 
@@ -83,7 +89,8 @@ A hard negative intentionally resembles a defect but is valid. The initial hard 
 promotion beside two repeated metrics. It is not a third metric peer, so visual asymmetry must not
 become a spacing failure.
 
-Future additions should cover mixed variants, masonry, editorial asymmetry, badges, overlays,
+Current browser hard negatives cover intentional metric grouping and a source-declared dialog
+overlay. Future additions should cover mixed variants, masonry, editorial asymmetry, badges,
 sticky elements, charts, photographs, skeletons, and loading/error/empty states.
 
 ## Review and oracle changes
@@ -97,7 +104,7 @@ sticky elements, charts, photographs, skeletons, and loading/error/empty states.
 
 ## Holdout
 
-No holdout case exists in version `0.1.0`. Public repository cases are development-visible. Before
+No holdout case exists. Public repository cases are development-visible. Before
 using holdout results for a maturity or accuracy claim, freeze data before tuning, restrict access
 to labels or use an independent evaluator, record any exposure, and publish split-specific counts
 and limitations.
