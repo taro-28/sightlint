@@ -129,9 +129,9 @@ viewport capture never substitutes for it.
   records why.
 - `renderBox` is `getBoundingClientRect()` after transforms, translated into document CSS pixels.
   It is a browser geometry measurement, not a visible-ink or unoccluded-pixel box.
-- `hitBox` is recorded only for an interactive node whose center-point hit test resolves to the
-  node or one of its descendants. It is not synthesized for noninteractive nodes or failed hit
-  tests.
+- `hitBox` remains absent because one center-point hit test cannot establish the full interactive
+  region. The exact center hit-test outcome is retained only in the Web extension; it is not a
+  substitute rectangle.
 - `inkBox` remains absent because this slice does not segment screenshot pixels.
 
 Computed font size, line height, weight, visibility, display, opacity, overflow, writing direction,
@@ -174,9 +174,10 @@ Unknown request or response fields are rejected. A consumer must reject unsuppor
 recognized extension versions rather than partially interpreting them. Artifact IR remains
 `0.1.0`; CheckReport remains `0.2.0`; existing rule versions and CLI exit codes do not change.
 
-The npm lockfile is part of the compatibility and supply-chain record. Playwright is Apache-2.0;
-TypeScript is Apache-2.0; Node type declarations are MIT. The project itself remains unlicensed
-until issue #33, so adding dependencies does not imply a repository license grant.
+The npm lockfile is part of the compatibility and supply-chain record. Playwright and TypeScript
+are Apache-2.0; Node type declarations and the AJV schema validator are MIT. The project itself
+remains unlicensed until issue #33, so adding dependencies does not imply a repository license
+grant.
 
 ## Evaluation
 

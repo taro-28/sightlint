@@ -3,6 +3,19 @@
   "schemaVersion": "0.1.0",
   "documentType": "browserRuleOracle",
   "commandSurface": "sightlint check --format json",
+  "metrics": {
+    "failurePrecision": "matched reviewed failed targets / all emitted failed targets; report numerator and denominator, never a zero-denominator percentage",
+    "caseCoverage": "browser cases executed through both public processes / all reviewed browser cases",
+    "abstention": "count reviewed acquisition cantTell/untested annotations and rule inapplicable/cantTell/untested outcomes separately",
+    "falsePositives": "emitted failed targets not present in the corresponding reviewed rule oracle",
+    "mutationKillRate": "reviewed rule-eligible mutations producing the named failure / all reviewed rule-eligible mutations; acquisition-only mutations are reported separately",
+    "limitations": [
+      "The seven public cases belong to one fictional application family and are visible during development.",
+      "One bounds failure is too small a denominator for a real-world precision estimate.",
+      "The spacing mutation is acquisition-only because protocol 0.1 does not emit semantic peer relations.",
+      "No private holdout or independent dual review exists."
+    ]
+  },
   "cases": [
     {
       "caseId": "dashboard-browser-ambiguous",
