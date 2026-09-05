@@ -178,8 +178,11 @@ extensions must be able to preserve:
 - capture timing/state mismatch;
 - unresolved conflict requiring `cantTell`.
 
-ADRs 0033 and 0034 implement the first Playwright-based reconciliation slice in an adapter-private
-extension. A later generalized conflict model may require a core/schema ADR.
+ADRs 0033 and 0034 implement the first Playwright-based reconciliation slice. ADR 0035 evolves it
+to the official optional `org.sightlint.web@0.3.0` extension, with explicit DOM, render, and
+optional platform-accessibility evidence references per selected node. The deterministic engine
+strictly validates that extension and consumes it only for Web-profile rules; acquisition remains
+in the untrusted Node process. A later generalized conflict model may require a core/schema ADR.
 
 ## Policy is not an observation
 
@@ -271,5 +274,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0035 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0036 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

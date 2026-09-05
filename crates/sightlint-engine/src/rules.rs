@@ -8,7 +8,8 @@ use crate::geometry::{
     QueryContext, ResolvedRect, ensure_comparable, ordered_gap, overlap_extents, within_canvas,
 };
 use crate::report::{
-    Measurement, RuleKind, RuleMaturity, RuleOutcome, RuleResult, Target, TargetKind,
+    Measurement, PolicyProvenance, PolicySourceKind, RuleEnforcement, RuleKind, RuleMaturity,
+    RuleOutcome, RuleResult, Target, TargetKind,
 };
 
 /// Input category required by a rule.
@@ -26,6 +27,10 @@ pub enum InputAspect {
     VisualStyle,
     /// Explicit visual expectations from an official extension.
     DeclaredVisualContracts,
+    /// Native structure and accessibility observations from the official Web extension.
+    WebStructure,
+    /// Synchronized browser geometry and reconciliation from the official Web extension.
+    WebReconciliation,
 }
 
 /// Static, inspectable definition of an executable rule.
@@ -41,7 +46,53 @@ pub struct RuleDefinition {
     pub input_aspects: &'static [InputAspect],
     /// Current validation maturity.
     pub maturity: RuleMaturity,
+    /// Static policy and enforcement metadata.
+    pub policy: RulePolicyDefinition,
 }
+
+/// Static policy metadata attached to a rule definition.
+#[derive(Debug, Clone, Copy)]
+pub struct RulePolicyDefinition {
+    /// Named profile that selects the rule.
+    pub profile: &'static str,
+    /// Authority category for the expectation.
+    pub source_kind: PolicySourceKind,
+    /// Stable policy identifier.
+    pub source_id: &'static str,
+    /// Policy source version.
+    pub source_version: &'static str,
+    /// Documentation or standard reference.
+    pub reference: &'static str,
+    /// Default process-gate behavior.
+    pub enforcement: RuleEnforcement,
+}
+
+pub(crate) const BASE_BOUNDS_POLICY: RulePolicyDefinition = RulePolicyDefinition {
+    profile: "sightlint:base",
+    source_kind: PolicySourceKind::ConservativeBuiltIn,
+    source_id: "sightlint:canvas-containment",
+    source_version: "0.1.0",
+    reference: "docs/rules.md#bounds-within-canvas",
+    enforcement: RuleEnforcement::Blocking,
+};
+
+pub(crate) const BASE_DECLARED_RELATION_POLICY: RulePolicyDefinition = RulePolicyDefinition {
+    profile: "sightlint:base",
+    source_kind: PolicySourceKind::DeclaredContract,
+    source_id: "artifact-ir:declared-relation",
+    source_version: "0.1.0",
+    reference: "docs/artifact-ir.md#relations",
+    enforcement: RuleEnforcement::Blocking,
+};
+
+pub(crate) const BASE_DECLARED_VISUAL_POLICY: RulePolicyDefinition = RulePolicyDefinition {
+    profile: "sightlint:base",
+    source_kind: PolicySourceKind::DeclaredContract,
+    source_id: "org.sightlint.visual:declared-contract",
+    source_version: "0.1.0",
+    reference: "docs/decisions/0020-explicit-visual-consistency-contracts.md",
+    enforcement: RuleEnforcement::Blocking,
+};
 
 /// One narrow deterministic rule.
 pub trait AtomicRule {
@@ -78,6 +129,7 @@ static BOUNDS_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: BASE_BOUNDS_POLICY,
 };
 
 impl AtomicRule for BoundsWithinCanvasRule {
@@ -184,6 +236,7 @@ static NON_OVERLAP_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: BASE_DECLARED_RELATION_POLICY,
 };
 
 impl AtomicRule for DeclaredNonOverlapRule {
@@ -399,6 +452,10 @@ static PEER_SPACING_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: RulePolicyDefinition {
+        source_id: "artifact-ir:peer-sequence.expected-gap",
+        ..BASE_DECLARED_RELATION_POLICY
+    },
 };
 
 impl AtomicRule for PeerSpacingConsistencyRule {
@@ -642,6 +699,14 @@ fn build_result(
         title: definition.title.to_owned(),
         kind: RuleKind::Atomic,
         maturity: definition.maturity,
+        policy: PolicyProvenance {
+            profile: definition.policy.profile.to_owned(),
+            source_kind: definition.policy.source_kind,
+            source_id: definition.policy.source_id.to_owned(),
+            source_version: definition.policy.source_version.to_owned(),
+            reference: definition.policy.reference.to_owned(),
+        },
+        enforcement: definition.policy.enforcement,
         target,
         outcome,
         message,

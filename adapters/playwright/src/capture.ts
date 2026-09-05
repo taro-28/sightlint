@@ -616,6 +616,9 @@ function buildArtifactIr(
       nodeId: node.nodeId,
       locator: node.browser.locator as unknown as JsonObject,
       tagName: node.browser.tagName,
+      domEvidenceId: domEvidence,
+      renderEvidenceId: renderEvidence,
+      accessibilityEvidenceId: node.accessibility.status === "observed" ? axEvidence : null,
       disabled: node.browser.disabled,
       interactive: node.browser.interactive,
       layoutMethod: node.browser.layoutBox === null ? "unavailable" : "offsetParentBorderBoxToDocument",
@@ -676,7 +679,7 @@ function buildArtifactIr(
       ancestorClip: ancestorClip(node.browser),
       pixelContentMatch: {
         status: "cantTell",
-        reason: "web extension 0.2 does not perform pixel-content segmentation or identity matching",
+        reason: "web extension 0.3 does not perform pixel-content segmentation or identity matching",
       },
     });
   }
@@ -734,7 +737,7 @@ function buildArtifactIr(
       nodes: reconciliationNodes,
       pixelContentComparison: {
         status: "cantTell",
-        reason: "pixel-content identity is outside web extension 0.2",
+        reason: "pixel-content identity is outside web extension 0.3",
       },
     },
   };

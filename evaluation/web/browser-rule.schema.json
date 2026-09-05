@@ -61,7 +61,7 @@
     "ruleContract": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ruleId", "ruleVersion", "maturity", "enforcement", "policy", "applicability", "requiredEvidence", "validAlternatives", "falsePositiveRisks", "evaluationCases"],
+      "required": ["ruleId", "ruleVersion", "maturity", "enforcement", "policy", "applicability", "requiredEvidence", "validAlternatives", "severityInputs", "falsePositiveRisks", "falseNegativeRisks", "evaluationCases"],
       "properties": {
         "ruleId": { "$ref": "#/$defs/nonEmptyString" },
         "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
@@ -71,7 +71,9 @@
         "applicability": { "$ref": "#/$defs/nonEmptyString" },
         "requiredEvidence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmptyString" } },
         "validAlternatives": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "severityInputs": { "$ref": "#/$defs/severityInputs" },
         "falsePositiveRisks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "falseNegativeRisks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
         "evaluationCases": {
           "type": "object",
           "additionalProperties": false,
@@ -84,6 +86,17 @@
             "hardNegative": { "$ref": "#/$defs/caseIds" }
           }
         }
+      }
+    },
+    "severityInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["userHarm", "affectedScope", "reversibility", "accessibilityImpact"],
+      "properties": {
+        "userHarm": { "$ref": "#/$defs/nonEmptyString" },
+        "affectedScope": { "$ref": "#/$defs/nonEmptyString" },
+        "reversibility": { "$ref": "#/$defs/nonEmptyString" },
+        "accessibilityImpact": { "$ref": "#/$defs/nonEmptyString" }
       }
     },
     "caseIds": {

@@ -197,7 +197,9 @@ Do not merge by choosing one source globally. Represent:
 
 Issue #23 uses Playwright as the first structured adapter and reconciliation proving ground. ADRs
 0033 and 0034 implement its local-fixture process boundary and versioned acquisition evidence
-matrix without adding browser dependencies to the Rust kernel.
+matrix without adding browser dependencies to the Rust kernel. ADR 0035 makes the resulting
+`org.sightlint.web@0.3.0` payload an official optional extension: Rust strictly validates its
+normalized records and evidence references but never launches Playwright or reads the screenshot.
 
 ## Artifact IR boundaries
 
@@ -231,8 +233,11 @@ A rule executes only after its targets, required aspects, applicability, policy,
 tolerance are known. Missing meaning produces `cantTell`, `inapplicable`, or `untested` according
 to the rule contract.
 
-Issue #24 owns recommended zero-setup profiles and rule admission. Broad aesthetic critique can
-exist as advisory output but is not a trusted blocking obligation.
+ADR 0035 implements the first issue #24 profile slice. `sightlint:recommended` is the additive
+default, while `--profile base` runs only pre-existing explicit/base rules. Three Web-specific
+atomic rules consume validated native structure and browser reconciliation; their policy
+provenance and advisory enforcement are serialized independently from outcome and maturity.
+Broad aesthetic critique is not a trusted blocking obligation.
 
 ## Interaction architecture
 

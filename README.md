@@ -36,8 +36,8 @@ The near-term execution epic is
    foundation (complete);
 2. [#23](https://github.com/taro-28/sightlint/issues/23) — Playwright native/pixel web adapter and
    acquisition evidence matrix (complete);
-3. [#24](https://github.com/taro-28/sightlint/issues/24) — evaluated zero-setup recommended rules
-   (next);
+3. [#24](https://github.com/taro-28/sightlint/issues/24) — first evaluated zero-setup recommended
+   Web pack (complete);
 4. a Codex edit/check/fix/rerun demonstration;
 5. [#33](https://github.com/taro-28/sightlint/issues/33) — license, compatibility, packaging, and
    first alpha release.
@@ -140,6 +140,20 @@ When sufficient facts and explicit relations/policies exist, current visual cont
 This does not mean all required facts or peer relationships can be inferred from an arbitrary
 screenshot.
 
+### Zero-setup recommended Web rules
+
+`sightlint check` now selects `sightlint:recommended` by default. For a validated
+`org.sightlint.web@0.3.0` extension, the deterministic Rust kernel emits three narrow advisory
+rules for programmatic control names, one render-box-center hit sample, and rectangular clipping
+of native controls by non-scrollable ancestors. Each result records its profile, policy source,
+maturity, enforcement, and exact DOM/render/accessibility evidence identifiers.
+
+`--profile base` keeps the pre-existing explicit/base rules and omits the recommended Web rules;
+it does not skip validation of a recognized Web extension. Recommended failures are advisory and
+therefore do not fail the default process gate. This first pack is evaluated only on the public,
+repository-owned fictional application, so it does not establish WCAG conformance, complete hit
+regions, representative real-world precision, or blocking maturity.
+
 ### Deterministic PNG acquisition
 
 The current M3 path performs:
@@ -193,6 +207,10 @@ cargo run --locked -p sightlint-cli -- \
 cargo run --locked -p sightlint-cli -- \
   check fixtures/e2e/pass-web.json --format json
 
+# Explicitly opt out of the additive recommended profile.
+cargo run --locked -p sightlint-cli -- \
+  check fixtures/e2e/pass-web.json --profile base --format json
+
 # Validate/adapt supported PNG source facts.
 cargo run --locked -p sightlint-cli -- \
   adapt-image screenshot.png
@@ -222,12 +240,40 @@ For trusted checks, exit codes are:
 
 | Code | Meaning |
 |---:|---|
-| `0` | no failed result; `cantTell` is advisory unless explicitly denied |
-| `1` | a rule failed, or strict policy denied `cantTell` |
+| `0` | no blocking failure; advisory failures and `cantTell` do not fail unless explicitly denied |
+| `1` | a blocking rule failed, or strict policy denied `cantTell` |
 | `2` | usage, I/O, decoding, adapter, or semantic-validation error |
 
 `inspect-image` never exits 1 for a heuristic. Observed or explicitly unavailable coverage exits
 0; malformed/usage/execution failure exits 2.
+
+### Current local Web agent sequence
+
+The current zero-setup rule path is two explicit local processes; a combined command and the
+source-edit demonstration remain the next #34 slice. After installing the locked adapter/browser
+dependencies described in [`adapters/playwright/README.md`](adapters/playwright/README.md):
+
+```bash
+cargo build --locked -p sightlint-cli
+npm --prefix adapters/playwright run build
+
+capture_dir="$(mktemp -d)"
+node adapters/playwright/dist/src/cli.js \
+  --request evaluation/web/requests/dashboard-browser-unnamed-control.json \
+  --repository-root "$PWD" \
+  --artifact-ir-out "$capture_dir/artifact-ir.json" \
+  --screenshot-out "$capture_dir/screenshot.png"
+
+# No profile/config file is required; recommended is the default.
+target/debug/sightlint check "$capture_dir/artifact-ir.json" --format json
+
+# Explicitly compare only the pre-existing base/declared rules.
+target/debug/sightlint check "$capture_dir/artifact-ir.json" --profile base --format json
+```
+
+The recommended report identifies `web-help-action`, the exact evidence records, WCAG policy
+provenance, and advisory enforcement. An agent must edit the source, acquire a fresh state into a
+new output directory, and rerun the same checker; it must not declare success from its own edit.
 
 ## Executable verification
 
@@ -242,9 +288,10 @@ Current committed assets include:
 - **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
 - a repository-owned realistic Web fixture foundation with six separately annotated acquisition
   and rule cases, including one targeted mutation and one intentional-grouping hard negative;
-- a 19-case Playwright companion that captures selected DOM/accessibility structure, computed
+- a 23-case Playwright companion that captures selected DOM/accessibility structure, computed
   geometry, client/scroll overflow, ancestor clipping, center-hit samples, writing direction, and
-  a synchronized viewport screenshot through a separate Node process;
+  a synchronized viewport screenshot through a separate Node process, then evaluates the public
+  binary's base and zero-setup recommended profiles;
 - targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
   byte-identical results.
 
@@ -252,10 +299,10 @@ Normal read-only CI verifies corpus drift, rustfmt, Clippy with denied warnings,
 public E2E, rustdoc, Rust 1.85.0, and Linux/macOS/Windows. Public behavior is incomplete until the
 exact final PR head and the merged `main` commit both pass.
 
-Synthetic and repository-owned regression data does not establish real-world precision. The #22
-and #23 slices define a reviewed Web evaluation contract and one controlled local browser path,
-but representative sampling, independent review, semantic peer inference, complete hit regions,
-pixel-content identity, and a protected holdout process remain future work.
+Synthetic and repository-owned regression data does not establish real-world precision. The
+#22–#24 slices define a reviewed Web evaluation contract, one controlled local browser path, and
+three advisory rules, but representative sampling, independent review, semantic peer inference,
+complete hit regions, pixel-content identity, and a protected holdout process remain future work.
 
 ## Architecture
 
@@ -307,7 +354,7 @@ Read:
 | #34 | first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0035 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0036 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index.
 
 ## Development rules

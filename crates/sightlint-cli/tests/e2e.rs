@@ -103,6 +103,10 @@ fn clean_fixture_runs_the_complete_pipeline_in_both_report_formats() {
     let report = parse_stdout(&json);
     assert_eq!(report["artifactId"], "artifact-pass-web");
     assert_eq!(report["artifactKind"], "web");
+    assert_eq!(
+        report["profiles"],
+        serde_json::json!(["sightlint:base", "sightlint:recommended"])
+    );
     assert_eq!(report["summary"]["passed"], 5);
     assert_eq!(report["summary"]["failed"], 0);
     assert_eq!(report["summary"]["cantTell"], 0);
@@ -118,6 +122,19 @@ fn clean_fixture_runs_the_complete_pipeline_in_both_report_formats() {
         result_outcome(&report, "visual.spacing.peer-consistency"),
         Some("passed")
     );
+    for result in report["results"].as_array().expect("report results") {
+        assert_eq!(result["policy"]["profile"], "sightlint:base");
+        assert_eq!(result["enforcement"], "blocking");
+    }
+
+    let base = check_json("pass-web.json", &["--profile", "base"]);
+    assert_code(&base, EXIT_SUCCESS);
+    let base_report = parse_stdout(&base);
+    assert_eq!(
+        base_report["profiles"],
+        serde_json::json!(["sightlint:base"])
+    );
+    assert_eq!(base_report["results"], report["results"]);
 
     let mut command = binary();
     command.arg("check").arg(fixture("pass-web.json"));
@@ -125,6 +142,7 @@ fn clean_fixture_runs_the_complete_pipeline_in_both_report_formats() {
     assert_code(&human, EXIT_SUCCESS);
     let human = String::from_utf8(human.stdout).expect("human report is UTF-8");
     assert!(human.contains("5 result(s): 5 passed, 0 failed"));
+    assert!(human.contains("profiles: sightlint:base, sightlint:recommended"));
     assert!(human.contains("PASS visual.spacing.peer-consistency"));
     assert!(human.contains("evidence: e-contract, e-render"));
 }
@@ -280,7 +298,8 @@ fn schema_and_version_commands_expose_machine_and_human_contract_versions() {
     let version = String::from_utf8(version.stdout).expect("version output is UTF-8");
     assert!(version.contains("Artifact IR schema 0.1.0"));
     assert!(version.contains("Visual extension 0.1.0"));
-    assert!(version.contains("Report schema 0.2.0"));
+    assert!(version.contains("Web extension 0.3.0"));
+    assert!(version.contains("Report schema 0.3.0"));
 
     let mut visual_schema_command = binary();
     visual_schema_command

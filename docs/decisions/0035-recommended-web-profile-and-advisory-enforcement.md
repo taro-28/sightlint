@@ -36,11 +36,11 @@ rewrite Artifact IR.
 
 The first pack contains three atomic, medium-specific rules:
 
-1. `web.accessibility.interactive-name@0.1.0` checks a visible native interactive component only
-   when the platform accessibility snapshot was observed. Its expectation source is WCAG 2.2
-   Success Criterion 4.1.2, “Name, Role, Value.” A missing programmatically determined name fails;
-   missing platform semantics becomes `cantTell`; non-interactive or non-rendered nodes are
-   `inapplicable`.
+1. `web.accessibility.interactive-name@0.1.0` checks a visible DOM-interactive node only when the
+   platform accessibility snapshot exposes a role in a conservative UI-control applicability set.
+   Its expectation source is WCAG 2.2 Success Criterion 4.1.2, “Name, Role, Value.” A missing
+   programmatically determined name fails; missing or unadmitted platform semantics becomes
+   `cantTell`; non-interactive or non-rendered nodes are `inapplicable`.
 2. `web.interaction.center-hit@0.1.0` checks a visible, enabled, untransformed native control whose
    center lies in the captured viewport and whose exact browser sample used
    `elementFromPoint`. A hit on the control or its descendant passes; an unrelated, non-dialog
@@ -85,16 +85,18 @@ becomes an official optional extension consumed by the trusted Rust engine only 
 versioned decoding and semantic validation. The `0.1.0` and `0.2.0` schemas remain available.
 
 Validation proves unique node/reconciliation membership, core node and evidence references,
-matching node sets, finite values, valid evidence classes, and consistent hit-sample method/
-outcome combinations. Browser acquisition remains outside Rust. The kernel consumes normalized
-records deterministically and never launches Playwright or reads screenshots.
+matching node sets, finite values, valid evidence classes, matching adapter/version/source-digest/
+local-processing/native-selector provenance, and consistent hit-sample method/outcome combinations.
+Browser acquisition remains outside Rust. The kernel consumes normalized records deterministically
+and never launches Playwright or reads screenshots.
 
 ### Evaluation contract
 
 The Web rule oracle evolves independently from acquisition annotations. For every admitted rule it
 records policy provenance, maturity, enforcement, applicability, expected outcome, false-positive
-risk, and a clean/mutation/hard-negative or abstention relation. Implementation output is never
-copied into the oracle.
+and false-negative risks, qualitative severity inputs without deriving a severity label, and a
+clean/mutation/hard-negative or abstention relation. Implementation output is never copied into
+the oracle.
 
 The public browser E2E reports per-rule decision coverage, precision with explicit denominators,
 false-positive failures, correct abstention, and mutation kill rate. Public smoke/development/
@@ -154,4 +156,3 @@ needed precedence and exception model.
   same-environment runs.
 - Preserve generator drift, all Rust/CLI/PNG/image/product/Web corpora, rustdoc, Rust 1.85.0, and
   Linux/macOS/Windows gates.
-

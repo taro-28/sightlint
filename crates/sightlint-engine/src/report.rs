@@ -10,7 +10,7 @@ use sightlint_ir::{
 };
 
 /// Current serialized report schema version.
-pub const REPORT_SCHEMA_VERSION: &str = "0.2.0";
+pub const REPORT_SCHEMA_VERSION: &str = "0.3.0";
 
 /// ACT-inspired result of evaluating one applicable target.
 #[derive(
@@ -63,6 +63,44 @@ pub enum RuleMaturity {
     Advisory,
     /// Rule has earned eligibility for explicit blocking policy.
     BlockingEligible,
+}
+
+/// Authority category that supplied a rule expectation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum PolicySourceKind {
+    /// An explicit project, design-system, or artifact contract.
+    DeclaredContract,
+    /// A named platform or accessibility standard.
+    PlatformStandard,
+    /// A narrow conservative baseline shipped by `SightLint`.
+    ConservativeBuiltIn,
+}
+
+/// Whether a failed result changes the default process gate.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum RuleEnforcement {
+    /// Report the result without failing the default process gate.
+    Advisory,
+    /// A failed result causes the default process gate to fail.
+    Blocking,
+}
+
+/// Versioned provenance for the expectation evaluated by a rule.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct PolicyProvenance {
+    /// Named built-in profile that selected the rule.
+    pub profile: String,
+    /// Authority category for the expectation.
+    pub source_kind: PolicySourceKind,
+    /// Stable policy or standard identifier.
+    pub source_id: String,
+    /// Version of the policy source.
+    pub source_version: String,
+    /// Human- or machine-navigable source reference.
+    pub reference: String,
 }
 
 /// Stable kind of target evaluated by a rule.
@@ -118,6 +156,10 @@ pub struct RuleResult {
     pub kind: RuleKind,
     /// Current validation maturity.
     pub maturity: RuleMaturity,
+    /// Provenance of the expectation applied to this result.
+    pub policy: PolicyProvenance,
+    /// Whether a failure changes the default process gate.
+    pub enforcement: RuleEnforcement,
     /// Evaluated target.
     pub target: Target,
     /// ACT-inspired outcome.
@@ -186,6 +228,8 @@ pub struct CheckReport {
     /// Independently versioned official extensions consumed by the engine.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub extension_versions: BTreeMap<String, String>,
+    /// Named rule profiles selected for this execution, in stable order.
+    pub profiles: Vec<String>,
     /// Outcome counts.
     pub summary: ReportSummary,
     /// Results in stable rule and target order.
@@ -197,8 +241,11 @@ impl CheckReport {
     pub fn new(
         document: &ArtifactIr,
         extension_versions: BTreeMap<String, String>,
+        mut profiles: Vec<String>,
         mut results: Vec<RuleResult>,
     ) -> Self {
+        profiles.sort();
+        profiles.dedup();
         for result in &mut results {
             result.evidence_ids.sort();
             result.evidence_ids.dedup();
@@ -228,6 +275,7 @@ impl CheckReport {
             artifact_id: document.artifact.id.clone(),
             artifact_kind: document.artifact.kind,
             extension_versions,
+            profiles,
             summary,
             results,
         }
@@ -265,6 +313,7 @@ impl CheckReport {
                 .join(", ");
             let _ = writeln!(output, "extensions: {extensions}");
         }
+        let _ = writeln!(output, "profiles: {}", self.profiles.join(", "));
 
         for result in &self.results {
             let aspect = result
@@ -282,6 +331,17 @@ impl CheckReport {
                 aspect
             );
             let _ = writeln!(output, "  {}", result.message);
+            let _ = writeln!(
+                output,
+                "  policy: {}@{} ({:?}, {})",
+                result.policy.source_id,
+                result.policy.source_version,
+                result.policy.source_kind,
+                match result.enforcement {
+                    RuleEnforcement::Advisory => "advisory",
+                    RuleEnforcement::Blocking => "blocking",
+                }
+            );
             if !result.evidence_ids.is_empty() {
                 let evidence = result
                     .evidence_ids
@@ -294,6 +354,13 @@ impl CheckReport {
         }
 
         output
+    }
+
+    /// Returns whether at least one blocking rule failed.
+    pub fn has_blocking_failure(&self) -> bool {
+        self.results.iter().any(|result| {
+            result.outcome == RuleOutcome::Failed && result.enforcement == RuleEnforcement::Blocking
+        })
     }
 }
 

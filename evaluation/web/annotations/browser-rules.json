@@ -10,9 +10,9 @@
     "falsePositives": "emitted failed targets not present in the corresponding reviewed rule oracle",
     "mutationKillRate": "reviewed rule-eligible mutations producing the named failure / all reviewed rule-eligible mutations; acquisition-only mutations are reported separately",
     "limitations": [
-      "The nineteen public cases belong to one fictional application family and are visible during development.",
-      "Three reviewed bounds failures are too small a denominator for a real-world precision estimate.",
-      "Acquisition-only clipping, occlusion, overflow, peer-size, transformed-text, and direction cases do not gain rule verdicts without explicit applicability and policy.",
+      "The twenty-three public cases belong to one fictional application family and are visible during development.",
+      "One reviewed failure per recommended rule is too small a denominator for a real-world precision estimate.",
+      "Only narrowly applicable control clipping and occlusion gain new rule verdicts; raw overflow, peer-size, transformed-text, and direction observations remain non-verdict evidence.",
       "Complete hit regions and pixel-content identity remain cantTell.",
       "No private holdout or independent dual review exists."
     ]
@@ -1113,7 +1113,7 @@
         "sourceVersion": "2.2",
         "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
       },
-      "applicability": "Visible interactive Web nodes with an observed platform accessibility snapshot.",
+      "applicability": "Visible DOM-interactive Web nodes with an observed platform accessibility role in the rule's conservative UI-control set.",
       "requiredEvidence": [
         "exact DOM interactivity and visibility",
         "platform accessibility role/name"
@@ -1124,9 +1124,20 @@
         "aria-labelledby",
         "another platform-supported accessible-name source"
       ],
+      "severityInputs": {
+        "userHarm": "An unnamed control can be undiscoverable or ambiguous to assistive-technology users.",
+        "affectedScope": "One observed interactive control in one captured state.",
+        "reversibility": "A localized semantic-label change is normally reversible and has several valid name sources.",
+        "accessibilityImpact": "Direct programmatic-name impact; this rule does not assign a severity label."
+      },
       "falsePositiveRisks": [
         "an incomplete accessibility snapshot may look unnamed",
         "a focusable generic surface may not be a supported user interface component"
+      ],
+      "falseNegativeRisks": [
+        "unselected controls are not evaluated",
+        "a non-empty but misleading or duplicate name passes this atomic rule",
+        "unsupported platform roles abstain rather than fail"
       ],
       "evaluationCases": {
         "pass": [
@@ -1170,9 +1181,20 @@
         "off-viewport controls require a separate scrolled capture",
         "non-rectangular or transformed controls require richer hit-region evidence"
       ],
+      "severityInputs": {
+        "userHarm": "A blocked sampled point can prevent pointer activation, but one point does not prove total inoperability.",
+        "affectedScope": "One native control at one render-box-center sample in one captured state.",
+        "reversibility": "Layout, stacking, or overlay changes are reversible but may affect intended modal behavior.",
+        "accessibilityImpact": "Pointer interaction may be affected while keyboard or alternate hit locations may remain usable; no severity label is inferred."
+      },
       "falsePositiveRisks": [
         "one center point does not prove the complete hit region",
         "transient or intentional overlays can occlude controls"
+      ],
+      "falseNegativeRisks": [
+        "blocked points away from the center are not sampled",
+        "controls without stable test-id locators abstain from this conservative rule",
+        "interaction states absent from the static capture are not evaluated"
       ],
       "evaluationCases": {
         "pass": [
@@ -1215,9 +1237,20 @@
         "non-rectangular clips require pixel or source evidence",
         "out-of-document controls are handled by the existing bounds rule"
       ],
+      "severityInputs": {
+        "userHarm": "A clipped control can hide content or reduce its usable pointer area.",
+        "affectedScope": "One native control and its recorded rectangular overflow ancestors in one captured state.",
+        "reversibility": "Container size, control position, or overflow policy can be changed locally but may alter intended scrolling.",
+        "accessibilityImpact": "Visual and pointer access may be affected; keyboard reachability and complete hit geometry are not proven, so no severity label is inferred."
+      },
       "falsePositiveRisks": [
         "scrollable carousels can intentionally show partial controls",
         "masks and clip paths are not modeled by rectangular overflow reconciliation"
+      ],
+      "falseNegativeRisks": [
+        "masks, clip paths, and non-rectangular effects are not evaluated",
+        "unselected controls and uncaptured responsive states are not evaluated",
+        "out-of-document controls are delegated to the separate bounds rule"
       ],
       "evaluationCases": {
         "pass": [

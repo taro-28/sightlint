@@ -420,7 +420,7 @@ body[data-case="ambiguous-peer-group"] .metric-card-third {
 }
 
 .help-action {
-  display: grid;
+  display: none;
   width: 42px;
   height: 42px;
   place-items: center;
@@ -429,6 +429,15 @@ body[data-case="ambiguous-peer-group"] .metric-card-third {
   color: #33405a;
   background: #ffffff;
   font-weight: 800;
+}
+
+body[data-case="control-boundaries"] .help-action,
+body[data-case="unnamed-control-mutant"] .help-action {
+  position: fixed;
+  z-index: 4;
+  top: 300px;
+  right: 48px;
+  display: grid;
 }
 
 .small-visual-glyph {

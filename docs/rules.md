@@ -108,8 +108,9 @@ every value. Expectations are resolved in this order:
 A result records which source won, its version, scope, and any overridden alternatives. Project
 exceptions must be narrow and reviewable; a broad ignore switch should not hide unrelated results.
 
-Potential future profiles include recommended, web, mobile, slides, documents, platform versions,
-and organization/project overlays. Names and configuration require an ADR before stabilization.
+ADR 0035 defines `sightlint:recommended` as additive over `sightlint:base` and exposes
+`--profile base` as the initial opt-out. Future web, mobile, slides, documents, platform versions,
+and organization/project overlays require another ADR before stabilization.
 
 ## Inferred project norms
 
@@ -235,12 +236,28 @@ Current structured-IR rules/contracts include:
 - project-supplied minimum font size;
 - direction, coordinate-space, unit, tolerance, evidence, and ambiguity handling.
 
+The additive zero-setup `sightlint:recommended` profile also includes three
+`org.sightlint.web@0.3.0` rules:
+
+- `web.accessibility.interactive-name@0.1.0` for visible DOM-interactive nodes with an observed
+  platform role in a conservative UI-control set;
+- `web.interaction.center-hit@0.1.0` for one exact render-box-center sample on a conservative
+  native-control subset;
+- `web.interaction.ancestor-clip@0.1.0` for rectangular clipping of native controls by
+  non-scrollable ancestors.
+
+All three are `advisory` maturity and enforcement. They preserve `cantTell` for incomplete
+accessibility data, intentional/source-observed dialog overlays, transformed controls, and
+scrollable clipping. They do not convert generic overflow, screenshot heuristics, or repeated
+geometry into verdicts. `--profile base` is the explicit opt-out; recognized Web extensions are
+still validated before base rules run.
+
 These rules consume declared/evidence-backed inputs. Current `inspect-image` observations do not
 become trusted semantic peers or blocking spacing failures.
 
-## Recommended first-wave candidates
+## Further recommended candidates
 
-Final selection is evidence-gated by issues #22–#24, but likely high-confidence areas are:
+The first admitted slice is intentionally narrow. Further candidates remain evidence-gated:
 
 - out-of-viewport, clipping, and overflow;
 - overlap/occlusion with native/render evidence;

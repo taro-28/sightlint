@@ -276,7 +276,7 @@ fn adam7_pass_reconstruction_remains_deterministic_through_check_image() {
     assert!(first.stderr.is_empty());
     let report: Value = serde_json::from_slice(&first.stdout).expect("JSON report");
     // CheckReport has always exposed `results`; `findings` was never its wire contract.
-    assert_eq!(report["reportSchemaVersion"], "0.2.0");
+    assert_eq!(report["reportSchemaVersion"], "0.3.0");
     assert_eq!(report["artifactKind"], "image");
     assert_eq!(report["summary"]["failed"], 0);
     assert!(

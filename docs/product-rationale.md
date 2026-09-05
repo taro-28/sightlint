@@ -319,8 +319,9 @@ This wedge is captured by issues #22, #23, #24, and execution epic #34.
 
 ## Recommended rule packs
 
-The project should eventually offer composable defaults such as recommended, web, mobile, slide,
-and document profiles. Their exact names/configuration remain a future ADR.
+ADR 0035 establishes the first composable default: `sightlint:recommended` is additive over
+`sightlint:base`, and `--profile base` is the initial explicit opt-out. Future web, mobile, slide,
+document, organization, and project overlays still require evidence and a follow-up ADR.
 
 A rule enters a recommended pack only after it has:
 

@@ -168,7 +168,10 @@ exceptions.
 - **Learn the current project as truth:** existing defects can become the inferred standard.
 - **Pure aesthetic critique:** useful as advisory prose, not the deterministic core.
 
-Issue #24 preserves the rule-pack product requirement and admission criteria.
+ADR 0035 implements the first issue #24 profile slice: `sightlint:recommended` is the additive
+default, `--profile base` is the explicit opt-out, and policy provenance and enforcement are
+separate CheckReport fields. The first three Web rules remain advisory because their evaluation is
+public, single-family, and non-holdout.
 
 ## Playwright and rendering
 
@@ -193,8 +196,9 @@ kernel.
   clipping, and occlusion.
 
 ADRs 0033 and 0034 implement issue #23's bounded local-fixture adapter, deterministic capture
-requirements, and reviewed evidence matrix. Complete hit regions and pixel-content identity remain
-explicitly unresolved rather than inferred.
+contract, and evidence matrix. ADR 0035 promotes the versioned Web payload to an official optional
+extension consumed only after strict Rust validation; Playwright remains outside the kernel.
+Complete hit regions and pixel-content identity remain explicitly unresolved rather than inferred.
 
 ## Image path decisions
 
@@ -285,8 +289,10 @@ The repository keeps these distinct:
 - intended product outcomes;
 - eventual user benefit.
 
-The initial product corpus is synthetic and valuable for regression, but it cannot establish
-real-world UI review accuracy. Issue #22 is the next evidence gate.
+The initial product corpus and repository-owned Web application are valuable for regression, but
+they cannot establish real-world UI review accuracy. ADRs 0032–0035 therefore keep acquisition and
+rule truth separate and the first recommended Web rules advisory. Representative independent and
+holdout evaluation remains a future evidence gate.
 
 ### Why mutation pairs matter
 
@@ -411,7 +417,8 @@ Important historical detail:
 - branch-only ADRs 0025–0029 described experiments that were never accepted into current `main`;
 - ADR 0030 re-established the verified raster boundary;
 - ADR 0031 defines current advisory image inspection;
-- new ADRs should continue at 0035 or later rather than silently reusing historical numbers.
+- ADR 0035 defines the first recommended Web profile and advisory enforcement;
+- new ADRs should continue at 0036 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -421,9 +428,9 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - license and distribution model: ADR 0007 / issue #33;
 - branch protection: issue #19;
 - legacy branch cleanup/settings: issue #32;
-- realistic evaluation schema and holdout process: issue #22;
-- Playwright protocol/capture environment: issue #23;
-- recommended profile syntax and rule maturity thresholds: issue #24;
+- representative corpus expansion and protected holdout operation beyond the public #22 slice;
+- arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
+- project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
 - background/segmentation policy after benchmarking: issue #25;
 - alpha geometry implementation details on current raster: issue #26;
 - custom versus library decoding for broader formats: issue #27;
