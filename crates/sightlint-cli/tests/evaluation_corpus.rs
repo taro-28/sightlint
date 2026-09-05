@@ -133,8 +133,22 @@ fn valid_medium(medium: &str) -> bool {
 fn validate_manifest_header(manifest: &Value, repository_root: &Path) {
     assert_fields(
         manifest,
-        &["$schema", "schemaVersion", "corpus", "sources", "gates", "cases"],
-        &["$schema", "schemaVersion", "corpus", "sources", "gates", "cases"],
+        &[
+            "$schema",
+            "schemaVersion",
+            "corpus",
+            "sources",
+            "gates",
+            "cases",
+        ],
+        &[
+            "$schema",
+            "schemaVersion",
+            "corpus",
+            "sources",
+            "gates",
+            "cases",
+        ],
         "evaluation manifest",
     );
     assert_eq!(
@@ -311,35 +325,35 @@ fn required_outcomes(expectation: &Value, case_id: &str) -> RequiredOutcomes {
 }
 
 fn parse_mutation(case: &Value, case_id: &str) -> Option<MutationExpectation> {
-    object(case, "evaluation case").get("mutation").map(|value| {
-        assert_fields(
-            value,
-            &["baselineCaseId", "targetRuleId"],
-            &["baselineCaseId", "targetRuleId"],
-            "mutation",
-        );
-        let baseline_case_id = string_field(value, "baselineCaseId", "mutation");
-        let target_rule_id = string_field(value, "targetRuleId", "mutation");
-        assert!(
-            !baseline_case_id.is_empty() && !target_rule_id.is_empty(),
-            "evaluation case {case_id:?} has an incomplete mutation relation"
-        );
-        MutationExpectation {
-            mutant_case_id: case_id.to_owned(),
-            baseline_case_id: baseline_case_id.to_owned(),
-            target_rule_id: target_rule_id.to_owned(),
-        }
-    })
+    object(case, "evaluation case")
+        .get("mutation")
+        .map(|value| {
+            assert_fields(
+                value,
+                &["baselineCaseId", "targetRuleId"],
+                &["baselineCaseId", "targetRuleId"],
+                "mutation",
+            );
+            let baseline_case_id = string_field(value, "baselineCaseId", "mutation");
+            let target_rule_id = string_field(value, "targetRuleId", "mutation");
+            assert!(
+                !baseline_case_id.is_empty() && !target_rule_id.is_empty(),
+                "evaluation case {case_id:?} has an incomplete mutation relation"
+            );
+            MutationExpectation {
+                mutant_case_id: case_id.to_owned(),
+                baseline_case_id: baseline_case_id.to_owned(),
+                target_rule_id: target_rule_id.to_owned(),
+            }
+        })
 }
 
-fn parse_case(
-    case: &Value,
-    repository_root: &Path,
-    source_ids: &BTreeSet<String>,
-) -> CaseSpec {
+fn parse_case(case: &Value, repository_root: &Path, source_ids: &BTreeSet<String>) -> CaseSpec {
     assert_fields(
         case,
-        &["id", "split", "medium", "sourceId", "input", "expect", "mutation"],
+        &[
+            "id", "split", "medium", "sourceId", "input", "expect", "mutation",
+        ],
         &["id", "split", "medium", "sourceId", "input", "expect"],
         "evaluation case",
     );
@@ -590,10 +604,7 @@ fn verify_mutations(
 #[test]
 fn smoke_product_evaluation_matches_versioned_oracles_and_kills_mutations() {
     let repository_root = repository_root();
-    let manifest = load_json(
-        &repository_root.join(MANIFEST_PATH),
-        "evaluation manifest",
-    );
+    let manifest = load_json(&repository_root.join(MANIFEST_PATH), "evaluation manifest");
     validate_manifest_header(&manifest, &repository_root);
 
     let source_ids = validate_sources(&manifest);
