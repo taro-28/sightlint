@@ -239,6 +239,8 @@ Current committed assets include:
 - **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
 - a repository-owned realistic Web fixture foundation with six separately annotated acquisition
   and rule cases, including one targeted mutation and one intentional-grouping hard negative;
+- a seven-case Playwright companion that captures selected DOM/accessibility structure, computed
+  geometry, and a synchronized viewport screenshot through a separate Node process;
 - targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
   byte-identical results.
 
@@ -247,8 +249,9 @@ public E2E, rustdoc, Rust 1.85.0, and Linux/macOS/Windows. Public behavior is in
 exact final PR head and the merged `main` commit both pass.
 
 Synthetic and repository-owned regression data does not establish real-world precision. The first
-issue #22 slice defines a reviewed Web evaluation contract, but browser acquisition,
-representative sampling, independent review, and a protected holdout process remain future work.
+issue #22/#23 slices define a reviewed Web evaluation contract and one controlled local browser
+path, but representative sampling, independent review, semantic peer inference, pixel-content
+identity, and a protected holdout process remain future work.
 
 ## Architecture
 
@@ -300,7 +303,7 @@ Read:
 | #34 | first evidence-backed zero-setup web UI alpha epic |
 
 Issues define future work, not implemented behavior. New architecture decisions continue at ADR
-0033 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0034 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index.
 
 ## Development rules

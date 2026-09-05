@@ -60,6 +60,11 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/generate_raster_corpus.py --check`
 - [ ] `python3 tools/generate_inspection_corpus.py --check`
 - [ ] `python3 tools/check_web_evaluation.py`
+- [ ] `npm --prefix adapters/playwright ci --ignore-scripts`
+- [ ] `npm --prefix adapters/playwright run install:browser`
+- [ ] `npm --prefix adapters/playwright run check`
+- [ ] `cargo build --locked -p sightlint-cli`
+- [ ] `npm --prefix adapters/playwright run test:e2e`
 - [ ] `cargo fmt --all -- --check`
 - [ ] `cargo clippy --locked --workspace --all-targets --all-features -- -D warnings`
 - [ ] `cargo test --locked --workspace --all-features`

@@ -11,9 +11,9 @@ toolchain supporting the 2024 edition. Local development follows the `stable` ch
 checks the minimum version.
 
 Install Rust through `rustup`, clone the repository, and allow the checked-in
-`rust-toolchain.toml` to install `rustfmt` and Clippy. Future process adapters may use another
-language when it is the best platform fit—for example TypeScript/Node for Playwright—but they
-must remain outside the deterministic Rust kernel and declare their own pinned toolchain.
+`rust-toolchain.toml` to install `rustfmt` and Clippy. The Playwright adapter uses pinned
+TypeScript/Node dependencies outside the deterministic Rust kernel; future process adapters may
+likewise use the language that best matches their platform while declaring a pinned toolchain.
 
 ## Authoritative starting point
 
@@ -120,6 +120,11 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+npm --prefix adapters/playwright ci --ignore-scripts
+npm --prefix adapters/playwright run install:browser
+npm --prefix adapters/playwright run check
+cargo build --locked -p sightlint-cli
+npm --prefix adapters/playwright run test:e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features

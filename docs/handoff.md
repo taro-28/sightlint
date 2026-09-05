@@ -11,14 +11,14 @@ Last handoff preparation: 2026-09-05.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of this handoff work, the last functional baseline was:
+At the start of the Playwright acquisition slice, the latest verified baseline was:
 
-- commit: `583136ac965a342526c6bbc100250cd9d7ce3a0c`
-- tree: `c74368a152c2cfc65ae82c8db05735f014ae273a`
-- merged PR: #21
-- main CI: run 33972019767, all five jobs successful
+- commit: `4ced8f0557d70f0609ee6e6bb3b09c651362997c`
+- tree: `8e78267f4d1a4a3f01103a3fca80505c453bc865`
+- merged PR: #36
+- main CI: run 33980632268, all five jobs successful
 
-This handoff PR changes documentation and workflow instructions, not the product kernel. After it
+The current focused branch adds the first process-isolated browser acquisition path. After it
 merges, its resulting `main` commit supersedes the hash above as the repository starting point.
 Never hard-code the old hash as a branch base. Verify the current `main` and its CI.
 
@@ -172,8 +172,8 @@ Identical pixels with an “intentional grouping” annotation receive the same 
 
 ### Realistic Web evaluation foundation
 
-ADR 0032 and `evaluation/web/` provide the first issue #22 foundation without implementing a Web
-adapter. The committed repository-owned dashboard has six reviewed state/environment records:
+ADR 0032 and `evaluation/web/` provide the first issue #22 foundation. The committed
+repository-owned dashboard has six reviewed declared-IR state/environment records:
 
 - three required public-binary smoke cases for explicit peer spacing;
 - one clean baseline and one targeted 16 CSS-pixel mutation;
@@ -183,10 +183,31 @@ adapter. The committed repository-owned dashboard has six reviewed state/environ
 - separate acquisition and rule annotation documents;
 - explicit source ownership, pending-license, privacy, split, and holdout declarations.
 
-All browser-derived DOM/accessibility snapshots, computed render/hit geometry, screenshots, and
-native/pixel reconciliation remain `untested` for issue #23. The runnable inputs use independently
-authored declared Artifact IR projections and do not establish acquisition accuracy. Metrics are
-small-corpus regression counts, not general UI/UX accuracy.
+The original runnable inputs use independently authored declared Artifact IR projections and do
+not establish acquisition accuracy. Their browser fields remain `untested` rather than being
+rewritten from implementation output. Metrics are small-corpus regression counts, not general
+UI/UX accuracy.
+
+### Playwright Web acquisition slice
+
+ADR 0033 and `adapters/playwright/` add an untrusted TypeScript/Node process with locked
+Playwright/Chromium dependencies. Protocol `0.1.0` accepts a repository-contained local HTML
+fixture and emits canonical Artifact IR plus an `org.sightlint.web@0.1.0` extension and a
+synchronized PNG viewport screenshot. It records selected DOM hierarchy, locator-scoped
+accessibility summaries, computed style, layout/render geometry, center hit tests, document and
+viewport canvases, scroll translation, environment/version provenance, privacy/network status,
+and bounded native/screenshot reconciliation.
+
+Seven independent browser requests and acquisition/rule oracles cover clean, out-of-document and
+spacing mutations, responsive and text-scale states, an ambiguous state, and an
+intentional-grouping hard negative. E2E invokes the actual Node process and built `sightlint`
+binary, validates versioned schemas, checks stable error/resource behavior, and compares repeated
+response, IR, screenshot, and report bytes on Linux.
+
+This slice supports exactly one main frame/page, local `file:` fixtures, and at most 200 selected
+nodes. It does not infer semantic peer relations or compare pixel content; those aspects remain
+`untested`/`cantTell`. Cross-platform screenshot byte identity and real-world UI/UX accuracy are
+not claimed.
 
 ### Public commands
 
@@ -203,6 +224,16 @@ sightlint inspect-image INPUT [--format human|json]
 ```
 
 Use `cargo run --locked -p sightlint-cli -- ...` until packaging is defined.
+
+The Web adapter currently has a separate Node process surface:
+
+```bash
+node adapters/playwright/dist/src/cli.js \
+  --request REQUEST.json \
+  --repository-root REPOSITORY \
+  --artifact-ir-out ARTIFACT-IR.json \
+  --screenshot-out SCREENSHOT.png
+```
 
 For checks, exit codes are 0 for no denied failures, 1 for a failed/strictly denied result, and 2
 for usage/input/execution errors. `inspect-image` never exits 1 for a heuristic; observations or
@@ -238,7 +269,11 @@ SightLint treats tests as part of the product specification.
 - three repeated public-binary smoke executions;
 - one killed peer-spacing mutation and one nonfailing intentional-grouping hard negative;
 - three explicit deferred abstentions for ambiguous/responsive/text-scale acquisition;
-- no claimed browser acquisition, screenshot corpus, or holdout.
+- seven companion browser captures with separate acquisition/rule oracles;
+- synchronized DOM/accessibility/computed geometry and viewport screenshot metadata;
+- one browser bounds mutation kill, one intentional-grouping hard negative, and explicit
+  semantic/pixel abstentions;
+- no representative screenshot corpus, private holdout, or general accuracy claim.
 
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
@@ -268,7 +303,8 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - automatic peer-role or design-intent inference;
 - trusted spacing failures derived only from image grouping;
 - color management, compositing, or trusted contrast from PNG samples;
-- Playwright/DOM/accessibility capture;
+- arbitrary-URL, iframe, shadow-DOM, full accessibility-tree, or interaction capture;
+- automatic semantic peer inference from Playwright output;
 - PPTX, PDF/document, Android, or iOS adapters;
 - baseline/semantic visual diff beyond current explicit contracts;
 - dynamic interaction traces, pending/error/recovery/destructive-action rules;
@@ -304,10 +340,11 @@ Issue #34 is the execution epic for the first evidence-backed zero-setup web UI 
 complete, select the earliest unblocked item in this sequence:
 
 1. **#22 — human-reviewed realistic evaluation corpus.** The ADR/schema/dashboard/oracle foundation
-   is present. Continue with reviewed synchronized native/pixel capture, broader cases/review, and
-   representative metrics without treating the visible development data as holdout.
-2. **#23 — Playwright web adapter.** Capture DOM/accessibility/computed layout and synchronized
-   screenshot in an isolated TypeScript/Node process, then reconcile evidence into IR.
+   and first synchronized browser companion slice are present. Continue with broader independent
+   cases/review and representative metrics without treating visible development data as holdout.
+2. **#23 — Playwright web adapter.** Protocol `0.1.0` supplies the initial isolated local-fixture
+   path. Continue with the issue's remaining fixture breadth and portability evidence before
+   treating the adapter as generally complete.
 3. **#24 — recommended zero-setup rule packs.** Admit a small set of high-confidence rules only
    after evidence demonstrates acceptable precision/coverage/abstention.
 4. **Agent loop within #34.** One local command, canonical report, targeted defect, Codex fix, and
@@ -409,6 +446,11 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+npm --prefix adapters/playwright ci --ignore-scripts
+npm --prefix adapters/playwright run install:browser
+npm --prefix adapters/playwright run check
+cargo build --locked -p sightlint-cli
+npm --prefix adapters/playwright run test:e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features

@@ -9,17 +9,24 @@ SightLint. It is governed by ADR 0032 and is deliberately separate from:
 
 ## Current scope
 
-Version `0.1.0` contains one fictional dashboard application and six reviewed case records. Three
-smoke cases exercise the existing `visual.spacing.peer-consistency@0.1.0` rule through the built
-`sightlint` binary:
+The original version `0.1.0` corpus contains one fictional dashboard application and six reviewed
+rule-projection records. Three smoke cases exercise the existing
+`visual.spacing.peer-consistency@0.1.0` rule through the built `sightlint` binary:
 
 - a clean repeated-card sequence;
 - one targeted gap mutation;
 - an intentional grouping hard negative that must not fail the spacing rule.
 
-Three development records preserve the next acquisition questions: ambiguous peer intent, a narrow
-viewport, and increased text scale. They are explicitly `untested` until issue #23 provides the
-Playwright adapter and synchronized native/pixel capture.
+Three development records preserve acquisition questions: ambiguous peer intent, a narrow
+viewport, and increased text scale. Their original declared-IR projections remain explicitly
+`untested`; they are not rewritten from browser output.
+
+ADR 0033 adds a separate browser-acquisition companion slice with seven reviewed requests. It runs
+the repository-owned fixture through the isolated `sightlint-web` process and covers clean,
+out-of-document mutation, spacing mutation, intentional-grouping hard negative, ambiguous,
+responsive, and 125% text-scale states. `annotations/browser-acquisition.json` records acquisition
+truth, while `annotations/browser-rules.json` independently records expected results from the
+built Rust binary. Captured Artifact IR and screenshots remain temporary test artifacts.
 
 This corpus is realistic in structure, not representative in sampling. It contains one application
 family, one language, one theme, and one evaluated rule. It does not establish real-world UI/UX
@@ -32,6 +39,11 @@ accuracy or recommended/blocking maturity.
 - `corpus.json`: reviewed case inventory and governance metadata.
 - `annotations/acquisition.json`: what a future adapter should acquire, including untested aspects.
 - `annotations/rules.json`: applicability, policy, expected rule outcomes, and false-positive risks.
+- `browser-acquisition.schema.json` and `annotations/browser-acquisition.json`: reviewed browser
+  structure, geometry, reconciliation, mutation, hard-negative, and abstention expectations.
+- `browser-rule.schema.json` and `annotations/browser-rules.json`: independent public-binary
+  verdict expectations and explicit non-claims.
+- `requests/`: versioned deterministic capture requests for the Playwright adapter.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
 - `inputs/`: independently authored Artifact IR projections for currently runnable rule cases.
 
@@ -45,14 +57,16 @@ review-version decision, and review of related baseline, mutation, hard-negative
 
 ## Acquisition status
 
-Browser acquisition is not implemented in this slice. The corpus intentionally records DOM/
-accessibility capture, computed render and hit geometry, screenshot pixels, and native/pixel
-reconciliation as `untested`. Source-reviewed selectors, hierarchy, and intended peer membership do
-not become exact rendered facts.
+Browser protocol `0.1.0` measures selected DOM/accessibility observations, computed
+layout/render geometry, center hit tests, viewport screenshot extent, and bounded native/screenshot
+reconciliation for the seven companion cases. Screenshot pixel-content identity remains
+`cantTell`, and semantic peer membership remains `untested`/`cantTell`; source-reviewed intent does
+not become an inferred fact.
 
-Issue #23 will add the isolated Playwright adapter and compare its output with the acquisition
-annotations. Missing or conflicting observations must remain `cantTell`/`untested` or conflict
-evidence rather than being copied from the rule oracle.
+The original six-case declared-IR corpus is retained unchanged except for source-digest drift. It
+continues to test the peer-spacing rule independently of acquisition. Missing or conflicting
+browser observations remain abstentions or conflict evidence rather than being copied from the
+rule oracle.
 
 ## Data governance
 
@@ -76,5 +90,14 @@ every runnable smoke case:
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 ```
 
-It reports explicit counts for labeled cases, applicability, covered pass/fail decisions, false
-positives, correct abstentions, and mutation kills. Those counts are not a quality score.
+The browser companion uses the actual Node adapter process and built Rust binary:
+
+```bash
+npm --prefix adapters/playwright run check
+cargo build --locked -p sightlint-cli
+npm --prefix adapters/playwright run test:e2e
+```
+
+Together they expose explicit cases for pass/fail coverage, false-positive protection,
+abstention, and mutation detection. Those small public-fixture counts are not a quality score or a
+real-world accuracy estimate.

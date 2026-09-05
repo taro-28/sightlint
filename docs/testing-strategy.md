@@ -261,8 +261,9 @@ Current examples:
 - the 30-case image-inspection corpus compares region bounds, groups, gaps, abstentions, evidence,
   and errors under the strict perimeter hypothesis.
 
-Future examples include Playwright fixtures with DOM/accessibility/computed geometry and a
-synchronized screenshot, plus OCR/CV/VLM outputs compared with reviewed annotations.
+The initial Playwright example uses seven repository-owned states with selected
+DOM/accessibility/computed geometry and a synchronized screenshot. Broader Web fixtures and future
+OCR/CV/VLM outputs still require comparison with independent reviewed annotations.
 
 Required acquisition controls include:
 
@@ -364,6 +365,11 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+npm --prefix adapters/playwright ci --ignore-scripts
+npm --prefix adapters/playwright run install:browser
+npm --prefix adapters/playwright run check
+cargo build --locked -p sightlint-cli
+npm --prefix adapters/playwright run test:e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
