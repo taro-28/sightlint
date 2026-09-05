@@ -129,14 +129,17 @@ peer-spacing mutation, and one intentional-grouping hard negative.
 Three smoke cases execute independently authored Artifact IR projections through the built
 `sightlint` binary and require byte-stable reports. Three development cases preserve ambiguous
 peer intent, a narrow viewport, and increased text scale as deferred abstentions. A separate
-19-case ADR 0033/0034 companion now exercises controlled local Playwright capture, selected DOM and
+23-case ADR 0033–0035 companion now exercises controlled local Playwright capture, selected DOM and
 accessibility observations, computed geometry, overflow, clipping, center-hit samples, writing
 direction, synchronized screenshot extent, and the built Rust binary against independent
-acquisition and rule oracles. It reports 70 acquisition expectations, 37 acquisition abstentions,
-9/9 observed acquisition mutations, 3/3 current-rule mutation kills, and zero unexpected or
-hard-negative failures. Pixel-content identity, complete hit regions, and semantic peer inference
-remain `cantTell`/`untested`. These counts are regression evidence for the evaluation contract, not
-real-world acquisition accuracy or representative rule precision.
+acquisition and rule oracles. It reports 76 acquisition expectations, 45 acquisition abstentions,
+11/11 observed acquisition mutations, 6/6 rule-eligible mutation kills, 6/6 matched emitted
+failures, and zero unexpected or hard-negative failures. For each of the three recommended rules,
+the browser E2E records 5/5 contracted outcome-category entries, 1/1 matched failure, 2/2 reviewed
+abstentions, 1/1 killed targeted mutation, and zero hard-negative failures. Pixel-content identity,
+complete hit regions, and semantic peer inference remain `cantTell`/`untested`. These counts are
+regression evidence for one public fictional application, not real-world acquisition accuracy or
+representative rule precision.
 
 ### PNG raster acquisition corpus
 
@@ -168,10 +171,12 @@ It proves the current source-pixel path, not screenshot UI understanding.
 It proves the narrow unanimous-perimeter acquisition policy and nonblocking uncertainty. It is not
 a benchmark for rounded, shadowed, textual, photographic, or complex application screenshots.
 
-## Next evaluation gate: issue #22
+## Next evaluation expansion gates
 
-Before promoting broad image inference, Playwright-derived rules, or recommended zero-setup
-profiles, build a realistic corpus with repository-owned local web fixtures.
+The first #22 evaluation foundation and #24 advisory rule slice are complete. Before promoting
+broader image inference, more Playwright-derived rules, or any rule to blocking maturity, expand
+the repository-owned Web applications, independent review, and protected-holdout process. The
+following records remain the required shape for those additions.
 
 ### Artifact records
 

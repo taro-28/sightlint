@@ -6,7 +6,7 @@ and accessibility observations, computed layout/render geometry, bounded clippin
 center-hit samples, and a synchronized viewport screenshot, then writes Artifact IR for the
 deterministic Rust `sightlint` binary.
 
-The adapter is governed by ADRs 0033 and 0034. It is not part of the Rust kernel and does not decide
+The adapter is governed by ADRs 0033–0035. It is not part of the Rust kernel and does not decide
 whether a UI is good or bad.
 
 ## Compatibility
@@ -16,9 +16,9 @@ whether a UI is good or bad.
 - Playwright: exactly `1.63.0` with its matching Chromium build.
 - Schema validation: AJV exactly `8.20.0` in development/E2E.
 - capture request/response: `0.1.0`.
-- adapter implementation: `0.2.0`.
-- `org.sightlint.web` extension: `0.2.0`; the strict `0.1.0` schema remains available for version
-  dispatch and historical validation.
+- adapter implementation: `0.3.0`.
+- `org.sightlint.web` extension: `0.3.0`; strict `0.1.0` and `0.2.0` schemas remain available for
+  version dispatch and historical validation.
 - Artifact IR: `0.1.0`.
 
 Install the locked dependencies and browser once:
@@ -45,12 +45,14 @@ node adapters/playwright/dist/src/cli.js \
   > "$capture_dir/response.json"
 
 target/debug/sightlint check "$capture_dir/artifact-ir.json" --format json
+# Optional override: --profile base omits the additive recommended Web rules.
 ```
 
 Success writes canonical response JSON to stdout, nothing to stderr, and exits 0. Invalid input,
 unsupported browser state, resource-limit failure, or capture failure writes one stable diagnostic
-to stderr, nothing to stdout, and exits 2. Rule failures belong to the subsequent Rust command,
-which retains its existing exit codes.
+to stderr, nothing to stdout, and exits 2. Rule verdicts belong to the subsequent Rust command.
+The default recommended Web rules are advisory, while pre-existing base-rule failures retain their
+blocking exit behavior.
 
 ## Trust, network, and privacy boundary
 
@@ -77,16 +79,22 @@ extent, layout/render disagreement, and partial screenshot coverage stay explici
 extension. Native structure never overwrites pixel evidence. Pixel-content identity is
 `cantTell` because this version performs no segmentation, OCR, CV, or visual identity matching.
 
-Extension `0.2.0` also keeps client and scroll sizes, computed white-space/text-overflow values,
+Extension `0.3.0` keeps the `0.2.0` client and scroll sizes, computed
+white-space/text-overflow values,
 rectangular overflow-ancestor intersections, and the selected element at a render-box-center hit
-sample. These are measurements, not UX verdicts. A center sample is not a complete hit rectangle;
-core `hitBox` remains absent and `hitRegion` is explicitly `cantTell`.
+sample. It additionally names the exact DOM, render, and optional accessibility evidence record
+for every selected node so the trusted engine can validate the evidence class, adapter/version,
+source digest, local-processing flag, and native locator before executing a rule.
+These are measurements, not UX verdicts. A center sample is not a complete hit rectangle; core
+`hitBox` remains absent and `hitRegion` is explicitly `cantTell`.
 
 The adapter does not infer semantic peer groups. Consequently, the existing peer-spacing rule is
-`inapplicable` for raw adapter output until a later evaluated relation source exists. The reviewed
-browser acquisition and rule oracles are separate files; captured output is temporary and is not
-used to generate either oracle. Passing this synthetic fixture does not establish real-world Web
-UI/UX accuracy, accessibility conformance, or rule-pack maturity.
+`inapplicable` for raw adapter output until a later evaluated relation source exists. The
+recommended profile consumes only three narrow evidence patterns admitted by ADR 0035; raw
+overflow, transforms, repeated dimensions, and screenshots do not become automatic failures. The
+reviewed browser acquisition and rule oracles are separate files; captured output is temporary
+and is not used to generate either oracle. Passing this synthetic fixture does not establish
+real-world Web UI/UX accuracy, accessibility conformance, or blocking rule maturity.
 
 ## Validation
 
@@ -96,9 +104,11 @@ cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run test:e2e
 ```
 
-The E2E executes the actual Node process and built Rust binary, validates both versioned schemas,
-checks 19 reviewed clean/mutation/hard-negative/ambiguous/responsive/text-scale and evidence-matrix
-cases, exercises
-stable malformed/resource errors, and compares repeated response, IR, screenshot, and rule-report
-bytes within one declared compatibility environment. Linux is the required browser E2E platform;
-cross-platform screenshot byte identity is not claimed.
+The E2E executes the actual Node process and built Rust binary, validates current and historical
+strict schemas, checks 23 reviewed clean/mutation/hard-negative/ambiguous/responsive/text-scale and
+evidence-matrix cases, exercises recommended/default/base profile behavior and stable
+malformed/resource errors, and compares repeated response, IR, screenshot, and rule-report bytes
+within one declared compatibility environment. It reports per-rule contract coverage, failure
+precision, reviewed abstention, mutation kill rate, and hard-negative failures with explicit
+denominators. Linux is the required browser E2E platform; cross-platform screenshot byte identity
+is not claimed.

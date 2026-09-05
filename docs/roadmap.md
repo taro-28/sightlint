@@ -15,7 +15,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
-| M4 — Structured adapters | active | process-isolated Playwright local-fixture capture plus 19-case native/pixel evidence matrix | evaluated zero-setup rules, portability characterization, then other media by demand |
+| M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix and first advisory recommended Web pack | portability characterization, broader representative evaluation, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
 | M7 — Ecosystem and release | not started | local development CLI only | agent workflow, MCP/GitHub/editor surfaces, packaging, license, release |
@@ -48,11 +48,11 @@ Issue #34 owns this outcome.
    - preserve layout/render/hit geometry, selectors, units, browser environment, privacy, and
      resource limits;
    - reconcile native and pixel evidence instead of choosing one globally.
-3. **#24 — Recommended zero-setup rule packs (next)**
-   - admit only narrow, evaluated rules with a named policy source and acceptable precision at
-     stated coverage;
-   - preserve project/design-system/platform precedence and `cantTell`;
-   - do not turn broad aesthetic preferences into blocking obligations.
+3. **#24 — Recommended zero-setup rule packs (complete for the first Web pack)**
+   - the additive default `sightlint:recommended` profile admits three narrow Web rules with named
+     policy provenance;
+   - `--profile base` is the explicit opt-out, and profile/enforcement are canonical report data;
+   - all three rules remain advisory and preserve `cantTell` for unresolved alternatives.
 4. **Agent fix-and-rerun slice within #34**
    - expose one local command and canonical machine report;
    - demonstrate Codex locating a source target, applying a focused edit, and rerunning SightLint;
@@ -65,7 +65,7 @@ Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by putting
 logic into the Rust kernel. Do not skip #24 by presenting raw measurements as a complete UI/UX
 reviewer.
 
-### Completed #22/#23 foundation and browser evidence matrix
+### Completed #22–#24 evaluation, acquisition, and first recommended-rule path
 
 ADR 0032 establishes an independently versioned Web evaluation contract and one repository-owned
 dashboard fixture. Six reviewed records separate acquisition annotations from rule verdicts. Three
@@ -73,20 +73,25 @@ smoke cases exercise the existing explicit peer-spacing rule through the public 
 baseline, targeted mutation, and intentional-grouping hard negative; three declared-IR development
 cases keep ambiguous, narrow-viewport, and text-scale acquisition explicitly untested.
 
-ADRs 0033 and 0034 add a separate 19-case browser companion without overwriting those projections.
+ADRs 0033 and 0034 add a separate browser companion without overwriting those projections.
 The isolated Node process captures selected DOM/accessibility structure, computed geometry,
 client/scroll overflow, rectangular ancestor clipping, render-box-center hit samples, writing
 direction, a synchronized viewport screenshot, and explicit native/screenshot reconciliation.
-Human-authored browser acquisition and rule oracles cover nine targeted acquisition mutations,
-three current-rule mutation kills, two hard negatives, ambiguity, responsive layout, text scale,
-and 37 explicit acquisition abstentions. The actual capture and built Rust binary are exercised
-together on Linux with byte-stability checks.
+ADR 0035 evolves that companion to 23 cases and the official optional
+`org.sightlint.web@0.3.0` extension, adds explicit per-node evidence references, and admits three
+advisory deterministic rules for programmatic names, one center-hit sample, and non-scrollable
+ancestor clipping. Human-authored acquisition and rule oracles cover 11 targeted acquisition
+mutations, 6 rule-eligible mutation kills, hard negatives, ambiguity, responsive layout, text
+scale, and 45 explicit acquisition abstentions. The actual capture and built Rust binary are
+exercised together on Linux with byte-stability, profile override, malformed-extension, and
+per-rule metric checks.
 
-This completes the bounded #22 and #23 issue contracts, but it is not evidence of general Web
+This completes the bounded #22–#24 issue contracts, but it is not evidence of general Web
 accuracy. The corpus has one fictional application family, maintainer-only review, visible
 development labels, no private holdout, no pixel-content identity, no complete hit regions, no
-semantic peer inference, and no representative sampling. Issue #24 must admit rules
-conservatively without turning these acquisition measurements into automatic defects.
+semantic peer inference, and no representative sampling. The three new rules therefore remain
+advisory; the next #34 slice must prove the local agent fix-and-rerun outcome without broadening
+their claims.
 
 ## Scope-selection rules
 
@@ -167,13 +172,13 @@ and applicability are known.
 
 ### Remaining candidate areas
 
-- clipping and occlusion with richer render evidence;
+- broader clipping and occlusion beyond the first conservative Web-control slice;
 - safe areas and hit-target relationships;
 - text overflow/truncation;
 - responsive transformations;
 - color and contrast after color-management/compositing evidence is defined;
 - baseline and semantic diff;
-- recommended policy profiles and inferred project norms.
+- additional recommended policies and inferred project norms.
 
 ### Gate
 
@@ -186,8 +191,8 @@ Do not add a broad rule because it sounds like a best practice. The rule must de
 - hard negatives and false-positive risks;
 - real or sufficiently realistic evaluation before recommended/blocking maturity.
 
-Issue #24 owns the recommended-pack product layer; #22 supplies the evaluation gate and #23 the
-first rich evidence source.
+ADR 0035 supplies the first #24 recommended-pack slice; further admissions still depend on the
+#22 evaluation gate and #23 evidence source.
 
 ## M3 — Deterministic image adapter
 
@@ -257,7 +262,7 @@ pixels to verify rendered reality.
 
 ### First adapter: Playwright/web — #23
 
-Capture protocol `0.1.0` with `org.sightlint.web@0.2.0` captures, from one controlled local session:
+Capture protocol `0.1.0` with `org.sightlint.web@0.3.0` captures, from one controlled local session:
 
 - DOM and frame hierarchy;
 - accessibility roles/names/states;
@@ -273,10 +278,12 @@ Capture protocol `0.1.0` with `org.sightlint.web@0.2.0` captures, from one contr
 The browser runs in an isolated TypeScript/Node adapter process. It is not linked into the trusted
 Rust kernel. Start with repository-owned local fixtures rather than arbitrary network URLs.
 
-The #23 matrix includes overlap/occlusion, clipping, overflow, visual/interactive extent,
+The #23/#24 matrix includes overlap/occlusion, clipping, overflow, visual/interactive extent,
 hidden/disabled/offscreen, peer-dimension, transformed-text, responsive desktop/mobile,
-RTL/vertical-writing, and intentional-overlay fixtures. Characterizing macOS and Windows browser
-output, and later support for iframes, shadow DOM, interaction, and arbitrary projects, remain
+RTL/vertical-writing, named/unnamed/ambiguous controls, scrollable clipping, and intentional-overlay
+fixtures. The default recommended profile evaluates three narrow advisory obligations in Rust;
+raw acquisition measurements remain non-verdicts. Characterizing macOS and Windows browser output,
+and later support for iframes, shadow DOM, interaction, and arbitrary projects, remain
 future compatibility/capability work rather than part of the bounded local-fixture protocol.
 Pixel-content identity, complete hit regions, and semantic peer relations remain abstentions until
 independently evaluated evidence exists.
@@ -409,7 +416,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0035 or later.
+- New architecture decision numbers continue at 0036 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.

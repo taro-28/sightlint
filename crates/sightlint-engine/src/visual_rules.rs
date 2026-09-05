@@ -9,9 +9,13 @@ use sightlint_ir::{
 
 use crate::geometry::{QueryContext, ResolvedRect, bottom, ensure_comparable, right};
 use crate::report::{
-    Measurement, RuleKind, RuleMaturity, RuleOutcome, RuleResult, Target, TargetKind,
+    Measurement, PolicyProvenance, RuleKind, RuleMaturity, RuleOutcome, RuleResult, Target,
+    TargetKind,
 };
-use crate::rules::{InputAspect, RuleDefinition};
+use crate::rules::{
+    BASE_BOUNDS_POLICY, BASE_DECLARED_VISUAL_POLICY, InputAspect, RuleDefinition,
+    RulePolicyDefinition,
+};
 
 /// Runs every built-in M2 rule against a validated official visual extension.
 pub(crate) fn run_visual_rules(
@@ -32,6 +36,11 @@ static PARENT_CONTAINMENT_DEFINITION: RuleDefinition = RuleDefinition {
     title: "Child bounds stay within parent bounds",
     input_aspects: &[InputAspect::NodeGeometry, InputAspect::Evidence],
     maturity: RuleMaturity::Experimental,
+    policy: RulePolicyDefinition {
+        source_id: "sightlint:parent-containment",
+        reference: "docs/decisions/0020-explicit-visual-consistency-contracts.md",
+        ..BASE_BOUNDS_POLICY
+    },
 };
 
 static PEER_ALIGNMENT_DEFINITION: RuleDefinition = RuleDefinition {
@@ -44,6 +53,7 @@ static PEER_ALIGNMENT_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: BASE_DECLARED_VISUAL_POLICY,
 };
 
 static PEER_EXTENT_DEFINITION: RuleDefinition = RuleDefinition {
@@ -56,6 +66,7 @@ static PEER_EXTENT_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: BASE_DECLARED_VISUAL_POLICY,
 };
 
 static PEER_FONT_SIZE_DEFINITION: RuleDefinition = RuleDefinition {
@@ -68,6 +79,7 @@ static PEER_FONT_SIZE_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: BASE_DECLARED_VISUAL_POLICY,
 };
 
 static MINIMUM_FONT_SIZE_DEFINITION: RuleDefinition = RuleDefinition {
@@ -80,6 +92,7 @@ static MINIMUM_FONT_SIZE_DEFINITION: RuleDefinition = RuleDefinition {
         InputAspect::Evidence,
     ],
     maturity: RuleMaturity::Experimental,
+    policy: BASE_DECLARED_VISUAL_POLICY,
 };
 
 fn evaluate_parent_containment(context: &QueryContext<'_>) -> Vec<RuleResult> {
@@ -865,6 +878,14 @@ fn build_result(
         title: definition.title.to_owned(),
         kind: RuleKind::Atomic,
         maturity: definition.maturity,
+        policy: PolicyProvenance {
+            profile: definition.policy.profile.to_owned(),
+            source_kind: definition.policy.source_kind,
+            source_id: definition.policy.source_id.to_owned(),
+            source_version: definition.policy.source_version.to_owned(),
+            reference: definition.policy.reference.to_owned(),
+        },
+        enforcement: definition.policy.enforcement,
         target,
         outcome,
         message,

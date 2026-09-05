@@ -76,7 +76,7 @@ interface AcquisitionCase {
     target: string;
     changedProperty: string;
     preservedProperties: string[];
-    evidenceExpectations: Array<"layoutRenderConflict" | "renderOffset" | "ancestorClipping" | "overflowMeasurement" | "centerHitSample" | "peerDimensionDifference">;
+    evidenceExpectations: Array<"layoutRenderConflict" | "renderOffset" | "ancestorClipping" | "overflowMeasurement" | "centerHitSample" | "peerDimensionDifference" | "accessibilityName">;
   };
 }
 
@@ -86,9 +86,19 @@ interface RuleCase {
   classification: string;
   expectedExitCode: number;
   expectedFailureCount: number;
+  expectedBlockingFailureCount: number;
   expectedResults: Array<{
     ruleId: string;
     ruleVersion: string;
+    maturity: string;
+    enforcement: string;
+    policy: {
+      profile: string;
+      sourceKind: string;
+      sourceId: string;
+      sourceVersion: string;
+      reference: string;
+    };
     outcome: string;
     targetKind: string;
     targetId: string;
@@ -96,6 +106,17 @@ interface RuleCase {
   }>;
   falsePositiveRisk: string;
   nonClaim: string;
+}
+
+interface RuleContract {
+  ruleId: string;
+  evaluationCases: {
+    pass: string[];
+    fail: string[];
+    cantTell: string[];
+    inapplicable: string[];
+    hardNegative: string[];
+  };
 }
 
 interface CaptureRun {
@@ -113,6 +134,7 @@ interface RuleMetrics {
   matchedFailures: number;
   unexpectedFailures: number;
   abstentions: number;
+  results: Array<Record<string, unknown>>;
 }
 
 function run(program: string, args: string[], cwd = repositoryRoot): Promise<ProcessResult> {
@@ -184,6 +206,8 @@ function assertMutationEvidence(oracle: AcquisitionCase): void {
       ), `${oracle.caseId} overflow evidence`);
     } else if (signal === "centerHitSample") {
       assert.ok(oracle.expectations.nodes.some((node) => ["occluded", "offViewport"].includes(node.centerHitSample?.outcome ?? "")), `${oracle.caseId} center-hit evidence`);
+    } else if (signal === "accessibilityName") {
+      assert.ok(oracle.expectations.nodes.some((node) => node.accessibilityStatus === "observed" && node.role !== null && node.name === null), `${oracle.caseId} accessibility-name evidence`);
     } else {
       const sizes = oracle.expectations.nodes.flatMap((node) => node.renderSize === undefined ? [] : [`${node.renderSize.width}x${node.renderSize.height}`]);
       assert.ok(new Set(sizes).size > 1, `${oracle.caseId} peer dimension evidence`);
@@ -266,6 +290,12 @@ function assertAcquisition(runResult: CaptureRun, oracle: AcquisitionCase): void
     assert.ok(core, `missing core node ${expected.id}`);
     assert.ok(acquired, `missing extension node ${expected.id}`);
     assert.ok(reconciled, `missing reconciliation node ${expected.id}`);
+    assert.equal(acquired["domEvidenceId"], `e-dom-${expected.id}`);
+    assert.equal(acquired["renderEvidenceId"], `e-render-${expected.id}`);
+    assert.equal(
+      acquired["accessibilityEvidenceId"],
+      expected.accessibilityStatus === "observed" ? `e-ax-${expected.id}` : null,
+    );
     assert.equal(core["parentId"] ?? null, expected.parentId, `${expected.id} parent`);
     assert.equal(object(acquired["accessibility"], `${expected.id} accessibility`)["status"], expected.accessibilityStatus);
     assert.equal(object(acquired["accessibility"], `${expected.id} accessibility`)["role"], expected.role);
@@ -351,6 +381,8 @@ function resultMatches(candidate: Record<string, unknown>, expected: RuleCase["e
   const target = object(candidate["target"], "rule target");
   return candidate["ruleId"] === expected.ruleId &&
     candidate["ruleVersion"] === expected.ruleVersion &&
+    candidate["maturity"] === expected.maturity &&
+    candidate["enforcement"] === expected.enforcement &&
     candidate["outcome"] === expected.outcome &&
     target["kind"] === expected.targetKind &&
     target["id"] === expected.targetId &&
@@ -366,10 +398,15 @@ function assertRuleReport(result: ProcessResult, oracle: RuleCase): RuleMetrics 
   for (const expected of oracle.expectedResults) {
     const matches = results.filter((candidate) => resultMatches(candidate, expected));
     assert.equal(matches.length, 1, `missing or duplicate reviewed result in ${oracle.caseId}: ${JSON.stringify(expected)}`);
+    assert.deepEqual(matches[0]?.["policy"], expected.policy, `${oracle.caseId} policy provenance`);
   }
   assert.ok(oracle.falsePositiveRisk.length > 0);
   assert.ok(oracle.nonClaim.length > 0);
   const failures = results.filter((candidate) => candidate["outcome"] === "failed");
+  assert.equal(
+    failures.filter((candidate) => candidate["enforcement"] === "blocking").length,
+    oracle.expectedBlockingFailureCount,
+  );
   const reviewedFailures = oracle.expectedResults.filter((expected) => expected.outcome === "failed");
   const matchedFailures = failures.filter((candidate) => reviewedFailures.some((expected) => resultMatches(candidate, expected))).length;
   return {
@@ -377,6 +414,7 @@ function assertRuleReport(result: ProcessResult, oracle: RuleCase): RuleMetrics 
     matchedFailures,
     unexpectedFailures: failures.length - matchedFailures,
     abstentions: results.filter((candidate) => ["cantTell", "inapplicable", "untested"].includes(String(candidate["outcome"]))).length,
+    results,
   };
 }
 
@@ -396,8 +434,10 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
     }
   }
   const ruleCases = new Map((array(ruleDocument["cases"], "rule cases") as unknown as RuleCase[]).map((item) => [item.caseId, item]));
+  const ruleContracts = array(ruleDocument["ruleContracts"], "rule contracts") as unknown as RuleContract[];
   const responseValidator = await schemaValidator("adapters/playwright/schemas/capture-response.schema.json");
   const extensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension.schema.json");
+  const secondExtensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension-0.2.schema.json");
   const previousExtensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension-0.1.schema.json");
   const completed: CaptureRun[] = [];
   let completedCases = 0;
@@ -412,6 +452,7 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
   let falsePositiveFailures = 0;
   let ruleAbstentions = 0;
   let hardNegativeFailures = 0;
+  const evaluatedRuleResults = new Map<string, Array<Record<string, unknown>>>();
 
   try {
     for (const oracle of acquisitionCases) {
@@ -427,10 +468,12 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
       assertValid(responseValidator, previousAdapterResponse, `${oracle.caseId} response with previous adapter metadata`);
       const webExtension = object(object(captured.artifactIr["extensions"], "extensions")[webExtensionKey], "Web extension");
       assertValid(extensionValidator, webExtension, `${oracle.caseId} extension`);
+      assert.equal(secondExtensionValidator(webExtension), false, `${oracle.caseId} must not be reinterpreted as extension 0.2`);
       assert.equal(previousExtensionValidator(webExtension), false, `${oracle.caseId} must not be reinterpreted as extension 0.1`);
       assertAcquisition(captured, oracle);
       const report = await run(sightlintBinary, ["check", join(captured.directory, "artifact-ir.json"), "--format", "json"]);
       const metrics = assertRuleReport(report, ruleOracle);
+      evaluatedRuleResults.set(oracle.caseId, metrics.results);
       completedCases += 1;
       acquisitionExpectations += oracle.expectations.nodes.length + oracle.expectations.gaps.length;
       acquisitionAbstentions += oracle.abstentions.length;
@@ -460,26 +503,140 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
     const repeatedReport = await run(sightlintBinary, ["check", join(repeatedClean.directory, "artifact-ir.json"), "--format", "json"]);
     assert.deepEqual(repeatedReport, firstReport, "rule report, stderr, and exit code must be stable");
 
-    assert.equal(completedCases, 19);
-    assert.equal(acquisitionExpectations, 70);
-    assert.equal(acquisitionAbstentions, 37);
-    assert.equal(detectedAcquisitionMutations, acquisitionMutations);
-    assert.equal(acquisitionMutations, 9);
-    assert.equal(eligibleRuleMutations, 3);
-    assert.equal(killedRuleMutations, eligibleRuleMutations);
-    assert.equal(matchedFailures, 3);
-    assert.equal(emittedFailures, 3);
-    assert.equal(falsePositiveFailures, 0);
-    assert.equal(ruleAbstentions, 38);
-    assert.equal(hardNegativeFailures, 0);
+    const defaultReport = JSON.parse(firstReport.stdout.toString("utf8")) as Record<string, unknown>;
+    assert.deepEqual(defaultReport["profiles"], ["sightlint:base", "sightlint:recommended"]);
+    assert.equal(object(defaultReport["extensionVersions"], "extension versions")[webExtensionKey], "0.3.0");
+    const explicitRecommendedReport = await run(sightlintBinary, ["check", join(firstClean.directory, "artifact-ir.json"), "--profile", "recommended", "--format", "json"]);
+    assert.deepEqual(explicitRecommendedReport, firstReport, "the zero-setup default must equal explicit recommended selection");
+    const baseReportProcess = await run(sightlintBinary, ["check", join(firstClean.directory, "artifact-ir.json"), "--profile", "base", "--format", "json"]);
+    assert.equal(baseReportProcess.code, 0, baseReportProcess.stderr.toString("utf8"));
+    const baseReport = JSON.parse(baseReportProcess.stdout.toString("utf8")) as Record<string, unknown>;
+    assert.deepEqual(baseReport["profiles"], ["sightlint:base"]);
+    assert.equal(object(baseReport["extensionVersions"], "base extension versions")[webExtensionKey], "0.3.0");
+    assert.equal(array(baseReport["results"], "base results").some((result) => String(result["ruleId"]).startsWith("web.")), false);
+
+    const unsupportedIr = structuredClone(firstClean.artifactIr);
+    object(object(unsupportedIr["extensions"], "unsupported extensions")[webExtensionKey], "unsupported Web extension")["extensionVersion"] = "9.9.9";
+    const unsupportedPath = join(firstClean.directory, "unsupported-web-extension.json");
+    await writeFile(unsupportedPath, `${JSON.stringify(unsupportedIr)}\n`);
+    const unsupportedFirst = await run(sightlintBinary, ["check", unsupportedPath, "--format", "json"]);
+    const unsupportedSecond = await run(sightlintBinary, ["check", unsupportedPath, "--format", "json"]);
+    assert.equal(unsupportedFirst.code, 2);
+    assert.equal(unsupportedFirst.stdout.byteLength, 0);
+    assert.match(unsupportedFirst.stderr.toString("utf8"), /UnsupportedVersion.*extensionVersion/u);
+    assert.deepEqual(unsupportedSecond, unsupportedFirst, "unsupported-extension diagnostics must be byte-stable");
+
+    const danglingEvidenceIr = structuredClone(firstClean.artifactIr);
+    const danglingExtension = object(object(danglingEvidenceIr["extensions"], "dangling extensions")[webExtensionKey], "dangling Web extension");
+    const danglingNode = array(danglingExtension["nodes"], "dangling Web nodes")[0];
+    assert.ok(danglingNode);
+    danglingNode["domEvidenceId"] = "evidence-that-does-not-exist";
+    const danglingPath = join(firstClean.directory, "dangling-web-evidence.json");
+    await writeFile(danglingPath, `${JSON.stringify(danglingEvidenceIr)}\n`);
+    const danglingFirst = await run(sightlintBinary, ["check", danglingPath, "--profile", "base", "--format", "json"]);
+    const danglingSecond = await run(sightlintBinary, ["check", danglingPath, "--profile", "base", "--format", "json"]);
+    assert.equal(danglingFirst.code, 2);
+    assert.equal(danglingFirst.stdout.byteLength, 0);
+    assert.match(danglingFirst.stderr.toString("utf8"), /InvalidReference.*domEvidenceId/u);
+    assert.deepEqual(danglingSecond, danglingFirst, "malformed-extension diagnostics must be byte-stable");
+
+    const invalidProvenanceIr = structuredClone(firstClean.artifactIr);
+    const provenanceExtension = object(object(invalidProvenanceIr["extensions"], "provenance extensions")[webExtensionKey], "provenance Web extension");
+    const provenanceNode = array(provenanceExtension["nodes"], "provenance Web nodes")[0];
+    assert.ok(provenanceNode);
+    const provenanceEvidenceId = string(provenanceNode["domEvidenceId"], "provenance evidence ID");
+    const provenanceEvidence = array(invalidProvenanceIr["evidence"], "provenance evidence").find((item) => item["id"] === provenanceEvidenceId);
+    assert.ok(provenanceEvidence);
+    object(provenanceEvidence["source"], "provenance evidence source")["adapterVersion"] = "0.2.0";
+    const invalidProvenancePath = join(firstClean.directory, "invalid-web-provenance.json");
+    await writeFile(invalidProvenancePath, `${JSON.stringify(invalidProvenanceIr)}\n`);
+    const invalidProvenanceFirst = await run(sightlintBinary, ["check", invalidProvenancePath, "--format", "json"]);
+    const invalidProvenanceSecond = await run(sightlintBinary, ["check", invalidProvenancePath, "--format", "json"]);
+    assert.equal(invalidProvenanceFirst.code, 2);
+    assert.equal(invalidProvenanceFirst.stdout.byteLength, 0);
+    assert.match(invalidProvenanceFirst.stderr.toString("utf8"), /InvalidEvidenceProvenance.*domEvidenceId/u);
+    assert.deepEqual(invalidProvenanceSecond, invalidProvenanceFirst, "invalid-provenance diagnostics must be byte-stable");
+
     process.stdout.write(
-      `browser evaluation v1: cases=${completedCases}/19, acquisition_expectations=${acquisitionExpectations}, ` +
+      `browser evaluation v1: cases=${completedCases}/23, acquisition_expectations=${acquisitionExpectations}, ` +
       `failure_precision=${matchedFailures}/${emittedFailures}, false_positive_failures=${falsePositiveFailures}, ` +
       `acquisition_abstentions=${acquisitionAbstentions}, rule_abstentions=${ruleAbstentions}, ` +
       `acquisition_mutations_detected=${detectedAcquisitionMutations}/${acquisitionMutations}, ` +
       `eligible_rule_mutations_killed=${killedRuleMutations}/${eligibleRuleMutations}, ` +
       `hard_negative_failures=${hardNegativeFailures}\n`,
     );
+    assert.equal(completedCases, 23);
+    assert.equal(acquisitionExpectations, 76);
+    assert.equal(acquisitionAbstentions, 45);
+    assert.equal(detectedAcquisitionMutations, acquisitionMutations);
+    assert.equal(acquisitionMutations, 11);
+    assert.equal(eligibleRuleMutations, 6);
+    assert.equal(killedRuleMutations, eligibleRuleMutations);
+    assert.equal(matchedFailures, 6);
+    assert.equal(emittedFailures, 6);
+    assert.equal(falsePositiveFailures, 0);
+    assert.equal(ruleAbstentions, 660);
+    assert.equal(hardNegativeFailures, 0);
+
+    for (const contract of ruleContracts) {
+      let coveredEntries = 0;
+      let expectedEntries = 0;
+      let emittedRuleFailures = 0;
+      let matchedRuleFailures = 0;
+      let reviewedAbstentions = 0;
+      let matchedAbstentions = 0;
+      let ruleHardNegativeFailures = 0;
+
+      for (const [category, caseIds] of Object.entries(contract.evaluationCases)) {
+        for (const caseId of caseIds) {
+          expectedEntries += 1;
+          const caseOracle = ruleCases.get(caseId);
+          const actual = evaluatedRuleResults.get(caseId);
+          assert.ok(caseOracle, `${contract.ruleId} references unknown case ${caseId}`);
+          assert.ok(actual, `${contract.ruleId} case ${caseId} was not executed`);
+          if (category === "hardNegative") {
+            const failures = actual.filter((result) => result["ruleId"] === contract.ruleId && result["outcome"] === "failed");
+            ruleHardNegativeFailures += failures.length;
+            if (failures.length === 0) coveredEntries += 1;
+            continue;
+          }
+          const expectedOutcome = category === "pass" ? "passed" : category === "fail" ? "failed" : category;
+          const reviewed = caseOracle.expectedResults.filter((result) => result.ruleId === contract.ruleId && result.outcome === expectedOutcome);
+          assert.ok(reviewed.length > 0, `${contract.ruleId} ${category} lacks a reviewed result in ${caseId}`);
+          if (reviewed.every((expected) => actual.some((result) => resultMatches(result, expected)))) coveredEntries += 1;
+          if (["cantTell", "inapplicable", "untested"].includes(expectedOutcome)) {
+            reviewedAbstentions += reviewed.length;
+            matchedAbstentions += reviewed.filter((expected) => actual.some((result) => resultMatches(result, expected))).length;
+          }
+        }
+      }
+
+      for (const [caseId, actual] of evaluatedRuleResults) {
+        const caseOracle = ruleCases.get(caseId);
+        assert.ok(caseOracle);
+        const expectedFailures = caseOracle.expectedResults.filter((result) => result.ruleId === contract.ruleId && result.outcome === "failed");
+        const failures = actual.filter((result) => result["ruleId"] === contract.ruleId && result["outcome"] === "failed");
+        emittedRuleFailures += failures.length;
+        matchedRuleFailures += failures.filter((result) => expectedFailures.some((expected) => resultMatches(result, expected))).length;
+      }
+
+      assert.equal(coveredEntries, expectedEntries, `${contract.ruleId} contract coverage`);
+      assert.equal(matchedRuleFailures, emittedRuleFailures, `${contract.ruleId} failure precision`);
+      assert.equal(matchedAbstentions, reviewedAbstentions, `${contract.ruleId} reviewed abstentions`);
+      assert.equal(ruleHardNegativeFailures, 0, `${contract.ruleId} hard-negative failures`);
+      const killedMutations = contract.evaluationCases.fail.filter((caseId) => {
+        const actual = evaluatedRuleResults.get(caseId) ?? [];
+        return actual.some((result) => result["ruleId"] === contract.ruleId && result["outcome"] === "failed");
+      }).length;
+      assert.equal(killedMutations, contract.evaluationCases.fail.length, `${contract.ruleId} mutation kill rate`);
+      process.stdout.write(
+        `${contract.ruleId}: contract_coverage=${coveredEntries}/${expectedEntries}, ` +
+        `failure_precision=${matchedRuleFailures}/${emittedRuleFailures}, ` +
+        `reviewed_abstentions=${matchedAbstentions}/${reviewedAbstentions}, ` +
+        `mutation_kill_rate=${killedMutations}/${contract.evaluationCases.fail.length}, ` +
+        `hard_negative_failures=${ruleHardNegativeFailures}\n`,
+      );
+    }
   } finally {
     await Promise.all(completed.map(async (item) => rm(item.directory, { recursive: true, force: true })));
   }

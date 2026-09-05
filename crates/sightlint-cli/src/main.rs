@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand, ValueEnum};
-use sightlint_engine::{CheckReport, RuleOutcome};
+use sightlint_engine::{CheckOptions, CheckProfile, CheckReport, RuleOutcome};
 use sightlint_ir::ArtifactIr;
 
 const MAX_INPUT_BYTES: u64 = 16 * 1024 * 1024;
@@ -37,6 +37,9 @@ enum Command {
         /// Treat any `cantTell` result as a failing quality gate.
         #[arg(long)]
         deny_cant_tell: bool,
+        /// Built-in policy profile; recommended is zero-setup and base disables its added rules.
+        #[arg(long, value_enum, default_value_t = Profile::Recommended)]
+        profile: Profile,
     },
     /// Adapt a supported image file into canonical Artifact IR JSON.
     AdaptImage {
@@ -61,6 +64,9 @@ enum Command {
         /// Treat any `cantTell` result as a failing quality gate.
         #[arg(long)]
         deny_cant_tell: bool,
+        /// Built-in policy profile; recommended is zero-setup and base disables its added rules.
+        #[arg(long, value_enum, default_value_t = Profile::Recommended)]
+        profile: Profile,
     },
     /// Validate and emit canonical Artifact IR JSON.
     Normalize {
@@ -84,6 +90,21 @@ enum OutputFormat {
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
+enum Profile {
+    Recommended,
+    Base,
+}
+
+impl From<Profile> for CheckProfile {
+    fn from(value: Profile) -> Self {
+        match value {
+            Profile::Recommended => Self::Recommended,
+            Profile::Base => Self::Base,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
 enum SchemaKind {
     ArtifactIr,
     Visual,
@@ -99,14 +120,16 @@ fn run(cli: Cli) -> ExitCode {
             input,
             format,
             deny_cant_tell,
-        } => run_check(&input, format, deny_cant_tell),
+            profile,
+        } => run_check(&input, format, deny_cant_tell, profile),
         Command::AdaptImage { input } => run_adapt_image(&input),
         Command::InspectImage { input, format } => run_inspect_image(&input, format),
         Command::CheckImage {
             input,
             format,
             deny_cant_tell,
-        } => run_check_image(&input, format, deny_cant_tell),
+            profile,
+        } => run_check_image(&input, format, deny_cant_tell, profile),
         Command::Normalize { input } => run_normalize(&input),
         Command::Schema { kind } => {
             let schema = match kind {
@@ -120,10 +143,11 @@ fn run(cli: Cli) -> ExitCode {
         }
         Command::Version => {
             let output = format!(
-                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nReport schema {}\nPNG adapter {}\n",
+                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nWeb extension {}\nReport schema {}\nPNG adapter {}\n",
                 env!("CARGO_PKG_VERSION"),
                 sightlint_engine::supported_schema_version(),
                 sightlint_engine::supported_visual_extension_version(),
+                sightlint_engine::supported_web_extension_version(),
                 sightlint_engine::REPORT_SCHEMA_VERSION,
                 env!("CARGO_PKG_VERSION")
             );
@@ -132,12 +156,17 @@ fn run(cli: Cli) -> ExitCode {
     }
 }
 
-fn run_check(input: &Path, format: OutputFormat, deny_cant_tell: bool) -> ExitCode {
+fn run_check(
+    input: &Path,
+    format: OutputFormat,
+    deny_cant_tell: bool,
+    profile: Profile,
+) -> ExitCode {
     let document = match load_document(input) {
         Ok(document) => document,
         Err(error) => return fail(error),
     };
-    run_document_check(&document, format, deny_cant_tell)
+    run_document_check(&document, format, deny_cant_tell, profile)
 }
 
 fn run_adapt_image(input: &Path) -> ExitCode {
@@ -169,20 +198,31 @@ fn run_inspect_image(input: &Path, format: OutputFormat) -> ExitCode {
     }
 }
 
-fn run_check_image(input: &Path, format: OutputFormat, deny_cant_tell: bool) -> ExitCode {
+fn run_check_image(
+    input: &Path,
+    format: OutputFormat,
+    deny_cant_tell: bool,
+    profile: Profile,
+) -> ExitCode {
     let document = match load_png_document(input) {
         Ok(document) => document,
         Err(error) => return fail(error),
     };
-    run_document_check(&document, format, deny_cant_tell)
+    run_document_check(&document, format, deny_cant_tell, profile)
 }
 
 fn run_document_check(
     document: &ArtifactIr,
     format: OutputFormat,
     deny_cant_tell: bool,
+    profile: Profile,
 ) -> ExitCode {
-    let report = match sightlint_engine::check(document) {
+    let report = match sightlint_engine::check_with_options(
+        document,
+        CheckOptions {
+            profile: profile.into(),
+        },
+    ) {
         Ok(report) => report,
         Err(error) => return fail(error.to_string()),
     };
@@ -202,10 +242,7 @@ fn write_report(report: &CheckReport, format: OutputFormat, deny_cant_tell: bool
         return fail(format!("failed to write standard output: {error}"));
     }
 
-    let has_failure = report
-        .results
-        .iter()
-        .any(|result| result.outcome == RuleOutcome::Failed);
+    let has_failure = report.has_blocking_failure();
     let has_denied_unknown = deny_cant_tell
         && report
             .results

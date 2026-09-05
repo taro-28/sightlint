@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sightlint:schema:web-extension:0.3.0",
-  "title": "SightLint official Web acquisition extension",
+  "$id": "urn:sightlint:schema:web-extension:0.2.0",
+  "title": "SightLint private Web acquisition extension",
   "type": "object",
   "additionalProperties": false,
   "required": ["extensionVersion", "document", "environment", "capture", "nodes", "reconciliation"],
   "properties": {
-    "extensionVersion": { "const": "0.3.0" },
+    "extensionVersion": { "const": "0.2.0" },
     "document": {
       "type": "object",
       "additionalProperties": false,
@@ -184,12 +184,9 @@
     "node": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nodeId", "locator", "tagName", "domEvidenceId", "renderEvidenceId", "accessibilityEvidenceId", "disabled", "interactive", "layoutMethod", "layoutUnavailableReason", "renderMethod", "clientSize", "scrollSize", "overflowMeasurement", "centerHitSample", "hitRegion", "computedStyle", "clippingAncestors", "accessibility"],
+      "required": ["nodeId", "locator", "tagName", "disabled", "interactive", "layoutMethod", "layoutUnavailableReason", "renderMethod", "clientSize", "scrollSize", "overflowMeasurement", "centerHitSample", "hitRegion", "computedStyle", "clippingAncestors", "accessibility"],
       "properties": {
         "nodeId": { "$ref": "#/$defs/nonEmptyString" }, "locator": { "$ref": "#/$defs/locator" }, "tagName": { "$ref": "#/$defs/nonEmptyString" },
-        "domEvidenceId": { "$ref": "#/$defs/nonEmptyString" },
-        "renderEvidenceId": { "$ref": "#/$defs/nonEmptyString" },
-        "accessibilityEvidenceId": { "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }] },
         "disabled": { "type": "boolean" }, "interactive": { "type": "boolean" },
         "layoutMethod": { "enum": ["offsetParentBorderBoxToDocument", "unavailable"] }, "layoutUnavailableReason": { "type": ["string", "null"] },
         "renderMethod": { "const": "getBoundingClientRect" },

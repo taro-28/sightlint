@@ -204,7 +204,7 @@ fn assert_success_paths(case: &Value, png: &[u8], file: &TempPng) {
     assert_metadata(case, &ir);
     let direct = stdin(&["check-image", "-", "--format", "json"], png);
     let report = json_success(&direct, id);
-    assert_eq!(report["reportSchemaVersion"], "0.2.0");
+    assert_eq!(report["reportSchemaVersion"], "0.3.0");
     assert_eq!(report["artifactKind"], "image");
     assert_eq!(report["summary"]["failed"], 0);
     let results = report["results"].as_array().expect("rule results");

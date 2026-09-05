@@ -11,16 +11,16 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of the Web evidence-matrix completion slice, the latest verified baseline was:
+At the start of the first recommended-Web-pack slice, the latest verified baseline was:
 
-- commit: `e7adccafc7a69bba9aed92e258d967b3818c142e`
-- tree: `9b2de55f5b80da11e9404cc09b41b9e46f239d8c`
-- merged PR: #37
-- main CI: run 33983892020, all six jobs successful
+- commit: `db0ce344b4e4234965e6efbffe2d8bbff7266bfe`
+- tree: `61d5759bdd4a414b39f7396b7bdd9cfe203f033d`
+- merged PR: #40
+- main CI: run 33993115696, all six jobs successful
 
-The current focused branch completes the bounded issue #23 acquisition evidence matrix. After it
-merges, its resulting `main` commit supersedes the hash above as the repository starting point.
-Never hard-code the old hash as a branch base. Verify the current `main` and its CI.
+The current focused branch implements issue #24's first bounded advisory recommended Web pack.
+After it merges, its resulting `main` commit supersedes the hash above as the repository starting
+point. Never hard-code the old hash as a branch base. Verify the current `main` and its CI.
 
 Use this source-of-truth order:
 
@@ -190,27 +190,28 @@ UI/UX accuracy.
 
 ### Playwright Web acquisition and evidence matrix
 
-ADRs 0033/0034 and `adapters/playwright/` add an untrusted TypeScript/Node process with locked
+ADRs 0033–0035 and `adapters/playwright/` add an untrusted TypeScript/Node process with locked
 Playwright/Chromium dependencies. Protocol `0.1.0` accepts a repository-contained local HTML
-fixture and emits canonical Artifact IR plus an `org.sightlint.web@0.2.0` extension and a
+fixture and emits canonical Artifact IR plus an `org.sightlint.web@0.3.0` extension and a
 synchronized PNG viewport screenshot. It records selected DOM hierarchy, locator-scoped
 accessibility summaries, computed style, layout/render geometry, client/scroll overflow,
 rectangular ancestor clipping, render-box-center hit samples, document and viewport canvases,
 scroll translation, writing direction, environment/version provenance, privacy/network status,
-and bounded native/screenshot reconciliation. Complete hit regions remain `cantTell`; a center
-sample is not serialized as core `hitBox`.
+bounded native/screenshot reconciliation, and explicit DOM/render/optional accessibility evidence
+identifiers per selected node. Complete hit regions remain `cantTell`; a center sample is not
+serialized as core `hitBox`.
 
-Nineteen independent browser requests and acquisition/rule oracles cover clean baselines; nine
+Twenty-three independent browser requests and acquisition/rule oracles cover clean baselines; 11
 targeted acquisition mutations for bounds, spacing, clipping, overflow, occlusion, peer dimension,
-transformed text, and desktop/mobile positioning; two hard negatives; responsive, text-scale,
-RTL/vertical-writing, disabled/hidden/offscreen-control, and ambiguous states. E2E invokes the
-actual Node process and built `sightlint` binary, validates current and retained previous schemas,
-checks stable error/resource behavior, and compares repeated response, IR, screenshot, and report
-bytes on Linux.
+transformed text, programmatic names, and desktop/mobile positioning; hard negatives; responsive,
+text-scale, RTL/vertical-writing, disabled/hidden/offscreen-control, scrollable clipping, and
+ambiguous states. E2E invokes the actual Node process and built `sightlint` binary, validates
+current and retained previous schemas, checks stable error/resource/recognized-extension behavior,
+and compares repeated response, IR, screenshot, and report bytes on Linux.
 
-Current development-corpus metrics are 19/19 cases, 70 reviewed acquisition expectations, 37
-reviewed acquisition abstentions, 9/9 acquisition mutations observed, 3/3 current-rule-eligible
-mutations killed, 3/3 emitted failures matched, zero unexpected failures, and zero hard-negative
+Current development-corpus metrics are 23/23 cases, 76 reviewed acquisition expectations, 45
+reviewed acquisition abstentions, 11/11 acquisition mutations observed, 6/6 rule-eligible
+mutations killed, 6/6 emitted failures matched, zero unexpected failures, and zero hard-negative
 failures. These are single-family public regression counts, not real-world accuracy.
 
 This slice supports exactly one main frame/page, local `file:` fixtures, and at most 200 selected
@@ -218,17 +219,39 @@ nodes. It does not infer semantic peer relations or compare pixel content; those
 `untested`/`cantTell`. Cross-platform screenshot byte identity and real-world UI/UX accuracy are
 not claimed.
 
+### Zero-setup recommended Web pack
+
+ADR 0035 makes `sightlint:recommended` the additive default for `check` and `check-image`, with
+`--profile base` as the explicit opt-out. When a strictly validated Web extension is present, the
+Rust kernel runs three atomic rules:
+
+- `web.accessibility.interactive-name@0.1.0`;
+- `web.interaction.center-hit@0.1.0`;
+- `web.interaction.ancestor-clip@0.1.0`.
+
+Each CheckReport `0.3.0` result records policy source, profile, maturity, enforcement, and linked
+evidence. Existing base/explicit rules are blocking; the three new Web rules are advisory and do
+not cause exit 1. `--deny-cant-tell` remains an explicit stricter gate. The pack preserves
+`cantTell` for incomplete platform semantics, intentional dialog overlays, transforms, incomplete
+hit-region evidence, and scrollable clipping. It does not turn raw overflow, screenshots, or peer
+dimensions into automatic defects.
+
+For each recommended rule, the public browser E2E covers 5/5 contracted outcome-category entries,
+1/1 matched failure, 2/2 reviewed abstentions, 1/1 killed targeted mutation, and zero hard-negative
+failures. The corpus is public, fictional, maintainer-reviewed, and non-holdout; these counts do not
+establish WCAG conformance, representative precision, or blocking maturity.
+
 ### Public commands
 
 The current command families include:
 
 ```bash
-sightlint check INPUT [--format human|json] [--deny-cant-tell]
+sightlint check INPUT [--format human|json] [--deny-cant-tell] [--profile recommended|base]
 sightlint normalize INPUT
 sightlint schema
 sightlint version
 sightlint adapt-image INPUT
-sightlint check-image INPUT [--format human|json] [--deny-cant-tell]
+sightlint check-image INPUT [--format human|json] [--deny-cant-tell] [--profile recommended|base]
 sightlint inspect-image INPUT [--format human|json]
 ```
 
@@ -244,8 +267,9 @@ node adapters/playwright/dist/src/cli.js \
   --screenshot-out SCREENSHOT.png
 ```
 
-For checks, exit codes are 0 for no denied failures, 1 for a failed/strictly denied result, and 2
-for usage/input/execution errors. `inspect-image` never exits 1 for a heuristic; observations or
+For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
+`cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
+failures remain visible with exit 0. `inspect-image` never exits 1 for a heuristic; observations or
 explicit unavailable coverage exit 0, malformed/usage/execution errors exit 2.
 
 ## Continuous verification currently in `main`
@@ -278,11 +302,11 @@ SightLint treats tests as part of the product specification.
 - three repeated public-binary smoke executions;
 - one killed peer-spacing mutation and one nonfailing intentional-grouping hard negative;
 - three explicit deferred abstentions for ambiguous/responsive/text-scale acquisition;
-- 19 companion browser captures with separate acquisition/rule oracles;
+- 23 companion browser captures with separate acquisition/rule oracles;
 - synchronized DOM/accessibility/computed geometry, overflow/clipping/center-hit evidence, and
   viewport screenshot metadata;
-- three browser bounds mutation kills, two hard negatives, nine acquisition mutations, and
-  explicit semantic/pixel/hit-region abstentions;
+- six rule-eligible mutation kills, 11 acquisition mutations, per-rule policy/profile/enforcement
+  assertions, hard negatives, and explicit semantic/pixel/hit-region abstentions;
 - no representative screenshot corpus, private holdout, or general accuracy claim.
 
 Synthetic success is regression evidence, not real-world accuracy evidence.
@@ -317,6 +341,7 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - automatic semantic peer inference from Playwright output;
 - PPTX, PDF/document, Android, or iOS adapters;
 - baseline/semantic visual diff beyond current explicit contracts;
+- blocking recommended Web rules, project overrides, or representative real-world rule evidence;
 - dynamic interaction traces, pending/error/recovery/destructive-action rules;
 - MCP, GitHub Checks annotations, editor extension, browser extension, or local GUI;
 - broad automatic fixes;
@@ -352,12 +377,13 @@ complete, select the earliest unblocked item in this sequence:
 1. **#22 — human-reviewed realistic evaluation corpus (complete).** The
    ADR/schema/dashboard/oracle foundation and synchronized browser companion are present.
 2. **#23 — Playwright web adapter (complete).** Protocol `0.1.0` plus
-   `org.sightlint.web@0.2.0` supplies the bounded isolated local-fixture path and issue-required
+   `org.sightlint.web@0.3.0` supplies the bounded isolated local-fixture path and issue-required
    evidence matrix. Arbitrary applications and cross-platform screenshot identity remain
    explicit non-goals/non-claims.
-3. **#24 — recommended zero-setup rule packs (next).** Admit a small set of high-confidence rules only
-   after evidence demonstrates acceptable precision/coverage/abstention.
-4. **Agent loop within #34.** One local command, canonical report, targeted defect, Codex fix, and
+3. **#24 — first recommended zero-setup Web pack (complete).** Three narrow advisory rules run by
+   default with explicit policy provenance, conservative abstention, and per-rule regression
+   metrics.
+4. **Agent loop within #34 (next).** One local command, canonical report, targeted defect, Codex fix, and
    post-fix rerun through the same checker.
 5. **#33 — alpha release gate.** Resolve license, packaging, compatibility, supply chain, and
    distribution after product evidence exists.
@@ -543,7 +569,8 @@ A local Codex session is continuing SightLint correctly when it can explain, bef
 - why SightLint separates acquisition, evidence, policy, applicability, and judgment;
 - why native structure and pixels are reconciled rather than one replacing the other;
 - why uncertainty is a result rather than an error to hide;
-- why the next product gate is realistic evaluation and a structured web adapter;
+- why the next product gate is a source-locatable agent fix-and-rerun slice over the evaluated Web
+  path;
 - why stale Draft branches are not a shortcut;
 - which exact E2E proves the public claim;
 - what remains unimplemented and what the PR must not claim.

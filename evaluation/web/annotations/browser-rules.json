@@ -1,8 +1,8 @@
 {
   "$schema": "../browser-rule.schema.json",
-  "schemaVersion": "0.1.0",
+  "schemaVersion": "0.2.0",
   "documentType": "browserRuleOracle",
-  "commandSurface": "sightlint check --format json",
+  "commandSurface": "sightlint check --profile recommended --format json",
   "metrics": {
     "failurePrecision": "matched reviewed failed targets / all emitted failed targets; report numerator and denominator, never a zero-denominator percentage",
     "caseCoverage": "browser cases executed through both public processes / all reviewed browser cases",
@@ -10,9 +10,9 @@
     "falsePositives": "emitted failed targets not present in the corresponding reviewed rule oracle",
     "mutationKillRate": "reviewed rule-eligible mutations producing the named failure / all reviewed rule-eligible mutations; acquisition-only mutations are reported separately",
     "limitations": [
-      "The nineteen public cases belong to one fictional application family and are visible during development.",
-      "Three reviewed bounds failures are too small a denominator for a real-world precision estimate.",
-      "Acquisition-only clipping, occlusion, overflow, peer-size, transformed-text, and direction cases do not gain rule verdicts without explicit applicability and policy.",
+      "The twenty-three public cases belong to one fictional application family and are visible during development.",
+      "One reviewed failure per recommended rule is too small a denominator for a real-world precision estimate.",
+      "Only narrowly applicable control clipping and occlusion gain new rule verdicts; raw overflow, peer-size, transformed-text, and direction observations remain non-verdict evidence.",
       "Complete hit regions and pixel-content identity remain cantTell.",
       "No private holdout or independent dual review exists."
     ]
@@ -31,7 +31,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-ambiguous",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Inferring peer intent from repeated pixels or unequal gaps would manufacture an unsupported failure.",
@@ -41,6 +50,59 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The correct rule behavior is abstention through inapplicability because no peer relation is emitted."
+      },
+      "expectedBlockingFailureCount": 0
+    },
+    {
+      "caseId": "dashboard-browser-ambiguous-control",
+      "request": "evaluation/web/requests/dashboard-browser-ambiguous-control.json",
+      "classification": "ambiguous",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-ambiguous-control",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "cantTell",
+          "targetKind": "node",
+          "targetId": "web-ambiguous-action",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Treating focusability or visible text as proof of a supported control role and accessible name would fabricate platform semantics.",
+      "nonClaim": "The abstention does not pass the generic interactive surface; it records insufficient native accessibility evidence.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The focusable generic surface is intentionally outside the adapter's conservatively parsed accessibility roots."
       }
     },
     {
@@ -56,7 +118,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-clean",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Viewport bounds must not be substituted for document bounds, or legitimate below-the-fold content would fail.",
@@ -66,7 +137,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "All captured node render boxes remain within the document canvas; peer spacing is not evaluated without a relation."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-clipping",
@@ -81,7 +153,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-clipping",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Promoting rectangular ancestor clipping directly into a failure would ignore intentional carousels, masks, and reveal interactions.",
@@ -91,7 +172,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "Existing rules receive exact core geometry only and do not infer a clipping policy from the private Web extension."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-control-boundaries",
@@ -106,6 +188,117 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-control-boundaries",
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "passed",
+          "targetKind": "node",
+          "targetId": "web-help-action",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "node",
+          "targetId": "web-hidden-action",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-center-hit",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "passed",
+          "targetKind": "node",
+          "targetId": "web-help-action",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-center-hit",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "node",
+          "targetId": "web-disabled-action",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.ancestor-clip",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-ancestor-clip",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "passed",
+          "targetKind": "node",
+          "targetId": "web-clipped-action",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.ancestor-clip",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-ancestor-clip",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "node",
+          "targetId": "web-hidden-action",
           "targetAspect": null
         }
       ],
@@ -116,6 +309,59 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "All selected control geometry remains within the document and no exact hit region is asserted."
+      },
+      "expectedBlockingFailureCount": 0
+    },
+    {
+      "caseId": "dashboard-browser-control-clip",
+      "request": "evaluation/web/requests/dashboard-browser-control-clip.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 1,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-control-clip",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.ancestor-clip",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-ancestor-clip",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-clipped-action",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Rectangular clipping can be intentional; the rule fails only a visible native control clipped by hidden/clip overflow and excludes scrollable alternatives.",
+      "nonClaim": "The advisory failure proves rectangular ancestor clipping of one control, not its visible pixel fraction or complete hit area.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The baseline and mutant preserve the control while changing only the parent's overflow policy from visible to hidden."
       }
     },
     {
@@ -131,7 +377,16 @@
           "outcome": "failed",
           "targetKind": "node",
           "targetId": "web-offscreen-action",
-          "targetAspect": "renderBox"
+          "targetAspect": "renderBox",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:canvas-containment",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/rules.md#bounds-within-canvas"
+          }
         },
         {
           "ruleId": "visual.spacing.peer-consistency",
@@ -139,7 +394,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-control-offscreen",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "A visibility-aware future policy must distinguish intentionally parked controls; the current exact bounds rule only proves the render box is outside the document.",
@@ -149,7 +413,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The source mutation moves the enabled export control beyond the document's left edge, which is sufficient for the existing exact bounds rule."
-      }
+      },
+      "expectedBlockingFailureCount": 1
     },
     {
       "caseId": "dashboard-browser-intentional-grouping",
@@ -164,7 +429,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-intentional-grouping",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Treating the adjacent complementary promotion as a metric peer would create a false-positive spacing verdict.",
@@ -174,7 +448,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "Native hierarchy and complementary semantics are preserved, while no peer relation is invented."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-intentional-overlay",
@@ -189,6 +464,32 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-intentional-overlay",
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
+        },
+        {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-center-hit",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "cantTell",
+          "targetKind": "node",
+          "targetId": "web-review-action",
           "targetAspect": null
         }
       ],
@@ -199,7 +500,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The selected dialog is source-declared intentional, remains within document bounds, and does not create a supported current-rule failure."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-mobile",
@@ -214,7 +516,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-mobile",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Using the screenshot viewport as the core canvas would falsely fail valid below-the-fold nodes.",
@@ -224,7 +535,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The document canvas contains the responsive page even though one viewport screenshot is partial."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-notification-clean",
@@ -239,7 +551,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-notification-clean",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Conflating below-fold document content with screenshot absence would fail a valid page even though this selected baseline is positioned in the captured viewport.",
@@ -249,14 +570,15 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The notification baseline has no overflow, clipping, transform conflict, or out-of-document geometry."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-occlusion",
       "request": "evaluation/web/requests/dashboard-browser-occlusion.json",
       "classification": "targetedMutation",
       "expectedExitCode": 0,
-      "expectedFailureCount": 0,
+      "expectedFailureCount": 1,
       "expectedResults": [
         {
           "ruleId": "visual.spacing.peer-consistency",
@@ -264,17 +586,44 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-occlusion",
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
+        },
+        {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-center-hit",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-review-action",
           "targetAspect": null
         }
       ],
       "falsePositiveRisk": "Failing every center occlusion could misclassify transient or intentional layers; issue #24 must define sufficient evidence and applicability.",
-      "nonClaim": "The adapter detects the sampled blocker, but the current kernel makes no occlusion verdict.",
+      "nonClaim": "The advisory failure proves only that the exact render-box center hit an unrelated selected blocker; it does not measure the complete hit region.",
       "review": {
         "status": "maintainerReviewed",
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The acquisition oracle records the changed center-hit evidence while the rule oracle conservatively remains inapplicable."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-occlusion-clean",
@@ -289,6 +638,32 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-occlusion-clean",
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
+        },
+        {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-center-hit",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "passed",
+          "targetKind": "node",
+          "targetId": "web-review-action",
           "targetAspect": null
         }
       ],
@@ -299,7 +674,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The selected action's center resolves to the action while all core geometry remains in bounds."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-out-of-viewport",
@@ -314,7 +690,16 @@
           "outcome": "failed",
           "targetKind": "node",
           "targetId": "web-metric-revenue",
-          "targetAspect": "renderBox"
+          "targetAspect": "renderBox",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:canvas-containment",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/rules.md#bounds-within-canvas"
+          }
         },
         {
           "ruleId": "visual.spacing.peer-consistency",
@@ -322,7 +707,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-out-of-viewport",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "A viewport-only canvas or rounded transform delta could change the failure target; the oracle requires document-space exact render evidence.",
@@ -332,7 +726,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The targeted transform moves only the selected card's render box beyond the document's left edge."
-      }
+      },
+      "expectedBlockingFailureCount": 1
     },
     {
       "caseId": "dashboard-browser-overflow",
@@ -347,7 +742,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-overflow",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Scroll/client overflow alone cannot distinguish harmful truncation from intentional ellipsis with an alternate disclosure path.",
@@ -357,7 +761,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "No current deterministic rule consumes private Web overflow evidence, so the mutation is acquisition-only."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-peer-dimension",
@@ -372,7 +777,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-peer-dimension",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Repeated-card appearance must not be upgraded into semantic peer membership solely to produce a size-consistency failure.",
@@ -382,7 +796,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The adapter preserves the dimensions but emits no exact peer relation required by a consistency rule."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-responsive-mobile-mutant",
@@ -397,7 +812,16 @@
           "outcome": "failed",
           "targetKind": "node",
           "targetId": "web-metric-revenue",
-          "targetAspect": "renderBox"
+          "targetAspect": "renderBox",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:canvas-containment",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/rules.md#bounds-within-canvas"
+          }
         },
         {
           "ruleId": "visual.spacing.peer-consistency",
@@ -405,7 +829,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-responsive-mobile-mutant",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Using desktop expectations for the mobile layout could produce the wrong target; the oracle requires the mobile document-space render box.",
@@ -415,7 +848,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "At the declared mobile viewport, only the transformed revenue card crosses the document's left edge."
-      }
+      },
+      "expectedBlockingFailureCount": 1
     },
     {
       "caseId": "dashboard-browser-rtl-vertical",
@@ -430,7 +864,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-rtl-vertical",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Assuming left-to-right or horizontal writing when interpreting geometry could create direction-dependent false positives.",
@@ -440,6 +883,59 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "Native direction and writing-mode evidence is retained while no direction-specific rule is admitted."
+      },
+      "expectedBlockingFailureCount": 0
+    },
+    {
+      "caseId": "dashboard-browser-scrollable-control",
+      "request": "evaluation/web/requests/dashboard-browser-scrollable-control.json",
+      "classification": "hardNegative",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-scrollable-control",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.ancestor-clip",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "conservativeBuiltIn",
+            "sourceId": "sightlint:web-ancestor-clip",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+          },
+          "outcome": "cantTell",
+          "targetKind": "node",
+          "targetId": "web-clipped-action",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Failing all partial ancestor intersections would misclassify controls intentionally reachable in scrollable regions.",
+      "nonClaim": "The abstention preserves a valid scrolling alternative without proving that scrolling is discoverable or usable.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The hard negative retains the same partial geometry as the mutant but uses auto overflow, so static evidence cannot prove harmful clipping."
       }
     },
     {
@@ -455,7 +951,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-spacing-mutant",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "A geometry-only adapter must not upgrade visual similarity into exact peer membership just to kill the spacing mutation.",
@@ -465,7 +970,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "Acquisition truth records the transform conflict separately from the unavailable peer relation required by the rule."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-text-scale",
@@ -480,7 +986,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-text-scale",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Reusing unscaled geometry or assuming increased document height is a defect would create false failures.",
@@ -490,7 +1005,8 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "Scaled native geometry remains within the document canvas, and no peer relation is emitted."
-      }
+      },
+      "expectedBlockingFailureCount": 0
     },
     {
       "caseId": "dashboard-browser-transformed-text",
@@ -505,7 +1021,16 @@
           "outcome": "inapplicable",
           "targetKind": "artifact",
           "targetId": "web-dashboard-browser-transformed-text",
-          "targetAspect": null
+          "targetAspect": null,
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          }
         }
       ],
       "falsePositiveRisk": "Using computed font size alone could miss rendered scaling, while treating every transform as harmful could fail legitimate emphasis or animation.",
@@ -515,6 +1040,234 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "No current rule has visible-ink evidence or a transformed-text policy, so the correct present behavior is non-failure."
+      },
+      "expectedBlockingFailureCount": 0
+    },
+    {
+      "caseId": "dashboard-browser-unnamed-control",
+      "request": "evaluation/web/requests/dashboard-browser-unnamed-control.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 1,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-browser-unnamed-control",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-help-action",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "An absent name may reflect incomplete platform acquisition; this case fails only because the platform snapshot is observed and explicitly contains the button role with no name.",
+      "nonClaim": "The advisory result checks programmatic naming for one selected native control; it is not a complete WCAG conformance audit.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The clean icon button has an exact platform name and the mutant removes only its aria-label while preserving visual and interaction evidence."
+      }
+    }
+  ],
+  "profiles": [
+    "sightlint:base",
+    "sightlint:recommended"
+  ],
+  "ruleContracts": [
+    {
+      "ruleId": "web.accessibility.interactive-name",
+      "ruleVersion": "0.1.0",
+      "maturity": "advisory",
+      "enforcement": "advisory",
+      "policy": {
+        "profile": "sightlint:recommended",
+        "sourceKind": "platformStandard",
+        "sourceId": "wcag:4.1.2-name-role-value",
+        "sourceVersion": "2.2",
+        "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+      },
+      "applicability": "Visible DOM-interactive Web nodes with an observed platform accessibility role in the rule's conservative UI-control set.",
+      "requiredEvidence": [
+        "exact DOM interactivity and visibility",
+        "platform accessibility role/name"
+      ],
+      "validAlternatives": [
+        "visible text",
+        "aria-label",
+        "aria-labelledby",
+        "another platform-supported accessible-name source"
+      ],
+      "severityInputs": {
+        "userHarm": "An unnamed control can be undiscoverable or ambiguous to assistive-technology users.",
+        "affectedScope": "One observed interactive control in one captured state.",
+        "reversibility": "A localized semantic-label change is normally reversible and has several valid name sources.",
+        "accessibilityImpact": "Direct programmatic-name impact; this rule does not assign a severity label."
+      },
+      "falsePositiveRisks": [
+        "an incomplete accessibility snapshot may look unnamed",
+        "a focusable generic surface may not be a supported user interface component"
+      ],
+      "falseNegativeRisks": [
+        "unselected controls are not evaluated",
+        "a non-empty but misleading or duplicate name passes this atomic rule",
+        "unsupported platform roles abstain rather than fail"
+      ],
+      "evaluationCases": {
+        "pass": [
+          "dashboard-browser-control-boundaries"
+        ],
+        "fail": [
+          "dashboard-browser-unnamed-control"
+        ],
+        "cantTell": [
+          "dashboard-browser-ambiguous-control"
+        ],
+        "inapplicable": [
+          "dashboard-browser-control-boundaries"
+        ],
+        "hardNegative": [
+          "dashboard-browser-intentional-overlay"
+        ]
+      }
+    },
+    {
+      "ruleId": "web.interaction.center-hit",
+      "ruleVersion": "0.1.0",
+      "maturity": "advisory",
+      "enforcement": "advisory",
+      "policy": {
+        "profile": "sightlint:recommended",
+        "sourceKind": "conservativeBuiltIn",
+        "sourceId": "sightlint:web-center-hit",
+        "sourceVersion": "0.1.0",
+        "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+      },
+      "applicability": "Visible, enabled, untransformed native controls with a stable test-id locator and an in-viewport render-box-center browser sample.",
+      "requiredEvidence": [
+        "exact DOM interactivity and style",
+        "exact render box",
+        "elementFromPoint center sample",
+        "native role of an occluding dialog when present"
+      ],
+      "validAlternatives": [
+        "a source-declared dialog may intentionally occlude a background control",
+        "off-viewport controls require a separate scrolled capture",
+        "non-rectangular or transformed controls require richer hit-region evidence"
+      ],
+      "severityInputs": {
+        "userHarm": "A blocked sampled point can prevent pointer activation, but one point does not prove total inoperability.",
+        "affectedScope": "One native control at one render-box-center sample in one captured state.",
+        "reversibility": "Layout, stacking, or overlay changes are reversible but may affect intended modal behavior.",
+        "accessibilityImpact": "Pointer interaction may be affected while keyboard or alternate hit locations may remain usable; no severity label is inferred."
+      },
+      "falsePositiveRisks": [
+        "one center point does not prove the complete hit region",
+        "transient or intentional overlays can occlude controls"
+      ],
+      "falseNegativeRisks": [
+        "blocked points away from the center are not sampled",
+        "controls without stable test-id locators abstain from this conservative rule",
+        "interaction states absent from the static capture are not evaluated"
+      ],
+      "evaluationCases": {
+        "pass": [
+          "dashboard-browser-occlusion-clean"
+        ],
+        "fail": [
+          "dashboard-browser-occlusion"
+        ],
+        "cantTell": [
+          "dashboard-browser-intentional-overlay"
+        ],
+        "inapplicable": [
+          "dashboard-browser-control-boundaries"
+        ],
+        "hardNegative": [
+          "dashboard-browser-intentional-overlay"
+        ]
+      }
+    },
+    {
+      "ruleId": "web.interaction.ancestor-clip",
+      "ruleVersion": "0.1.0",
+      "maturity": "advisory",
+      "enforcement": "advisory",
+      "policy": {
+        "profile": "sightlint:recommended",
+        "sourceKind": "conservativeBuiltIn",
+        "sourceId": "sightlint:web-ancestor-clip",
+        "sourceVersion": "0.1.0",
+        "reference": "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md"
+      },
+      "applicability": "Visible, enabled, untransformed native controls inside the document whose render rectangle is partially or fully clipped by a rectangular overflow ancestor.",
+      "requiredEvidence": [
+        "exact DOM interactivity and style",
+        "exact render box",
+        "rectangular overflow-ancestor reconciliation"
+      ],
+      "validAlternatives": [
+        "auto or scroll ancestors may intentionally expose content through scrolling",
+        "non-rectangular clips require pixel or source evidence",
+        "out-of-document controls are handled by the existing bounds rule"
+      ],
+      "severityInputs": {
+        "userHarm": "A clipped control can hide content or reduce its usable pointer area.",
+        "affectedScope": "One native control and its recorded rectangular overflow ancestors in one captured state.",
+        "reversibility": "Container size, control position, or overflow policy can be changed locally but may alter intended scrolling.",
+        "accessibilityImpact": "Visual and pointer access may be affected; keyboard reachability and complete hit geometry are not proven, so no severity label is inferred."
+      },
+      "falsePositiveRisks": [
+        "scrollable carousels can intentionally show partial controls",
+        "masks and clip paths are not modeled by rectangular overflow reconciliation"
+      ],
+      "falseNegativeRisks": [
+        "masks, clip paths, and non-rectangular effects are not evaluated",
+        "unselected controls and uncaptured responsive states are not evaluated",
+        "out-of-document controls are delegated to the separate bounds rule"
+      ],
+      "evaluationCases": {
+        "pass": [
+          "dashboard-browser-control-boundaries"
+        ],
+        "fail": [
+          "dashboard-browser-control-clip"
+        ],
+        "cantTell": [
+          "dashboard-browser-scrollable-control"
+        ],
+        "inapplicable": [
+          "dashboard-browser-control-boundaries"
+        ],
+        "hardNegative": [
+          "dashboard-browser-scrollable-control"
+        ]
       }
     }
   ]

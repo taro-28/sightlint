@@ -17,9 +17,9 @@ not outrun the evidence, contracts, and sequencing recorded in this repository.
 7. Define the user-visible claim, evidence, applicability, policy, uncertainty, fixtures,
    evaluation, privacy/security/resource model, and explicit non-goals.
 
-Issue #34 is the canonical near-term execution epic. Its preferred sequence is realistic
-evaluation (#22), Playwright acquisition (#23), recommended rules (#24), a local agent fix/rerun
-loop, then the alpha release gate (#33).
+Issue #34 is the canonical near-term execution epic. Realistic evaluation (#22), Playwright
+acquisition (#23), and the first advisory recommended Web pack (#24) are complete; the local agent
+fix/rerun loop is next, followed by the alpha release gate (#33).
 
 ## Development workflow
 

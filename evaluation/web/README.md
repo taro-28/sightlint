@@ -21,18 +21,19 @@ Three development records preserve acquisition questions: ambiguous peer intent,
 viewport, and increased text scale. Their original declared-IR projections remain explicitly
 `untested`; they are not rewritten from browser output.
 
-ADRs 0033 and 0034 add a separate browser-acquisition companion with 19 reviewed requests. It runs
+ADRs 0033–0035 add a separate browser-acquisition/rule companion with 23 reviewed requests. It runs
 the repository-owned fixture through the isolated `sightlint-web` process and covers clean,
 out-of-document, clipping, overflow, occlusion, peer-dimension, transformed-text, control-state,
-responsive, RTL/vertical-writing, ambiguity, and intentional-asymmetry/overlay cases.
+responsive, RTL/vertical-writing, unnamed/ambiguous controls, scrollable versus non-scrollable
+control clipping, and intentional-asymmetry/overlay cases.
 `annotations/browser-acquisition.json` records acquisition truth, while
 `annotations/browser-rules.json` independently records expected results from the built Rust
 binary. Captured Artifact IR and screenshots remain temporary review/test artifacts and are never
 copied into either oracle.
 
 This corpus is realistic in structure, not representative in sampling. It contains one application
-family, one language, one theme, and two explicitly reviewed current rule paths. It does not
-establish real-world UI/UX accuracy or recommended/blocking maturity.
+family, one language, one theme, and a small set of explicitly reviewed rule paths. It does not
+establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
 
 ## Files and authority
 
@@ -43,10 +44,11 @@ establish real-world UI/UX accuracy or recommended/blocking maturity.
 - `annotations/rules.json`: applicability, policy, expected rule outcomes, and false-positive risks.
 - `browser-acquisition.schema.json` and `annotations/browser-acquisition.json`: reviewed browser
   structure, geometry, reconciliation, mutation, hard-negative, and abstention expectations.
-- `browser-acquisition-0.1.schema.json`: retained strict previous schema for compatibility checks;
-  the current browser acquisition oracle is `0.2.0`.
+- `browser-acquisition-0.1.schema.json` and `browser-acquisition-0.2.schema.json`: retained strict
+  previous schemas for compatibility checks; the current browser acquisition oracle is `0.3.0`.
 - `browser-rule.schema.json` and `annotations/browser-rules.json`: independent public-binary
-  verdict expectations and explicit non-claims.
+  verdict expectations, rule admission contracts, policy/enforcement provenance, metrics, and
+  explicit non-claims. The current rule oracle is `0.2.0`; strict `0.1.0` is retained.
 - `requests/`: versioned deterministic capture requests for the Playwright adapter.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
 - `inputs/`: independently authored Artifact IR projections for currently runnable rule cases.
@@ -61,12 +63,19 @@ review-version decision, and review of related baseline, mutation, hard-negative
 
 ## Acquisition status
 
-Browser protocol `0.1.0` and `org.sightlint.web@0.2.0` measure selected DOM/accessibility
+Browser protocol `0.1.0` and `org.sightlint.web@0.3.0` measure selected DOM/accessibility
 observations, computed layout/render geometry, client/scroll overflow, rectangular ancestor
 clipping, center hit samples, viewport screenshot extent, and bounded native/screenshot
-reconciliation for the 19 companion cases. Screenshot pixel-content identity and complete hit
-regions remain `cantTell`, and semantic peer membership remains `untested`/`cantTell`;
-source-reviewed intent does not become an inferred fact.
+reconciliation for the 23 companion cases. Version `0.3.0` adds explicit DOM, render, and optional
+accessibility evidence identifiers for trusted-kernel provenance validation. Screenshot
+pixel-content identity and complete hit regions remain `cantTell`, and semantic peer membership
+remains `untested`/`cantTell`; source-reviewed intent does not become an inferred fact.
+
+The default `sightlint:recommended` profile consumes this extension for three advisory rules:
+programmatic names, one exact center-hit sample, and rectangular non-scrollable ancestor clipping.
+The oracle preserves pass, targeted failure, `cantTell`, `inapplicable`, and hard-negative
+relations for each rule. `--profile base` omits those rules but still validates the recognized
+extension. Raw measurements are not copied into verdict ground truth.
 
 The original six-case declared-IR corpus is retained unchanged except for source-digest drift. It
 continues to test the peer-spacing rule independently of acquisition. Missing or conflicting
@@ -103,8 +112,9 @@ cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run test:e2e
 ```
 
-Together they currently report 19/19 case coverage, 70 reviewed acquisition expectations, 37
-reviewed acquisition abstentions, 9/9 acquisition mutations observed, 3/3 current-rule-eligible
-mutations killed, 3/3 matched emitted failures, zero unexpected failures, and zero hard-negative
-failures. Those small public-fixture counts are not a quality score or a real-world accuracy
-estimate.
+Together they currently report 23/23 case coverage, 76 reviewed acquisition expectations, 45
+reviewed acquisition abstentions, 11/11 acquisition mutations observed, 6/6 rule-eligible
+mutations killed, 6/6 matched emitted failures, zero unexpected failures, and zero hard-negative
+failures. Each recommended rule records 5/5 contracted outcome-category entries, 1/1 matched
+failure, 2/2 reviewed abstentions, 1/1 killed mutation, and zero hard-negative failures. Those
+small public-fixture counts are not a quality score or a real-world accuracy estimate.

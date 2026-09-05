@@ -261,11 +261,14 @@ Current examples:
 - the 30-case image-inspection corpus compares region bounds, groups, gaps, abstentions, evidence,
   and errors under the strict perimeter hypothesis.
 
-The Playwright evidence matrix uses 19 repository-owned states with selected
+The Playwright evidence matrix uses 23 repository-owned states with selected
 DOM/accessibility/computed geometry, overflow/clipping/center-hit reconciliation, and synchronized
 screenshots. Its acquisition and rule oracles are independently authored, and previous/current
-strict schemas remain distinguishable. Broader representative Web applications and future
-OCR/CV/VLM outputs still require comparison with independent reviewed annotations.
+strict schemas remain distinguishable. The built binary also runs the default recommended and
+explicit base profiles, rejects malformed recognized Web extensions, and reports rule-specific
+contract coverage, failure precision, reviewed abstention, mutation kill rate, and hard-negative
+failures. Broader representative Web applications and future OCR/CV/VLM outputs still require
+comparison with independent reviewed annotations.
 
 Required acquisition controls include:
 
@@ -301,8 +304,9 @@ It must:
 The original rule smoke corpus is synthetic Artifact IR regression data. ADR 0032 adds the first
 repository-owned realistic Web fixture foundation: six reviewed case records, separate acquisition
 and rule oracles, three runnable public-binary smoke cases, one targeted mutation, one intentional-
-grouping hard negative, and explicit deferred abstentions. Browser acquisition is still untested;
-this foundation does not support strong UI/UX claims or recommended blocking maturity.
+grouping hard negative, and explicit deferred abstentions. ADRs 0033–0035 add the isolated browser
+path and three narrow recommended Web rules. All three remain advisory because this public
+single-application corpus does not support strong UI/UX claims or blocking maturity.
 
 ## Layer 11 — Performance and resource tests
 

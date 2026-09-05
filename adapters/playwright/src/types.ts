@@ -1,9 +1,9 @@
 export const PROTOCOL_VERSION = "0.1.0";
 export const ADAPTER_NAME = "sightlint-playwright";
-export const ADAPTER_VERSION = "0.2.0";
+export const ADAPTER_VERSION = "0.3.0";
 export const PLAYWRIGHT_VERSION = "1.63.0";
 export const WEB_EXTENSION_KEY = "org.sightlint.web";
-export const WEB_EXTENSION_VERSION = "0.2.0";
+export const WEB_EXTENSION_VERSION = "0.3.0";
 
 export const LIMITS = Object.freeze({
   requestBytes: 1024 * 1024,

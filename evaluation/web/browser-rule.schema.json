@@ -1,15 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sightlint:schema:web-browser-rule-oracle:0.1.0",
+  "$id": "urn:sightlint:schema:web-browser-rule-oracle:0.2.0",
   "title": "SightLint reviewed browser rule oracle",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "schemaVersion", "documentType", "commandSurface", "metrics", "cases"],
+  "required": ["$schema", "schemaVersion", "documentType", "commandSurface", "profiles", "ruleContracts", "metrics", "cases"],
   "properties": {
     "$schema": { "const": "../browser-rule.schema.json" },
-    "schemaVersion": { "const": "0.1.0" },
+    "schemaVersion": { "const": "0.2.0" },
     "documentType": { "const": "browserRuleOracle" },
-    "commandSurface": { "const": "sightlint check --format json" },
+    "commandSurface": { "const": "sightlint check --profile recommended --format json" },
+    "profiles": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": { "enum": ["sightlint:base", "sightlint:recommended"] }
+    },
+    "ruleContracts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ruleContract" } },
     "metrics": {
       "type": "object",
       "additionalProperties": false,
@@ -39,13 +46,75 @@
         "rationale": { "$ref": "#/$defs/nonEmptyString" }
       }
     },
-    "expectedResult": {
+    "policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ruleId", "ruleVersion", "outcome", "targetKind", "targetId", "targetAspect"],
+      "required": ["profile", "sourceKind", "sourceId", "sourceVersion", "reference"],
+      "properties": {
+        "profile": { "enum": ["sightlint:base", "sightlint:recommended"] },
+        "sourceKind": { "enum": ["declaredContract", "platformStandard", "conservativeBuiltIn"] },
+        "sourceId": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "reference": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "ruleContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "maturity", "enforcement", "policy", "applicability", "requiredEvidence", "validAlternatives", "severityInputs", "falsePositiveRisks", "falseNegativeRisks", "evaluationCases"],
       "properties": {
         "ruleId": { "$ref": "#/$defs/nonEmptyString" },
         "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "maturity": { "const": "advisory" },
+        "enforcement": { "const": "advisory" },
+        "policy": { "$ref": "#/$defs/policy" },
+        "applicability": { "$ref": "#/$defs/nonEmptyString" },
+        "requiredEvidence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "validAlternatives": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "severityInputs": { "$ref": "#/$defs/severityInputs" },
+        "falsePositiveRisks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "falseNegativeRisks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "evaluationCases": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pass", "fail", "cantTell", "inapplicable", "hardNegative"],
+          "properties": {
+            "pass": { "$ref": "#/$defs/caseIds" },
+            "fail": { "$ref": "#/$defs/caseIds" },
+            "cantTell": { "$ref": "#/$defs/caseIds" },
+            "inapplicable": { "$ref": "#/$defs/caseIds" },
+            "hardNegative": { "$ref": "#/$defs/caseIds" }
+          }
+        }
+      }
+    },
+    "severityInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["userHarm", "affectedScope", "reversibility", "accessibilityImpact"],
+      "properties": {
+        "userHarm": { "$ref": "#/$defs/nonEmptyString" },
+        "affectedScope": { "$ref": "#/$defs/nonEmptyString" },
+        "reversibility": { "$ref": "#/$defs/nonEmptyString" },
+        "accessibilityImpact": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "caseIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "expectedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "maturity", "enforcement", "policy", "outcome", "targetKind", "targetId", "targetAspect"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "maturity": { "enum": ["experimental", "advisory", "blockingEligible"] },
+        "enforcement": { "enum": ["advisory", "blocking"] },
+        "policy": { "$ref": "#/$defs/policy" },
         "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] },
         "targetKind": { "$ref": "#/$defs/nonEmptyString" },
         "targetId": { "$ref": "#/$defs/nonEmptyString" },
@@ -55,13 +124,14 @@
     "case": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["caseId", "request", "classification", "expectedExitCode", "expectedFailureCount", "expectedResults", "falsePositiveRisk", "nonClaim", "review"],
+      "required": ["caseId", "request", "classification", "expectedExitCode", "expectedFailureCount", "expectedBlockingFailureCount", "expectedResults", "falsePositiveRisk", "nonClaim", "review"],
       "properties": {
         "caseId": { "$ref": "#/$defs/nonEmptyString" },
         "request": { "$ref": "#/$defs/relativePath" },
         "classification": { "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous"] },
         "expectedExitCode": { "enum": [0, 1] },
         "expectedFailureCount": { "type": "integer", "minimum": 0 },
+        "expectedBlockingFailureCount": { "type": "integer", "minimum": 0 },
         "expectedResults": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/expectedResult" } },
         "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" },
         "nonClaim": { "$ref": "#/$defs/nonEmptyString" },
