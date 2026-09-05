@@ -1,8 +1,6 @@
 //! Integration tests for deterministic PNG scanline filter reconstruction.
 
-use sightlint_adapter_png::{
-    PngAdapterError, PngFilterError, reconstruct_png_scanlines,
-};
+use sightlint_adapter_png::{PngAdapterError, PngFilterError, reconstruct_png_scanlines};
 
 const ADAM7_PASSES: [(u32, u32, u32, u32); 7] = [
     (0, 0, 8, 8),
@@ -105,6 +103,12 @@ fn png_with_scanlines(
     png
 }
 
+fn reference_average(left: u8, up: u8) -> u8 {
+    // Independent widened arithmetic: the sum is at most 510.
+    let sum: u16 = [left, up].map(u16::from).iter().sum();
+    u8::try_from(sum / 2).expect("byte average")
+}
+
 fn reference_paeth(left: u8, up: u8, upper_left: u8) -> u8 {
     let estimate = i16::from(left) + i16::from(up) - i16::from(upper_left);
     let candidates = [left, up, upper_left];
@@ -130,19 +134,13 @@ fn encode_row(filter: u8, current: &[u8], previous: Option<&[u8]>, bpp: usize) -
                 0
             };
             let up = previous.map_or(0, |row| row[index]);
-            let upper_left = previous.map_or(0, |row| {
-                if index >= bpp {
-                    row[index - bpp]
-                } else {
-                    0
-                }
-            });
+            let upper_left =
+                previous.map_or(0, |row| if index >= bpp { row[index - bpp] } else { 0 });
             let predictor = match filter {
                 0 => 0,
                 1 => left,
                 2 => up,
-                3 => u8::try_from((u16::from(left) + u16::from(up)) / 2)
-                    .expect("byte average"),
+                3 => reference_average(left, up),
                 4 => reference_paeth(left, up, upper_left),
                 _ => unreachable!("test filter range"),
             };
@@ -171,7 +169,9 @@ fn reconstructs_all_filter_types_from_independently_encoded_rows() {
     let filters = [0_u8, 1, 2, 3, 4];
     let mut scanlines = Vec::new();
     for (index, row) in rows.iter().enumerate() {
-        let previous = index.checked_sub(1).map(|previous| rows[previous].as_slice());
+        let previous = index
+            .checked_sub(1)
+            .map(|previous| rows[previous].as_slice());
         scanlines.push(filters[index]);
         scanlines.extend_from_slice(&encode_row(filters[index], row, previous, 3));
     }
@@ -264,8 +264,7 @@ fn derives_predictor_widths_for_every_legal_byte_class() {
         let reconstructed = reconstruct_png_scanlines(&png).expect("valid predictor case");
         assert_eq!(reconstructed.packed_sample_bytes, original, "{case:?}");
         assert_eq!(
-            reconstructed.passes[0].filter_bytes_per_pixel,
-            case.expected_bpp,
+            reconstructed.passes[0].filter_bytes_per_pixel, case.expected_bpp,
             "{case:?}"
         );
         assert_eq!(reconstructed.passes[0].row_bytes, case.expected_row_bytes);
