@@ -1,0 +1,263 @@
+name: M3 alpha bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-png-alpha-observations
+
+permissions:
+  contents: write
+
+jobs:
+  wire-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-png-alpha-observations
+          fetch-depth: 0
+      - name: Verify prerequisite and wire alpha analysis
+        shell: bash
+        run: |
+          test -f crates/sightlint-adapter-png/src/samples.rs
+          python3 - <<'PY'
+          from pathlib import Path
+
+          lib = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = lib.read_text()
+          replacements = [
+              (
+                  '//! This crate validates PNG metadata, the complete chunk stream, bounded zlib inflation,\n//! scanline-filter reconstruction, and deterministic expansion to PNG-encoded RGBA8. Color\n//! management, ink bounds, text, components, and semantic roles remain separate stages.',
+                  '//! This crate validates PNG metadata, bounded decoding, scanline reconstruction,\n//! PNG-encoded RGBA8 expansion, and exact alpha-visible geometry. Color management, opaque\n//! background inference, text, components, and semantic roles remain separate stages.',
+              ),
+              (
+                  'mod inflate;\nmod samples;\nmod structure;',
+                  'mod inflate;\nmod pixels;\nmod samples;\nmod structure;',
+              ),
+              (
+                  'pub use samples::{\n    NormalizedPng, PngColorDescription, PngSampleError, normalize_png_rgba8,\n};\npub use structure::{PngStructure, PngStructureError, inspect_png_structure};',
+                  'pub use pixels::{\n    AlphaPixelAnalysis, AnalyzedPng, EdgeVisibleCounts, PixelInsets, PixelRect, PngPixelError,\n    analyze_png_alpha,\n};\npub use samples::{\n    NormalizedPng, PngColorDescription, PngSampleError, normalize_png_rgba8,\n};\npub use structure::{PngStructure, PngStructureError, inspect_png_structure};',
+              ),
+              (
+                  '    /// Reconstructed samples cannot be normalized under the PNG palette/transparency contract.\n    InvalidSampleData(PngSampleError),\n    /// The adapter produced IR that violates the current core contract.',
+                  '    /// Reconstructed samples cannot be normalized under the PNG palette/transparency contract.\n    InvalidSampleData(PngSampleError),\n    /// Normalized pixels cannot satisfy the exact alpha-analysis contract.\n    InvalidPixelData(PngPixelError),\n    /// The adapter produced IR that violates the current core contract.',
+              ),
+              (
+                  '            Self::InvalidSampleData(error) => error.fmt(formatter),\n            Self::InvalidArtifactIr(message) => {',
+                  '            Self::InvalidSampleData(error) => error.fmt(formatter),\n            Self::InvalidPixelData(error) => error.fmt(formatter),\n            Self::InvalidArtifactIr(message) => {',
+              ),
+          ]
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'lib replacement expected once, found {count}: {old!r}')
+              text = text.replace(old, new)
+
+          old_adapt = '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let normalized = normalize_png_rgba8(input)?;
+    let reconstructed = &normalized.reconstructed;'''
+          new_adapt = '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let analyzed = analyze_png_alpha(input)?;
+    let normalized = &analyzed.normalized;
+    let alpha = analyzed.alpha;
+    let reconstructed = &normalized.reconstructed;'''
+          if text.count(old_adapt) != 1:
+              raise SystemExit(f'adapt marker mismatch: {text.count(old_adapt)}')
+          text = text.replace(old_adapt, new_adapt)
+
+          evidence_marker = '''    let evidence_id = Identifier::from("evidence:png-header");
+    let canvas_id = Identifier::from("canvas");'''
+          evidence_replacement = '''    let evidence_id = Identifier::from("evidence:png-header");
+    let alpha_evidence_id = Identifier::from("evidence:png-alpha");
+    let canvas_id = Identifier::from("canvas");'''
+          if text.count(evidence_marker) != 1:
+              raise SystemExit('evidence ID marker mismatch')
+          text = text.replace(evidence_marker, evidence_replacement)
+
+          evidence_end = '''        uncertainty: None,
+    };
+
+    let full_rect = ObservedRect {'''
+          alpha_evidence = '''        uncertainty: None,
+    };
+    let alpha_evidence = Evidence {
+        id: alpha_evidence_id.clone(),
+        class: EvidenceClass::ExactSource,
+        source: EvidenceSource {
+            adapter: ADAPTER_NAME.to_owned(),
+            adapter_version: env!("CARGO_PKG_VERSION").to_owned(),
+            model: None,
+            input_digest: None,
+            external_processing: false,
+        },
+        selector: Some(Selector::NativeId {
+            native_id: "png-encoded-rgba8-alpha".to_owned(),
+        }),
+        confidence: None,
+        uncertainty: None,
+    };
+
+    let full_rect = ObservedRect {'''
+          if text.count(evidence_end) != 1:
+              raise SystemExit('evidence insertion marker mismatch')
+          text = text.replace(evidence_end, alpha_evidence)
+
+          document_marker = '''    let mut document = ArtifactIr {'''
+          analysis_values = '''    let alpha_visible_bounds = alpha.visible_bounds.map(|bounds| {
+        json!({
+            "x": bounds.x,
+            "y": bounds.y,
+            "width": bounds.width,
+            "height": bounds.height
+        })
+    });
+    let alpha_opaque_bounds = alpha.opaque_bounds.map(|bounds| {
+        json!({
+            "x": bounds.x,
+            "y": bounds.y,
+            "width": bounds.width,
+            "height": bounds.height
+        })
+    });
+    let transparent_insets = alpha.transparent_insets.map(|insets| {
+        json!({
+            "top": insets.top,
+            "right": insets.right,
+            "bottom": insets.bottom,
+            "left": insets.left
+        })
+    });
+    let alpha_ink_box = alpha.visible_bounds.map(|bounds| ObservedRect {
+        rect: Rect {
+            x: f64::from(bounds.x),
+            y: f64::from(bounds.y),
+            width: f64::from(bounds.width),
+            height: f64::from(bounds.height),
+        },
+        coordinate_space_id: canvas_id.clone(),
+        evidence_id: alpha_evidence_id.clone(),
+    });
+
+    let mut document = ArtifactIr {'''
+          if text.count(document_marker) != 1:
+              raise SystemExit('document marker mismatch')
+          text = text.replace(document_marker, analysis_values)
+
+          old_node = '''            coordinate_space_id: canvas_id,
+            parent_id: None,
+            role: None,
+            name: None,
+            geometry: Geometry {
+                layout_box: None,
+                render_box: Some(full_rect),
+                ink_box: None,
+                hit_box: None,
+            },'''
+          new_node = '''            coordinate_space_id: canvas_id,
+            parent_id: None,
+            role: None,
+            name: None,
+            geometry: Geometry {
+                layout_box: None,
+                render_box: Some(full_rect),
+                ink_box: alpha_ink_box,
+                hit_box: None,
+            },'''
+          if text.count(old_node) != 1:
+              raise SystemExit('node geometry marker mismatch')
+          text = text.replace(old_node, new_node)
+          if text.count('        evidence: vec![evidence],') != 1:
+              raise SystemExit('evidence vector marker mismatch')
+          text = text.replace(
+              '        evidence: vec![evidence],',
+              '        evidence: vec![evidence, alpha_evidence],',
+          )
+          if text.count('            "version": "0.1.0",') != 1:
+              raise SystemExit('PNG extension version marker mismatch')
+          text = text.replace(
+              '            "version": "0.1.0",',
+              '            "version": "0.2.0",',
+          )
+
+          metadata_marker = '''            "colorDescription": {
+                "srgb": color_description.has_srgb,
+                "gamma": color_description.has_gamma,
+                "chromaticities": color_description.has_chromaticities,
+                "iccProfile": color_description.has_icc_profile
+            }
+'''
+          metadata_replacement = '''            "colorDescription": {
+                "srgb": color_description.has_srgb,
+                "gamma": color_description.has_gamma,
+                "chromaticities": color_description.has_chromaticities,
+                "iccProfile": color_description.has_icc_profile
+            },
+            "alphaAnalysis": {
+                "visibleBounds": alpha_visible_bounds,
+                "opaqueBounds": alpha_opaque_bounds,
+                "transparentInsets": transparent_insets,
+                "visiblePixelCount": alpha.visible_pixel_count,
+                "opaquePixelCount": alpha.opaque_pixel_count,
+                "transparentPixelCount": alpha.transparent_pixel_count,
+                "translucentPixelCount": alpha.translucent_pixel_count,
+                "edgeVisiblePixels": {
+                    "top": alpha.edge_visible_pixels.top,
+                    "right": alpha.edge_visible_pixels.right,
+                    "bottom": alpha.edge_visible_pixels.bottom,
+                    "left": alpha.edge_visible_pixels.left
+                },
+                "allTransparent": alpha.all_transparent,
+                "allVisible": alpha.all_visible
+            }
+'''
+          if text.count(metadata_marker) != 1:
+              raise SystemExit('alpha metadata marker mismatch')
+          lib.write_text(text.replace(metadata_marker, metadata_replacement))
+
+          decisions = Path('docs/decisions/README.md')
+          text = decisions.read_text()
+          marker = '- [0025 — PNG encoded RGBA8 normalization](0025-png-encoded-rgba8-normalization.md)\n'
+          addition = marker + '- [0026 — Exact alpha-visible pixel observations](0026-alpha-visible-pixel-observations.md)\n'
+          if text.count(marker) != 1:
+              raise SystemExit(f'ADR index marker mismatch: {text.count(marker)}')
+          decisions.write_text(text.replace(marker, addition))
+
+          readme = Path('README.md')
+          text = readme.read_text()
+          old = '''M3 now validates the complete PNG chunk stream, inflates `IDAT` within an exact decoded-size
+budget, reconstructs all five scanline filters, and expands packed samples, palettes, alpha, and
+Adam7 passes into explicitly non-color-managed PNG-encoded RGBA8. No final display color, ink,
+text, components, roles, or other semantics are invented. Later pixel analysis builds on these
+verified parser boundaries rather than bypassing them.'''
+          new = '''M3 now validates the complete PNG chunk stream, performs bounded decoding, reconstructs all
+scanline filters, expands samples to explicitly non-color-managed PNG-encoded RGBA8, and derives
+exact alpha-visible bounds and transparent insets. Opaque background subtraction, final display
+color, text, components, roles, and other semantics are not invented. Later pixel analysis builds
+on these verified observations rather than bypassing them.'''
+          if old in text:
+              text = text.replace(old, new)
+          elif new not in text:
+              raise SystemExit('README M3 marker not found')
+          readme.write_text(text)
+          PY
+      - name: Verify complete alpha analysis
+        shell: bash
+        run: |
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified implementation and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/m3-alpha-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: derive exact alpha-visible PNG geometry'
+          git push origin HEAD:feat/m3-png-alpha-observations
