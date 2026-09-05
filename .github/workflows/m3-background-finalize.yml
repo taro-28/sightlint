@@ -1,0 +1,81 @@
+name: M3 background finalize
+
+on:
+  push:
+    branches:
+      - feat/m3-opaque-background-candidates
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-opaque-background-candidates
+          fetch-depth: 0
+      - name: Use latest branch and integrate prerequisites
+        shell: bash
+        run: |
+          sleep 150
+          git fetch origin main feat/m3-png-alpha-observations feat/m3-opaque-background-candidates
+          git reset --hard origin/feat/m3-opaque-background-candidates
+          git merge --no-edit origin/main
+          git merge --no-edit origin/feat/m3-png-alpha-observations
+          test -f crates/sightlint-adapter-png/src/pixels.rs
+      - name: Apply bootstrap wiring if it remains pending
+        shell: bash
+        run: |
+          if test -f .github/workflows/m3-background-bootstrap.yml && ! grep -q '^mod background;$' crates/sightlint-adapter-png/src/lib.rs; then
+            python3 - <<'PY'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/m3-background-bootstrap.yml').read_text()
+          start_marker = "          python3 - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          embedded = workflow[start:end]
+          script = '\n'.join(
+              line[10:] if line.startswith('          ') else line
+              for line in embedded.splitlines()
+          )
+          exec(compile(script, 'm3-background-bootstrap-embedded', 'exec'))
+          PY
+          fi
+      - name: Install the reviewed staged implementation
+        shell: bash
+        run: |
+          test -f crates/sightlint-adapter-png/src/background_refactored.rs
+          mv crates/sightlint-adapter-png/src/background_refactored.rs \
+             crates/sightlint-adapter-png/src/background.rs
+      - name: Apply machine-safe fixes and verify behavior
+        shell: bash
+        run: |
+          cargo fmt --all
+          cargo clippy --fix --allow-dirty --allow-staged --locked --workspace --all-targets --all-features -- -D warnings
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo fmt --all -- --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          rm -f .github/workflows/m3-alpha-bootstrap.yml
+          rm -f .github/workflows/m3-alpha-finalize.yml
+          rm -f .github/workflows/m3-alpha-integrate.yml
+          rm -f .github/workflows/m3-background-bootstrap.yml
+          rm -f .github/workflows/m3-background-finalize.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: derive opaque border background candidates'
+          git push origin HEAD:feat/m3-opaque-background-candidates
