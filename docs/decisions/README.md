@@ -1,15 +1,23 @@
 # Architecture decision records
 
-Architecture decision records capture choices that constrain future implementation.
+Architecture decision records capture choices that constrain future implementation. The files
+listed under **Accepted decisions** are normative because they are present and indexed on current
+`main`. A file on an unmerged or closed branch is not accepted repository policy merely because
+its own header says `Status: Accepted`.
 
-Statuses:
+Read `docs/handoff.md` for the current operational state and `docs/decision-history.md` for the
+background, alternatives, and disposition of historical experiments.
 
-- **Proposed:** under discussion and not normative
-- **Accepted:** normative until superseded
-- **Superseded:** replaced by a later ADR
-- **Rejected:** considered and not adopted
+## Status meanings
 
-Accepted decisions:
+- **Proposed:** under discussion and not normative.
+- **Accepted:** normative until superseded; listed in this index on `main`.
+- **Superseded:** replaced by a later accepted ADR.
+- **Rejected:** considered and not adopted.
+- **Historical branch decision:** design reference from an unmerged/superseded branch; never
+  normative on current `main`.
+
+## Accepted decisions
 
 - [0001 — Product scope and name](0001-product-scope-and-name.md)
 - [0002 — Rust deterministic kernel](0002-rust-deterministic-kernel.md)
@@ -38,12 +46,49 @@ Accepted decisions:
 - [0030 — Verified staged raster and byte corpus](0030-verified-staged-raster-and-corpus.md)
 - [0031 — Advisory image-region inspection](0031-advisory-image-region-inspection.md)
 
-The two historical ADR 0024 files have distinct full paths. Preserve existing links rather than
-renumbering them silently. Earlier experimental branch decisions numbered 0025–0029 are not
-implicitly accepted or integrated by this index; ADR 0030 specifies the current raster slice.
+Two different files received number 0024 during the remote-development phase. Their full paths are
+stable and both are accepted. Do not silently rename or renumber historical links. New decisions
+continue at **0032** or later.
 
-Proposed decisions:
+## Proposed decisions
 
 - [0007 — Licensing](0007-licensing.md)
 
-Use [the template](template.md) for new decisions.
+Licensing and first-release work are tracked by issue #33. Public repository visibility is not an
+open-source license.
+
+## Historical branch decisions 0025–0029
+
+Draft PRs #13–#17 created ADRs on branches that were never merged into the recovered/current
+`main`. Those files are not present in this index and are not normative. Their useful reasoning
+has been transferred as follows:
+
+| Historical ADR | Subject | Current disposition |
+|---|---|---|
+| 0025 | broad PNG-encoded RGBA8 normalization, palette, sub-byte, 16-bit, `tRNS` | optional strategy and requirements in issue #27 |
+| 0026 | exact alpha-visible bounds, insets, edge counts, `inkBox` | clean current-main implementation contract in issue #26 |
+| 0027 | ranked exact corner/edge background candidates | benchmark candidate in issue #25 |
+| 0028 | layered image bytes/current assertions/future ground truth corpus | current raster/inspection corpora plus real evaluation gate #22 |
+| 0029 | 95%-qualified border and row-run/union-find components | benchmark candidate in issue #25 |
+
+The corresponding PRs were closed as superseded. Do not copy their `Status: Accepted` header into
+current policy, merge their branches wholesale, or reuse their obsolete self-writing workflows.
+Start from current green `main`, review the linked issue, and write a new ADR when the evidence is
+sufficient to choose an approach.
+
+## Decision-authoring protocol
+
+Before implementing an architectural, schema, protocol, trust-boundary, compatibility,
+policy-precedence, resource-model, or public-report change:
+
+1. confirm the current issue and roadmap gate;
+2. read `docs/handoff.md`, `docs/product-rationale.md`, and `docs/decision-history.md`;
+3. compare relevant alternatives, including doing nothing and using an existing library/process;
+4. state evidence, assumptions, uncertainty, privacy, security, resource, compatibility, and
+   evaluation implications;
+5. define non-goals and a migration/supersession plan;
+6. add the ADR to this index in the same PR;
+7. implement only after the decision is reviewable;
+8. update the handoff and roadmap when the accepted decision changes current work.
+
+Use [the template](template.md) and the next unused number at or after 0032.
