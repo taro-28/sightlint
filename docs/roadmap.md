@@ -11,17 +11,18 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 
 | Milestone | Status | Verified scope | Main remaining gap |
 |---|---|---|---|
-| M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI, hosting protection | release administration |
+| M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI, hosting protection, license | ongoing governance and security review |
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
 | M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix and first advisory recommended Web pack | portability characterization, broader representative evaluation, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
-| M7 — Ecosystem and release | active | local CLI plus bounded one-command Web agent workflow | MCP/GitHub/editor surfaces, packaging, license, release |
+| M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
 
-The project is pre-alpha. The kernel and structured-IR path are much more mature than the ability
-to infer useful structure and applicability from an arbitrary screenshot.
+The project has a narrowly scoped source-only alpha. The kernel and structured-IR path are much
+more mature than the ability to infer useful structure and applicability from an arbitrary
+screenshot.
 
 ## Near-term product outcome
 
@@ -31,7 +32,8 @@ The first meaningful product target is not “support every artifact” or “co
 > of high-confidence basic UI/UX findings without manually describing every element, edit the
 > source, rerun the same check, and verify the named finding is resolved.
 
-Issue #34 owns this outcome.
+Issue #34 established this bounded outcome. It does not establish arbitrary-site or general
+screenshot UI/UX accuracy.
 
 ### Required sequence
 
@@ -57,7 +59,7 @@ Issue #34 owns this outcome.
    - expose one local command and canonical machine report;
    - demonstrate Codex locating a source target, applying a focused edit, and rerunning SightLint;
    - verify the original finding disappears without hiding new failures.
-5. **#33 — First alpha release gate (next)**
+5. **#33 — First alpha release gate (complete)**
    - resolve license, compatibility surfaces, packaging, supply-chain checks, install, and release
      documentation only after the product path above has evidence.
 
@@ -94,12 +96,17 @@ human-authored source edit in an isolated copy, and post-fix rerun; it checks by
 removal of the named finding, no new failure, and retained ambiguous/intentional-overlay
 `cantTell` behavior.
 
-This completes the bounded #22–#24 and #42 contracts, but it is not evidence of general Web
+ADR 0037 and accepted ADR 0007 complete the release gate with dual `MIT OR Apache-2.0` licensing,
+surface-specific alpha compatibility, dependency-license checks, and a deterministic source
+archive verified on the supported hosted systems. The first release deliberately publishes no
+prebuilt binary, Cargo crate, npm package, installer, container, signature, or attestation.
+
+This completes the bounded #22–#24, #42, and #33 sequence, but it is not evidence of general Web
 accuracy. The corpus has one fictional application family, maintainer-only review, visible
 development labels, no private holdout, no pixel-content identity, no complete hit regions, no
 semantic peer inference, and no representative sampling. The three new rules therefore remain
-advisory. The next required gate is #33; the scripted edit is not a claim about autonomous agent
-quality or arbitrary repositories.
+advisory. The scripted edit is not a claim about autonomous agent quality or arbitrary
+repositories. The earliest remaining research gate is #25.
 
 ## Scope-selection rules
 
@@ -126,13 +133,13 @@ in issues, not long-lived Draft branches.
 - Rust 2024 workspace and Rust 1.85.0 MSRV;
 - deterministic/local-first trusted-kernel boundary;
 - formatting, Clippy, tests, rustdoc, MSRV, and Linux/macOS/Windows CI;
-- explicit unresolved license and release decisions.
+- explicit license and release decisions, now resolved by accepted ADR 0007 and ADR 0037.
 
 ### Administrative status
 
 - #19 — complete: active `Protect main` ruleset and required checks;
 - #32 — complete: legacy branches removed and automatic branch deletion enabled;
-- #33 — license and release readiness.
+- #33 — complete: dual license, compatibility policy, source packaging, and first alpha release.
 
 Hosting protection does not authorize bypassing local, PR-head, or post-merge CI discipline.
 
@@ -384,8 +391,10 @@ Issue #31 covers:
 - editor/browser/local UI;
 - optional policy/history service that does not replace local core.
 
-Issue #33 covers license, independent compatibility surfaces, binary/crate packaging, release
-provenance, supply-chain checks, install documentation, and the first public alpha.
+Issue #33 resolved license, independent compatibility surfaces, source packaging, release
+provenance, supply-chain checks, install documentation, and the first public alpha. It selected a
+source-only release and deferred binary/crate/npm channels until demand and channel-specific
+contracts justify them.
 
 ### First bounded slice
 
@@ -396,6 +405,17 @@ provenance, supply-chain checks, install documentation, and the first public alp
 - ambiguity and intentional-overlay controls preserve `cantTell`;
 - temporary artifacts stay local and are removed; no hosted processor or automatic source editor
   is introduced.
+
+### First alpha release
+
+- `v0.1.0-alpha.1` is a source-only GitHub prerelease under `MIT OR Apache-2.0`;
+- a deterministic tracked-source archive and canonical SHA-256 record are verified before
+  publication;
+- the extracted Rust workspace is tested on Ubuntu x64, macOS arm64, and Windows x64;
+- the extracted full Playwright product path is tested on Linux with Node 20–24 and pinned
+  Chromium;
+- checksums detect corruption but do not authenticate the publisher; signing, attestations,
+  registries, installers, and prebuilt binaries remain deferred and unclaimed.
 
 ### Sequencing rule
 
@@ -433,7 +453,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0037 or later.
+- New architecture decision numbers continue at 0038 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -460,8 +480,8 @@ Every public behavior must satisfy the applicable matrix:
 | #30 | interaction states/effects/traces/recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #32 | completed legacy branch and repository-setting cleanup |
-| #33 | license, compatibility, packaging, and alpha release |
-| #34 | first evidence-backed zero-setup web UI alpha execution epic |
+| #33 | completed license, compatibility, source packaging, and alpha release gate |
+| #34 | completed first evidence-backed zero-setup web UI alpha execution epic |
 
 Issues define work and evidence requirements. They do not make proposed capabilities current until
 an accepted ADR, tested implementation, and successful merge establish them.

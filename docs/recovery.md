@@ -116,6 +116,7 @@ screenshot UI/UX accuracy. A heuristic observation is not a blocking rule result
 
 ## Current continuation
 
-The incident is closed as an implementation recovery. The next product sequence is issue #34:
-realistic evaluation (#22), Playwright native/pixel acquisition (#23), evaluated recommended rules
-(#24), a local Codex fix-and-rerun workflow, and then the release gate (#33).
+The incident is closed as an implementation recovery. Issue #34's sequence—realistic evaluation
+(#22), Playwright native/pixel acquisition (#23), evaluated recommended rules (#24), the local
+Codex fix-and-rerun workflow (#42), and the source-only release gate (#33)—is complete. The earliest
+remaining research gate is #25.

@@ -404,6 +404,14 @@ the PR template:
 | #18 | integration and CI recovery merged |
 | #20 | verified raster plus 38-case pixel corpus merged |
 | #21 | advisory region/gap inspection plus 30-case corpus merged |
+| #35 | authoritative local handoff and evidence-gated roadmap merged |
+| #36 | realistic Web evaluation foundation merged |
+| #37 | first reviewed Playwright acquisition slice merged |
+| #39 | repository protection/settings evidence merged; issues #19/#32 resolved |
+| #40 | complete bounded Playwright evidence matrix merged |
+| #41 | first advisory recommended Web pack merged |
+| #43 | one-command local Web agent workflow merged |
+| #45 | accessibility snapshot parser ReDoS repair merged |
 
 PR numbers not listed as merged capabilities must not be inferred from sequence alone.
 
@@ -419,14 +427,15 @@ Important historical detail:
 - ADR 0031 defines current advisory image inspection;
 - ADR 0035 defines the first recommended Web profile and advisory enforcement;
 - ADR 0036 defines the one-command local Web orchestration and source-navigation report;
-- new ADRs should continue at 0037 or later rather than silently reusing historical numbers.
+- accepted ADR 0007 selects dual `MIT OR Apache-2.0` licensing;
+- ADR 0037 defines the source-only first alpha release and surface-specific compatibility policy;
+- new ADRs should continue at 0038 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
 
 ## Decisions still open
 
-- license and distribution model: ADR 0007 / issue #33;
 - representative corpus expansion and protected holdout operation beyond the public #22 slice;
 - arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
@@ -436,12 +445,14 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - perception-worker protocol/calibration: issue #28;
 - adapter ordering after web: issue #29;
 - interaction trace/effect schema: issue #30;
-- MCP/GitHub/editor/local UI and packaging surface: issue #31;
-- first evidence-backed web alpha execution: issue #34, with the local agent slice in #42.
+- MCP/GitHub/editor/local UI and later package channels: issue #31;
+- signing/attestation identity and any future registry or prebuilt-binary channel after the
+  source-only ADR 0037 alpha.
 
 Open issues are hypotheses and work contracts. They become normative only through accepted ADRs,
 verified implementation, and merged `main`.
 
-Administrative issues #19 and #32 are resolved. GitHub now enforces the documented `main`
+Administrative issues #19 and #32 are resolved, and the bounded issue #34 alpha sequence is
+complete. GitHub now enforces the documented `main`
 ruleset, squash-only merging, and automatic head-branch deletion; the legacy remote refs were
 removed after their unique intent was preserved in issues and this history.

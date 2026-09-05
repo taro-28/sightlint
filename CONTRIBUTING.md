@@ -1,6 +1,6 @@
 # Contributing to SightLint
 
-SightLint is pre-alpha and architecture-first. Contributions are welcome, but implementation must
+SightLint is an architecture-first alpha. Contributions are welcome, but implementation must
 not outrun the evidence, contracts, and sequencing recorded in this repository.
 
 ## Before opening code
@@ -17,9 +17,10 @@ not outrun the evidence, contracts, and sequencing recorded in this repository.
 7. Define the user-visible claim, evidence, applicability, policy, uncertainty, fixtures,
    evaluation, privacy/security/resource model, and explicit non-goals.
 
-Issue #34 is the canonical near-term execution epic. Realistic evaluation (#22), Playwright
-acquisition (#23), the first advisory recommended Web pack (#24), and the bounded local agent
-fix/rerun loop (#42) are complete. The alpha release gate (#33) is next.
+Issue #34's first-alpha sequence is complete through realistic evaluation (#22), Playwright
+acquisition (#23), the first advisory recommended Web pack (#24), the bounded local agent
+fix/rerun loop (#42), and the source-only alpha release gate (#33). Continue with the earliest
+evidence-backed open milestone issue from current `main`.
 
 ## Development workflow
 
@@ -48,6 +49,9 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+python3 tools/release.py validate-tag --tag v0.1.0-alpha.1
+python3 tools/check_dependency_licenses.py
+python3 -m unittest tools/test_release.py
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
@@ -114,7 +118,9 @@ relax local, exact-head, or post-merge CI discipline.
 
 ## Licensing
 
-No contribution/source license has been selected. Until proposed ADR 0007 and issue #33 are
-resolved and a repository license is added, external code contributions should remain discussion,
-review, or explicitly authorized work. Public visibility is not permission to use or redistribute
-the code or fixtures.
+SightLint is dual-licensed under `MIT OR Apache-2.0`. Unless explicitly agreed otherwise in
+writing, an intentional contribution submitted and accepted for inclusion is provided under those
+same terms. No separate CLA or sign-off is required for this alpha. Mark material that is not a
+contribution or cannot be redistributed before submitting it. External fixtures, screenshots,
+datasets, fonts, model weights, and brands require their own recorded license, provenance, and
+privacy review; the project license cannot be assigned to them by assumption.

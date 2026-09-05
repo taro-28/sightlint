@@ -39,15 +39,16 @@ Verify the corresponding `main` CI before planning.
 
 ## Canonical next work
 
-Issue #34 is the execution epic. Choose the earliest unblocked step:
+Issue #34's bounded execution sequence is complete:
 
 1. #22 — realistic, human-reviewed UI evaluation and hard negatives (complete);
 2. #23 — isolated Playwright web adapter with native/pixel reconciliation (complete);
 3. #24 — evaluated zero-setup recommended rule packs (complete);
 4. #42 — Codex edit/check/fix/rerun demonstration within #34 (complete);
-5. #33 — license, compatibility, packaging, and first alpha release (next).
+5. #33 — license, compatibility, packaging, and first alpha release (complete).
 
-Other preserved work is tracked in #25–#32. Existing stale code does not change priority.
+The earliest remaining research gate is #25. Other preserved work is tracked in #26–#31.
+Existing stale code does not change priority.
 
 ## Non-negotiable workflow
 

@@ -52,7 +52,8 @@ must not begin until these items are accepted or explicitly deferred.
 - [ ] `AGENTS.md` is normative for coding agents.
 - [ ] Architectural changes require ADRs before implementation.
 - [ ] Roadmap milestone exit criteria control scope.
-- [ ] Licensing remains an explicit unresolved decision and crates are not publishable yet.
+- [x] Licensing was explicitly deferred for M0 and later resolved as `MIT OR Apache-2.0`; crates
+  remain intentionally unpublished for the source-only alpha.
 
 ## M0 exit
 
