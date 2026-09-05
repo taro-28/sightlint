@@ -2,33 +2,73 @@
 
 **Deterministic, evidence-backed visual linting for interfaces and artifacts.**
 
-SightLint is an architecture-first project for finding visual and interaction-quality
-problems in web interfaces, mobile applications, slides, documents, PDFs, and images.
-It is designed for both humans and coding agents.
+SightLint is an architecture-first project for finding visual and interaction-quality problems in
+web interfaces, mobile applications, slides, documents, PDFs, and images. It is designed for both
+humans and coding agents.
 
-> **Status: pre-alpha.** The repository is establishing its contracts and verification
-> boundaries before implementing broad artifact support. Do not depend on the current API.
-> General screenshot-only UI/UX defect detection is not yet implemented. Image inspection
-> supplies narrow, advisory-only region and gap observations, not semantic UX pass/fail verdicts.
-> A green synthetic test suite is not evidence of real-world design-review accuracy.
+> **Status: pre-alpha.** Do not depend on the current API. General screenshot-only UI/UX defect
+> detection is not implemented. Current image inspection supplies a narrow, advisory-only region
+> and gap observation under explicit assumptions; it is not a semantic UX pass/fail verdict. Green
+> synthetic tests are not evidence of real-world design-review accuracy.
+
+## Continue in local Codex
+
+The repository is the complete handoff from the earlier remote/mobile development session.
+
+Start with [`CODEX.md`](CODEX.md), then follow [`AGENTS.md`](AGENTS.md) and
+[`docs/handoff.md`](docs/handoff.md). The handoff records the exact current capability, historical
+PR disposition, branch and hosting limitations, complete validation commands, open decisions, and
+the canonical issue sequence. Product reasoning and rejected alternatives are preserved in:
+
+- [`docs/product-rationale.md`](docs/product-rationale.md)
+- [`docs/decision-history.md`](docs/decision-history.md)
+- [`docs/evaluation-strategy.md`](docs/evaluation-strategy.md)
+- [`docs/roadmap.md`](docs/roadmap.md)
+
+Always start from the latest green `main`. Closed Draft PRs #12–#17 and their branches are
+historical reference only and must not be reopened, merged, or used as a base. Their remaining
+value is preserved in current issues.
+
+The near-term execution epic is
+[Issue #34](https://github.com/taro-28/sightlint/issues/34):
+
+1. [#22](https://github.com/taro-28/sightlint/issues/22) — realistic human-reviewed UI evaluation;
+2. [#23](https://github.com/taro-28/sightlint/issues/23) — Playwright native/pixel web adapter;
+3. [#24](https://github.com/taro-28/sightlint/issues/24) — evaluated zero-setup recommended rules;
+4. a Codex edit/check/fix/rerun demonstration;
+5. [#33](https://github.com/taro-28/sightlint/issues/33) — license, compatibility, packaging, and
+   first alpha release.
 
 ## Why
 
-AI can generate plausible-looking artifacts quickly, but basic quality failures still slip
-through: inconsistent spacing, weak typography, clipping, overlap, missing states, unsafe
-actions, inaccessible controls, and misleading feedback. A free-form AI critique is not a
-reliable quality gate because its observations and judgments can vary between runs.
+AI can generate plausible artifacts quickly, but basic quality failures still slip through:
+inconsistent spacing and typography, clipping, overlap, responsive breakage, missing states,
+unsafe actions, inaccessible controls, and misleading feedback.
 
-SightLint instead separates the problem into explicit stages:
+Static linters understand code but often not the rendered result. Pixel diffs detect change but
+not whether it is good. Accessibility tools cover an important subset. Design-system checks do
+not cover every relationship or state. Free-form AI critique can be useful but is difficult to
+reproduce, audit, version, evaluate, and trust as a release gate.
+
+SightLint separates the problem into explicit stages:
 
 ```text
 native structure / pixels / interaction traces
                     │
                     ▼
-              artifact adapters
+              untrusted adapters
                     │
                     ▼
-       evidence-backed Artifact IR
+   observations + provenance + uncertainty
+                    │
+                    ▼
+       validation and reconciliation
+                    │
+                    ▼
+             Artifact IR
+                    │
+                    ▼
+     applicability + policy resolution
                     │
                     ▼
        deterministic queries and rules
@@ -39,232 +79,263 @@ native structure / pixels / interaction traces
 
 The intended invariant is:
 
-> Given the same normalized IR, rule versions, configuration, and engine version,
-> SightLint must produce the same rule results.
+> Given the same normalized observations, rule versions, configuration, engine version, and
+> declared compatibility environment, SightLint produces the same canonical results.
 
-Probabilistic perception may help construct the IR, but it must not be disguised as fact.
-Every inferred value carries provenance, confidence, and uncertainty where applicable.
+Probabilistic perception may help construct observations, but inferred meaning must not be
+disguised as fact. Confidence, alternatives, uncertainty, and source conflicts remain data.
 
-## Product direction
+## Product requirement
 
-SightLint will be local-first and cross-artifact. Pixels are the universal observation
-layer; richer native structure is preferred whenever available.
+The north star is not “measure a screenshot.” It is:
 
-Planned adapters include:
+> A coding agent should apply ordinary UI/UX and artifact-quality fundamentals even when the user
+> did not remember to enumerate spacing, typography, accessibility, layout, and interaction rules
+> in every prompt.
 
-- JSON IR fixtures for deterministic engine development
-- rendered images
-- web pages through a browser adapter
-- PowerPoint and other slide formats
-- structured PDF and document formats
-- Android and iOS semantic trees
-- optional vision or language-model perception workers
+That requires reusable policy packs, rich acquisition, explicit applicability, evaluation, and
+explainable deterministic obligations. It does not require one universal visual style or opaque
+quality score.
 
-The first functional milestone is deliberately narrow: load a versioned Artifact IR,
-execute deterministic geometry rules, and emit evidence-linked results from a Rust CLI.
-M2 extends that deterministic boundary with an official visual-contract extension for
-explicit containment, alignment, peer extent consistency, peer typography consistency, and
-project-supplied minimum font-size policies. These rules still consume declared,
-evidence-backed observations rather than inferring semantics from pixels.
+Policy precedence is:
 
-The current M3 PNG path validates header metadata, the complete bounded chunk stream, and
-zlib/DEFLATE data carried by `IDAT`, then reconstructs all five PNG scanline filters with
-pass-local Adam7 history. Eight-bit grayscale, RGB, grayscale-alpha, and RGBA samples without
-tRNS can be expanded and scattered into row-major **PNG-encoded RGBA8**. These are unassociated
-source samples, not display-corrected sRGB or linear-light colors. No color management or
-alpha compositing is applied. The additional RGBA allocation is capped at 256 MiB.
+1. explicit project contract or exception;
+2. exact design-system or platform contract;
+3. statistically inferred project norm with visible confidence;
+4. platform convention;
+5. conservative built-in baseline.
 
-The adapter reports explicit raster unavailability for palette, non-eight-bit, tRNS, animation
-markers, or over-budget expansion. This is not a claim that unsupported ancillary semantics
-have been fully validated. Raw pixels are available only through the native adapter API;
-serialized IR contains versioned availability, counts, a regression checksum, and provenance.
-No ink bounds, text, components, roles, peer groups, or automatic UX findings are inferred by
-`adapt-image` or `check-image`. Later-stage draft PRs are not completed features.
-See [ADR 0030](docs/decisions/0030-verified-staged-raster-and-corpus.md).
+Every result should state which policy supplied the expectation.
 
-## Current deterministic command surface
+## Current verified capabilities
 
-The CLI accepts medium-neutral Artifact IR directly and can also validate and adapt deterministic
-PNG source facts. Browser, slide, PDF, mobile, OCR, CV, and model-based acquisition remain
-separate layers so that medium-specific sensing cannot leak into deterministic rule verdicts.
+### Artifact IR and deterministic rule engine
 
-```bash
-# Validate IR, run built-in atomic rules, and print a human report.
-cargo run -p sightlint-cli -- check fixtures/e2e/pass-web.json
+The Rust kernel supports:
 
-# Produce canonical machine-readable rule results.
-cargo run -p sightlint-cli -- check fixtures/e2e/pass-web.json --format json
+- versioned, medium-neutral Artifact IR;
+- semantic validation and canonical serialization;
+- stable IDs, evidence selectors, confidence, and uncertainty;
+- explicit units and coordinate spaces;
+- separate layout, render/ink, and hit geometry;
+- atomic rules and evidence-linked human/JSON reports;
+- `passed`, `failed`, `inapplicable`, `cantTell`, and `untested`;
+- stable CLI exit behavior and byte-level determinism tests.
 
-# Validate PNG source stages and report staged raster availability in canonical IR.
-cargo run -p sightlint-cli -- adapt-image screenshot.png
+When sufficient facts and explicit relations/policies exist, current visual contracts cover:
 
-# Adapt a PNG and immediately run the same deterministic rule engine.
-cargo run -p sightlint-cli -- check-image screenshot.png --format json
+- bounds within a canvas;
+- declared non-overlap;
+- peer spacing consistency;
+- parent containment;
+- logical alignment;
+- peer width/height consistency;
+- peer typography consistency;
+- project-supplied minimum font-size policy;
+- direction, unit, tolerance, and ambiguity behavior.
 
-# Observe region and gap candidates without a blocking UX verdict.
-cargo run -p sightlint-cli -- inspect-image screenshot.png --format json
+This does not mean all required facts or peer relationships can be inferred from an arbitrary
+screenshot.
 
-# Binary stdin is supported for image adaptation too.
-cat screenshot.png | cargo run -p sightlint-cli -- adapt-image -
+### Deterministic PNG acquisition
 
-# Make ambiguous cantTell outcomes fail an explicitly strict quality gate.
-cargo run -p sightlint-cli -- check fixtures/e2e/cant-tell-missing-box.json --deny-cant-tell
+The current M3 path performs:
 
-# Normalize semantically valid IR into canonical JSON.
-cargo run -p sightlint-cli -- normalize fixtures/e2e/pass-web-shuffled.json
-
-# Emit the current Artifact IR schema.
-cargo run -p sightlint-cli -- schema
+```text
+PNG signature/IHDR validation
+  -> bounded complete chunk/order/CRC validation
+  -> bounded IDAT zlib/DEFLATE inflation
+  -> all five scanline-filter reconstructions
+  -> non-interlaced or Adam7 handling
+  -> row-major PNG-encoded RGBA8 for supported inputs
 ```
 
-`check-image` currently has only whole-image source facts to inspect; the rule engine does not
-consume raster samples as semantic nodes or peer groups. Exit zero does not mean that the
-screenshot has passed a comprehensive UI/UX review. Inspect individual `results` and their
-applicability; the report schema does not contain a `findings` field.
+Supported raster inputs are eight-bit grayscale, RGB, grayscale-alpha, and RGBA without `tRNS`.
+Palette/indexed, sub-byte, 16-bit, `tRNS`, animation, and over-budget cases are explicitly
+unavailable instead of guessed.
 
-The public exit-code contract for checks is:
+The bytes are unassociated PNG-encoded samples, not display-corrected sRGB or linear-light color.
+No gamma/ICC/chromaticity transform or alpha compositing is applied, so these values alone cannot
+support a trusted colorimetric or contrast verdict. Raw pixels remain inside the adapter API;
+serialized IR contains bounded metadata, checksum, and provenance.
+
+### Advisory image-region inspection
+
+`inspect-image` uses one deliberately strict acquisition hypothesis:
+
+- all raster pixels are opaque;
+- the complete perimeter has one exact RGBA value;
+- that value is recorded as an unconfirmed background candidate;
+- four-connected non-candidate regions are extracted within fixed budgets;
+- groups require at least three same-size, same-color solid rectangles aligned in one row/column;
+- foreign regions intersecting the intervening strip prevent grouping;
+- exact device-pixel gaps are reported as `uniform` or `unequal` observations.
+
+The committed clean/mutated pair yields `[1, 1]` and `[1, 2]`. Unequal gaps produce a nonblocking
+advisory, while `uxVerdict` remains `cantTell`: identical pixels could express intentional grouping.
+
+This prototype does not generally support text, rounded cards, shadows, gradients, photos,
+antialiasing, hierarchy, semantic roles, or design intent.
+
+## Current commands
+
+Use Cargo until packaging is defined:
+
+```bash
+# Structured Artifact IR check.
+cargo run --locked -p sightlint-cli -- \
+  check fixtures/e2e/pass-web.json
+
+# Canonical rule report.
+cargo run --locked -p sightlint-cli -- \
+  check fixtures/e2e/pass-web.json --format json
+
+# Validate/adapt supported PNG source facts.
+cargo run --locked -p sightlint-cli -- \
+  adapt-image screenshot.png
+
+# Adapt a PNG and run the trusted rule engine.
+cargo run --locked -p sightlint-cli -- \
+  check-image screenshot.png --format json
+
+# Obtain advisory region and gap observations.
+cargo run --locked -p sightlint-cli -- \
+  inspect-image screenshot.png --format json
+
+# Binary stdin is supported.
+cat screenshot.png | cargo run --locked -p sightlint-cli -- adapt-image -
+
+# Explicitly deny cantTell in a trusted check policy.
+cargo run --locked -p sightlint-cli -- \
+  check fixtures/e2e/cant-tell-missing-box.json --deny-cant-tell
+
+# Canonicalize valid IR and expose the schema/version.
+cargo run --locked -p sightlint-cli -- normalize fixtures/e2e/pass-web-shuffled.json
+cargo run --locked -p sightlint-cli -- schema
+cargo run --locked -p sightlint-cli -- version
+```
+
+For trusted checks, exit codes are:
 
 | Code | Meaning |
 |---:|---|
-| `0` | No failed results; `cantTell` remains advisory unless explicitly denied |
-| `1` | A rule failed, or strict policy denied a `cantTell` result |
-| `2` | Usage, I/O, decoding, adapter validation, or semantic IR validation error |
+| `0` | no failed result; `cantTell` is advisory unless explicitly denied |
+| `1` | a rule failed, or strict policy denied `cantTell` |
+| `2` | usage, I/O, decoding, adapter, or semantic-validation error |
 
-## Advisory image inspection
+`inspect-image` never exits 1 for a heuristic. Observed or explicitly unavailable coverage exits
+0; malformed/usage/execution failure exits 2.
 
-`inspect-image` is a separate, opt-in acquisition experiment, not a new blocking rule. Given
-an entirely opaque raster with a single-color perimeter, it hypothesizes that color as the
-background and measures four-connected regions that differ from it. Same-size, single-color
-solid rectangles aligned in a row or column can form repeated-shape candidates. A foreign
-region intersecting the intervening strip prevents that grouping.
+## Executable verification
 
-The report includes exact source-device-pixel bounds and gaps, evidence links, the background
-hypothesis, uncalibrated semantic confidence, and `blocking: false`. The committed card pair
-has observed gaps `[1, 1]` and `[1, 2]`. The second receives an unequal-gap advisory, but both
-retain `uxVerdict: cantTell`: identical pixels could also represent intentional grouping.
-The unchanged old future semantic-spacing oracle remains `untested`.
+SightLint separates conformance, acquisition evaluation, semantic rule evaluation, and eventual
+user-outcome evidence. See [`docs/evaluation-strategy.md`](docs/evaluation-strategy.md).
 
-No options are needed to select candidate shapes. JSON output has `inspectionSchemaVersion`
-0.1.0, independently of Artifact IR and CheckReport. Human output says advisory-only. Exit 0
-means the inspection ran or returned explicit unavailable coverage, not that a design is good.
-Exit 2 indicates input, usage, I/O, or execution failure. This command never exits 1 and does
-not accept `--deny-cant-tell`; heuristic observations cannot silently block a build.
+Current committed assets include:
 
-Inspection is limited to 4,194,304 pixels and 1,024 connected regions. Exceeding either limit,
-nonopaque pixels, a varying border, or unavailable source pixels produces an explicit reason
-and no partial region/group output. These limits are checked after the existing bounded PNG
-acquisition. Rounded cards, text, shadows, gradients, photographs, and complex layouts are
-not generally supported; this prototype is not a general screenshot design reviewer.
-See [ADR 0031](docs/decisions/0031-advisory-image-region-inspection.md) and the
-[observation evaluation contract](evaluation/image-inspection.md).
+- generated `fixtures/e2e/` Artifact IR conformance data;
+- a versioned synthetic rule smoke oracle under `evaluation/`;
+- **38 PNG raster cases** with exact independent pixel, unavailable, or malformed outcomes;
+- **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
+- targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
+  byte-identical results.
 
-## Executable verification and evaluation
+Normal read-only CI verifies corpus drift, rustfmt, Clippy with denied warnings, all tests, explicit
+public E2E, rustdoc, Rust 1.85.0, and Linux/macOS/Windows. Public behavior is incomplete until the
+exact final PR head and the merged `main` commit both pass.
 
-`fixtures/e2e/` contains committed synthetic conformance data generated by
-`tools/generate_e2e_fixtures.py`. The CI workflow verifies that the committed corpus is
-reproducible and executes the real `sightlint` binary on Linux, macOS, and Windows.
-
-[The native pixel corpus](fixtures/png-raster/README.md) contains 38 committed PNG inputs and
-independent expected-pixel, unavailable, or malformed-input outcomes. It checks the native API's
-actual pixels, the CLI checksum and evidence, file/stdin equivalence, normalization, direct and
-two-step command paths, and repeated output bytes. A separate generator check detects fixture
-drift. Its clean and mutated card layouts retain future semantic spacing ground truth as
-**untested**; successfully decoding them is not counted as detecting a UX defect.
-
-[The image-inspection corpus](fixtures/image-inspection/corpus.json) adds 30 observation cases:
-19 observed, nine unavailable, and two malformed. It verifies the real public binary's acquired
-bounds and gaps against independently specified oracles. Controls include horizontal/vertical
-patterns, translation, scaling, recoloring, blockers, different sizes/colors, holes, diagonal
-contact, alpha, and intentional unequal grouping. API/file/stdin/JSON/human output, evidence
-links, determinism, and preserved check-image behavior are exercised. Actual pixel/component
-budget boundaries also have direct raster tests. CI runs its generator check and E2E explicitly.
-
-`evaluation/` is a separate, versioned product oracle. Its existing rule smoke corpus runs the
-public binary repeatedly, verifies declared rule outcomes, rejects undeclared failures or
-abstentions, and requires targeted mutations to change the named rule from `passed` to `failed`.
-The inspection acquisition oracle remains separate from that rule schema so measured patterns
-are not misrepresented as semantic rule outcomes. Both suites are synthetic regressions, not
-evidence of real-world precision. New claims require appropriate acquisition and rule oracles.
-
-The public-binary test suites additionally construct deterministic PNG byte streams and feed
-them through binary stdin. Their zlib coverage combines an independent test-only stored-DEFLATE
-encoder with fixed- and dynamic-Huffman streams generated by Python's zlib implementation.
-Inspection fixtures use Python's independent fixed-Huffman encoder and explicit shape/gap
-oracles; they do not derive expected regions by running SightLint. Generator drift fails CI.
-Filter tests use independent forward encoders and known packed-byte answers. Public E2E also
-compares direct `check-image` output against `adapt-image` followed by `check` byte for byte.
-
-A new public rule or adapter is not complete without corresponding pass, fail/mutation,
-ambiguity, inapplicable, malformed-input, boundary, resource-limit, determinism, and product
-oracle coverage where those outcomes apply. See [the evaluation corpus](evaluation/README.md).
+Synthetic regression data does not establish real-world precision. Issue #22 defines the required
+realistic, human-reviewed evaluation and holdout process.
 
 ## Architecture
 
-The repository is organized around a small Rust kernel and replaceable sensors:
-
 ```text
-Rust kernel       deterministic IR, geometry, query, rule execution, reporting
-Adapters          browser, image, PPTX, PDF, Android, iOS, and other sensors
-Perception        optional OCR/CV/VLM processes; never part of the trusted verdict kernel
-Integrations      CLI, CI, MCP, editor extensions, and future local UI
+Rust kernel       deterministic IR, validation, queries, rules, reports
+Adapters          browser, image, PPTX, PDF, Android, iOS, traces
+Perception        optional isolated OCR/CV/VLM workers
+Integrations      CLI, CI, Codex/MCP, GitHub, editor, future local UI
 ```
 
-Read these documents before changing the architecture:
+The kernel does not run a browser/model, fetch network resources, interpret every source format,
+or use wall-clock/random/locale defaults. Adapter languages may match their platforms: TypeScript
+for Playwright, Kotlin for Android, Swift for iOS, Python for perception experiments, and Rust for
+bounded deterministic primitives.
 
-- [Vision and scope](docs/vision.md)
-- [Project principles](docs/principles.md)
-- [Architecture](docs/architecture.md)
-- [Artifact IR](docs/artifact-ir.md)
-- [Rule model](docs/rules.md)
-- [Testing strategy](docs/testing-strategy.md)
-- [Threat model](docs/threat-model.md)
-- [Roadmap](docs/roadmap.md)
-- [Architecture decisions](docs/decisions/README.md)
-- [Integration recovery and evidence discipline](docs/recovery.md)
+Read:
 
-Coding agents must also follow [AGENTS.md](AGENTS.md).
+- [`docs/handoff.md`](docs/handoff.md)
+- [`docs/product-rationale.md`](docs/product-rationale.md)
+- [`docs/decision-history.md`](docs/decision-history.md)
+- [`docs/vision.md`](docs/vision.md)
+- [`docs/principles.md`](docs/principles.md)
+- [`docs/architecture.md`](docs/architecture.md)
+- [`docs/artifact-ir.md`](docs/artifact-ir.md)
+- [`docs/rules.md`](docs/rules.md)
+- [`docs/testing-strategy.md`](docs/testing-strategy.md)
+- [`docs/evaluation-strategy.md`](docs/evaluation-strategy.md)
+- [`docs/roadmap.md`](docs/roadmap.md)
+- [`docs/decisions/README.md`](docs/decisions/README.md)
+- [`docs/development.md`](docs/development.md)
 
-## Development
+## Preserved backlog
 
-The repository uses Rust 2024 with an explicit minimum supported Rust version. Common
-commands are available through Cargo aliases:
+| Issue | Purpose |
+|---|---|
+| #19 | branch protection and required checks |
+| #22 | realistic human-reviewed evaluation gate |
+| #23 | Playwright web adapter and reconciliation |
+| #24 | zero-setup recommended rule packs |
+| #25 | background/segmentation benchmark research |
+| #26 | exact alpha-visible transparent-asset geometry |
+| #27 | optional broader PNG coverage and decoder strategy |
+| #28 | isolated OCR/CV/VLM worker protocol |
+| #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
+| #30 | interaction states, effects, traces, and recovery |
+| #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
+| #32 | legacy branch and repository-setting cleanup |
+| #33 | license, compatibility, packaging, and alpha release |
+| #34 | first evidence-backed zero-setup web UI alpha epic |
 
-```bash
-cargo check-all
-cargo lint
-cargo test-all
-cargo docs
-python3 tools/generate_raster_corpus.py --check
-python3 tools/generate_inspection_corpus.py --check
-cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
-cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
-```
+Issues define future work, not implemented behavior. New architecture decisions continue at ADR
+0032 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+current issues in the ADR index.
 
-Before public behavior is considered complete, CI must pass on the exact final commit,
-including generated fixtures, public-binary E2E, and the product evaluation smoke corpus.
-The normal CI workflow is read-only, rejects known stale integration files, and continues
-independent checks after a failure without ignoring that failure.
+## Development rules
 
-Repository branch protection is a separate hosting setting, not enabled by this workflow.
-[Issue #19](../../issues/19) tracks the administrative action, explicitly deferred by the
-maintainer. PR-and-CI verification still applies; do not infer enforced protection from the
-existence of a workflow or a green badge.
+- start from the latest green `main`;
+- one focused issue, branch, and PR;
+- ADR before architecture/schema/protocol/trust/policy changes;
+- no self-writing feature workflows;
+- no placeholder/final/review/ready/`v2` branch chains;
+- no unconnected implementation;
+- public-binary/process E2E and independent oracles;
+- hard negatives and conservative abstention;
+- exact final-head and post-merge CI;
+- update handoff and roadmap when facts change;
+- local-first and no artifact upload by default.
 
-See [Development](docs/development.md), [Testing strategy](docs/testing-strategy.md),
-[Product evaluation](evaluation/README.md), and [Contributing](CONTRIBUTING.md).
+The complete local gate is in [`AGENTS.md`](AGENTS.md) and
+[`docs/development.md`](docs/development.md).
+
+Branch protection is not currently enabled; #19 tracks the deferred administrative action.
+Legacy branches and automatic deletion are tracked by #32. Do not infer hosting enforcement from a
+green CI badge.
 
 ## What SightLint is not
 
 SightLint is not intended to:
 
-- assign a magical universal UX score
-- let an LLM make opaque blocking decisions
-- replace user research, usability testing, or product judgment
-- require uploading private artifacts to a hosted service
-- force every medium into a web-specific DOM model
+- prove that an artifact is universally beautiful, persuasive, or usable;
+- replace representative user research;
+- assign one opaque universal UX score;
+- let an LLM make the final blocking decision;
+- force every medium into DOM/CSS concepts;
+- require a hosted service or artifact upload;
+- treat every visual difference as a defect;
+- let a coding agent grade its own edit without rerunning the checker.
 
-## License
+## License and release
 
-No open-source license has been selected yet. The workspace is intentionally marked
-`publish = false` until the maintainer accepts a licensing decision. See
-[ADR 0007](docs/decisions/0007-licensing.md).
+No open-source license has been selected and no release exists. The workspace remains
+`publish = false`. Public source visibility is not permission to use or redistribute the project.
+See proposed ADR 0007 and issue #33 before publishing or distributing an alpha.

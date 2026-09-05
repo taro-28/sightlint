@@ -1,35 +1,106 @@
 name: Architecture decision
-description: Propose a durable change to a project invariant or subsystem boundary
+description: Propose a durable change to a project invariant, protocol, or subsystem boundary
 title: "adr: "
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Read the current ADR index, `docs/handoff.md`, and `docs/decision-history.md` before
+        proposing a decision. Branch-only historical ADRs 0025–0029 are references, not accepted
+        policy. New ADR numbers continue at 0032 or later.
+
+  - type: input
+    id: issue-roadmap
+    attributes:
+      label: Parent issue and roadmap milestone
+      placeholder: "#23 / M4"
+    validations:
+      required: true
+
   - type: textarea
     id: context
     attributes:
-      label: Context
-      description: What durable problem or constraint requires a decision?
+      label: Durable context and decision pressure
+      description: What user/product problem, constraint, or evidence requires a decision now? Why is deferral insufficient?
     validations:
       required: true
+
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current verified state
+      description: Identify the current main behavior, accepted decisions, tests, compatibility surfaces, and relevant historical experiments.
+    validations:
+      required: true
+
   - type: textarea
     id: decision
     attributes:
-      label: Proposed decision
+      label: Proposed decision and precise boundary
+      description: State what becomes normative, what remains adapter/inferred/advisory, and what is explicitly unchanged.
     validations:
       required: true
+
   - type: textarea
     id: alternatives
     attributes:
       label: Alternatives considered
+      description: Include doing nothing/defer, existing standards or libraries, process isolation, custom implementation, and rejected historical approaches.
     validations:
       required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and assumptions
+      description: What specifications, experiments, benchmarks, corpora, or product requirements support the choice? What remains uncertain?
+    validations:
+      required: true
+
+  - type: textarea
+    id: trust
+    attributes:
+      label: Trust, privacy, security, and resource effects
+      description: Exact versus inferred data, process/network boundary, untrusted inputs, limits, failure/abstention, and local/remote behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: data-model
+    attributes:
+      label: Data model, units, provenance, and reconciliation
+      description: Core versus extension fields, versioning, selectors/IDs, coordinate spaces, evidence, conflicts, and deterministic normalization.
+    validations:
+      required: true
+
   - type: textarea
     id: consequences
     attributes:
       label: Consequences and compatibility impact
+      description: Benefits, costs, maintenance, migration, affected schemas/protocols/rules/CLI, supported platforms, and reversibility.
     validations:
       required: true
+
   - type: textarea
-    id: verification
+    id: evaluation
     attributes:
-      label: Verification plan
+      label: Verification and product-evaluation plan
+      description: Conformance, acquisition, rule, hard-negative, mutation, boundary, determinism, holdout, and user-outcome evidence as applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: Non-goals and prohibited interpretations
+      description: State what the decision does not prove or authorize and which shortcuts must not be taken.
+    validations:
+      required: true
+
+  - type: textarea
+    id: rollout
+    attributes:
+      label: Rollout, supersession, and documentation plan
+      description: Smallest vertical slice, migration, fallback, how the ADR is indexed, and required handoff/roadmap updates.
     validations:
       required: true

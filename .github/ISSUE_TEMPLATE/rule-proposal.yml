@@ -1,51 +1,138 @@
 name: Rule proposal
-description: Propose an atomic or composite lint rule
+description: Propose an atomic or composite lint obligation
 title: "rule: "
 body:
+  - type: markdown
+    attributes:
+      value: |
+        A visual difference is not automatically a defect. Define acquisition, semantic
+        applicability, policy source, deterministic expectation, valid alternatives, and evidence.
+        Read `AGENTS.md`, `docs/rules.md`, and `docs/evaluation-strategy.md` first.
+
+  - type: input
+    id: issue-roadmap
+    attributes:
+      label: Parent issue and roadmap milestone
+      placeholder: "#24 / M2-M4"
+    validations:
+      required: true
+
   - type: input
     id: rule-id
     attributes:
-      label: Proposed rule ID
-      placeholder: visual.spacing.peer-consistency
+      label: Proposed stable rule ID and semantic version
+      placeholder: visual.spacing.peer-consistency@0.2.0
     validations:
       required: true
+
   - type: textarea
     id: problem
     attributes:
       label: User-visible problem
-      description: Describe the concrete defect, not only a broad heuristic.
+      description: Describe the concrete recurring defect and user impact, not only a broad heuristic or aesthetic preference.
     validations:
       required: true
+
   - type: textarea
     id: inputs
     attributes:
-      label: Required input aspects and evidence
-      description: Geometry, semantics, pixels, interaction trace, native structure, and so on.
+      label: Required input aspects and evidence grades
+      description: Geometry, semantics, pixels, native structure, typography, policy, interaction trace, and so on. Distinguish exact from inferred.
     validations:
       required: true
+
   - type: textarea
     id: applicability
     attributes:
-      label: Applicability
-      description: Define exactly when the rule should run and when it is inapplicable.
+      label: Semantic applicability and targets
+      description: Define exactly when targets are equivalent/relevant, when the rule is inapplicable, and what evidence is required to avoid false grouping.
     validations:
       required: true
+
   - type: textarea
-    id: expectation
+    id: policy
     attributes:
-      label: Deterministic expectation
-      description: Define the assertion after inputs have been normalized.
+      label: Expectation and policy source
+      description: State project/design-system/platform/inferred/built-in precedence, units, tolerance, exceptions, and how the chosen source appears in the report.
     validations:
       required: true
+
   - type: textarea
-    id: ambiguity
+    id: deterministic-expectation
     attributes:
-      label: cantTell and false-positive cases
+      label: Deterministic obligation after normalization
+      description: Define the calculation or accepted alternatives without relying on free-form model judgment.
     validations:
       required: true
+
+  - type: textarea
+    id: outcomes
+    attributes:
+      label: passed, failed, cantTell, inapplicable, and untested behavior
+      description: State sufficient evidence for each applicable outcome and whether any result is advisory or blocking-eligible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Valid design or interaction alternatives
+      description: List multiple acceptable solutions and cases where the apparent pattern is intentional.
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: False positives, false negatives, conflicts, and abstention
+      description: Include hard negatives, missing/conflicting sources, localization, platform, viewport/state, and confidence limits.
+    validations:
+      required: true
+
+  - type: textarea
+    id: severity
+    attributes:
+      label: Severity inputs and CI maturity
+      description: Separate harm/scope/frequency/recoverability/task criticality from confidence. State experimental/advisory/blocking-eligible requirements.
+    validations:
+      required: true
+
   - type: textarea
     id: fixtures
     attributes:
-      label: Passing, failing, and mutation fixtures
+      label: Conformance and mutation fixtures
+      description: Passing, targeted fail/mutation, cantTell, inapplicable, untested, malformed, boundary, direction/scale, determinism, and public-binary cases as applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: product-evaluation
+    attributes:
+      label: Realistic evaluation, hard negatives, metrics, and holdout
+      description: Reference #22 or an equivalent reviewed corpus; specify precision, coverage, abstention, mutation kill rate, and non-claims.
+    validations:
+      required: true
+
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Explanation and remediation contract
+      description: What evidence, policy, target, alternatives, and fix guidance will users see? How will a post-fix rerun verify resolution?
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Versioning and compatibility impact
+      description: Rule ID/semantics, configuration/profile, reports, adapters, and existing baselines.
+    validations:
+      required: true
+
+  - type: textarea
+    id: exit
+    attributes:
+      label: Exit criteria and explicit non-goals
+      description: Define exact-head/post-merge CI, evaluation evidence, documentation/handoff updates, and what this rule will not claim.
     validations:
       required: true
