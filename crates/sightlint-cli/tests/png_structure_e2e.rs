@@ -58,6 +58,35 @@ fn crc32(bytes: &[u8]) -> u32 {
     !crc
 }
 
+fn adler32(bytes: &[u8]) -> u32 {
+    const MOD_ADLER: u32 = 65_521;
+    let mut a = 1_u32;
+    let mut b = 0_u32;
+    for &byte in bytes {
+        a = (a + u32::from(byte)) % MOD_ADLER;
+        b = (b + a) % MOD_ADLER;
+    }
+    (b << 16) | a
+}
+
+fn zlib_stored(bytes: &[u8]) -> Vec<u8> {
+    let mut output = vec![0x78, 0x01];
+    let chunk_count = bytes.len().div_ceil(65_535);
+    if bytes.is_empty() {
+        output.extend_from_slice(&[0x01, 0x00, 0x00, 0xff, 0xff]);
+    } else {
+        for (index, chunk) in bytes.chunks(65_535).enumerate() {
+            output.push(u8::from(index + 1 == chunk_count));
+            let length = u16::try_from(chunk.len()).expect("stored block fits u16");
+            output.extend_from_slice(&length.to_le_bytes());
+            output.extend_from_slice(&(!length).to_le_bytes());
+            output.extend_from_slice(chunk);
+        }
+    }
+    output.extend_from_slice(&adler32(bytes).to_be_bytes());
+    output
+}
+
 fn append_chunk(bytes: &mut Vec<u8>, kind: [u8; 4], data: &[u8]) {
     let length = u32::try_from(data.len()).expect("test chunk length fits u32");
     bytes.extend_from_slice(&length.to_be_bytes());
@@ -80,7 +109,7 @@ fn png_prefix(bit_depth: u8, color_type: u8) -> Vec<u8> {
 
 fn rgba_png() -> Vec<u8> {
     let mut bytes = png_prefix(8, 6);
-    append_chunk(&mut bytes, *b"IDAT", &[1, 2, 3]);
+    append_chunk(&mut bytes, *b"IDAT", &zlib_stored(&[0_u8; 198]));
     append_chunk(&mut bytes, *b"IEND", &[]);
     bytes
 }
@@ -89,8 +118,10 @@ fn rgba_png() -> Vec<u8> {
 fn complete_stream_metadata_is_exposed_deterministically() {
     let mut png = png_prefix(8, 3);
     append_chunk(&mut png, *b"PLTE", &[0, 0, 0, 255, 255, 255]);
-    append_chunk(&mut png, *b"IDAT", &[1, 2]);
-    append_chunk(&mut png, *b"IDAT", &[3, 4, 5]);
+    let compressed = zlib_stored(&[0_u8; 54]);
+    let split = compressed.len() / 2;
+    append_chunk(&mut png, *b"IDAT", &compressed[..split]);
+    append_chunk(&mut png, *b"IDAT", &compressed[split..]);
     append_chunk(&mut png, *b"IEND", &[]);
 
     let output = run_stdin(&png);
@@ -100,7 +131,7 @@ fn complete_stream_metadata_is_exposed_deterministically() {
     let metadata = &ir["extensions"]["org.sightlint.adapter.png"];
     assert_eq!(metadata["chunkCount"], 5);
     assert_eq!(metadata["idatChunkCount"], 2);
-    assert_eq!(metadata["idatBytes"], 5);
+    assert_eq!(metadata["idatBytes"], compressed.len());
     assert_eq!(metadata["hasPalette"], true);
 
     let repeated = run_stdin(&png);
@@ -112,7 +143,7 @@ fn complete_stream_metadata_is_exposed_deterministically() {
 fn accepts_structurally_valid_unknown_ancillary_chunks() {
     let mut png = png_prefix(8, 6);
     append_chunk(&mut png, *b"vpAg", &[9, 8, 7]);
-    append_chunk(&mut png, *b"IDAT", &[]);
+    append_chunk(&mut png, *b"IDAT", &zlib_stored(&[0_u8; 198]));
     append_chunk(&mut png, *b"IEND", &[]);
 
     let output = run_stdin(&png);
@@ -197,7 +228,7 @@ fn exact_chunk_budget_boundary_is_enforced() {
     for _ in 0..9_997 {
         append_chunk(&mut at_limit, *b"tEXt", &[]);
     }
-    append_chunk(&mut at_limit, *b"IDAT", &[]);
+    append_chunk(&mut at_limit, *b"IDAT", &zlib_stored(&[0_u8; 198]));
     append_chunk(&mut at_limit, *b"IEND", &[]);
     let accepted = run_stdin(&at_limit);
     assert_eq!(accepted.status.code(), Some(EXIT_SUCCESS));
