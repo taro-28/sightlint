@@ -11,14 +11,14 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of the first recommended-Web-pack slice, the latest verified baseline was:
+At the start of the local-agent-workflow slice, the latest verified baseline was:
 
-- commit: `db0ce344b4e4234965e6efbffe2d8bbff7266bfe`
-- tree: `61d5759bdd4a414b39f7396b7bdd9cfe203f033d`
-- merged PR: #40
-- main CI: run 33993115696, all six jobs successful
+- commit: `c532af42a6f70c6286e635632e3637696ae8f0d5`
+- tree: `4a023e87c31567d7a4b68f3c182e48861a8cf865`
+- merged PR: #41
+- main CI: run 33996175086, all six jobs successful
 
-The current focused branch implements issue #24's first bounded advisory recommended Web pack.
+The current focused branch implements issue #42's bounded one-command agent workflow.
 After it merges, its resulting `main` commit supersedes the hash above as the repository starting
 point. Never hard-code the old hash as a branch base. Verify the current `main` and its CI.
 
@@ -241,6 +241,26 @@ For each recommended rule, the public browser E2E covers 5/5 contracted outcome-
 failures. The corpus is public, fictional, maintainer-reviewed, and non-holdout; these counts do not
 establish WCAG conformance, representative precision, or blocking maturity.
 
+### One-command local Web agent workflow
+
+ADR 0036 adds `sightlint-web-check` in the untrusted Node adapter package. One invocation captures
+the repository-owned fixture into private temporary storage, calls the built public Rust binary
+with `sightlint:recommended`, and emits either a canonical workflow report `0.1.0` or a stable
+color-free human report. The envelope preserves the complete capture response and CheckReport and
+joins node results to captured native selectors, source-bundle paths, and evidence identifiers.
+
+Node does not compute or change outcomes. Exit 0/1 is preserved from the Rust blocking policy;
+operational/contract failures exit 2. Temporary absolute paths are not serialized and the capture
+files are removed. Native selectors are navigation hints, not exact source-line attribution.
+
+The reviewed public smoke E2E runs the same command repeatedly on an isolated copy of the Atlas
+unnamed-control mutation, applies only the human-authored edit in
+`evaluation/web/annotations/agent-workflow.json`, and reruns it. It proves byte stability within
+the declared environment, the reviewed finding-to-selector join, disappearance of the named
+finding, zero new failures, and retained `cantTell` for an ambiguous control and intentional dialog
+overlay. It does not prove autonomous edit selection, representative agent success, a protected
+holdout, WCAG conformance, or general Web UI/UX accuracy.
+
 ### Public commands
 
 The current command families include:
@@ -266,6 +286,19 @@ node adapters/playwright/dist/src/cli.js \
   --artifact-ir-out ARTIFACT-IR.json \
   --screenshot-out SCREENSHOT.png
 ```
+
+The bounded combined agent surface is:
+
+```bash
+node adapters/playwright/dist/src/check-cli.js \
+  --request REQUEST.json \
+  --repository-root REPOSITORY \
+  --sightlint-binary target/debug/sightlint \
+  --format json
+```
+
+Omit `--format json` for human output. It performs capture plus the Rust check without persisting
+temporary artifacts or moving verdict policy into Node.
 
 For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
 `cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
@@ -307,6 +340,9 @@ SightLint treats tests as part of the product specification.
   viewport screenshot metadata;
 - six rule-eligible mutation kills, 11 acquisition mutations, per-rule policy/profile/enforcement
   assertions, hard negatives, and explicit semantic/pixel/hit-region abstentions;
+- one public reviewed agent workflow oracle covering the combined command, native source-target
+  join, temporary fix/rerun, no-new-failure postcondition, JSON/human byte stability, and
+  ambiguity/intentional-overlay controls;
 - no representative screenshot corpus, private holdout, or general accuracy claim.
 
 Synthetic success is regression evidence, not real-world accuracy evidence.
@@ -383,9 +419,9 @@ complete, select the earliest unblocked item in this sequence:
 3. **#24 — first recommended zero-setup Web pack (complete).** Three narrow advisory rules run by
    default with explicit policy provenance, conservative abstention, and per-rule regression
    metrics.
-4. **Agent loop within #34 (next).** One local command, canonical report, targeted defect, Codex fix, and
-   post-fix rerun through the same checker.
-5. **#33 — alpha release gate.** Resolve license, packaging, compatibility, supply chain, and
+4. **#42 — agent loop within #34 (complete).** One local command, canonical report, targeted
+   defect, reviewed source edit, and post-fix rerun through the same checker.
+5. **#33 — alpha release gate (next).** Resolve license, packaging, compatibility, supply chain, and
    distribution after product evidence exists.
 
 Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by placing browser/model

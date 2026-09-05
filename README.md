@@ -38,7 +38,8 @@ The near-term execution epic is
    acquisition evidence matrix (complete);
 3. [#24](https://github.com/taro-28/sightlint/issues/24) — first evaluated zero-setup recommended
    Web pack (complete);
-4. a Codex edit/check/fix/rerun demonstration;
+4. [#42](https://github.com/taro-28/sightlint/issues/42) — one-command Codex
+   edit/check/fix/rerun path (complete);
 5. [#33](https://github.com/taro-28/sightlint/issues/33) — license, compatibility, packaging, and
    first alpha release.
 
@@ -249,31 +250,29 @@ For trusted checks, exit codes are:
 
 ### Current local Web agent sequence
 
-The current zero-setup rule path is two explicit local processes; a combined command and the
-source-edit demonstration remain the next #34 slice. After installing the locked adapter/browser
-dependencies described in [`adapters/playwright/README.md`](adapters/playwright/README.md):
+After installing the locked adapter/browser dependencies described in
+[`adapters/playwright/README.md`](adapters/playwright/README.md), build both local processes once:
 
 ```bash
 cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run build
 
-capture_dir="$(mktemp -d)"
-node adapters/playwright/dist/src/cli.js \
+node adapters/playwright/dist/src/check-cli.js \
   --request evaluation/web/requests/dashboard-browser-unnamed-control.json \
-  --repository-root "$PWD" \
-  --artifact-ir-out "$capture_dir/artifact-ir.json" \
-  --screenshot-out "$capture_dir/screenshot.png"
-
-# No profile/config file is required; recommended is the default.
-target/debug/sightlint check "$capture_dir/artifact-ir.json" --format json
-
-# Explicitly compare only the pre-existing base/declared rules.
-target/debug/sightlint check "$capture_dir/artifact-ir.json" --profile base --format json
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --format json
 ```
 
-The recommended report identifies `web-help-action`, the exact evidence records, WCAG policy
-provenance, and advisory enforcement. An agent must edit the source, acquire a fresh state into a
-new output directory, and rerun the same checker; it must not declare success from its own edit.
+Omit `--format json` for a stable color-free human report. The machine envelope preserves capture
+and runtime provenance, the unchanged CheckReport, and exact node-ID joins to native selectors and
+the loaded source-bundle files. The selector is a navigation hint rather than exact source-line
+causality. Temporary IR and screenshot files are removed, and the Node layer never issues or
+modifies a verdict.
+
+The reviewed E2E runs this same command on the unnamed-control mutation, applies one independently
+authored edit to an isolated fixture copy, and reruns it. It checks that the named finding is gone
+and no new failure appears; it does not let the edit itself declare success.
 
 ## Executable verification
 
@@ -292,6 +291,9 @@ Current committed assets include:
   geometry, client/scroll overflow, ancestor clipping, center-hit samples, writing direction, and
   a synchronized viewport screenshot through a separate Node process, then evaluates the public
   binary's base and zero-setup recommended profiles;
+- a versioned one-command agent report and one reviewed temporary source-edit/fix/rerun case with
+  byte-stable JSON/human output, native source navigation, and retained ambiguity/hard-negative
+  controls;
 - targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
   byte-identical results.
 

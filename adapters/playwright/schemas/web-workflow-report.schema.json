@@ -36,6 +36,7 @@
   "$defs": {
     "nonEmptyString": { "type": "string", "minLength": 1 },
     "semanticVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "packageVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$" },
     "identifier": { "type": "string", "minLength": 1 },
     "repositoryPath": {
       "type": "string",
@@ -158,7 +159,7 @@
       "required": ["reportSchemaVersion", "engineVersion", "artifactId", "artifactKind", "profiles", "summary", "results"],
       "properties": {
         "reportSchemaVersion": { "const": "0.3.0" },
-        "engineVersion": { "$ref": "#/$defs/semanticVersion" },
+        "engineVersion": { "$ref": "#/$defs/packageVersion" },
         "artifactId": { "$ref": "#/$defs/identifier" },
         "artifactKind": { "enum": ["web", "mobile", "slide", "document", "pdf", "image", "other"] },
         "extensionVersions": {

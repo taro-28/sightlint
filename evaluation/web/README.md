@@ -121,3 +121,8 @@ mutations killed, 6/6 matched emitted failures, zero unexpected failures, and ze
 failures. Each recommended rule records 5/5 contracted outcome-category entries, 1/1 matched
 failure, 2/2 reviewed abstentions, 1/1 killed mutation, and zero hard-negative failures. Those
 small public-fixture counts are not a quality score or a real-world accuracy estimate.
+
+The agent-workflow E2E additionally reports 1/1 initial named finding, 1/1 source-target join, 1/1
+reviewed fix verified, zero new failures, 2/2 repeated JSON and human byte checks, and 2/2 reviewed
+`cantTell` controls with zero false-positive failures. The task, edit, and labels are public, so
+these are workflow regression counts rather than agent-generalization metrics.

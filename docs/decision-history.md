@@ -418,7 +418,8 @@ Important historical detail:
 - ADR 0030 re-established the verified raster boundary;
 - ADR 0031 defines current advisory image inspection;
 - ADR 0035 defines the first recommended Web profile and advisory enforcement;
-- new ADRs should continue at 0036 or later rather than silently reusing historical numbers.
+- ADR 0036 defines the one-command local Web orchestration and source-navigation report;
+- new ADRs should continue at 0037 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -438,7 +439,7 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - adapter ordering after web: issue #29;
 - interaction trace/effect schema: issue #30;
 - MCP/GitHub/editor/local UI and packaging surface: issue #31;
-- first evidence-backed web alpha execution: issue #34.
+- first evidence-backed web alpha execution: issue #34, with the local agent slice in #42.
 
 Open issues are hypotheses and work contracts. They become normative only through accepted ADRs,
 verified implementation, and merged `main`.

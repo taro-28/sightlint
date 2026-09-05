@@ -106,7 +106,8 @@ agent generalization requires independently sampled tasks and leakage-controlled
 
 ## Compatibility
 
-`sightlint-web-check` and workflow report `0.1.0` are new alpha surfaces. Capture protocol `0.1.0`,
+`sightlint-web-check` and workflow report `0.1.0` are new alpha surfaces in private adapter package
+`0.4.0`. Capture protocol `0.1.0`,
 `org.sightlint.web@0.3.0`, Artifact IR `0.1.0`, CheckReport `0.3.0`, existing `sightlint-web`, and
 Rust CLI behavior remain unchanged. The report schema rejects unknown fields and unsupported
 versions. Any incompatible envelope or exit-semantics change requires a new version and retained
