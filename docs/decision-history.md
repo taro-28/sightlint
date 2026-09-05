@@ -1,0 +1,435 @@
+# Decision history and alternatives
+
+This document preserves the reasoning that led to the current repository. Accepted ADRs remain
+the normative architectural record. This history explains context, alternatives, reversals, and
+superseded experiments so a future coding agent does not repeat the same investigation or infer
+intent from branch names.
+
+## Product origin
+
+The starting observation was that AI-generated applications can be technically functional while
+still exhibiting basic visual/UX defects. The desired solution was not another prompt template or
+one-off screenshot critique. The requirement was a reusable checker that applies ordinary UI/UX
+fundamentals even when the user gives no design-quality instructions.
+
+That led to these product conclusions:
+
+- the checker needs reusable rule/policy knowledge;
+- rendered output matters, not only source code;
+- image analysis should be usable beyond web pages;
+- mobile apps, slides, documents, PDFs, and images should fit the same broad model;
+- dynamic UX eventually requires traces, not one screenshot;
+- probabilistic perception can help acquire structure but cannot be the final blocking judge;
+- exact measurements and contextual applicability must be separated;
+- the tool needs evaluation data early, because technically correct infrastructure can still
+  become the wrong product.
+
+## Name selection
+
+The project name is **SightLint**, with repository and CLI spelling `sightlint`.
+
+The desired naming properties were:
+
+- communicate “linting what is seen,” not only source code;
+- remain applicable to web, mobile, slides, documents, PDFs, and images;
+- work naturally as a CLI command;
+- retain `lint` so users understand the workflow;
+- provide enough brand/search distinctiveness for an OSS project.
+
+Alternatives considered included `VisualLint`, `vlint`, `ViewLint`, `CraftLint`, `PrismLint`,
+`FrameLint`, `LensLint`, and several visual/verify-derived names. The direct names were often
+already used by tools or research in closely related areas, and `vlint`/`ViewLint` had especially
+confusing overlaps with visual UI linting. `SightLint` was selected as the best balance of meaning,
+CLI readability, cross-artifact scope, and distinctiveness.
+
+Do not casually rename the project. A rebrand would require renewed package/repository/product/
+trademark research, compatibility planning, and migration documentation.
+
+## Core versus adapters
+
+### Decision
+
+Use a deterministic Rust kernel surrounded by replaceable adapters and optional perception
+workers.
+
+### Why
+
+The kernel owns stable contracts, validation, units, geometry, rule execution, outcomes, and
+canonical reports. Rust supports local native binaries, explicit resource/error handling, and
+memory-safe parsing of untrusted inputs.
+
+The best adapter language varies by platform:
+
+- TypeScript/Node for Playwright/browser automation;
+- Kotlin for Android;
+- Swift for iOS;
+- Python for OCR/CV/model experimentation;
+- Rust for bounded file parsers and deterministic image primitives.
+
+Versioned process boundaries were preferred to an early in-process plugin ABI because they isolate
+crashes, memory, dependencies, runtimes, and language choices.
+
+### Alternatives not selected
+
+- **All TypeScript:** convenient for web but weak as the cross-platform trusted image/file kernel
+  and likely to pull browser/framework assumptions into core data.
+- **All Python:** excellent for perception research but less suitable as a small deterministic
+  distributable kernel and static contract boundary.
+- **All Rust:** unnecessary and counterproductive for browser/mobile/model integrations.
+- **In-process plugin ABI:** premature compatibility burden and weaker failure isolation.
+- **Hosted service first:** conflicts with local/private artifacts and makes the core dependent on
+  network availability and retention policy.
+
+## Medium-neutral Artifact IR
+
+### Decision
+
+Create a language-neutral, versioned Artifact IR rather than defining the product around DOM/CSS
+or raw screenshots.
+
+### Model influences
+
+The IR borrows ideas rather than copying one existing schema:
+
+- scene graphs and design-tool node trees for canvases, nodes, bounds, hierarchy, and z-order;
+- DOM/accessibility trees for roles, names, states, actions, and relationships;
+- Figma-like node structures for cross-artifact visual objects and properties;
+- platform accessibility/UI-automation hierarchies for mobile semantics and hit geometry;
+- slide/document/PDF object and tag trees for pages, shapes, text, reading order, and native IDs;
+- W3C ACT-style atomic/composite rule concepts and outcome distinctions;
+- JSON Schema/versioned extensions for language-neutral validation and forward evolution;
+- evidence/annotation models for provenance, selectors, confidence, and uncertainty.
+
+No existing structure fully represented source geometry, rendered ink, hit targets, inferred
+semantics, traces, evidence strength, and cross-medium extensions together. A SightLint-specific
+IR was therefore justified, while retaining familiar concepts and serializable boundaries.
+
+### Key distinctions
+
+- source/layout bounds, render/ink bounds, and hit bounds are different;
+- observations and derived relations are different;
+- exact facts and inferred values are different;
+- evidence confidence and verdict outcome are different;
+- rule severity and confidence are different;
+- medium-specific fields belong in versioned extensions;
+- IDs must not depend on input order or randomized hashes.
+
+### Alternatives not selected
+
+- **DOM as universal IR:** excludes non-web artifacts and encodes implementation details.
+- **Accessibility tree as universal IR:** useful semantics but incomplete visual geometry and no
+  guarantee of rendered visibility.
+- **Screenshot pixel graph only:** universal input but weak meaning and expensive inference.
+- **Figma node schema as universal IR:** useful design structure but not interaction traces or
+  platform/runtime evidence.
+- **One untyped JSON property bag:** easy initially, impossible to validate/version reliably.
+
+## Evidence before verdict
+
+### Decision
+
+Every result must identify observed facts, targets, expected obligation, policy source, evidence,
+and uncertainty. The trusted outcomes are `passed`, `failed`, `inapplicable`, `cantTell`, and
+`untested`.
+
+### Why
+
+Visual/UX rules are often context-dependent. A numerical outlier can be an intentional group or
+variant. Returning `cantTell` protects precision and makes coverage visible. `untested` prevents an
+unexecuted check from looking like a pass.
+
+### Alternatives not selected
+
+- **Boolean pass/fail only:** hides missing evidence and encourages false certainty.
+- **Model confidence as outcome:** confidence is not applicability or correctness.
+- **Severity derived from confidence:** a low-confidence catastrophic issue and a high-confidence
+  cosmetic issue are different dimensions.
+- **One aggregate quality score:** conceals which obligations failed and cannot be a trusted gate.
+
+## Policy instead of taste
+
+### Decision
+
+Executable rules verify narrow obligations. Policy precedence is project contract, exact
+design-system/platform contract, inferred project norm, platform convention, then conservative
+built-in baseline.
+
+### Why
+
+The product should work with no per-project setup, but there is no context-free universal answer
+for every spacing, text size, hierarchy, density, or interaction choice. Built-in recommended
+profiles are necessary, yet reports must identify their policy source and accept project
+exceptions.
+
+### Alternatives not selected
+
+- **Require users to configure every value:** defeats the zero-instruction product requirement.
+- **Hard-code one universal design system:** high false-positive risk and style lock-in.
+- **Learn the current project as truth:** existing defects can become the inferred standard.
+- **Pure aesthetic critique:** useful as advisory prose, not the deterministic core.
+
+Issue #24 preserves the rule-pack product requirement and admission criteria.
+
+## Playwright and rendering
+
+### Decision
+
+Playwright is not required to inspect every artifact, but it is the preferred first structured
+adapter for web applications.
+
+### Why
+
+A screenshot is sufficient for pixel facts but not reliable semantic roles, DOM hierarchy,
+computed styles, hit targets, clipping ancestors, or interaction state. A controlled browser can
+provide native facts and the screenshot from the same session. The adapter remains outside the
+kernel.
+
+### Alternatives not selected
+
+- **Make Playwright mandatory for core:** prevents image, mobile, slide, and document use.
+- **Screenshot-only web analysis first:** forces expensive/uncertain reconstruction of information
+  the browser already knows.
+- **Static source analysis only:** misses final rendering, transforms, font/runtime differences,
+  clipping, and occlusion.
+
+Issue #23 defines the first web adapter slice and deterministic capture requirements.
+
+## Image path decisions
+
+### Initial question
+
+Could a screenshot be converted into deterministic structural data and then checked like any
+other artifact? The answer remains “partly, with explicit evidence and degraded coverage.”
+
+### Implemented sequence
+
+The project deliberately proved one exact layer at a time:
+
+1. PNG signature/IHDR and source metadata;
+2. full chunk framing/order/CRC validation;
+3. bounded IDAT inflation;
+4. all five filter reconstructions and Adam7 pass layout;
+5. bounded eight-bit RGBA raster for common screenshot formats;
+6. committed exact pixel corpus;
+7. conservative background-relative region/gap observations;
+8. advisory-only unequal-gap reporting and negative controls.
+
+Each stage is reachable through public commands and covered by E2E before the next is claimed.
+
+### Important correction
+
+Early remote work over-invested in building PNG details and created multiple speculative Draft
+branches. The project advantage is not a custom PNG decoder. The current decision is:
+
+- retain the verified narrow decoder as a trustworthy acquisition slice;
+- expand codec coverage only when real product evidence requires it;
+- explicitly evaluate a mature decoding library or isolated decoder rather than assuming custom
+  code is always safer;
+- move effort toward realistic evaluation, structured adapters, semantics, policy, and rules.
+
+Issue #27 captures optional format expansion and the decoder strategy decision.
+
+### Alpha-visible geometry
+
+Alpha provides exact visible-source bounds for transparent assets but does not identify whitespace
+inside opaque screenshots. The old implementation branch was not integrated; issue #26 preserves
+the valid scope for a clean reimplementation.
+
+### Background candidates and components
+
+Two approaches were explored:
+
+- ranked exact corner/edge color candidates;
+- a 95%-edge-qualified background with row-run/union-find components.
+
+Current `main` uses a stricter unanimous-perimeter hypothesis and bounded flood fill because its
+behavior is easier to state and test. The broader approaches may improve coverage but can mistake
+headers, gradients, photos, overlays, or edge content for background. They are benchmark
+candidates in issue #25, not accepted current behavior.
+
+### Semantic boundary
+
+The current image command can measure `[1,1]` versus `[1,2]`, but it cannot prove whether the third
+item belongs to the same semantic group. That exact distinction is why the report says
+`uxVerdict: cantTell` and remains nonblocking.
+
+## Testing and evaluation decisions
+
+### Public-binary E2E from the start
+
+A linter can have perfect unit tests and a broken command, adapter wiring, report, or exit code.
+Therefore every public behavior requires committed native input and execution through the built
+`sightlint` binary.
+
+The required case families include, where applicable:
+
+- passing;
+- targeted fail/mutation;
+- `cantTell`;
+- `inapplicable`;
+- `untested`;
+- malformed input;
+- exact boundary and resource limit;
+- ordering and metamorphic transformations;
+- repeated byte-identical output;
+- OS/MSRV compatibility.
+
+### Conformance versus product validity
+
+The repository keeps these distinct:
+
+- parser/rule/CLI conformance;
+- sensor acquisition correctness;
+- intended product outcomes;
+- eventual user benefit.
+
+The initial product corpus is synthetic and valuable for regression, but it cannot establish
+real-world UI review accuracy. Issue #22 is the next evidence gate.
+
+### Why mutation pairs matter
+
+A clean fixture alone proves little. A targeted mutation should change one property and be killed
+by the named rule. This helps verify that the checker detects the intended defect rather than
+merely producing a stable report.
+
+### Why holdout data is planned
+
+A rule tuned against all known examples can memorize its development corpus. Future credible
+accuracy claims need frozen holdout data, documented access/leakage policy, and reviewed oracle
+changes.
+
+## Cross-artifact scope
+
+The architecture was required to support web, mobile, slides, documents, PDFs, and images. This is
+an architectural constraint, not a schedule to implement everything at once.
+
+The sequence is:
+
+- prove the kernel and exact IR rules;
+- prove image acquisition and uncertainty boundaries;
+- build realistic evaluation;
+- add Playwright as the first rich adapter;
+- establish recommended rules;
+- then add PPTX/PDF/mobile adapters according to demand and fixture quality;
+- add optional perception and interaction traces only through isolated protocols;
+- add MCP/GitHub/editor/UI surfaces after the core produces useful evidence.
+
+Issues #29, #28, #30, and #31 preserve those later stages.
+
+## Local-first and privacy
+
+### Decision
+
+Core commands must run locally and transmit nothing unless the user explicitly selects an
+external adapter/model.
+
+### Why
+
+Source code, screenshots, documents, and app states may contain credentials, customer data, or
+unreleased designs. Local operation also improves repeatability and CI use.
+
+### Deferred decisions
+
+Remote perception, telemetry, hosted history, and organization policy services may exist later,
+but require explicit endpoint, retention, transmitted-data, and opt-in decisions. They cannot be
+a requirement of core linting.
+
+## Auto-fix
+
+### Decision
+
+Do not begin with broad automatic correction. Start with evidence-linked findings and rerun the
+same rule after a coding agent proposes an edit.
+
+### Why
+
+A layout change can affect responsive behavior, design-system constraints, semantics, and other
+rules. A generative model should not both make the change and declare success without an
+independent rerun.
+
+Narrow deterministic fixes can be introduced later with preconditions, source ownership,
+post-fix verification, and mutation tests.
+
+## Remote-development incident and lessons
+
+The mobile/remote phase demonstrated several process failures:
+
+- multiple branch names for one logical task;
+- stale Draft PRs appearing more advanced than verified `main`;
+- write-enabled temporary workflows used to assemble or repair code;
+- duplicate modules waiting for later wiring;
+- tests that referenced APIs the public library did not expose;
+- success reports based on old or partial CI;
+- confusion between PR mergeability and actual green checks.
+
+PR #18 recovered the integration baseline. Later work used read-only normal CI and exact-head
+verification. The permanent lessons are encoded in `AGENTS.md`, `docs/handoff.md`, issue #32, and
+the PR template:
+
+- one current branch per task;
+- current `main` only as the base;
+- no self-writing feature workflows;
+- no unconnected implementation;
+- exact final-head and post-merge CI;
+- stale work moves to issues/docs and is closed.
+
+## Historical PR disposition
+
+| PR | Outcome |
+|---|---|
+| #1 | project foundation merged |
+| #2 | deterministic vertical slice and E2E merged |
+| #3 | visual geometry/typography contracts merged |
+| #4 | first deterministic PNG adapter merged |
+| #5 | full chunk validation merged |
+| #6 | bounded IDAT inflation merged |
+| #7 | product evaluation harness merged |
+| #8–#9 | placeholder/redundant PRs closed during recovery |
+| #10 | verified filter reconstruction merged |
+| #11 | staged common RGBA raster experiment merged into the then-current line; later recovered/current path is defined by #18/#20 |
+| #12 | superseded duplicate filter branch, closed |
+| #13 | superseded broad PNG normalization, remaining idea in #27 |
+| #14 | superseded alpha geometry branch, remaining idea in #26 |
+| #15 | superseded background candidate branch, research in #25 |
+| #16 | superseded image corpus branch, real evaluation in #22 |
+| #17 | superseded component branch, current slice #21 and research #25 |
+| #18 | integration and CI recovery merged |
+| #20 | verified raster plus 38-case pixel corpus merged |
+| #21 | advisory region/gap inspection plus 30-case corpus merged |
+
+PR numbers not listed as merged capabilities must not be inferred from sequence alone.
+
+## Accepted, historical, and proposed ADRs
+
+The index in `docs/decisions/README.md` is authoritative.
+
+Important historical detail:
+
+- two different ADR files were assigned number 0024 during remote development;
+- branch-only ADRs 0025–0029 described experiments that were never accepted into current `main`;
+- ADR 0030 re-established the verified raster boundary;
+- ADR 0031 defines current advisory image inspection;
+- new ADRs should continue at 0032 or later rather than silently reusing historical numbers.
+
+Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
+inside an unmerged branch and does not make them accepted repository decisions.
+
+## Decisions still open
+
+- license and distribution model: ADR 0007 / issue #33;
+- branch protection: issue #19;
+- legacy branch cleanup/settings: issue #32;
+- realistic evaluation schema and holdout process: issue #22;
+- Playwright protocol/capture environment: issue #23;
+- recommended profile syntax and rule maturity thresholds: issue #24;
+- background/segmentation policy after benchmarking: issue #25;
+- alpha geometry implementation details on current raster: issue #26;
+- custom versus library decoding for broader formats: issue #27;
+- perception-worker protocol/calibration: issue #28;
+- adapter ordering after web: issue #29;
+- interaction trace/effect schema: issue #30;
+- MCP/GitHub/editor/local UI and packaging surface: issue #31;
+- first evidence-backed web alpha execution: issue #34.
+
+Open issues are hypotheses and work contracts. They become normative only through accepted ADRs,
+verified implementation, and merged `main`.
