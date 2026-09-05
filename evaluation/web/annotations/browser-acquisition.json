@@ -7,7 +7,7 @@
     "implementationOutputUsedAsOracle": false,
     "sourceId": "atlas-dashboard-repository-fixture-v1",
     "ownership": "sightlintRepository",
-    "license": "project-license-pending-repository-test-data",
+    "license": "MIT OR Apache-2.0",
     "privacyReview": "syntheticNoPersonalData",
     "externalAssets": false,
     "externalProcessing": false,

@@ -92,9 +92,9 @@ allows no permissions, aborts external requests, and never selects a hosted proc
 
 The extension does not serialize full HTML or arbitrary text. It keeps a locator-scoped
 accessibility root summary and a digest of the complete scoped snapshot; descendants are redacted.
-Fixture data is fictional and repository-owned. Do not use private/customer pages or screenshots
-as committed test data. The project license remains unresolved, so the fixture and adapter carry no
-independent redistribution grant.
+Fixture data is fictional and repository-owned under `MIT OR Apache-2.0`. Do not use
+private/customer pages or screenshots as committed test data. Third-party or future real fixtures
+require an independent license, redistribution, provenance, and privacy record before commit.
 
 The controlled Atlas fixture has no time-, randomness-, storage-, history-, or network-dependent
 output. Protocol `0.1.0` does not virtualize time or random sources in arbitrary applications.

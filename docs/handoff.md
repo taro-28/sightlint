@@ -11,16 +11,16 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of the repository-settings documentation slice, the latest verified baseline was:
+At the start of the alpha-release slice, the latest verified baseline was:
 
-- commit: `2dbffba6802151842d4dfb7720b2367f589b6d1b`
-- tree: `ed1b6ce7e492cf5ff069bbd43cc6d5c1c04e4d9e`
-- merged PR: #43
-- main CI: run 33997596273, all six jobs successful
+- commit: `2448a44273d6703d7555283ca5d1f76adb07cd43`
+- tree: `66a1ea1523c8cbf07f08a46113f296b8354abbee`
+- merged PR: #45
+- main CI: run 33998665657, all six jobs successful
+- main CodeQL: run 33998665271, Rust and JavaScript/TypeScript successful
 
-The current focused branch records the already-applied GitHub settings for issues #19 and #32.
-After it merges, its resulting `main` commit supersedes the hash above as the repository starting
-point. Never hard-code this hash as a branch base. Verify the current `main` and its CI.
+The release PR and tag workflow supersede that hash once merged and published. Never hard-code the
+recorded baseline as a branch base; verify the latest `main`, its exact CI, and the release page.
 
 Use this source-of-truth order:
 
@@ -89,16 +89,25 @@ Connector for this repository. No self-hosted runner, webhook, deploy key, Pages
 Environment is configured. Discussions remains disabled and no committed issue-template link
 points to it.
 
+The repository description identifies SightLint as deterministic, evidence-backed visual linting;
+topics cover Rust, CLI, Playwright, accessibility, UI testing, and developer tooling. No separate
+project homepage is currently appropriate. Dependabot PR #38 was closed because Node 26 type
+definitions exceed the accepted Node 20–24 alpha compatibility range.
+
 ### Release status
 
 - repository: public;
-- project status: pre-alpha;
+- project status: narrow source-only alpha;
 - workspace version: `0.1.0-alpha.1`;
-- releases: none at handoff time;
-- license: not selected;
-- crate publication: disabled.
+- first release: GitHub prerelease tag `v0.1.0-alpha.1`;
+- artifact: deterministic tracked-source archive plus canonical SHA-256 record;
+- license: `MIT OR Apache-2.0` for repository-owned source, documentation, schemas, and fixtures;
+- Cargo crate publication: disabled; Node package: private;
+- no prebuilt binary, registry package, installer, container, signature, or attestation.
 
-Public visibility is not an OSS license. Issue #33 is the release gate.
+Accepted ADR 0007 defines the license boundary. ADR 0037 and `docs/release.md` define the first
+release, supported environments, verification procedure, and explicit non-claims. Checksums detect
+corruption; they do not authenticate the publisher.
 
 ## What is actually implemented
 
@@ -193,7 +202,7 @@ repository-owned dashboard has six reviewed declared-IR state/environment record
   relation;
 - development records for ambiguous peer intent, a narrow viewport, and 125% text scale;
 - separate acquisition and rule annotation documents;
-- explicit source ownership, pending-license, privacy, split, and holdout declarations.
+- explicit source ownership, dual-license, privacy, split, and holdout declarations.
 
 The original runnable inputs use independently authored declared Artifact IR projections and do
 not establish acquisition accuracy. Their browser fields remain `untested` rather than being
@@ -289,7 +298,8 @@ sightlint check-image INPUT [--format human|json] [--deny-cant-tell] [--profile 
 sightlint inspect-image INPUT [--format human|json]
 ```
 
-Use `cargo run --locked -p sightlint-cli -- ...` until packaging is defined.
+For a checkout, use `cargo run --locked -p sightlint-cli -- ...`. The source alpha documents how to
+verify and build the same CLI from its release archive; no registry or prebuilt binary is claimed.
 
 The Web adapter currently has a separate Node process surface:
 
@@ -366,6 +376,8 @@ Synthetic success is regression evidence, not real-world accuracy evidence.
 The normal workflow is read-only and includes:
 
 - generated fixture drift checks;
+- release-tag/package metadata, locked dependency-license, and source-archive safety/determinism
+  checks;
 - rustfmt;
 - Clippy with warnings denied;
 - full workspace tests;
@@ -395,7 +407,8 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - dynamic interaction traces, pending/error/recovery/destructive-action rules;
 - MCP, GitHub Checks annotations, editor extension, browser extension, or local GUI;
 - broad automatic fixes;
-- packaged installation or public release.
+- prebuilt binaries, Cargo/npm publication, package-manager installers, signed artifacts, or
+  attestations.
 
 ## Product hypothesis and largest remaining risks
 
@@ -421,8 +434,7 @@ The largest risks are now product/evidence risks rather than basic kernel feasib
 
 ## Canonical next sequence
 
-Issue #34 is the execution epic for the first evidence-backed zero-setup web UI alpha. Until it is
-complete, select the earliest unblocked item in this sequence:
+Issue #34's bounded execution sequence is complete:
 
 1. **#22 — human-reviewed realistic evaluation corpus (complete).** The
    ADR/schema/dashboard/oracle foundation and synchronized browser companion are present.
@@ -435,8 +447,9 @@ complete, select the earliest unblocked item in this sequence:
    metrics.
 4. **#42 — agent loop within #34 (complete).** One local command, canonical report, targeted
    defect, reviewed source edit, and post-fix rerun through the same checker.
-5. **#33 — alpha release gate (next).** Resolve license, packaging, compatibility, supply chain, and
-   distribution after product evidence exists.
+5. **#33 — alpha release gate (complete).** Dual licensing, surface-specific compatibility,
+   source-only packaging, dependency checks, cross-platform source verification, and the first
+   prerelease are present.
 
 Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by placing browser/model
 logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete product.
@@ -452,7 +465,9 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#29:** structured PPTX, PDF/document, Android, and iOS adapter roadmap.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
-- **#33:** licensing/release/compatibility/packaging gate.
+
+The earliest remaining research gate is #25. Later issues remain demand- and evidence-gated; the
+completed alpha does not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -533,6 +548,9 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+python3 tools/release.py validate-tag --tag v0.1.0-alpha.1
+python3 tools/check_dependency_licenses.py
+python3 -m unittest tools/test_release.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run check
@@ -620,8 +638,8 @@ A local Codex session is continuing SightLint correctly when it can explain, bef
 - why SightLint separates acquisition, evidence, policy, applicability, and judgment;
 - why native structure and pixels are reconciled rather than one replacing the other;
 - why uncertainty is a result rather than an error to hide;
-- why the next product gate is the licensing, compatibility, packaging, and alpha distribution
-  work in issue #33;
+- why the next research gate is issue #25 and why broader background hypotheses must be benchmarked
+  against realistic hard negatives before replacing the strict baseline;
 - why stale Draft branches are not a shortcut;
 - which exact E2E proves the public claim;
 - what remains unimplemented and what the PR must not claim.

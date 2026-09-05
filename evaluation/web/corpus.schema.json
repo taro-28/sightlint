@@ -86,7 +86,7 @@
         "kind": { "const": "repositoryOwnedFixture" },
         "origin": { "$ref": "#/$defs/relativePath" },
         "ownership": { "const": "sightlintRepository" },
-        "license": { "$ref": "#/$defs/nonEmptyString" },
+        "license": { "const": "MIT OR Apache-2.0" },
         "redistribution": { "$ref": "#/$defs/nonEmptyString" },
         "privacyReview": {
           "enum": ["syntheticNoPersonalData", "reviewRequired", "approved"]

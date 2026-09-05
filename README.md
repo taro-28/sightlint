@@ -6,7 +6,7 @@ SightLint is an architecture-first project for finding visual and interaction-qu
 web interfaces, mobile applications, slides, documents, PDFs, and images. It is designed for both
 humans and coding agents.
 
-> **Status: pre-alpha.** Do not depend on the current API. General screenshot-only UI/UX defect
+> **Status: `v0.1.0-alpha.1`.** Do not depend on the current API. General screenshot-only UI/UX defect
 > detection is not implemented. Current image inspection supplies a narrow, advisory-only region
 > and gap observation under explicit assumptions; it is not a semantic UX pass/fail verdict. Green
 > synthetic tests are not evidence of real-world design-review accuracy.
@@ -29,8 +29,8 @@ Always start from the latest green `main`. Closed Draft PRs #12–#17 and their 
 historical reference only and must not be reopened, merged, or used as a base. Their remaining
 value is preserved in current issues.
 
-The near-term execution epic is
-[Issue #34](https://github.com/taro-28/sightlint/issues/34):
+The bounded first-alpha execution epic,
+[Issue #34](https://github.com/taro-28/sightlint/issues/34), is complete:
 
 1. [#22](https://github.com/taro-28/sightlint/issues/22) — realistic human-reviewed UI evaluation
    foundation (complete);
@@ -41,7 +41,9 @@ The near-term execution epic is
 4. [#42](https://github.com/taro-28/sightlint/issues/42) — one-command Codex
    edit/check/fix/rerun path (complete);
 5. [#33](https://github.com/taro-28/sightlint/issues/33) — license, compatibility, packaging, and
-   first alpha release.
+   first alpha release (complete).
+
+The earliest remaining research gate is [#25](https://github.com/taro-28/sightlint/issues/25).
 
 ## Why
 
@@ -195,9 +197,14 @@ advisory, while `uxVerdict` remains `cantTell`: identical pixels could express i
 This prototype does not generally support text, rounded cards, shadows, gradients, photos,
 antialiasing, hierarchy, semantic roles, or design intent.
 
-## Current commands
+## Install and current commands
 
-Use Cargo until packaging is defined:
+The first alpha is a source-only GitHub prerelease with a deterministic archive and SHA-256
+checksum. Verify, build, and remove it using [`docs/release.md`](docs/release.md); read the
+surface-specific guarantees in [`docs/compatibility.md`](docs/compatibility.md). Prebuilt binaries
+and registry packages are not published.
+
+From a verified source tree:
 
 ```bash
 # Structured Artifact IR check.
@@ -335,6 +342,9 @@ Read:
 - [`docs/roadmap.md`](docs/roadmap.md)
 - [`docs/decisions/README.md`](docs/decisions/README.md)
 - [`docs/development.md`](docs/development.md)
+- [`docs/compatibility.md`](docs/compatibility.md)
+- [`docs/dependency-policy.md`](docs/dependency-policy.md)
+- [`docs/release.md`](docs/release.md)
 
 ## Preserved backlog
 
@@ -350,11 +360,11 @@ Read:
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states, effects, traces, and recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
-| #33 | license, compatibility, packaging, and alpha release |
-| #34 | first evidence-backed zero-setup web UI alpha epic |
+| #33 | completed license, compatibility, source packaging, and alpha release gate |
+| #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0037 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0038 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.
@@ -397,6 +407,12 @@ SightLint is not intended to:
 
 ## License and release
 
-No open-source license has been selected and no release exists. The workspace remains
-`publish = false`. Public source visibility is not permission to use or redistribute the project.
-See proposed ADR 0007 and issue #33 before publishing or distributing an alpha.
+SightLint is licensed under your choice of [MIT](LICENSE-MIT) or
+[Apache-2.0](LICENSE-APACHE). Repository-authored fictional fixtures, generated corpus data, and
+documentation use the same terms unless a more specific notice says otherwise. Third-party
+dependencies and browser downloads retain their own licenses; see
+[`docs/dependency-policy.md`](docs/dependency-policy.md).
+
+`v0.1.0-alpha.1` is distributed as a source archive/checksum GitHub prerelease. Rust crates remain
+`publish = false` and the Node package remains private; no prebuilt binary, crates.io/npm package,
+container, signature, or attestation is claimed.

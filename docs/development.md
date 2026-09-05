@@ -42,16 +42,16 @@ base because its name appears to describe a desired future feature.
 
 ## Current task sequence
 
-Issue #34 is the near-term execution epic. Unless a repair is required, prefer:
+Issue #34's bounded execution sequence is complete:
 
 1. #22 — realistic evaluation corpus and annotation process (complete);
 2. #23 — Playwright web adapter and native/pixel evidence matrix (complete);
 3. #24 — first evaluated advisory recommended Web pack (complete);
 4. the local agent edit/check/fix/rerun demo in #34 (complete);
-5. #33 — license, packaging, compatibility, and alpha release (next).
+5. #33 — license, packaging, compatibility, and alpha release (complete).
 
-Other work remains available in #25–#31, but historical branch code does not make it higher
-priority. Explain any deviation in the issue and PR.
+The earliest remaining research gate is #25. Other work remains available in #26–#31, but
+historical branch code does not change priority. Explain any deviation in the issue and PR.
 
 ## Planning before implementation
 
@@ -120,6 +120,9 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+python3 tools/release.py validate-tag --tag v0.1.0-alpha.1
+python3 tools/check_dependency_licenses.py
+python3 -m unittest tools/test_release.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run check
@@ -259,7 +262,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0037 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0038 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs
@@ -289,7 +292,7 @@ identical to the original.
 ## Repository administration and release
 
 - #19 and #32: completed branch protection, legacy branch pruning, and automatic deletion/settings;
-- #33: license, compatibility, packaging, security checks, and alpha distribution.
+- #33: completed license, compatibility, source packaging, security checks, and alpha distribution.
 
 Do not report release administration as complete before direct repository/release evidence
 confirms it.

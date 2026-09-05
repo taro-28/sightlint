@@ -8,8 +8,8 @@
     "implementationOutputUsedAsOracle": false,
     "sourceId": "atlas-dashboard-repository-fixture-v0",
     "ownership": "sightlintRepository",
-    "license": "project-license-pending-repository-test-data",
-    "redistribution": "No independent grant; redistribution follows the repository license decision in issue 33.",
+    "license": "MIT OR Apache-2.0",
+    "redistribution": "Redistribution permitted under MIT OR Apache-2.0.",
     "privacyReview": "syntheticNoPersonalData",
     "externalAssets": false,
     "externalProcessing": false

@@ -89,16 +89,17 @@ historical evidence only even after its branch is gone.
 ## Current product sequence
 
 Issue #34 is the canonical execution epic for the first evidence-backed zero-setup web UI alpha.
-Until it is complete, prefer the earliest unblocked step:
+Its bounded sequence is complete:
 
 1. #22 — realistic, human-reviewed evaluation corpus and hard negatives (complete);
 2. #23 — isolated Playwright native/pixel web adapter and acquisition evidence matrix (complete);
 3. #24 — first evaluated advisory recommended Web pack (complete);
 4. #42 — the local agent edit/check/fix/rerun loop defined by #34 (complete);
-5. #33 — licensing, compatibility, packaging, and first alpha release (next).
+5. #33 — licensing, compatibility, packaging, and first alpha release (complete).
 
-Other work is preserved in #25–#31. It is not automatically higher priority because historical
-code once existed on a stale branch. Explain any deviation from the sequence in the issue and PR.
+The earliest remaining research gate is #25. Other work is preserved in #26–#31; later milestones
+do not automatically outrank it because historical code once existed on a stale branch. Explain
+any deviation from the remaining sequence in the issue and PR.
 
 ## Before editing
 
@@ -131,7 +132,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0037 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0038 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -158,6 +159,9 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
+python3 tools/release.py validate-tag --tag v0.1.0-alpha.1
+python3 tools/check_dependency_licenses.py
+python3 -m unittest tools/test_release.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run check
