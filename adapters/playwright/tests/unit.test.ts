@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { Ajv2020, type AnySchema } from "ajv/dist/2020.js";
 
 import { canonicalJson, sha256 } from "../src/canonical.js";
+import { parseAccessibilitySnapshot } from "../src/capture.js";
 import { LIMITS, type JsonValue } from "../src/types.js";
 import { parseCaptureRequest } from "../src/validate.js";
 
@@ -21,6 +22,21 @@ test("canonical JSON orders object keys, preserves array order, and normalizes n
   const encoded = canonicalJson(value);
   assert.equal(encoded, '{"a":[{"a":2,"z":1},"last"],"z":0}\n');
   assert.equal(sha256(encoded), "sha256:4fac6adbd6cba80f1be71fb64d4aabb12b4734c8da4c294659eaab14a59d4238");
+});
+
+test("accessibility snapshot parsing is linear for escaped and malformed names", () => {
+  const observed = parseAccessibilitySnapshot('- button "Save \\"draft\\"" [disabled focused]', true);
+  assert.equal(observed.status, "observed");
+  assert.equal(observed.role, "button");
+  assert.equal(observed.name, 'Save "draft"');
+  assert.deepEqual(observed.states, ["disabled", "focused"]);
+
+  const adversarial = `- A "${"\\!".repeat(4_096)}`;
+  const rejected = parseAccessibilitySnapshot(adversarial, true);
+  assert.equal(rejected.status, "cantTell");
+  assert.equal(rejected.role, null);
+  assert.equal(rejected.name, null);
+  assert.equal(rejected.rootLine, adversarial);
 });
 
 test("request parser accepts the reviewed capture request", async () => {

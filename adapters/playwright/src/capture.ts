@@ -130,7 +130,7 @@ function accessibilityRootEligible(node: BrowserNode): boolean {
   ].includes(node.tagName);
 }
 
-function parseAccessibilitySnapshot(snapshot: string, rootEligible: boolean): AccessibilitySummary {
+export function parseAccessibilitySnapshot(snapshot: string, rootEligible: boolean): AccessibilitySummary {
   const digest = sha256(snapshot);
   const firstLine = snapshot
     .split(/\r?\n/u)
@@ -147,7 +147,7 @@ function parseAccessibilitySnapshot(snapshot: string, rootEligible: boolean): Ac
       descendantsRedacted: true,
     };
   }
-  const match = /^-\s+([A-Za-z][A-Za-z0-9_-]*)(?:\s+"((?:\\.|[^"])*)")?(?:\s+\[([^\]]+)\])?:?$/u.exec(firstLine);
+  const match = /^-\s+([A-Za-z][A-Za-z0-9_-]*)(?:\s+"((?:\\.|[^"\\])*)")?(?:\s+\[([^\]]+)\])?:?$/u.exec(firstLine);
   if (match === null || match[1] === undefined) {
     return {
       status: "cantTell",
