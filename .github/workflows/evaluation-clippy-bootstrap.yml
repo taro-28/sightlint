@@ -31,14 +31,13 @@ jobs:
               ('baseline_case_id', 'baseline'),
               ('target_rule_id', 'target_rule'),
           ]:
+              count = text.count(old)
+              if count == 0:
+                  raise SystemExit(f'identifier marker not found: {old}')
               text = text.replace(old, new)
-          old = '''    value
-              .as_array()
-              .map(Vec::as_slice)
-              .unwrap_or_else(|| panic!("{context} must be a JSON array"))'''
-          new = '''    value
-              .as_array()
-              .map_or_else(|| panic!("{context} must be a JSON array"), Vec::as_slice)'''
+
+          old = "fn array<'a>(value: &'a Value, context: &str) -> &'a [Value] {\n    value\n        .as_array()\n        .map(Vec::as_slice)\n        .unwrap_or_else(|| panic!(\"{context} must be a JSON array\"))\n}"
+          new = "fn array<'a>(value: &'a Value, context: &str) -> &'a [Value] {\n    value\n        .as_array()\n        .map_or_else(|| panic!(\"{context} must be a JSON array\"), Vec::as_slice)\n}"
           if text.count(old) != 1:
               raise SystemExit(f'array helper marker mismatch: {text.count(old)}')
           path.write_text(text.replace(old, new))
