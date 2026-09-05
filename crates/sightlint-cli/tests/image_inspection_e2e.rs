@@ -113,7 +113,10 @@ fn assert_observations(case: &Value, report: &Value) {
     assert_eq!(report["canvas"]["unit"], "devicePixel", "{id}");
     let regions = report["regions"].as_array().expect("regions");
     let groups = report["groups"].as_array().expect("groups");
-    let bounds: Vec<Value> = regions.iter().map(|region| region["bounds"].clone()).collect();
+    let bounds: Vec<Value> = regions
+        .iter()
+        .map(|region| region["bounds"].clone())
+        .collect();
     assert_eq!(json!(bounds), expected["bounds"], "{id}: acquired bounds");
     let measured: Vec<Value> = groups
         .iter()
@@ -126,7 +129,10 @@ fn assert_observations(case: &Value, report: &Value) {
     assert_eq!(json!(measured), expected["groups"], "{id}: acquired gaps");
     assert_eq!(report["summary"]["regionCount"], regions.len(), "{id}");
     assert_eq!(report["summary"]["groupCount"], groups.len(), "{id}");
-    let unequal = groups.iter().filter(|group| group["pattern"] == "unequal").count();
+    let unequal = groups
+        .iter()
+        .filter(|group| group["pattern"] == "unequal")
+        .count();
     assert_eq!(report["summary"]["unequalGapGroupCount"], unequal, "{id}");
     if expected["status"] == "unavailable" {
         assert_eq!(report["reason"], expected["reason"], "{id}");
@@ -135,8 +141,14 @@ fn assert_observations(case: &Value, report: &Value) {
     } else {
         assert_eq!(report["uxVerdict"], "cantTell", "{id}");
         assert_eq!(report["backgroundHypothesis"]["confirmed"], false);
-        assert_eq!(report["backgroundHypothesis"]["calibration"], "notCalibrated");
-        assert_eq!(report["backgroundHypothesis"]["semanticConfidence"], Value::Null);
+        assert_eq!(
+            report["backgroundHypothesis"]["calibration"],
+            "notCalibrated"
+        );
+        assert_eq!(
+            report["backgroundHypothesis"]["semanticConfidence"],
+            Value::Null
+        );
         assert_links_and_measurements(report);
     }
 }
@@ -187,7 +199,11 @@ fn verify_valid_case(case: &Value, png: &[u8]) {
     let report: Value = serde_json::from_slice(&first.stdout).expect("inspection JSON");
     assert_observations(case, &report);
     let api = inspect_png(png).expect("native inspection");
-    assert_eq!(first.stdout, api.to_canonical_json().unwrap().as_bytes(), "{id}");
+    assert_eq!(
+        first.stdout,
+        api.to_canonical_json().unwrap().as_bytes(),
+        "{id}"
+    );
     let file = TempImage::new(png);
     let file_output = file.inspect("json");
     success(&file_output, id);
@@ -211,7 +227,10 @@ fn verify_valid_case(case: &Value, png: &[u8]) {
     let indirect = run(&["check", "-", "--format", "json"], &adapted.stdout);
     success(&direct, id);
     success(&indirect, id);
-    assert_eq!(direct.stdout, indirect.stdout, "{id}: trusted pipeline drift");
+    assert_eq!(
+        direct.stdout, indirect.stdout,
+        "{id}: trusted pipeline drift"
+    );
 }
 
 #[test]
@@ -266,7 +285,10 @@ fn mutation_is_observed_without_promoting_ambiguous_design_intent_to_failure() {
     assert_eq!(changed, inspect("intentional-grouping"));
     assert_eq!(changed["uxVerdict"], "cantTell");
     for id in ["translated", "recolored"] {
-        assert_eq!(changed["groups"][0]["gaps"], inspect(id)["groups"][0]["gaps"]);
+        assert_eq!(
+            changed["groups"][0]["gaps"],
+            inspect(id)["groups"][0]["gaps"]
+        );
     }
     assert_eq!(inspect("scaled")["groups"][0]["gaps"], json!([2, 4]));
     for id in ["hollow", "mixed-region"] {
@@ -292,11 +314,17 @@ fn corpus_integrity_and_cli_usage_are_explicit() {
     assert_eq!(ids.len(), 30);
     assert_eq!(cases.len(), 30);
     assert_eq!(
-        cases.iter().filter(|c| c["expected"]["status"] == "observed").count(),
+        cases
+            .iter()
+            .filter(|c| c["expected"]["status"] == "observed")
+            .count(),
         19
     );
     assert_eq!(
-        cases.iter().filter(|c| c["expected"]["status"] == "unavailable").count(),
+        cases
+            .iter()
+            .filter(|c| c["expected"]["status"] == "unavailable")
+            .count(),
         9
     );
     for id in [
