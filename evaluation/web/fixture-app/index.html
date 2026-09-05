@@ -136,6 +136,14 @@
                 <span class="small-visual-glyph" data-testid="small-visual-glyph" aria-hidden="true">+</span>
                 <span class="visually-hidden">Add a review note</span>
               </button>
+              <button
+                class="help-action"
+                type="button"
+                data-testid="help-action"
+                aria-label="Open help center"
+              >
+                <span aria-hidden="true">?</span>
+              </button>
               <button type="button" data-testid="disabled-action" disabled>Publish summary</button>
               <button class="disclosure-action" type="button" data-testid="hidden-action">Archive report</button>
               <button class="offscreen-action" type="button" data-testid="offscreen-action">Export evidence</button>
@@ -149,6 +157,20 @@
               <strong>Review guidance</strong>
               <p>Compare the source note before publishing.</p>
             </aside>
+          </div>
+
+          <div class="control-clip-viewport" data-testid="control-clip-viewport">
+            <button class="clipped-action" type="button" data-testid="clipped-action">
+              Open inspector
+            </button>
+          </div>
+
+          <div
+            class="ambiguous-action"
+            tabindex="0"
+            data-testid="ambiguous-action"
+          >
+            Keyboard surface with unknown role
           </div>
         </section>
       </main>

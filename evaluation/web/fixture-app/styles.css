@@ -419,6 +419,18 @@ body[data-case="ambiguous-peer-group"] .metric-card-third {
   background: #eef9f5;
 }
 
+.help-action {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #c4ccd9;
+  border-radius: 10px;
+  color: #33405a;
+  background: #ffffff;
+  font-weight: 800;
+}
+
 .small-visual-glyph {
   display: grid;
   width: 18px;
@@ -448,8 +460,36 @@ body[data-case="ambiguous-peer-group"] .metric-card-third {
 }
 
 .accidental-blocker,
-.intentional-popover {
+.intentional-popover,
+.control-clip-viewport,
+.ambiguous-action {
   display: none;
+}
+
+.control-clip-viewport {
+  width: 176px;
+  height: 52px;
+  border: 1px solid #c4ccd9;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.clipped-action {
+  width: 148px;
+  height: 40px;
+  margin: 5px 0 0 -24px;
+  border: 1px solid #245f50;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #287b66;
+}
+
+.ambiguous-action {
+  padding: 12px 16px;
+  border: 1px dashed #7b879b;
+  border-radius: 10px;
+  color: #33405a;
+  background: #ffffff;
 }
 
 body[data-case="clipping-mutant"] .notification-card {
@@ -505,15 +545,42 @@ body[data-case="intentional-overlay"] .review-action-wrap {
 body[data-case="intentional-overlay"] .intentional-popover {
   position: absolute;
   z-index: 2;
-  top: 52px;
-  left: -220px;
-  display: block;
-  width: 240px;
+  inset: -8px;
+  display: grid;
+  width: 170px;
+  min-height: 58px;
   padding: 14px;
   border: 1px solid #c4ccd9;
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 12px 30px rgb(31 42 66 / 16%);
+}
+
+body[data-case="control-boundaries"] .control-clip-viewport,
+body[data-case="control-clip-mutant"] .control-clip-viewport,
+body[data-case="scrollable-control-hard-negative"] .control-clip-viewport {
+  position: fixed;
+  z-index: 3;
+  top: 360px;
+  right: 48px;
+  display: block;
+  overflow: visible;
+}
+
+body[data-case="control-clip-mutant"] .control-clip-viewport {
+  overflow: hidden;
+}
+
+body[data-case="scrollable-control-hard-negative"] .control-clip-viewport {
+  overflow: auto;
+}
+
+body[data-case="ambiguous-control"] .ambiguous-action {
+  position: fixed;
+  z-index: 3;
+  top: 360px;
+  right: 48px;
+  display: block;
 }
 
 body[data-case="intentional-overlay"] .intentional-popover p {
@@ -527,7 +594,8 @@ body[data-case="control-offscreen-mutant"] .offscreen-action {
 }
 
 body[data-case="control-boundaries"] .control-boundaries,
-body[data-case="control-offscreen-mutant"] .control-boundaries {
+body[data-case="control-offscreen-mutant"] .control-boundaries,
+body[data-case="unnamed-control-mutant"] .control-boundaries {
   position: fixed;
   z-index: 3;
   top: 116px;

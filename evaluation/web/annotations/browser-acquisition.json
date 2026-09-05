@@ -1,6 +1,6 @@
 {
   "$schema": "../browser-acquisition.schema.json",
-  "schemaVersion": "0.2.0",
+  "schemaVersion": "0.3.0",
   "documentType": "browserAcquisitionOracle",
   "provenance": {
     "authoringBasis": "humanReviewedFixtureContract",
@@ -115,6 +115,69 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The unequal visual intervals are measurable, while peer intent remains deliberately unresolved."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-ambiguous-control",
+      "request": "evaluation/web/requests/dashboard-browser-ambiguous-control.json",
+      "split": "development",
+      "classification": "ambiguous",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 39,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-ambiguous-action",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:ambiguous-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "interactiveRoleAndName",
+          "outcome": "cantTell",
+          "rationale": "A focusable generic div is pointer/keyboard interactive, but this capture does not expose a supported platform role or name."
+        },
+        {
+          "aspect": "componentPurpose",
+          "outcome": "cantTell",
+          "rationale": "Visible text does not authorize the adapter to invent an accessibility role."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The focusable generic surface intentionally lacks supported platform semantics so the name rule must preserve acquisition ambiguity."
       }
     },
     {
@@ -524,6 +587,100 @@
       }
     },
     {
+      "caseId": "dashboard-browser-control-clip",
+      "request": "evaluation/web/requests/dashboard-browser-control-clip.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 39,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-clipped-action",
+            "parentId": "web-control-clip-viewport",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Open inspector",
+            "display": "inline-block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:clipped-action"
+            },
+            "ancestorClipStatus": "partiallyClipped"
+          },
+          {
+            "id": "web-control-clip-viewport",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": false,
+            "overflowX": "hidden",
+            "overflowMeasurement": {
+              "horizontal": "absent",
+              "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "nonRectangularVisibleArea",
+          "outcome": "cantTell",
+          "rationale": "The adapter proves rectangular ancestor clipping but does not segment the control's visible pixels."
+        },
+        {
+          "aspect": "completeHitRegion",
+          "outcome": "cantTell",
+          "rationale": "The unchanged center hit does not prove the clipped edge remains usable."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+        "target": "web-clipped-action",
+        "changedProperty": "control viewport overflow from visible to hidden",
+        "preservedProperties": [
+          "control role and accessible name",
+          "control layout and render boxes",
+          "center hit sample",
+          "viewport, network, and privacy policy"
+        ],
+        "evidenceExpectations": [
+          "ancestorClipping"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The parent overflow mutation clips only the stable control edge while preserving its native semantics, geometry, and center hit."
+      }
+    },
+    {
       "caseId": "dashboard-browser-control-offscreen",
       "request": "evaluation/web/requests/dashboard-browser-control-offscreen.json",
       "split": "development",
@@ -769,13 +926,13 @@
             "accessibilityStatus": "observed",
             "role": "dialog",
             "name": "Review guidance",
-            "display": "block",
+            "display": "grid",
             "layoutRenderStatus": "agreement",
             "screenshotGeometryCoverage": "insideScreenshotExtent",
             "interactive": false,
             "renderSize": {
-              "width": 240,
-              "height": 84,
+              "width": 170,
+              "height": 58,
               "tolerance": 1,
               "unit": "cssPixel"
             },
@@ -792,8 +949,8 @@
             "screenshotGeometryCoverage": "insideScreenshotExtent",
             "interactive": true,
             "centerHitSample": {
-              "outcome": "hit",
-              "hitLocator": "testid:review-action"
+              "outcome": "occluded",
+              "hitLocator": "testid:intentional-popover"
             },
             "ancestorClipStatus": "notClipped"
           }
@@ -818,9 +975,9 @@
       },
       "review": {
         "status": "maintainerReviewed",
-        "reviewedAt": "2026-09-05",
+        "reviewedAt": "2026-09-06",
         "qualification": "repository maintainer product review",
-        "rationale": "The dialog role and stable hierarchy distinguish this intentional overlay from the accidental center blocker."
+        "rationale": "The source-declared dialog deliberately covers the review action center; native dialog semantics distinguish this hard negative from the accidental aria-hidden blocker."
       }
     },
     {
@@ -1703,6 +1860,90 @@
       }
     },
     {
+      "caseId": "dashboard-browser-scrollable-control",
+      "request": "evaluation/web/requests/dashboard-browser-scrollable-control.json",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 39,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-clipped-action",
+            "parentId": "web-control-clip-viewport",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Open inspector",
+            "display": "inline-block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:clipped-action"
+            },
+            "ancestorClipStatus": "partiallyClipped"
+          },
+          {
+            "id": "web-control-clip-viewport",
+            "parentId": "web-operations-panel",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "block",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+          "interactive": false,
+          "overflowX": "auto",
+          "overflowMeasurement": {
+            "horizontal": "absent",
+            "vertical": "absent"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "controlReachabilityAfterScroll",
+          "outcome": "cantTell",
+          "rationale": "Static capture does not execute or prove the scroll interaction that can reveal the clipped edge."
+        },
+        {
+          "aspect": "completeHitRegion",
+          "outcome": "cantTell",
+          "rationale": "One center hit remains insufficient to measure the complete activation region."
+        }
+      ],
+      "hardNegative": {
+        "category": "scrollablePartialControl",
+        "rationale": "A partially visible control inside an explicitly scrollable region is not equivalent to hidden/clip truncation and must not become an automatic failure."
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The scrollable ancestor preserves the same partial rectangle as the hidden mutant but changes the valid interaction alternative and therefore the rule verdict."
+      }
+    },
+    {
       "caseId": "dashboard-browser-spacing-mutant",
       "request": "evaluation/web/requests/dashboard-browser-spacing-mutant.json",
       "split": "development",
@@ -2024,6 +2265,83 @@
         "reviewedAt": "2026-09-05",
         "qualification": "repository maintainer product review",
         "rationale": "The text transform preserves computed font size while shrinking the render rectangle, so both observations must remain in conflict."
+      }
+    },
+    {
+      "caseId": "dashboard-browser-unnamed-control",
+      "request": "evaluation/web/requests/dashboard-browser-unnamed-control.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "unit": "cssPixel"
+        },
+        "minimumDocumentHeight": 800,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 39,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-help-action",
+            "parentId": "web-control-boundaries",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": null,
+            "display": "grid",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent",
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": {
+              "outcome": "hit",
+              "hitLocator": "testid:help-action"
+            },
+            "ancestorClipStatus": "notClipped"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "accessibleNamePurpose",
+          "outcome": "cantTell",
+          "rationale": "The platform snapshot proves that the name is absent, but acquisition alone does not infer the intended label text."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The icon pixels are synchronized but not segmented or matched to the native control."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+        "target": "web-help-action",
+        "changedProperty": "aria-label from Open help center to absent",
+        "preservedProperties": [
+          "visible icon and rendered pixels",
+          "button role and geometry",
+          "center hit sample",
+          "network and privacy policy"
+        ],
+        "evidenceExpectations": [
+          "accessibilityName"
+        ]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source mutation removes only the icon button's accessible-name declaration; the platform snapshot must retain the button role and an absent name."
       }
     }
   ]

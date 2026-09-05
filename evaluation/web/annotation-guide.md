@@ -1,7 +1,8 @@
 # Web evaluation annotation guide
 
-- Guide version: `0.1.0`
-- Governing decisions: ADR 0032; browser companion evolution in ADRs 0033 and 0034
+- Guide version: `0.2.0`
+- Governing decisions: ADR 0032; browser companion and recommended-profile evolution in ADRs
+  0033–0035
 - Initial reviewer qualification: repository maintainer product review
 
 ## Purpose
@@ -33,9 +34,11 @@ The ADR 0033/0034 companion oracle may label those browser observations only whe
 them in one synchronized run. It uses tolerances for authored CSS relationships rather than
 snapshot-blessing exact platform coordinates. It must keep semantic peer membership and
 pixel-content identity as `untested` or `cantTell` when the current protocol does not observe them.
-Browser acquisition oracle `0.2.0` may separately assert client/scroll overflow, rectangular
+Browser acquisition oracle `0.3.0` may separately assert client/scroll overflow, rectangular
 ancestor clipping, computed writing mode, and render-box-center hit samples. It must keep complete
-hit regions `cantTell`; a center sample is never annotated as an exact hit rectangle.
+hit regions `cantTell`; a center sample is never annotated as an exact hit rectangle. Version
+`0.3.0` also records the accessibility-name mutation as an acquisition expectation without
+placing a WCAG or product verdict in the acquisition document.
 
 Browser acquisition annotations and browser rule annotations are separate documents. A measured
 layout/render transform is acquisition truth. Whether an existing deterministic rule can act on
@@ -61,6 +64,13 @@ Rule annotations state:
 - likely false-positive risk;
 - reviewer status and rationale.
 
+Browser rule oracle `0.2.0` additionally defines each admitted recommended rule once, including
+its profile, policy source, required evidence, applicability, valid alternatives, false-positive
+risks, maturity, enforcement, and named pass/fail/abstention/hard-negative cases. Expected results
+repeat that policy identity so the E2E can prove the report did not silently select a different
+authority. A `failed` advisory result remains distinct from a blocking failure and does not by
+itself require exit code 1.
+
 An unequal measured gap is a failure only when the compared nodes are confirmed equivalent peers
 and the explicit fixture policy requires a uniform gap. Intentional grouping and disputed peer
 membership are not failed spacing obligations.
@@ -79,7 +89,7 @@ A targeted mutation must:
 
 The browser companion's targeted mutations each reference a clean browser request and name one
 source change. Their `evidenceExpectations` identify layout/render conflict, offset, clipping,
-overflow, center hit, or peer-dimension evidence that must expose the change. Acquisition-only
+overflow, center hit, peer-dimension, or accessibility-name evidence that must expose the change. Acquisition-only
 mutations may remain rule-inapplicable; a test must not invent semantic relations simply to raise a
 mutation-kill count.
 
@@ -89,8 +99,8 @@ A hard negative intentionally resembles a defect but is valid. The initial hard 
 promotion beside two repeated metrics. It is not a third metric peer, so visual asymmetry must not
 become a spacing failure.
 
-Current browser hard negatives cover intentional metric grouping and a source-declared dialog
-overlay. Future additions should cover mixed variants, masonry, editorial asymmetry, badges,
+Current browser hard negatives cover intentional metric grouping, a source-declared dialog
+overlay, and a partially visible control inside an explicitly scrollable region. Future additions should cover mixed variants, masonry, editorial asymmetry, badges,
 sticky elements, charts, photographs, skeletons, and loading/error/empty states.
 
 ## Review and oracle changes

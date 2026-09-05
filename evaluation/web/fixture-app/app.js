@@ -8,8 +8,10 @@
     "intentional-grouping",
     "ambiguous-peer-group",
     "clipping-mutant",
+    "control-clip-mutant",
     "control-boundaries",
     "control-offscreen-mutant",
+    "ambiguous-control",
     "intentional-overlay",
     "notification-clean",
     "occlusion-clean",
@@ -19,6 +21,8 @@
     "responsive-mobile-mutant",
     "rtl-vertical",
     "transformed-text-mutant",
+    "unnamed-control-mutant",
+    "scrollable-control-hard-negative",
   ]);
   const parameters = new URLSearchParams(window.location.search);
   const requestedCase = parameters.get("case") || "peer-spacing-clean";
@@ -29,6 +33,9 @@
   document.body.dataset.case = fixtureCase;
   document.documentElement.dir = fixtureCase === "rtl-vertical" ? "rtl" : "ltr";
   document.documentElement.style.fontSize = `${16 * textScale}px`;
+  if (fixtureCase === "unnamed-control-mutant") {
+    document.querySelector("[data-testid='help-action']")?.removeAttribute("aria-label");
+  }
   document.documentElement.dataset.fixtureReady = "true";
 
   Object.defineProperty(window, "__SIGHTLINT_FIXTURE__", {

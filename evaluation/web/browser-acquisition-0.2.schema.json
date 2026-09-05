@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sightlint:schema:web-browser-acquisition-oracle:0.3.0",
+  "$id": "urn:sightlint:schema:web-browser-acquisition-oracle:0.2.0",
   "title": "SightLint reviewed browser acquisition oracle",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "schemaVersion", "documentType", "provenance", "cases"],
   "properties": {
     "$schema": { "const": "../browser-acquisition.schema.json" },
-    "schemaVersion": { "const": "0.3.0" },
+    "schemaVersion": { "const": "0.2.0" },
     "documentType": { "const": "browserAcquisitionOracle" },
     "provenance": { "$ref": "#/$defs/provenance" },
     "cases": {
@@ -169,7 +169,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-              "enum": ["layoutRenderConflict", "renderOffset", "ancestorClipping", "overflowMeasurement", "centerHitSample", "peerDimensionDifference", "accessibilityName"]
+            "enum": ["layoutRenderConflict", "renderOffset", "ancestorClipping", "overflowMeasurement", "centerHitSample", "peerDimensionDifference"]
           }
         }
       }
