@@ -8,6 +8,7 @@
 
 mod filter;
 mod inflate;
+pub mod inspection;
 mod raster;
 mod structure;
 
