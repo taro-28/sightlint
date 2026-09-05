@@ -19,8 +19,8 @@ def chunk(kind, data):
 
 def encode(width, height, pixels):
     rows = b''.join(b'\0' + bytes(pixels[y * width * 4:(y + 1) * width * 4]) for y in range(height))
-    assert 0 < len(rows) <= 65535
-    stream = b'\x78\x01\x01' + struct.pack('<HH', len(rows), 65535 - len(rows)) + rows + struct.pack('>I', zlib.adler32(rows))
+    compressor = zlib.compressobj(9, zlib.DEFLATED, 15, 8, zlib.Z_FIXED)
+    stream = compressor.compress(rows) + compressor.flush()
     return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 6, 0, 0, 0))
             + chunk(b'IDAT', stream) + chunk(b'IEND', b''))
 

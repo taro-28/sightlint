@@ -426,11 +426,19 @@ mod tests {
             let mut pixels = Vec::new();
             for row in 0..height {
                 for column in 0..65 {
-                    let gray = if row % 2 == 1 && column % 2 == 1 { 0 } else { 255 };
+                    let gray = if row % 2 == 1 && column % 2 == 1 {
+                        0
+                    } else {
+                        255
+                    };
                     pixels.extend_from_slice(&[gray, gray, gray, 255]);
                 }
             }
-            let raster = EncodedRgba8Raster { width: 65, height, pixels };
+            let raster = EncodedRgba8Raster {
+                width: 65,
+                height,
+                pixels,
+            };
             let mut report = json!({"regions": [], "groups": [], "status": "unavailable"});
             inspect_raster(&raster, &mut report).unwrap();
             if height == 65 {
@@ -448,7 +456,11 @@ mod tests {
     fn actual_pixel_budget_boundary_never_emits_partial_observations() {
         for width in [2_048_u32, 2_049] {
             let count = usize::try_from(width * 2_048 * 4).unwrap();
-            let raster = EncodedRgba8Raster { width, height: 2_048, pixels: vec![255; count] };
+            let raster = EncodedRgba8Raster {
+                width,
+                height: 2_048,
+                pixels: vec![255; count],
+            };
             let mut report = json!({"regions": [], "groups": [], "status": "unavailable"});
             inspect_raster(&raster, &mut report).unwrap();
             if width == 2_048 {

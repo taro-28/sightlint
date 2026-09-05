@@ -25,7 +25,10 @@ fn corpus(directory: &str) -> Vec<Value> {
 
 fn bytes(case: &Value, rasters: &[Value]) -> Vec<u8> {
     let source = if let Some(id) = case["rasterCase"].as_str() {
-        rasters.iter().find(|item| item["id"] == id).expect("source case")
+        rasters
+            .iter()
+            .find(|item| item["id"] == id)
+            .expect("source case")
     } else {
         case
     };
@@ -46,12 +49,22 @@ fn run(args: &[&str], input: &[u8]) -> Output {
         .stderr(Stdio::piped())
         .spawn()
         .expect("spawn public binary");
-    child.stdin.take().expect("stdin").write_all(input).expect("write input");
+    child
+        .stdin
+        .take()
+        .expect("stdin")
+        .write_all(input)
+        .expect("write input");
     child.wait_with_output().expect("collect output")
 }
 
 fn success(output: &Output, id: &str) {
-    assert_eq!(output.status.code(), Some(0), "{id}: {}", String::from_utf8_lossy(&output.stderr));
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "{id}: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
     assert!(output.stderr.is_empty(), "{id}: unexpected stderr");
 }
 
@@ -61,9 +74,13 @@ impl TempImage {
     fn new(bytes: &[u8]) -> Self {
         let sequence = TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed);
         let path = std::env::temp_dir().join(format!(
-            "sightlint-inspection-{}-{sequence}.png", std::process::id()
+            "sightlint-inspection-{}-{sequence}.png",
+            std::process::id()
         ));
-        let mut file = OpenOptions::new().write(true).create_new(true).open(&path)
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
             .expect("unique temporary PNG");
         file.write_all(bytes).expect("write native fixture");
         Self(path)
@@ -71,8 +88,11 @@ impl TempImage {
 
     fn inspect(&self, format: &str) -> Output {
         Command::new(env!("CARGO_BIN_EXE_sightlint"))
-            .arg("inspect-image").arg(&self.0).args(["--format", format])
-            .output().expect("file inspection")
+            .arg("inspect-image")
+            .arg(&self.0)
+            .args(["--format", format])
+            .output()
+            .expect("file inspection")
     }
 }
 
@@ -95,9 +115,14 @@ fn assert_observations(case: &Value, report: &Value) {
     let groups = report["groups"].as_array().expect("groups");
     let bounds: Vec<Value> = regions.iter().map(|region| region["bounds"].clone()).collect();
     assert_eq!(json!(bounds), expected["bounds"], "{id}: acquired bounds");
-    let measured: Vec<Value> = groups.iter().map(|group| json!({
-        "axis": group["axis"], "gaps": group["gaps"], "pattern": group["pattern"]
-    })).collect();
+    let measured: Vec<Value> = groups
+        .iter()
+        .map(|group| {
+            json!({
+                "axis": group["axis"], "gaps": group["gaps"], "pattern": group["pattern"]
+            })
+        })
+        .collect();
     assert_eq!(json!(measured), expected["groups"], "{id}: acquired gaps");
     assert_eq!(report["summary"]["regionCount"], regions.len(), "{id}");
     assert_eq!(report["summary"]["groupCount"], groups.len(), "{id}");
@@ -118,7 +143,10 @@ fn assert_observations(case: &Value, report: &Value) {
 
 fn assert_links_and_measurements(report: &Value) {
     let regions = report["regions"].as_array().expect("regions");
-    let ids: BTreeSet<&str> = regions.iter().map(|r| r["id"].as_str().expect("id")).collect();
+    let ids: BTreeSet<&str> = regions
+        .iter()
+        .map(|r| r["id"].as_str().expect("id"))
+        .collect();
     assert_eq!(ids.len(), regions.len());
     assert_eq!(report["evidence"][0]["id"], "raster");
     for region in regions {
@@ -137,8 +165,12 @@ fn assert_links_and_measurements(report: &Value) {
         for member in group["regionIds"].as_array().expect("members") {
             assert!(ids.contains(member.as_str().expect("member id")));
         }
-        let gaps: Vec<u64> = group["gaps"].as_array().expect("gaps")
-            .iter().map(|gap| gap.as_u64().expect("integer gap")).collect();
+        let gaps: Vec<u64> = group["gaps"]
+            .as_array()
+            .expect("gaps")
+            .iter()
+            .map(|gap| gap.as_u64().expect("integer gap"))
+            .collect();
         let minimum = *gaps.iter().min().expect("at least two gaps");
         let maximum = *gaps.iter().max().expect("at least two gaps");
         assert_eq!(group["minimumGap"], minimum);
@@ -205,7 +237,10 @@ fn committed_native_corpus_matches_regions_gaps_abstentions_and_real_cli() {
             verify_valid_case(case, &png);
         }
     }
-    println!("{} native inspection cases verified; no semantic UX accuracy claimed", cases.len());
+    println!(
+        "{} native inspection cases verified; no semantic UX accuracy claimed",
+        cases.len()
+    );
 }
 
 #[test]
@@ -213,8 +248,14 @@ fn mutation_is_observed_without_promoting_ambiguous_design_intent_to_failure() {
     let cases = corpus("image-inspection");
     let rasters = corpus("png-raster");
     let inspect = |id: &str| {
-        let case = cases.iter().find(|case| case["id"] == id).expect("named case");
-        let output = run(&["inspect-image", "-", "--format", "json"], &bytes(case, &rasters));
+        let case = cases
+            .iter()
+            .find(|case| case["id"] == id)
+            .expect("named case");
+        let output = run(
+            &["inspect-image", "-", "--format", "json"],
+            &bytes(case, &rasters),
+        );
         success(&output, id);
         serde_json::from_slice::<Value>(&output.stdout).expect("report")
     };
@@ -233,7 +274,10 @@ fn mutation_is_observed_without_promoting_ambiguous_design_intent_to_failure() {
     }
     assert_eq!(inspect("hollow")["regions"][0]["pixelCount"], 16);
     for id in ["cards-clean", "cards-mutated"] {
-        let source = rasters.iter().find(|case| case["id"] == id).expect("source");
+        let source = rasters
+            .iter()
+            .find(|case| case["id"] == id)
+            .expect("source");
         assert_eq!(source["future"]["status"], "untested");
     }
 }
@@ -241,15 +285,36 @@ fn mutation_is_observed_without_promoting_ambiguous_design_intent_to_failure() {
 #[test]
 fn corpus_integrity_and_cli_usage_are_explicit() {
     let cases = corpus("image-inspection");
-    let ids: BTreeSet<&str> = cases.iter().map(|case| case["id"].as_str().unwrap()).collect();
+    let ids: BTreeSet<&str> = cases
+        .iter()
+        .map(|case| case["id"].as_str().unwrap())
+        .collect();
     assert_eq!(ids.len(), 30);
     assert_eq!(cases.len(), 30);
-    assert_eq!(cases.iter().filter(|c| c["expected"]["status"] == "observed").count(), 19);
-    assert_eq!(cases.iter().filter(|c| c["expected"]["status"] == "unavailable").count(), 9);
-    for id in ["blocker", "different-size", "different-color", "diagonal", "touching", "two-rows", "intentional-grouping"] {
+    assert_eq!(
+        cases.iter().filter(|c| c["expected"]["status"] == "observed").count(),
+        19
+    );
+    assert_eq!(
+        cases.iter().filter(|c| c["expected"]["status"] == "unavailable").count(),
+        9
+    );
+    for id in [
+        "blocker",
+        "different-size",
+        "different-color",
+        "diagonal",
+        "touching",
+        "two-rows",
+        "intentional-grouping",
+    ] {
         assert!(ids.contains(id), "missing negative/structural control {id}");
     }
-    for args in [vec!["inspect-image"], vec!["inspect-image", "-", "--format", "xml"], vec!["inspect-image", "-", "--deny-cant-tell"]] {
+    for args in [
+        vec!["inspect-image"],
+        vec!["inspect-image", "-", "--format", "xml"],
+        vec!["inspect-image", "-", "--deny-cant-tell"],
+    ] {
         assert_eq!(run(&args, &[]).status.code(), Some(2));
     }
 }

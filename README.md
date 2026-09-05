@@ -8,8 +8,9 @@ It is designed for both humans and coding agents.
 
 > **Status: pre-alpha.** The repository is establishing its contracts and verification
 > boundaries before implementing broad artifact support. Do not depend on the current API.
-> Screenshot-only UI/UX defect detection is not yet implemented. A successful PNG adaptation
-> or a green synthetic test suite is not evidence of real-world design-review accuracy.
+> General screenshot-only UI/UX defect detection is not yet implemented. Image inspection
+> supplies narrow, advisory-only region and gap observations, not semantic UX pass/fail verdicts.
+> A green synthetic test suite is not evidence of real-world design-review accuracy.
 
 ## Why
 
@@ -77,8 +78,9 @@ The adapter reports explicit raster unavailability for palette, non-eight-bit, t
 markers, or over-budget expansion. This is not a claim that unsupported ancillary semantics
 have been fully validated. Raw pixels are available only through the native adapter API;
 serialized IR contains versioned availability, counts, a regression checksum, and provenance.
-No ink bounds, text, components, roles, peer groups, or automatic UX findings are inferred.
-Later-stage draft PRs are not completed features. See [ADR 0030](docs/decisions/0030-verified-staged-raster-and-corpus.md).
+No ink bounds, text, components, roles, peer groups, or automatic UX findings are inferred by
+`adapt-image` or `check-image`. Later-stage draft PRs are not completed features.
+See [ADR 0030](docs/decisions/0030-verified-staged-raster-and-corpus.md).
 
 ## Current deterministic command surface
 
@@ -99,6 +101,9 @@ cargo run -p sightlint-cli -- adapt-image screenshot.png
 # Adapt a PNG and immediately run the same deterministic rule engine.
 cargo run -p sightlint-cli -- check-image screenshot.png --format json
 
+# Observe region and gap candidates without a blocking UX verdict.
+cargo run -p sightlint-cli -- inspect-image screenshot.png --format json
+
 # Binary stdin is supported for image adaptation too.
 cat screenshot.png | cargo run -p sightlint-cli -- adapt-image -
 
@@ -117,13 +122,41 @@ consume raster samples as semantic nodes or peer groups. Exit zero does not mean
 screenshot has passed a comprehensive UI/UX review. Inspect individual `results` and their
 applicability; the report schema does not contain a `findings` field.
 
-The public exit-code contract is:
+The public exit-code contract for checks is:
 
 | Code | Meaning |
 |---:|---|
 | `0` | No failed results; `cantTell` remains advisory unless explicitly denied |
 | `1` | A rule failed, or strict policy denied a `cantTell` result |
 | `2` | Usage, I/O, decoding, adapter validation, or semantic IR validation error |
+
+## Advisory image inspection
+
+`inspect-image` is a separate, opt-in acquisition experiment, not a new blocking rule. Given
+an entirely opaque raster with a single-color perimeter, it hypothesizes that color as the
+background and measures four-connected regions that differ from it. Same-size, single-color
+solid rectangles aligned in a row or column can form repeated-shape candidates. A foreign
+region intersecting the intervening strip prevents that grouping.
+
+The report includes exact source-device-pixel bounds and gaps, evidence links, the background
+hypothesis, uncalibrated semantic confidence, and `blocking: false`. The committed card pair
+has observed gaps `[1, 1]` and `[1, 2]`. The second receives an unequal-gap advisory, but both
+retain `uxVerdict: cantTell`: identical pixels could also represent intentional grouping.
+The unchanged old future semantic-spacing oracle remains `untested`.
+
+No options are needed to select candidate shapes. JSON output has `inspectionSchemaVersion`
+0.1.0, independently of Artifact IR and CheckReport. Human output says advisory-only. Exit 0
+means the inspection ran or returned explicit unavailable coverage, not that a design is good.
+Exit 2 indicates input, usage, I/O, or execution failure. This command never exits 1 and does
+not accept `--deny-cant-tell`; heuristic observations cannot silently block a build.
+
+Inspection is limited to 4,194,304 pixels and 1,024 connected regions. Exceeding either limit,
+nonopaque pixels, a varying border, or unavailable source pixels produces an explicit reason
+and no partial region/group output. These limits are checked after the existing bounded PNG
+acquisition. Rounded cards, text, shadows, gradients, photographs, and complex layouts are
+not generally supported; this prototype is not a general screenshot design reviewer.
+See [ADR 0031](docs/decisions/0031-advisory-image-region-inspection.md) and the
+[observation evaluation contract](evaluation/image-inspection.md).
 
 ## Executable verification and evaluation
 
@@ -135,42 +168,31 @@ reproducible and executes the real `sightlint` binary on Linux, macOS, and Windo
 independent expected-pixel, unavailable, or malformed-input outcomes. It checks the native API's
 actual pixels, the CLI checksum and evidence, file/stdin equivalence, normalization, direct and
 two-step command paths, and repeated output bytes. A separate generator check detects fixture
-drift. Its clean and mutated card layouts retain future spacing ground truth as **untested**;
-successfully decoding them is not counted as detecting their spacing difference.
+drift. Its clean and mutated card layouts retain future semantic spacing ground truth as
+**untested**; successfully decoding them is not counted as detecting a UX defect.
 
-`evaluation/` is a separate, versioned product oracle. Its smoke corpus runs the public
-binary repeatedly, verifies declared rule outcomes, rejects undeclared failures or abstentions,
-and requires targeted mutations to change the named rule from `passed` to `failed`. This prevents
-a green contract suite from being mistaken for proof that the tool still behaves as intended.
-The initial corpus is synthetic IR regression data, not evidence of real-world precision or
-automatic structure acquisition from images.
+[The image-inspection corpus](fixtures/image-inspection/corpus.json) adds 30 observation cases:
+19 observed, nine unavailable, and two malformed. It verifies the real public binary's acquired
+bounds and gaps against independently specified oracles. Controls include horizontal/vertical
+patterns, translation, scaling, recoloring, blockers, different sizes/colors, holes, diagonal
+contact, alpha, and intentional unequal grouping. API/file/stdin/JSON/human output, evidence
+links, determinism, and preserved check-image behavior are exercised. Actual pixel/component
+budget boundaries also have direct raster tests. CI runs its generator check and E2E explicitly.
+
+`evaluation/` is a separate, versioned product oracle. Its existing rule smoke corpus runs the
+public binary repeatedly, verifies declared rule outcomes, rejects undeclared failures or
+abstentions, and requires targeted mutations to change the named rule from `passed` to `failed`.
+The inspection acquisition oracle remains separate from that rule schema so measured patterns
+are not misrepresented as semantic rule outcomes. Both suites are synthetic regressions, not
+evidence of real-world precision. New claims require appropriate acquisition and rule oracles.
 
 The public-binary test suites additionally construct deterministic PNG byte streams and feed
 them through binary stdin. Their zlib coverage combines an independent test-only stored-DEFLATE
-encoder with fixed- and dynamic-Huffman streams generated by Python's zlib implementation, so
-the production inflater is not validated only against data produced by one local fixture encoder.
+encoder with fixed- and dynamic-Huffman streams generated by Python's zlib implementation.
+Inspection fixtures use Python's independent fixed-Huffman encoder and explicit shape/gap
+oracles; they do not derive expected regions by running SightLint. Generator drift fails CI.
 Filter tests use independent forward encoders and known packed-byte answers. Public E2E also
 compares direct `check-image` output against `adapt-image` followed by `check` byte for byte.
-
-The corpus and generated binary cases include:
-
-- clean web, mobile, slide, document, PDF, image, and other IR artifacts
-- targeted spacing, overlap, out-of-canvas, containment, alignment, extent, and typography mutations
-- missing and incomparable evidence that must return `cantTell`
-- inapplicable rule cases
-- zero and non-zero tolerance boundaries for declared visual contracts
-- explicit right-to-left and vertical-up logical alignment cases
-- malformed JSON, malformed official visual extensions, and semantically invalid IR
-- valid PNG grayscale, RGB, indexed, grayscale-alpha, RGBA, and Adam7 variants
-- complete PNG chunk ordering, CRC, palette, termination, and resource-limit cases
-- valid zlib streams split across `IDAT` boundaries, including the Adler-32 trailer
-- malformed DEFLATE, bad Adler-32, decoded-length mismatch, trailing compressed data, and decoded-size limits
-- all five scanline filters, packed and multi-byte predictor widths, pass resets, and invalid selectors
-- exact supported RGBA samples, hidden RGB under zero alpha, and explicit raster unavailability
-- reordered but semantically equivalent documents and visual contracts
-- preservation of unknown extensions while the official visual extension is validated and canonicalized
-- standard-input, output-format, normalization, safety-limit, and exit-code cases
-- repeated byte-for-byte determinism checks for both adapted IR and reports
 
 A new public rule or adapter is not complete without corresponding pass, fail/mutation,
 ambiguity, inapplicable, malformed-input, boundary, resource-limit, determinism, and product
@@ -213,7 +235,9 @@ cargo lint
 cargo test-all
 cargo docs
 python3 tools/generate_raster_corpus.py --check
+python3 tools/generate_inspection_corpus.py --check
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 ```
 
 Before public behavior is considered complete, CI must pass on the exact final commit,
