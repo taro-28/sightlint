@@ -1,0 +1,348 @@
+name: M3 components bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-background-relative-components
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-background-relative-components
+          fetch-depth: 0
+      - name: Integrate current evaluation prerequisite
+        shell: bash
+        run: |
+          sleep 180
+          git fetch origin main feat/m3-image-evaluation-corpus feat/m3-background-relative-components
+          git reset --hard origin/feat/m3-background-relative-components
+          git merge --no-edit origin/main
+          git merge --no-edit origin/feat/m3-image-evaluation-corpus
+          test -f crates/sightlint-adapter-png/src/background.rs
+          test -f tools/generate_image_evaluation_corpus.py
+          test -f crates/sightlint-adapter-png/src/components.rs
+      - name: Harden component tests and wire the adapter
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          components = Path('crates/sightlint-adapter-png/src/components.rs')
+          text = components.read_text()
+          text = text.replace(
+              '#[derive(Debug)]\nenum ComponentCollection {',
+              '#[derive(Debug, PartialEq, Eq)]\nenum ComponentCollection {',
+          )
+          components.write_text(text)
+
+          e2e = Path('crates/sightlint-cli/tests/png_components_e2e.rs')
+          text = e2e.read_text()
+          old = '''fn expected_regions(case: &Value) -> BTreeMap<&str, &Value> {
+    case["groundTruth"]["regions"]
+        .as_array()
+        .expect("regions")
+        .iter()
+        .map(|region| (region["id"].as_str().expect("region id"), &region["rect"]))
+        .collect()
+}'''
+          new = '''fn expected_regions(case: &Value) -> BTreeMap<String, Value> {
+    case["groundTruth"]["regions"]
+        .as_array()
+        .expect("regions")
+        .iter()
+        .map(|region| {
+            (
+                region["id"].as_str().expect("region id").to_owned(),
+                region["rect"].clone(),
+            )
+        })
+        .collect()
+}'''
+          if old in text:
+              text = text.replace(old, new)
+          elif new not in text:
+              raise SystemExit('expected region helper marker not found')
+          text = text.replace('assert_eq!(rect(&document, 0), *regions["top-navigation"]);', 'assert_eq!(rect(&document, 0), regions["top-navigation"]);')
+          text = text.replace('assert_eq!(rect(&document, 1), *regions["card-1"]);', 'assert_eq!(rect(&document, 1), regions["card-1"]);')
+          text = text.replace('assert_eq!(rect(&document, 2), *regions["card-2"]);', 'assert_eq!(rect(&document, 2), regions["card-2"]);')
+          text = text.replace('assert_eq!(rect(&document, 3), *regions["card-3"]);', 'assert_eq!(rect(&document, 3), regions["card-3"]);')
+          e2e.write_text(text)
+
+          lib = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = lib.read_text()
+          if 'mod components;' not in text:
+              marker = 'mod background;\n'
+              if text.count(marker) != 1:
+                  raise SystemExit('component module marker mismatch')
+              text = text.replace(marker, marker + 'mod components;\n')
+
+          if 'ComponentAnalyzedPng' not in text:
+              marker = 'pub use filter::{\n'
+              exports = '''pub use components::{
+    BACKGROUND_COMPONENT_POLICY_ID, BackgroundComponentAnalysis, BackgroundComponentStatus,
+    BackgroundRelativeComponent, ComponentAnalyzedPng, MAX_COMPONENT_RUNS, MAX_COMPONENTS,
+    PngComponentError, REQUIRED_EDGE_PERCENT, segment_png_background_components,
+};
+'''
+              if text.count(marker) != 1:
+                  raise SystemExit('component export marker mismatch')
+              text = text.replace(marker, exports + marker)
+
+          if 'InvalidComponentData(PngComponentError)' not in text:
+              marker = '''    /// Opaque pixels cannot satisfy the deterministic border-candidate contract.
+    InvalidBackgroundData(PngBackgroundError),
+'''
+              replacement = marker + '''    /// Background-relative component acquisition found an internal layout inconsistency.
+    InvalidComponentData(PngComponentError),
+'''
+              if text.count(marker) != 1:
+                  raise SystemExit('component error marker mismatch')
+              text = text.replace(marker, replacement)
+              display_marker = '            Self::InvalidBackgroundData(error) => error.fmt(formatter),\n'
+              if text.count(display_marker) != 1:
+                  raise SystemExit('component display marker mismatch')
+              text = text.replace(
+                  display_marker,
+                  display_marker + '            Self::InvalidComponentData(error) => error.fmt(formatter),\n',
+              )
+
+          old_adapt = '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let background_analyzed = analyze_png_background_candidates(input)?;
+    let background = &background_analyzed.background;
+    let analyzed = &background_analyzed.analyzed;'''
+          new_adapt = '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let component_analyzed = segment_png_background_components(input)?;
+    let component_analysis = &component_analyzed.component_analysis;
+    let background_analyzed = &component_analyzed.background_analyzed;
+    let background = &background_analyzed.background;
+    let analyzed = &background_analyzed.analyzed;'''
+          if old_adapt in text:
+              text = text.replace(old_adapt, new_adapt)
+          elif new_adapt not in text:
+              raise SystemExit('component adapt marker not found')
+
+          pass_anchor = '    let pass_metadata: Vec<serde_json::Value> = reconstructed\n'
+          if 'let component_status = match component_analysis.status' not in text:
+              values = '''    let component_status = match component_analysis.status {
+        BackgroundComponentStatus::Available => "available",
+        BackgroundComponentStatus::RequiresFullyOpaquePixels => "requiresFullyOpaquePixels",
+        BackgroundComponentStatus::ImageTooSmall => "imageTooSmall",
+        BackgroundComponentStatus::NoQualifiedBackgroundCandidate => {
+            "noQualifiedBackgroundCandidate"
+        }
+        BackgroundComponentStatus::RunLimitExceeded => "runLimitExceeded",
+        BackgroundComponentStatus::ComponentLimitExceeded => "componentLimitExceeded",
+    };
+    let component_candidate_rgba = component_analysis.candidate_rgba.map(|rgba| {
+        format!("#{:02x}{:02x}{:02x}{:02x}", rgba[0], rgba[1], rgba[2], rgba[3])
+    });
+    let component_metadata: Vec<serde_json::Value> = component_analysis
+        .components
+        .iter()
+        .map(|component| {
+            json!({
+                "index": component.index,
+                "bounds": {
+                    "x": component.bounds.x,
+                    "y": component.bounds.y,
+                    "width": component.bounds.width,
+                    "height": component.bounds.height
+                },
+                "pixelCount": component.pixel_count,
+                "runCount": component.run_count,
+                "touchesCanvasEdge": component.touches_canvas_edge
+            })
+        })
+        .collect();
+'''
+              if text.count(pass_anchor) != 1:
+                  raise SystemExit('component metadata value marker mismatch')
+              text = text.replace(pass_anchor, values + pass_anchor)
+
+          if '"backgroundRelativeComponents"' not in text:
+              marker = '''            "backgroundCandidateAnalysis": {
+                "applicability": background_applicability,
+                "colorSpace": "pngEncodedRgba8",
+                "candidateLimit": 8,
+                "cornerSampleCount": background.corner_sample_count,
+                "edgeSampleCount": background.edge_sample_count,
+                "imagePixelCount": background.image_pixel_count,
+                "leadingCandidateIndex": leading_background_candidate_index,
+                "candidates": background_candidate_metadata
+            }
+'''
+              replacement = marker[:-1] + ''',
+            "backgroundRelativeComponents": {
+                "policy": BACKGROUND_COMPONENT_POLICY_ID,
+                "status": component_status,
+                "requiredEdgePercent": REQUIRED_EDGE_PERCENT,
+                "maxRuns": MAX_COMPONENT_RUNS,
+                "maxComponents": MAX_COMPONENTS,
+                "candidateRgba": component_candidate_rgba,
+                "candidateCornerOccurrences": component_analysis.candidate_corner_occurrences,
+                "cornerSampleCount": component_analysis.corner_sample_count,
+                "candidateEdgePixelCount": component_analysis.candidate_edge_pixel_count,
+                "edgeSampleCount": component_analysis.edge_sample_count,
+                "components": component_metadata
+            }
+'''
+              if text.count(marker) != 1:
+                  raise SystemExit('component extension marker mismatch')
+              text = text.replace(marker, replacement)
+
+          if '            "version": "0.3.0",' in text:
+              text = text.replace('            "version": "0.3.0",', '            "version": "0.4.0",', 1)
+          elif '            "version": "0.4.0",' not in text:
+              raise SystemExit('PNG extension version marker mismatch')
+          lib.write_text(text)
+          PY
+      - name: Promote component expectations into the generated corpus
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          generator = Path('tools/generate_image_evaluation_corpus.py')
+          text = generator.read_text()
+          text = text.replace(
+              'assertion(png_pointer("version"), "0.3.0"),',
+              'assertion(png_pointer("version"), "0.4.0"),',
+          )
+
+          dashboard_marker = '''            assertion(
+                png_pointer("backgroundCandidateAnalysis/candidates/0/nonCandidateBounds"),
+                {"x": 16, "y": 16, "width": 208, "height": 112},
+            ),
+'''
+          dashboard_addition = dashboard_marker + '''            assertion(png_pointer("backgroundRelativeComponents/status"), "available"),
+            assertion(
+                png_pointer("backgroundRelativeComponents/candidateRgba"),
+                "#f6f7f9ff",
+            ),
+            length_assertion(png_pointer("backgroundRelativeComponents/components"), 4),
+'''
+          if 'backgroundRelativeComponents/components"), 4' not in text:
+              if text.count(dashboard_marker) != 1:
+                  raise SystemExit('dashboard component assertion marker mismatch')
+              text = text.replace(dashboard_marker, dashboard_addition)
+
+          transparent_marker = '''            length_assertion(png_pointer("backgroundCandidateAnalysis/candidates"), 0),
+'''
+          transparent_addition = transparent_marker + '''            assertion(
+                png_pointer("backgroundRelativeComponents/status"),
+                "requiresFullyOpaquePixels",
+            ),
+'''
+          if text.count('backgroundRelativeComponents/status') < 2:
+              # The marker occurs in transparent-padding first; add there only, then handle others below.
+              text = text.replace(transparent_marker, transparent_addition, 1)
+
+          all_transparent_marker = '''            assertion(png_pointer("backgroundCandidateAnalysis/applicability"), "requiresFullyOpaquePixels"),
+'''
+          all_transparent_addition = all_transparent_marker + '''            assertion(
+                png_pointer("backgroundRelativeComponents/status"),
+                "requiresFullyOpaquePixels",
+            ),
+'''
+          if 'all-transparent' in text and text.count(all_transparent_addition) == 0:
+              text = text.replace(all_transparent_marker, all_transparent_addition, 1)
+
+          tie_marker = '''            length_assertion(png_pointer("backgroundCandidateAnalysis/candidates"), 8),
+'''
+          tie_addition = tie_marker + '''            assertion(
+                png_pointer("backgroundRelativeComponents/status"),
+                "noQualifiedBackgroundCandidate",
+            ),
+'''
+          if '"noQualifiedBackgroundCandidate"' not in text:
+              if text.count(tie_marker) != 1:
+                  raise SystemExit('tie component assertion marker mismatch')
+              text = text.replace(tie_marker, tie_addition)
+
+          overlay_marker = '''            length_assertion(png_pointer("backgroundCandidateAnalysis/candidates"), 0),
+        )
+    )
+    case = {
+        "id": "translucent-overlay",'''
+          overlay_replacement = '''            length_assertion(png_pointer("backgroundCandidateAnalysis/candidates"), 0),
+            assertion(
+                png_pointer("backgroundRelativeComponents/status"),
+                "requiresFullyOpaquePixels",
+            ),
+        )
+    )
+    case = {
+        "id": "translucent-overlay",'''
+          if overlay_marker in text:
+              text = text.replace(overlay_marker, overlay_replacement)
+          elif overlay_replacement not in text:
+              raise SystemExit('overlay component assertion marker mismatch')
+          generator.write_text(text)
+          PY
+          python3 tools/generate_image_evaluation_corpus.py
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          decisions = Path('docs/decisions/README.md')
+          text = decisions.read_text()
+          marker = '- [0028 — Layered image evaluation corpus](0028-layered-image-evaluation-corpus.md)\n'
+          addition = marker + '- [0029 — Bounded background-relative component hypotheses](0029-background-relative-components.md)\n'
+          if '0029-background-relative-components.md' not in text:
+              if text.count(marker) != 1:
+                  raise SystemExit('ADR index marker mismatch')
+              decisions.write_text(text.replace(marker, addition))
+
+          readme = Path('README.md')
+          text = readme.read_text()
+          old = '''M3 now validates and decodes PNGs within explicit resource bounds, reconstructs samples into
+non-color-managed PNG-encoded RGBA8, derives exact alpha-visible geometry, and ranks exact opaque
+border colors as non-authoritative background candidates. Candidate-relative bounds do not
+replace exact `inkBox` evidence. Final display color, whitespace, text, components, roles, and
+other semantics are not invented.'''
+          new = '''M3 now validates and decodes PNGs within explicit resource bounds, reconstructs samples into
+non-color-managed RGBA8, derives exact alpha geometry, ranks opaque border-color candidates, and
+extracts bounded four-connected regions only under an explicit conservative background policy.
+These regions remain extension-scoped hypotheses: they do not replace exact `inkBox` evidence or
+become rule-consumable nodes. Text, roles, peer groups, whitespace, and UX semantics are not yet
+invented.'''
+          if old in text:
+              readme.write_text(text.replace(old, new))
+          elif new not in text:
+              raise SystemExit('README component status marker not found')
+          PY
+      - name: Apply machine-safe fixes and verify complete behavior
+        shell: bash
+        run: |
+          cargo fmt --all
+          cargo clippy --fix --allow-dirty --allow-staged --locked --workspace --all-targets --all-features -- -D warnings
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          python3 tools/generate_image_evaluation_corpus.py --check
+          cargo fmt --all -- --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          cargo test --locked -p sightlint-cli --test image_evaluation_corpus
+          cargo test --locked -p sightlint-cli --test png_components_e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified component slice
+        shell: bash
+        run: |
+          rm -f .github/workflows/m3-image-evaluation-bootstrap.yml
+          rm -f .github/workflows/m3-image-evaluation-finalize.yml
+          rm -f .github/workflows/m3-components-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: extract bounded background-relative components'
+          git push origin HEAD:feat/m3-background-relative-components
