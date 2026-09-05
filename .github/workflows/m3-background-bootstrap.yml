@@ -1,0 +1,238 @@
+name: M3 background bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-opaque-background-candidates
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-opaque-background-candidates
+          fetch-depth: 0
+      - name: Integrate exact alpha prerequisite
+        shell: bash
+        run: |
+          sleep 120
+          git fetch origin main feat/m3-png-alpha-observations feat/m3-opaque-background-candidates
+          git reset --hard origin/feat/m3-opaque-background-candidates
+          git merge --no-edit origin/main
+          git merge --no-edit origin/feat/m3-png-alpha-observations
+          test -f crates/sightlint-adapter-png/src/pixels.rs
+          test -f crates/sightlint-adapter-png/src/background.rs
+      - name: Wire candidate analysis into the adapter
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          lib = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = lib.read_text()
+          if not text.startswith('//! Deterministic PNG'):
+              raise SystemExit('unexpected PNG adapter source')
+
+          if 'mod background;' not in text:
+              marker = '#![forbid(unsafe_code)]\n\n'
+              if text.count(marker) != 1:
+                  raise SystemExit('module insertion marker mismatch')
+              text = text.replace(marker, marker + 'mod background;\n')
+
+          if 'BackgroundAnalyzedPng' not in text:
+              marker = 'pub use filter::{\n'
+              exports = '''pub use background::{
+    BackgroundAnalyzedPng, BackgroundCandidate, BackgroundCandidateAnalysis,
+    BackgroundCandidateApplicability, PngBackgroundError, analyze_png_background_candidates,
+};
+'''
+              if text.count(marker) != 1:
+                  raise SystemExit('background export marker mismatch')
+              text = text.replace(marker, exports + marker)
+
+          if 'InvalidBackgroundData(PngBackgroundError)' not in text:
+              marker = '''    /// Normalized pixels cannot satisfy the exact alpha-analysis contract.
+    InvalidPixelData(PngPixelError),
+'''
+              replacement = marker + '''    /// Opaque pixels cannot satisfy the deterministic border-candidate contract.
+    InvalidBackgroundData(PngBackgroundError),
+'''
+              if text.count(marker) != 1:
+                  raise SystemExit('background error marker mismatch')
+              text = text.replace(marker, replacement)
+              display_marker = '            Self::InvalidPixelData(error) => error.fmt(formatter),\n'
+              display_replacement = display_marker + \
+                  '            Self::InvalidBackgroundData(error) => error.fmt(formatter),\n'
+              if text.count(display_marker) != 1:
+                  raise SystemExit('background display marker mismatch')
+              text = text.replace(display_marker, display_replacement)
+
+          old_adapt = '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let analyzed = analyze_png_alpha(input)?;
+    let normalized = &analyzed.normalized;
+    let alpha = analyzed.alpha;
+    let reconstructed = &normalized.reconstructed;'''
+          new_adapt = '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let background_analyzed = analyze_png_background_candidates(input)?;
+    let background = &background_analyzed.background;
+    let analyzed = &background_analyzed.analyzed;
+    let normalized = &analyzed.normalized;
+    let alpha = analyzed.alpha;
+    let reconstructed = &normalized.reconstructed;'''
+          if old_adapt in text:
+              text = text.replace(old_adapt, new_adapt)
+          elif new_adapt not in text:
+              raise SystemExit('adapt background marker not found')
+
+          metadata_anchor = '    let pass_metadata: Vec<serde_json::Value> = reconstructed\n'
+          if 'let background_candidate_metadata:' not in text:
+              values = '''    let background_applicability = match background.applicability {
+        BackgroundCandidateApplicability::FullyOpaque => "fullyOpaque",
+        BackgroundCandidateApplicability::RequiresFullyOpaquePixels => {
+            "requiresFullyOpaquePixels"
+        }
+    };
+    let background_candidate_metadata: Vec<serde_json::Value> = background
+        .candidates
+        .iter()
+        .map(|candidate| {
+            let non_candidate_bounds = candidate.non_candidate_bounds.map(|bounds| {
+                json!({
+                    "x": bounds.x,
+                    "y": bounds.y,
+                    "width": bounds.width,
+                    "height": bounds.height
+                })
+            });
+            json!({
+                "rgba": candidate.hex_rgba(),
+                "packedRgba": candidate.packed_rgba,
+                "cornerOccurrences": candidate.corner_occurrences,
+                "edgePixelCount": candidate.edge_pixel_count,
+                "imagePixelCount": candidate.image_pixel_count,
+                "nonCandidateBounds": non_candidate_bounds
+            })
+        })
+        .collect();
+    let leading_background_candidate_index = if background_candidate_metadata.is_empty() {
+        None
+    } else {
+        Some(0_usize)
+    };
+'''
+              if text.count(metadata_anchor) != 1:
+                  raise SystemExit('background metadata value marker mismatch')
+              text = text.replace(metadata_anchor, values + metadata_anchor)
+
+          if '"backgroundCandidateAnalysis"' not in text:
+              marker = '''            "alphaAnalysis": {
+                "visibleBounds": alpha_visible_bounds,
+                "opaqueBounds": alpha_opaque_bounds,
+                "transparentInsets": transparent_insets,
+                "visiblePixelCount": alpha.visible_pixel_count,
+                "opaquePixelCount": alpha.opaque_pixel_count,
+                "transparentPixelCount": alpha.transparent_pixel_count,
+                "translucentPixelCount": alpha.translucent_pixel_count,
+                "edgeVisiblePixels": {
+                    "top": alpha.edge_visible_pixels.top,
+                    "right": alpha.edge_visible_pixels.right,
+                    "bottom": alpha.edge_visible_pixels.bottom,
+                    "left": alpha.edge_visible_pixels.left
+                },
+                "allTransparent": alpha.all_transparent,
+                "allVisible": alpha.all_visible
+            }
+'''
+              replacement = marker[:-1] + ''',
+            "backgroundCandidateAnalysis": {
+                "applicability": background_applicability,
+                "colorSpace": "pngEncodedRgba8",
+                "candidateLimit": 8,
+                "cornerSampleCount": background.corner_sample_count,
+                "edgeSampleCount": background.edge_sample_count,
+                "imagePixelCount": background.image_pixel_count,
+                "leadingCandidateIndex": leading_background_candidate_index,
+                "candidates": background_candidate_metadata
+            }
+'''
+              if text.count(marker) != 1:
+                  raise SystemExit('background extension insertion marker mismatch')
+              text = text.replace(marker, replacement)
+
+          if '            "version": "0.2.0",' in text:
+              text = text.replace(
+                  '            "version": "0.2.0",',
+                  '            "version": "0.3.0",',
+                  1,
+              )
+          elif '            "version": "0.3.0",' not in text:
+              raise SystemExit('PNG extension version marker mismatch')
+          lib.write_text(text)
+
+          for test_path in [
+              Path('crates/sightlint-cli/tests/png_alpha_e2e.rs'),
+          ]:
+              test_text = test_path.read_text()
+              test_text = test_text.replace(
+                  'assert_eq!(metadata["version"], "0.2.0");',
+                  'assert_eq!(metadata["version"], "0.3.0");',
+              )
+              test_path.write_text(test_text)
+
+          decisions = Path('docs/decisions/README.md')
+          decision_text = decisions.read_text()
+          marker = '- [0026 — Exact alpha-visible pixel observations](0026-alpha-visible-pixel-observations.md)\n'
+          addition = marker + '- [0027 — Deterministic opaque-border background candidates](0027-opaque-border-background-candidates.md)\n'
+          if '0027-opaque-border-background-candidates.md' not in decision_text:
+              if decision_text.count(marker) != 1:
+                  raise SystemExit('ADR index marker mismatch')
+              decisions.write_text(decision_text.replace(marker, addition))
+
+          readme = Path('README.md')
+          readme_text = readme.read_text()
+          old = '''M3 now validates the complete PNG chunk stream, performs bounded decoding, reconstructs all
+scanline filters, expands samples to explicitly non-color-managed PNG-encoded RGBA8, and derives
+exact alpha-visible bounds and transparent insets. Opaque background subtraction, final display
+color, text, components, roles, and other semantics are not invented. Later pixel analysis builds
+on these verified observations rather than bypassing them.'''
+          new = '''M3 now validates and decodes PNGs within explicit resource bounds, reconstructs samples into
+non-color-managed PNG-encoded RGBA8, derives exact alpha-visible geometry, and ranks exact opaque
+border colors as non-authoritative background candidates. Candidate-relative bounds do not
+replace exact `inkBox` evidence. Final display color, whitespace, text, components, roles, and
+other semantics are not invented.'''
+          if old in readme_text:
+              readme.write_text(readme_text.replace(old, new))
+          elif new not in readme_text:
+              raise SystemExit('README M3 marker not found')
+          PY
+      - name: Apply machine-safe fixes and verify behavior
+        shell: bash
+        run: |
+          cargo fmt --all
+          cargo clippy --fix --allow-dirty --allow-staged --locked --workspace --all-targets --all-features -- -D warnings
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo fmt --all -- --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          rm -f .github/workflows/m3-alpha-bootstrap.yml
+          rm -f .github/workflows/m3-alpha-finalize.yml
+          rm -f .github/workflows/m3-alpha-integrate.yml
+          rm -f .github/workflows/m3-background-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: derive opaque border background candidates'
+          git push origin HEAD:feat/m3-opaque-background-candidates
