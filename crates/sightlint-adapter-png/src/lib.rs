@@ -9,7 +9,7 @@
 mod inflate;
 mod structure;
 
-pub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};
+pub use inflate::{InflatedPng, PngInflateError, inflate_png_scanlines};
 pub use structure::{PngStructure, PngStructureError, inspect_png_structure};
 
 use std::collections::BTreeMap;

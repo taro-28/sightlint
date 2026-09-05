@@ -140,7 +140,7 @@ pub fn inflate_png_scanlines(input: &[u8]) -> Result<InflatedPng, PngAdapterErro
 }
 
 /// Returns the exact decompressed scanline byte count required by a validated PNG header.
-pub fn expected_scanline_bytes(header: PngHeader) -> u64 {
+pub(crate) fn expected_scanline_bytes(header: PngHeader) -> u64 {
     let bits_per_pixel = u64::from(channels(header.color_type)) * u64::from(header.bit_depth);
     if header.interlace_method == 0 {
         return pass_bytes(header.width, header.height, bits_per_pixel);

@@ -180,6 +180,42 @@ fn png_with_data(
     png
 }
 
+// Generated independently with Python's zlib.compress(..., level=6). These vectors exercise
+// fixed and dynamic Huffman DEFLATE blocks rather than SightLint's stored-block test encoder.
+const PYTHON_ZLIB_FIXED_RGBA_3X2: &[u8] = &[
+    0x78, 0x9c, 0x63, 0x60, 0xc0, 0x05, 0x00, 0x00, 0x1a, 0x00, 0x01,
+];
+const PYTHON_ZLIB_DYNAMIC_RGBA_64X64: &[u8] = &[
+    0x78, 0x9c, 0xed, 0xc1, 0x01, 0x0d, 0x00, 0x00, 0x00, 0xc2, 0xa0, 0xf7, 0x4f, 0x6d, 0x0e, 0x37,
+    0xa0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x80, 0x77, 0x03, 0x40, 0x40, 0x00, 0x01,
+];
+
+#[test]
+fn accepts_independent_fixed_and_dynamic_huffman_zlib_streams() {
+    for (width, height, compressed) in [
+        (3_u32, 2_u32, PYTHON_ZLIB_FIXED_RGBA_3X2),
+        (64_u32, 64_u32, PYTHON_ZLIB_DYNAMIC_RGBA_64X64),
+    ] {
+        let mut png = header_prefix(width, height, 8, 6, 0);
+        append_chunk(&mut png, *b"IDAT", compressed);
+        append_chunk(&mut png, *b"IEND", &[]);
+
+        let output = run_stdin(&["adapt-image", "-"], &png);
+        assert_eq!(
+            output.status.code(),
+            Some(EXIT_SUCCESS),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let ir: Value = serde_json::from_slice(&output.stdout).expect("canonical IR JSON");
+        assert_eq!(
+            ir["extensions"]["org.sightlint.adapter.png"]["inflatedScanlineBytes"],
+            expected_bytes(width, height, 8, 6, 0)
+        );
+    }
+}
+
 #[test]
 fn accepts_exact_zlib_scanline_lengths_and_split_idat() {
     for (width, height, depth, color_type, interlace) in [
