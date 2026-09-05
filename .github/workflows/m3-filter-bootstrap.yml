@@ -1,0 +1,199 @@
+name: M3 filter reconstruction bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-png-filter-reconstruction-v2
+
+permissions:
+  contents: write
+
+jobs:
+  wire-verify-and-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-png-filter-reconstruction-v2
+          fetch-depth: 0
+
+      - name: Wire deterministic filter reconstruction
+        shell: bash
+        run: |
+          set -euo pipefail
+          mv crates/sightlint-adapter-png/src/filter_next.rs crates/sightlint-adapter-png/src/filter.rs
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected replacement once, found {count}: {old!r}')
+              file.write_text(text.replace(old, new))
+
+          lib = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = lib.read_text()
+          doc_candidates = [
+              '''//! This crate validates PNG metadata, the complete chunk stream, and bounded zlib inflation.
+//! Inflated bytes remain PNG-filtered; the adapter does not yet derive pixel colors, ink bounds,
+//! text, components, or semantic roles.''',
+              '''//! This crate deliberately inspects only the PNG signature and `IHDR` chunk. It does not decode
+//! pixel samples and therefore does not infer ink bounds, text, components, or semantic roles.''',
+          ]
+          new_docs = '''//! This crate validates PNG metadata and chunk structure, performs bounded zlib inflation, and
+//! reconstructs all standard PNG scanline filters. Samples remain packed and pass-local; palette,
+//! transparency, color, ink, text, component, and semantic interpretation are still excluded.'''
+          matches = [candidate for candidate in doc_candidates if candidate in text]
+          if len(matches) != 1:
+              raise SystemExit(f'lib.rs: expected one known crate-doc block, found {len(matches)}')
+          text = text.replace(matches[0], new_docs)
+
+          replacements = [
+              (
+                  '''mod inflate;
+mod structure;
+
+pub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};
+pub use structure::{PngStructure, PngStructureError, inspect_png_structure};''',
+                  '''mod filter;
+mod inflate;
+mod structure;
+
+pub use filter::{
+    PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines,
+};
+pub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};
+pub use structure::{PngStructure, PngStructureError, inspect_png_structure};''',
+              ),
+              (
+                  '''    /// The PNG chunk stream is valid but its compressed image data is not.
+    InvalidImageData(PngInflateError),
+    /// The adapter produced IR that violates the current core contract.
+    InvalidArtifactIr(String),''',
+                  '''    /// The PNG chunk stream is valid but its compressed image data is not.
+    InvalidImageData(PngInflateError),
+    /// Inflated scanlines contain invalid filter data or an inconsistent pass layout.
+    InvalidFilterData(PngFilterError),
+    /// The adapter produced IR that violates the current core contract.
+    InvalidArtifactIr(String),''',
+              ),
+              (
+                  '''            Self::InvalidStructure(error) => error.fmt(formatter),
+            Self::InvalidImageData(error) => error.fmt(formatter),
+            Self::InvalidArtifactIr(message) => {''',
+                  '''            Self::InvalidStructure(error) => error.fmt(formatter),
+            Self::InvalidImageData(error) => error.fmt(formatter),
+            Self::InvalidFilterData(error) => error.fmt(formatter),
+            Self::InvalidArtifactIr(message) => {''',
+              ),
+              (
+                  '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let inflated = inflate_png_scanlines(input)?;
+    let structure = inflated.structure;
+    let inflated_scanline_bytes = inflated.scanline_bytes.len();
+    let header = structure.header;''',
+                  '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let reconstructed = reconstruct_png_scanlines(input)?;
+    let reconstructed_packed_sample_bytes = reconstructed.packed_sample_bytes.len();
+    let non_empty_pass_count = reconstructed.passes.len();
+    let structure = reconstructed.structure;
+    let inflated_scanline_bytes = expected_scanline_bytes(structure.header);
+    let header = structure.header;''',
+              ),
+              (
+                  '''            "hasPalette": structure.has_palette,
+            "inflatedScanlineBytes": inflated_scanline_bytes
+''',
+                  '''            "hasPalette": structure.has_palette,
+            "inflatedScanlineBytes": inflated_scanline_bytes,
+            "reconstructedPackedSampleBytes": reconstructed_packed_sample_bytes,
+            "nonEmptyPassCount": non_empty_pass_count
+''',
+              ),
+          ]
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'lib.rs: expected replacement once, found {count}: {old!r}')
+              text = text.replace(old, new)
+          lib.write_text(text)
+
+          replace_once(
+              'crates/sightlint-adapter-png/Cargo.toml',
+              'description = "Deterministic PNG metadata adapter for SightLint"',
+              'description = "Deterministic PNG source adapter for SightLint"',
+          )
+
+          decisions = Path('docs/decisions/README.md')
+          text = decisions.read_text()
+          marker = '- [0023 — Bounded PNG IDAT inflation](0023-bounded-png-idat-inflate.md)\n'
+          addition = marker + '- [0024 — Deterministic PNG filter reconstruction](0024-deterministic-png-filter-reconstruction.md)\n'
+          if text.count(marker) != 1:
+              raise SystemExit(f'ADR index: expected marker once, found {text.count(marker)}')
+          decisions.write_text(text.replace(marker, addition))
+
+          readme = Path('README.md')
+          text = readme.read_text()
+          old_m3 = '''M3 begins with a deliberately narrow deterministic PNG adapter. It validates the PNG signature
+and `IHDR` metadata, including CRC and format constraints, and emits exact-source Artifact IR
+without decoding pixel samples or inventing text, components, roles, ink bounds, or other
+semantics. Later pixel-analysis work builds on this adapter boundary rather than bypassing it.'''
+          new_m3 = '''M3 now validates complete PNG chunk streams, performs bounded zlib/DEFLATE inflation, and
+reconstructs all five standard scanline filters, including pass-local Adam7 history. The result
+is exact packed sample data, but SightLint still does not expand palettes or transparency,
+normalize pixels, infer foreground, calculate ink bounds, or invent text, components, or roles.'''
+          if text.count(old_m3) != 1:
+              raise SystemExit(f'README M3 block: expected once, found {text.count(old_m3)}')
+          text = text.replace(old_m3, new_m3)
+
+          old_surface = '''The CLI accepts medium-neutral Artifact IR directly and can also adapt the deterministic header
+metadata of PNG images. Browser, slide, PDF, mobile, OCR, CV, and model-based acquisition remain
+separate layers so that medium-specific sensing cannot leak into deterministic rule verdicts.'''
+          new_surface = '''The CLI accepts medium-neutral Artifact IR directly and can also validate and adapt exact PNG
+source facts through filter reconstruction. Browser, slide, PDF, mobile, OCR, CV, and model-based
+acquisition remain separate layers so medium-specific sensing cannot leak into deterministic rule
+verdicts.'''
+          if text.count(old_surface) != 1:
+              raise SystemExit(f'README command-surface block: expected once, found {text.count(old_surface)}')
+          text = text.replace(old_surface, new_surface)
+          text = text.replace(
+              '# Adapt exact PNG header metadata into canonical Artifact IR.',
+              '# Validate and adapt exact PNG source facts into canonical Artifact IR.',
+          )
+          text = text.replace(
+              '- valid PNG grayscale, RGB, indexed, grayscale-alpha, RGBA, and Adam7 header variants',
+              '- valid PNG color/depth classes, complete chunk streams, split IDAT, zlib, and Adam7 variants',
+          )
+          text = text.replace(
+              '- malformed PNG signatures, framing, CRCs, field combinations, and resource-limit cases',
+              '- malformed PNG signatures, chunks, CRCs, zlib streams, filter bytes, and resource limits',
+          )
+          readme.write_text(text)
+          PY
+
+      - name: Verify complete workspace and public binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo fmt --all
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test png_filter_e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+
+      - name: Commit verified filter reconstruction
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/m3-filter-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: reconstruct PNG scanline filters'
+          git push origin HEAD:feat/m3-png-filter-reconstruction-v2
