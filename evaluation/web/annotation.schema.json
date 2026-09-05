@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-evaluation-annotation:0.1.0",
+  "title": "SightLint web evaluation annotation",
+  "oneOf": [
+    { "$ref": "#/$defs/acquisitionDocument" },
+    { "$ref": "#/$defs/ruleDocument" }
+  ],
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "qualification", "guideVersion", "reviewedAt", "rationale"],
+      "properties": {
+        "status": { "enum": ["maintainerReviewed", "dualReviewed", "expertReviewed"] },
+        "qualification": { "$ref": "#/$defs/nonEmptyString" },
+        "guideVersion": { "$ref": "#/$defs/version" },
+        "reviewedAt": { "type": "string", "format": "date" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "enum": ["testId", "css", "nativeId"] },
+        "value": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "selector", "kind", "role", "parentId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "selector": { "$ref": "#/$defs/selector" },
+        "kind": { "$ref": "#/$defs/nonEmptyString" },
+        "role": { "$ref": "#/$defs/nonEmptyString" },
+        "parentId": { "type": ["string", "null"] }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "status", "nodeIds", "axis", "evidenceBasis", "alternatives"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "type": { "const": "peerSequence" },
+        "status": { "enum": ["confirmed", "disputed", "unknown"] },
+        "nodeIds": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "axis": { "enum": ["horizontal", "vertical", "unknown"] },
+        "evidenceBasis": { "$ref": "#/$defs/nonEmptyString" },
+        "alternatives": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "unavailableAspect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aspect", "status", "reason", "trackingIssue"],
+      "properties": {
+        "aspect": { "$ref": "#/$defs/nonEmptyString" },
+        "status": { "const": "untested" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" },
+        "trackingIssue": { "const": 23 }
+      }
+    },
+    "acquisitionCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "nodes", "relations", "unavailableAspects", "review"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/node" }
+        },
+        "relations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relation" }
+        },
+        "unavailableAspects": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/unavailableAspect" }
+        },
+        "review": { "$ref": "#/$defs/review" }
+      }
+    },
+    "acquisitionDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schemaVersion", "documentType", "cases"],
+      "properties": {
+        "$schema": { "const": "../annotation.schema.json" },
+        "schemaVersion": { "const": "0.1.0" },
+        "documentType": { "const": "acquisitionOracle" },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/acquisitionCase" }
+        }
+      }
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "rationale"],
+      "properties": {
+        "status": { "enum": ["applicable", "inapplicable", "cantTell"] },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source", "expectation", "value", "unit", "tolerance"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "source": { "const": "explicitFixtureContract" },
+        "expectation": { "const": "uniformAdjacentGap" },
+        "value": { "type": ["number", "null"] },
+        "unit": { "const": "cssPixel" },
+        "tolerance": { "type": "number", "minimum": 0 }
+      }
+    },
+    "severityInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["userHarm", "affectedScope", "reversibility", "accessibilityImpact"],
+      "properties": {
+        "userHarm": { "$ref": "#/$defs/nonEmptyString" },
+        "affectedScope": { "$ref": "#/$defs/nonEmptyString" },
+        "reversibility": { "$ref": "#/$defs/nonEmptyString" },
+        "accessibilityImpact": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "ruleCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caseId",
+        "ruleId",
+        "ruleVersion",
+        "targetRelationId",
+        "applicability",
+        "policy",
+        "expectedOutcome",
+        "minimumEvidence",
+        "validAlternatives",
+        "severityInputs",
+        "maturity",
+        "blocking",
+        "falsePositiveRisk",
+        "review"
+      ],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/version" },
+        "targetRelationId": { "type": ["string", "null"] },
+        "applicability": { "$ref": "#/$defs/applicability" },
+        "policy": { "oneOf": [{ "$ref": "#/$defs/policy" }, { "type": "null" }] },
+        "expectedOutcome": {
+          "enum": ["passed", "failed", "inapplicable", "cantTell", "untested"]
+        },
+        "minimumEvidence": { "$ref": "#/$defs/nonEmptyString" },
+        "validAlternatives": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "severityInputs": { "$ref": "#/$defs/severityInputs" },
+        "maturity": { "const": "experimental" },
+        "blocking": { "const": false },
+        "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" },
+        "review": { "$ref": "#/$defs/review" }
+      }
+    },
+    "ruleDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schemaVersion", "documentType", "cases"],
+      "properties": {
+        "$schema": { "const": "../annotation.schema.json" },
+        "schemaVersion": { "const": "0.1.0" },
+        "documentType": { "const": "ruleOracle" },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ruleCase" }
+        }
+      }
+    }
+  }
+}

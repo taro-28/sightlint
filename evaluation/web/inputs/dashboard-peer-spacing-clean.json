@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "0.1.0",
+  "artifact": {
+    "id": "web-dashboard-peer-spacing-clean",
+    "kind": "web",
+    "title": "Atlas dashboard — clean peer spacing",
+    "sourceName": "evaluation/web/fixture-app/index.html?case=peer-spacing-clean"
+  },
+  "canvases": [
+    {
+      "id": "viewport",
+      "size": { "width": 1280.0, "height": 800.0 },
+      "unit": "cssPixel",
+      "horizontalDirection": "right",
+      "verticalDirection": "down",
+      "evidenceId": "e-viewport"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "metric-activation",
+      "kind": { "value": "container", "evidenceId": "e-native" },
+      "coordinateSpaceId": "viewport",
+      "parentId": "metric-peer-group",
+      "role": { "value": "group", "evidenceId": "e-native" },
+      "name": { "value": "Activation metric", "evidenceId": "e-native" },
+      "geometry": {
+        "renderBox": {
+          "rect": { "x": 574.0, "y": 220.0, "width": 270.0, "height": 160.0 },
+          "coordinateSpaceId": "viewport",
+          "evidenceId": "e-render"
+        }
+      }
+    },
+    {
+      "id": "metric-peer-group",
+      "kind": { "value": "container", "evidenceId": "e-native" },
+      "coordinateSpaceId": "viewport",
+      "role": { "value": "group", "evidenceId": "e-native" },
+      "name": { "value": "Product signals", "evidenceId": "e-native" },
+      "geometry": {}
+    },
+    {
+      "id": "metric-retention",
+      "kind": { "value": "container", "evidenceId": "e-native" },
+      "coordinateSpaceId": "viewport",
+      "parentId": "metric-peer-group",
+      "role": { "value": "group", "evidenceId": "e-native" },
+      "name": { "value": "Retention metric", "evidenceId": "e-native" },
+      "geometry": {
+        "renderBox": {
+          "rect": { "x": 868.0, "y": 220.0, "width": 270.0, "height": 160.0 },
+          "coordinateSpaceId": "viewport",
+          "evidenceId": "e-render"
+        }
+      }
+    },
+    {
+      "id": "metric-revenue",
+      "kind": { "value": "container", "evidenceId": "e-native" },
+      "coordinateSpaceId": "viewport",
+      "parentId": "metric-peer-group",
+      "role": { "value": "group", "evidenceId": "e-native" },
+      "name": { "value": "Net revenue metric", "evidenceId": "e-native" },
+      "geometry": {
+        "renderBox": {
+          "rect": { "x": 280.0, "y": 220.0, "width": 270.0, "height": 160.0 },
+          "coordinateSpaceId": "viewport",
+          "evidenceId": "e-render"
+        }
+      }
+    }
+  ],
+  "relations": [
+    {
+      "type": "peerSequence",
+      "id": "relation-metrics",
+      "nodeIds": ["metric-revenue", "metric-activation", "metric-retention"],
+      "axis": "horizontal",
+      "boxKind": "render",
+      "expectedGap": 24.0,
+      "tolerance": 0.0,
+      "evidenceId": "e-contract"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e-contract",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "human-reviewed-web-evaluation",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-native",
+      "class": "exactSource",
+      "source": {
+        "adapter": "repository-fixture-source-review",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-render",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "human-reviewed-rule-fixture-projection",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-viewport",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "web-evaluation-environment",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    }
+  ]
+}

@@ -130,7 +130,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0032 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0033 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -156,6 +156,7 @@ baseline is:
 python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
+python3 tools/check_web_evaluation.py
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
@@ -164,6 +165,7 @@ cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
+cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

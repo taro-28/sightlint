@@ -409,7 +409,7 @@ Important historical detail:
 - branch-only ADRs 0025–0029 described experiments that were never accepted into current `main`;
 - ADR 0030 re-established the verified raster boundary;
 - ADR 0031 defines current advisory image inspection;
-- new ADRs should continue at 0032 or later rather than silently reusing historical numbers.
+- new ADRs should continue at 0033 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.

@@ -170,6 +170,24 @@ The clean/mutated synthetic card pair is measured as `[1, 1]` versus `[1, 2]`. T
 narrow measurement path, not that unequal spacing is semantically wrong in a real interface.
 Identical pixels with an “intentional grouping” annotation receive the same output.
 
+### Realistic Web evaluation foundation
+
+ADR 0032 and `evaluation/web/` provide the first issue #22 foundation without implementing a Web
+adapter. The committed repository-owned dashboard has six reviewed state/environment records:
+
+- three required public-binary smoke cases for explicit peer spacing;
+- one clean baseline and one targeted 16 CSS-pixel mutation;
+- one intentional-grouping hard negative that excludes an adjacent promotion from the metric peer
+  relation;
+- development records for ambiguous peer intent, a narrow viewport, and 125% text scale;
+- separate acquisition and rule annotation documents;
+- explicit source ownership, pending-license, privacy, split, and holdout declarations.
+
+All browser-derived DOM/accessibility snapshots, computed render/hit geometry, screenshots, and
+native/pixel reconciliation remain `untested` for issue #23. The runnable inputs use independently
+authored declared Artifact IR projections and do not establish acquisition accuracy. Metrics are
+small-corpus regression counts, not general UI/UX accuracy.
+
 ### Public commands
 
 The current command families include:
@@ -212,6 +230,15 @@ SightLint treats tests as part of the product specification.
   diagonal components, border variation, transparency, translation, scaling, recoloring, and
   intentional unequal grouping;
 - API/file/stdin/human/JSON/repeated-byte checks and actual budget-boundary unit tests.
+
+### Web evaluation fixtures
+
+- source-digest and reference validation for the repository-owned dashboard fixture;
+- six reviewed case records with separate acquisition/rule oracles;
+- three repeated public-binary smoke executions;
+- one killed peer-spacing mutation and one nonfailing intentional-grouping hard negative;
+- three explicit deferred abstentions for ambiguous/responsive/text-scale acquisition;
+- no claimed browser acquisition, screenshot corpus, or holdout.
 
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
@@ -276,8 +303,9 @@ The largest risks are now product/evidence risks rather than basic kernel feasib
 Issue #34 is the execution epic for the first evidence-backed zero-setup web UI alpha. Until it is
 complete, select the earliest unblocked item in this sequence:
 
-1. **#22 — human-reviewed realistic evaluation corpus.** Build repository-owned realistic web
-   fixtures, native/pixel and rule annotations, hard negatives, metrics, and holdout process.
+1. **#22 — human-reviewed realistic evaluation corpus.** The ADR/schema/dashboard/oracle foundation
+   is present. Continue with reviewed synchronized native/pixel capture, broader cases/review, and
+   representative metrics without treating the visible development data as holdout.
 2. **#23 — Playwright web adapter.** Capture DOM/accessibility/computed layout and synchronized
    screenshot in an isolated TypeScript/Node process, then reconcile evidence into IR.
 3. **#24 — recommended zero-setup rule packs.** Admit a small set of high-confidence rules only
@@ -380,6 +408,7 @@ At minimum, from repository root:
 python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
+python3 tools/check_web_evaluation.py
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
@@ -388,6 +417,7 @@ cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
+cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

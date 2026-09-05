@@ -35,6 +35,12 @@ These counts are descriptive rather than a quality score. Removing coverage requ
 manifest and documentation review; adding many near-duplicate cases must not be used to inflate
 apparent precision or recall.
 
+`evaluation/web/` is a separate, independently versioned foundation for issue #22. It adds a
+repository-owned dashboard fixture, separate acquisition and rule annotations, an explicit
+holdout policy, one targeted mutation, one intentional-grouping hard negative, and three runnable
+public-binary smoke cases. Browser acquisition remains `untested` until issue #23, so these cases
+do not establish adapter accuracy or real-world UI/UX precision.
+
 This bootstrap corpus does **not** prove real-world precision or UX value. Those claims require
 human-reviewed native artifacts and rule-specific validation.
 

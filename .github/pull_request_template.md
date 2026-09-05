@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0032 or later. -->
+0033 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -59,6 +59,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/generate_e2e_fixtures.py --check`
 - [ ] `python3 tools/generate_raster_corpus.py --check`
 - [ ] `python3 tools/generate_inspection_corpus.py --check`
+- [ ] `python3 tools/check_web_evaluation.py`
 - [ ] `cargo fmt --all -- --check`
 - [ ] `cargo clippy --locked --workspace --all-targets --all-features -- -D warnings`
 - [ ] `cargo test --locked --workspace --all-features`
@@ -67,6 +68,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test evaluation_corpus`
+- [ ] `cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture`
 - [ ] `RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps`
 - [ ] `cargo +1.85.0 check --workspace --all-targets --all-features --locked`
 - [ ] any new generator/process-adapter/public-E2E command is also in CI, `AGENTS.md`, and handoff

@@ -1,0 +1,336 @@
+{
+  "$schema": "./corpus.schema.json",
+  "schemaVersion": "0.1.0",
+  "corpus": {
+    "id": "sightlint-realistic-web-foundation",
+    "version": "0.1.0",
+    "description": "Repository-owned Web UI cases with separate acquisition and rule ground truth.",
+    "scope": "Evaluation-contract foundation for one explicit peer-spacing rule and future Web acquisition.",
+    "limitations": [
+      "One fictional dashboard application is not representative of real-world Web UI diversity.",
+      "Browser, accessibility, computed-geometry, screenshot, and reconciliation acquisition are untested until issue 23.",
+      "Runnable rule inputs contain reviewed declared geometry and are not evidence of adapter accuracy.",
+      "All labels are visible development data and none are a frozen holdout.",
+      "The evaluated rule remains experimental and nonblocking in this corpus."
+    ]
+  },
+  "annotationGuide": {
+    "version": "0.1.0",
+    "path": "evaluation/web/annotation-guide.md"
+  },
+  "sources": [
+    {
+      "id": "atlas-dashboard-repository-fixture-v0",
+      "kind": "repositoryOwnedFixture",
+      "origin": "evaluation/web/fixture-app",
+      "ownership": "sightlintRepository",
+      "license": "project-license-pending-repository-test-data",
+      "redistribution": "No independent grant; redistribution follows the repository license decision in issue 33.",
+      "privacyReview": "syntheticNoPersonalData",
+      "externalAssets": false
+    }
+  ],
+  "splitPolicy": {
+    "smoke": "Required public cases that protect the reviewed rule projection and hard-negative behavior.",
+    "development": "Public cases available to design and tune the future Web adapter and rules.",
+    "holdout": {
+      "status": "notEstablished",
+      "reason": "A public corpus with visible labels cannot provide a secret holdout.",
+      "requiredBeforeUse": [
+        "Record a freeze commit before tuning begins.",
+        "Define who can access artifacts and labels.",
+        "Use an independent evaluator or disclose every exposure.",
+        "Define a reviewed oracle-correction process.",
+        "Publish split-specific metrics and sampling limitations."
+      ]
+    },
+    "challenge": "Public hard negatives and unusual valid layouts; challenge cases are not secret holdout data."
+  },
+  "gates": {
+    "smoke": {
+      "determinismRuns": 2,
+      "requireAllExpectations": true,
+      "requireAllMutationsKilled": true,
+      "maximumFalsePositives": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "dashboard-ambiguous-peer-group",
+      "version": "0.1.0",
+      "split": "development",
+      "medium": "web",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "fixture": {
+        "entrypoint": "evaluation/web/fixture-app/index.html",
+        "state": "ambiguous-peer-group",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "sourceDigest": "sha256:01beba501f3c49eae8d11595164c277dcff4156f504cb96c8adae5844ccae153"
+      },
+      "environment": {
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "deviceScaleFactor": 1.0,
+        "textScale": 1.0,
+        "locale": "en-US",
+        "direction": "ltr",
+        "theme": "light"
+      },
+      "capture": {
+        "status": "untested",
+        "reason": "Peer intent and rendered geometry require the structured browser adapter.",
+        "trackingIssue": 23,
+        "externalProcessing": false
+      },
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/acquisition.json",
+        "caseId": "dashboard-ambiguous-peer-group"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/rules.json",
+        "caseId": "dashboard-ambiguous-peer-group"
+      },
+      "execution": {
+        "status": "untested",
+        "reason": "No reviewed peer relation may be projected while applicability remains disputed."
+      }
+    },
+    {
+      "id": "dashboard-intentional-grouping",
+      "version": "0.1.0",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "fixture": {
+        "entrypoint": "evaluation/web/fixture-app/index.html",
+        "state": "intentional-grouping",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "sourceDigest": "sha256:01beba501f3c49eae8d11595164c277dcff4156f504cb96c8adae5844ccae153"
+      },
+      "environment": {
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "deviceScaleFactor": 1.0,
+        "textScale": 1.0,
+        "locale": "en-US",
+        "direction": "ltr",
+        "theme": "light"
+      },
+      "capture": {
+        "status": "untested",
+        "reason": "DOM/accessibility and screenshot acquisition are deferred to issue 23.",
+        "trackingIssue": 23,
+        "externalProcessing": false
+      },
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/acquisition.json",
+        "caseId": "dashboard-intentional-grouping"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/rules.json",
+        "caseId": "dashboard-intentional-grouping"
+      },
+      "execution": {
+        "status": "runnable",
+        "inputKind": "artifactIr",
+        "inputPath": "evaluation/web/inputs/dashboard-intentional-grouping.json"
+      },
+      "hardNegative": {
+        "category": "intentionalGrouping",
+        "rationale": "The promotion is adjacent but is not a third metric peer; only the two metric cards share the spacing contract."
+      }
+    },
+    {
+      "id": "dashboard-mobile-clean",
+      "version": "0.1.0",
+      "split": "development",
+      "medium": "web",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "fixture": {
+        "entrypoint": "evaluation/web/fixture-app/index.html",
+        "state": "peer-spacing-clean",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "sourceDigest": "sha256:01beba501f3c49eae8d11595164c277dcff4156f504cb96c8adae5844ccae153"
+      },
+      "environment": {
+        "viewport": { "width": 390, "height": 844, "unit": "cssPixel" },
+        "deviceScaleFactor": 1.0,
+        "textScale": 1.0,
+        "locale": "en-US",
+        "direction": "ltr",
+        "theme": "light"
+      },
+      "capture": {
+        "status": "untested",
+        "reason": "Responsive computed geometry and screenshot acquisition are deferred to issue 23.",
+        "trackingIssue": 23,
+        "externalProcessing": false
+      },
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/acquisition.json",
+        "caseId": "dashboard-mobile-clean"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/rules.json",
+        "caseId": "dashboard-mobile-clean"
+      },
+      "execution": {
+        "status": "untested",
+        "reason": "The vertical rendered geometry has not been acquired or independently reviewed."
+      }
+    },
+    {
+      "id": "dashboard-peer-spacing-clean",
+      "version": "0.1.0",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "fixture": {
+        "entrypoint": "evaluation/web/fixture-app/index.html",
+        "state": "peer-spacing-clean",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "sourceDigest": "sha256:01beba501f3c49eae8d11595164c277dcff4156f504cb96c8adae5844ccae153"
+      },
+      "environment": {
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "deviceScaleFactor": 1.0,
+        "textScale": 1.0,
+        "locale": "en-US",
+        "direction": "ltr",
+        "theme": "light"
+      },
+      "capture": {
+        "status": "untested",
+        "reason": "DOM/accessibility and screenshot acquisition are deferred to issue 23.",
+        "trackingIssue": 23,
+        "externalProcessing": false
+      },
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/acquisition.json",
+        "caseId": "dashboard-peer-spacing-clean"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/rules.json",
+        "caseId": "dashboard-peer-spacing-clean"
+      },
+      "execution": {
+        "status": "runnable",
+        "inputKind": "artifactIr",
+        "inputPath": "evaluation/web/inputs/dashboard-peer-spacing-clean.json"
+      }
+    },
+    {
+      "id": "dashboard-peer-spacing-mutant",
+      "version": "0.1.0",
+      "split": "smoke",
+      "medium": "web",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "fixture": {
+        "entrypoint": "evaluation/web/fixture-app/index.html",
+        "state": "peer-spacing-mutant",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "sourceDigest": "sha256:01beba501f3c49eae8d11595164c277dcff4156f504cb96c8adae5844ccae153"
+      },
+      "environment": {
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "deviceScaleFactor": 1.0,
+        "textScale": 1.0,
+        "locale": "en-US",
+        "direction": "ltr",
+        "theme": "light"
+      },
+      "capture": {
+        "status": "untested",
+        "reason": "DOM/accessibility and screenshot acquisition are deferred to issue 23.",
+        "trackingIssue": 23,
+        "externalProcessing": false
+      },
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/acquisition.json",
+        "caseId": "dashboard-peer-spacing-mutant"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/rules.json",
+        "caseId": "dashboard-peer-spacing-mutant"
+      },
+      "execution": {
+        "status": "runnable",
+        "inputKind": "artifactIr",
+        "inputPath": "evaluation/web/inputs/dashboard-peer-spacing-mutant.json"
+      },
+      "mutation": {
+        "baselineCaseId": "dashboard-peer-spacing-clean",
+        "targetRuleId": "visual.spacing.peer-consistency",
+        "changedProperty": "The third metric render projection moves 16 CSS pixels along the sequence axis.",
+        "preservedProperties": [
+          "Viewport and coordinate unit",
+          "Metric content and peer membership",
+          "First and second metric geometry",
+          "Expected gap and tolerance",
+          "All non-target fixture sections"
+        ]
+      }
+    },
+    {
+      "id": "dashboard-text-scale-clean",
+      "version": "0.1.0",
+      "split": "development",
+      "medium": "web",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "fixture": {
+        "entrypoint": "evaluation/web/fixture-app/index.html",
+        "state": "peer-spacing-clean",
+        "sourceFiles": [
+          "evaluation/web/fixture-app/app.js",
+          "evaluation/web/fixture-app/index.html",
+          "evaluation/web/fixture-app/styles.css"
+        ],
+        "sourceDigest": "sha256:01beba501f3c49eae8d11595164c277dcff4156f504cb96c8adae5844ccae153"
+      },
+      "environment": {
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "deviceScaleFactor": 1.0,
+        "textScale": 1.25,
+        "locale": "en-US",
+        "direction": "ltr",
+        "theme": "light"
+      },
+      "capture": {
+        "status": "untested",
+        "reason": "Text-scale layout and screenshot acquisition are deferred to issue 23.",
+        "trackingIssue": 23,
+        "externalProcessing": false
+      },
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/acquisition.json",
+        "caseId": "dashboard-text-scale-clean"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/rules.json",
+        "caseId": "dashboard-text-scale-clean"
+      },
+      "execution": {
+        "status": "untested",
+        "reason": "Text-scale-dependent rendered geometry has not been acquired or independently reviewed."
+      }
+    }
+  ]
+}
