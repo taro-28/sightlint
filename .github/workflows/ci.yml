@@ -52,6 +52,12 @@ jobs:
       - name: Verify realistic Web evaluation corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/check_web_evaluation.py
+      - name: Verify release and dependency-license contracts
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 tools/release.py validate-tag --tag v0.1.0-alpha.1
+          python3 tools/check_dependency_licenses.py
+          python3 -m unittest tools/test_release.py
       - name: Check formatting
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo fmt --all -- --check

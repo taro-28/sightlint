@@ -12,7 +12,7 @@
       "id": "synthetic-artifact-ir-v0",
       "kind": "synthetic",
       "origin": "tools/generate_e2e_fixtures.py",
-      "license": "repository-test-data",
+      "license": "MIT OR Apache-2.0",
       "reviewStatus": "maintainer-reviewed"
     }
   ],

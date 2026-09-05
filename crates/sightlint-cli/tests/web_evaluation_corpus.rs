@@ -348,9 +348,10 @@ fn assert_governance_and_determinism(corpus: &Value) -> usize {
         "syntheticNoPersonalData"
     );
     assert!(!bool_field(&sources[0], "externalAssets", "Web source"));
-    assert!(
-        string_field(&sources[0], "license", "Web source").contains("pending"),
-        "the corpus must not invent a license before issue 33"
+    assert_eq!(
+        string_field(&sources[0], "license", "Web source"),
+        "MIT OR Apache-2.0",
+        "repository-owned Web source must record the accepted project license"
     );
 
     let split_policy = field(corpus, "splitPolicy", "Web corpus");
