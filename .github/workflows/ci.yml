@@ -40,6 +40,8 @@ jobs:
         run: cargo test --locked --workspace --all-features
       - name: Run fixture-driven CLI E2E explicitly
         run: cargo test --locked -p sightlint-cli --test e2e
+      - name: Run product evaluation smoke corpus explicitly
+        run: cargo test --locked -p sightlint-cli --test evaluation_corpus
       - name: Build documentation
         env:
           RUSTDOCFLAGS: -D warnings
@@ -75,5 +77,5 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal
           rustup default stable
-      - name: Run tests, including CLI E2E
+      - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
