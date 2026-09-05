@@ -44,9 +44,9 @@ appears to describe a desired future feature.
 
 Issue #34 is the near-term execution epic. Unless a repair is required, prefer:
 
-1. #22 — realistic evaluation corpus and annotation process;
-2. #23 — Playwright web adapter and native/pixel reconciliation;
-3. #24 — evaluated recommended rule packs;
+1. #22 — realistic evaluation corpus and annotation process (complete);
+2. #23 — Playwright web adapter and native/pixel evidence matrix (complete);
+3. #24 — evaluated recommended rule packs (next);
 4. the local agent edit/check/fix/rerun demo in #34;
 5. #33 — license, packaging, compatibility, and alpha release.
 
@@ -258,7 +258,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0033 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0035 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

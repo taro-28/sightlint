@@ -47,6 +47,7 @@ background, alternatives, and disposition of historical experiments.
 - [0031 — Advisory image-region inspection](0031-advisory-image-region-inspection.md)
 - [0032 — Realistic web evaluation foundation](0032-realistic-web-evaluation-foundation.md)
 - [0033 — Playwright web adapter process and capture protocol](0033-playwright-web-adapter-process.md)
+- [0034 — Web evidence matrix and extension evolution](0034-web-evidence-matrix-and-extension-evolution.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions

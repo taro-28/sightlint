@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sightlint:schema:web-extension:0.2.0",
+  "$id": "urn:sightlint:schema:web-extension:0.1.0",
   "title": "SightLint private Web acquisition extension",
   "type": "object",
   "additionalProperties": false,
   "required": ["extensionVersion", "document", "environment", "capture", "nodes", "reconciliation"],
   "properties": {
-    "extensionVersion": { "const": "0.2.0" },
+    "extensionVersion": { "const": "0.1.0" },
     "document": {
       "type": "object",
       "additionalProperties": false,
@@ -162,11 +162,10 @@
     "computedStyle": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["display", "visibility", "opacity", "overflowX", "overflowY", "whiteSpace", "textOverflow", "fontSize", "lineHeight", "fontWeight", "direction", "writingMode", "transform", "pointerEvents"],
+      "required": ["display", "visibility", "opacity", "overflowX", "overflowY", "fontSize", "lineHeight", "fontWeight", "direction", "writingMode", "transform", "pointerEvents"],
       "properties": {
         "display": { "$ref": "#/$defs/nonEmptyString" }, "visibility": { "$ref": "#/$defs/nonEmptyString" }, "opacity": { "type": "number" },
-        "overflowX": { "$ref": "#/$defs/nonEmptyString" }, "overflowY": { "$ref": "#/$defs/nonEmptyString" },
-        "whiteSpace": { "$ref": "#/$defs/nonEmptyString" }, "textOverflow": { "$ref": "#/$defs/nonEmptyString" }, "fontSize": { "$ref": "#/$defs/nonEmptyString" },
+        "overflowX": { "$ref": "#/$defs/nonEmptyString" }, "overflowY": { "$ref": "#/$defs/nonEmptyString" }, "fontSize": { "$ref": "#/$defs/nonEmptyString" },
         "lineHeight": { "$ref": "#/$defs/nonEmptyString" }, "fontWeight": { "$ref": "#/$defs/nonEmptyString" }, "direction": { "$ref": "#/$defs/nonEmptyString" },
         "writingMode": { "$ref": "#/$defs/nonEmptyString" }, "transform": { "$ref": "#/$defs/nonEmptyString" }, "pointerEvents": { "$ref": "#/$defs/nonEmptyString" }
       }
@@ -184,35 +183,12 @@
     "node": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nodeId", "locator", "tagName", "disabled", "interactive", "layoutMethod", "layoutUnavailableReason", "renderMethod", "clientSize", "scrollSize", "overflowMeasurement", "centerHitSample", "hitRegion", "computedStyle", "clippingAncestors", "accessibility"],
+      "required": ["nodeId", "locator", "tagName", "disabled", "interactive", "layoutMethod", "layoutUnavailableReason", "renderMethod", "hitTest", "computedStyle", "clippingAncestors", "accessibility"],
       "properties": {
         "nodeId": { "$ref": "#/$defs/nonEmptyString" }, "locator": { "$ref": "#/$defs/locator" }, "tagName": { "$ref": "#/$defs/nonEmptyString" },
         "disabled": { "type": "boolean" }, "interactive": { "type": "boolean" },
         "layoutMethod": { "enum": ["offsetParentBorderBoxToDocument", "unavailable"] }, "layoutUnavailableReason": { "type": ["string", "null"] },
-        "renderMethod": { "const": "getBoundingClientRect" },
-        "clientSize": { "$ref": "#/$defs/measuredSize" }, "scrollSize": { "$ref": "#/$defs/measuredSize" },
-        "overflowMeasurement": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["horizontal", "vertical", "method"],
-          "properties": {
-            "horizontal": { "enum": ["present", "absent"] },
-            "vertical": { "enum": ["present", "absent"] },
-            "method": { "const": "scrollSizeComparedWithClientSize" }
-          }
-        },
-        "centerHitSample": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["point", "outcome", "hitLocator", "method"],
-          "properties": {
-            "point": { "$ref": "#/$defs/pointWithUnit" },
-            "outcome": { "enum": ["hit", "notInteractive", "zeroArea", "offViewport", "occluded"] },
-            "hitLocator": { "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }] },
-            "method": { "enum": ["elementFromPointAtRenderBoxCenter", "notSampled"] }
-          }
-        },
-        "hitRegion": { "$ref": "#/$defs/cantTell" },
+        "renderMethod": { "const": "getBoundingClientRect" }, "hitTest": { "enum": ["hit", "notInteractive", "zeroArea", "offViewport", "occluded"] },
         "computedStyle": { "$ref": "#/$defs/computedStyle" },
         "clippingAncestors": {
           "type": "array",
@@ -250,7 +226,7 @@
     "reconciliationNode": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nodeId", "screenshotGeometryCoverage", "nativeVisibility", "layoutRender", "ancestorClip", "pixelContentMatch"],
+      "required": ["nodeId", "screenshotGeometryCoverage", "nativeVisibility", "layoutRender", "pixelContentMatch"],
       "properties": {
         "nodeId": { "$ref": "#/$defs/nonEmptyString" },
         "screenshotGeometryCoverage": { "enum": ["zeroArea", "outsideScreenshot", "partiallyOutsideScreenshot", "insideScreenshotExtent"] },
@@ -261,33 +237,9 @@
           "properties": { "display": { "$ref": "#/$defs/nonEmptyString" }, "visibility": { "$ref": "#/$defs/nonEmptyString" }, "opacity": { "type": "number" }, "centerHitTest": { "enum": ["hit", "notInteractive", "zeroArea", "offViewport", "occluded"] } }
         },
         "layoutRender": { "$ref": "#/$defs/layoutRender" },
-        "ancestorClip": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["status", "clippingAncestorLocators", "method"],
-              "properties": {
-                "status": { "enum": ["notClipped", "partiallyClipped", "fullyClipped"] },
-                "clippingAncestorLocators": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmptyString" } },
-                "method": { "const": "rectangularOverflowAncestorIntersection" }
-              }
-            },
-            { "$ref": "#/$defs/cantTell" }
-          ]
-        },
         "pixelContentMatch": { "$ref": "#/$defs/cantTell" }
-      }
-    },
-    "measuredSize": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["width", "height", "unit"],
-      "properties": {
-        "width": { "type": "integer", "minimum": 0 },
-        "height": { "type": "integer", "minimum": 0 },
-        "unit": { "const": "cssPixel" }
       }
     }
   }
 }
+

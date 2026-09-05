@@ -178,8 +178,8 @@ extensions must be able to preserve:
 - capture timing/state mismatch;
 - unresolved conflict requiring `cantTell`.
 
-Issue #23 defines the first Playwright-based reconciliation slice. A later generalized conflict
-model may require a core/schema ADR.
+ADRs 0033 and 0034 implement the first Playwright-based reconciliation slice in an adapter-private
+extension. A later generalized conflict model may require a core/schema ADR.
 
 ## Policy is not an observation
 
@@ -271,5 +271,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0033 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0035 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

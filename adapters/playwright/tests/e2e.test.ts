@@ -27,7 +27,26 @@ interface ExpectedNode {
   role: string | null;
   name: string | null;
   display: string;
+  visibility?: string;
+  opacity?: number;
+  overflowX?: string;
+  overflowY?: string;
+  whiteSpace?: string;
+  textOverflow?: string;
   fontSize?: string;
+  direction?: string;
+  writingMode?: string;
+  transform?: string;
+  disabled?: boolean;
+  interactive?: boolean;
+  accessibilityStates?: string[];
+  layoutSize?: { width: number; height: number; tolerance: number; unit: string };
+  renderSize?: { width: number; height: number; tolerance: number; unit: string };
+  clientSize?: { width: number; height: number; tolerance: number; unit: string };
+  scrollSize?: { width: number; height: number; tolerance: number; unit: string };
+  overflowMeasurement?: { horizontal: string; vertical: string };
+  centerHitSample?: { outcome: string; hitLocator: string | null };
+  ancestorClipStatus?: string;
   layoutRenderStatus: string;
   screenshotGeometryCoverage: string;
   renderOffset?: { x: number; y: number; tolerance: number; unit: string };
@@ -42,6 +61,7 @@ interface AcquisitionCase {
     sourceFiles: string[];
     viewport: { width: number; height: number; unit: string };
     minimumDocumentHeight: number;
+    documentDirection: "ltr" | "rtl";
     frameCount: number;
     minimumNodeCount: number;
     coreRelationCount: number;
@@ -51,6 +71,13 @@ interface AcquisitionCase {
     gaps: Array<{ from: string; to: string; axis: "horizontal" | "vertical"; value: number; tolerance: number; unit: string }>;
   };
   abstentions: Array<{ aspect: string; outcome: string; rationale: string }>;
+  mutation?: {
+    baselineRequest: string;
+    target: string;
+    changedProperty: string;
+    preservedProperties: string[];
+    evidenceExpectations: Array<"layoutRenderConflict" | "renderOffset" | "ancestorClipping" | "overflowMeasurement" | "centerHitSample" | "peerDimensionDifference">;
+  };
 }
 
 interface RuleCase {
@@ -130,6 +157,40 @@ function number(value: unknown, context: string): number {
   return value as number;
 }
 
+function assertSize(
+  actualValue: unknown,
+  expected: { width: number; height: number; tolerance: number; unit: string },
+  context: string,
+): void {
+  const actual = object(actualValue, context);
+  assert.equal(actual["unit"] ?? "cssPixel", expected.unit, `${context} unit`);
+  assert.ok(Math.abs(number(actual["width"], `${context} width`) - expected.width) <= expected.tolerance, `${context} width`);
+  assert.ok(Math.abs(number(actual["height"], `${context} height`) - expected.height) <= expected.tolerance, `${context} height`);
+}
+
+function assertMutationEvidence(oracle: AcquisitionCase): void {
+  if (oracle.classification !== "targetedMutation") return;
+  assert.ok(oracle.mutation, `${oracle.caseId} must declare mutation evidence`);
+  for (const signal of oracle.mutation.evidenceExpectations) {
+    if (signal === "layoutRenderConflict") {
+      assert.ok(oracle.expectations.nodes.some((node) => node.layoutRenderStatus === "conflict"), `${oracle.caseId} layout conflict evidence`);
+    } else if (signal === "renderOffset") {
+      assert.ok(oracle.expectations.nodes.some((node) => node.renderOffset !== undefined), `${oracle.caseId} render offset evidence`);
+    } else if (signal === "ancestorClipping") {
+      assert.ok(oracle.expectations.nodes.some((node) => ["partiallyClipped", "fullyClipped"].includes(node.ancestorClipStatus ?? "")), `${oracle.caseId} ancestor clipping evidence`);
+    } else if (signal === "overflowMeasurement") {
+      assert.ok(oracle.expectations.nodes.some((node) =>
+        node.overflowMeasurement?.horizontal === "present" || node.overflowMeasurement?.vertical === "present"
+      ), `${oracle.caseId} overflow evidence`);
+    } else if (signal === "centerHitSample") {
+      assert.ok(oracle.expectations.nodes.some((node) => ["occluded", "offViewport"].includes(node.centerHitSample?.outcome ?? "")), `${oracle.caseId} center-hit evidence`);
+    } else {
+      const sizes = oracle.expectations.nodes.flatMap((node) => node.renderSize === undefined ? [] : [`${node.renderSize.width}x${node.renderSize.height}`]);
+      assert.ok(new Set(sizes).size > 1, `${oracle.caseId} peer dimension evidence`);
+    }
+  }
+}
+
 function indexBy(items: Array<Record<string, unknown>>, field: string): Map<string, Record<string, unknown>> {
   return new Map(items.map((item) => [string(item[field], field), item]));
 }
@@ -185,6 +246,7 @@ function assertAcquisition(runResult: CaptureRun, oracle: AcquisitionCase): void
   assert.deepEqual(captureRecord["sourceFiles"], oracle.expectations.sourceFiles);
   assert.deepEqual(document["viewportSize"], oracle.expectations.viewport);
   assert.ok(number(object(document["documentSize"], "document size")["height"], "document height") >= oracle.expectations.minimumDocumentHeight);
+  assert.equal(document["direction"], oracle.expectations.documentDirection);
   assert.equal(document["frameCount"], oracle.expectations.frameCount);
   assert.equal(responseCapture["frameCount"], oracle.expectations.frameCount);
   assert.ok(array(ir["nodes"], "IR nodes").length >= oracle.expectations.minimumNodeCount);
@@ -208,13 +270,56 @@ function assertAcquisition(runResult: CaptureRun, oracle: AcquisitionCase): void
     assert.equal(object(acquired["accessibility"], `${expected.id} accessibility`)["status"], expected.accessibilityStatus);
     assert.equal(object(acquired["accessibility"], `${expected.id} accessibility`)["role"], expected.role);
     assert.equal(object(acquired["accessibility"], `${expected.id} accessibility`)["name"], expected.name);
-    assert.equal(object(acquired["computedStyle"], `${expected.id} style`)["display"], expected.display);
+    const accessibility = object(acquired["accessibility"], `${expected.id} accessibility`);
+    const style = object(acquired["computedStyle"], `${expected.id} style`);
+    assert.equal(style["display"], expected.display);
+    if (expected.accessibilityStates !== undefined) assert.deepEqual(accessibility["states"], expected.accessibilityStates);
+    if (expected.visibility !== undefined) assert.equal(style["visibility"], expected.visibility);
+    if (expected.opacity !== undefined) assert.equal(style["opacity"], expected.opacity);
+    if (expected.overflowX !== undefined) assert.equal(style["overflowX"], expected.overflowX);
+    if (expected.overflowY !== undefined) assert.equal(style["overflowY"], expected.overflowY);
+    if (expected.whiteSpace !== undefined) assert.equal(style["whiteSpace"], expected.whiteSpace);
+    if (expected.textOverflow !== undefined) assert.equal(style["textOverflow"], expected.textOverflow);
     if (expected.fontSize !== undefined) {
-      assert.equal(object(acquired["computedStyle"], `${expected.id} style`)["fontSize"], expected.fontSize);
+      assert.equal(style["fontSize"], expected.fontSize);
     }
+    if (expected.direction !== undefined) assert.equal(style["direction"], expected.direction);
+    if (expected.writingMode !== undefined) assert.equal(style["writingMode"], expected.writingMode);
+    if (expected.transform !== undefined) assert.equal(style["transform"], expected.transform);
+    if (expected.disabled !== undefined) assert.equal(acquired["disabled"], expected.disabled);
+    if (expected.interactive !== undefined) assert.equal(acquired["interactive"], expected.interactive);
+    if (expected.clientSize !== undefined) assertSize(acquired["clientSize"], expected.clientSize, `${expected.id} client size`);
+    if (expected.scrollSize !== undefined) assertSize(acquired["scrollSize"], expected.scrollSize, `${expected.id} scroll size`);
+    if (expected.overflowMeasurement !== undefined) {
+      const overflow = object(acquired["overflowMeasurement"], `${expected.id} overflow`);
+      assert.equal(overflow["horizontal"], expected.overflowMeasurement.horizontal);
+      assert.equal(overflow["vertical"], expected.overflowMeasurement.vertical);
+    }
+    if (expected.centerHitSample !== undefined) {
+      const sample = object(acquired["centerHitSample"], `${expected.id} center hit sample`);
+      assert.equal(sample["outcome"], expected.centerHitSample.outcome);
+      assert.equal(sample["hitLocator"], expected.centerHitSample.hitLocator);
+      assert.equal(
+        sample["method"],
+        ["hit", "occluded"].includes(expected.centerHitSample.outcome)
+          ? "elementFromPointAtRenderBoxCenter"
+          : "notSampled",
+      );
+    }
+    assert.equal(object(acquired["hitRegion"], `${expected.id} hit region`)["status"], "cantTell");
     const layoutRender = object(reconciled["layoutRender"], `${expected.id} layout/render`);
     assert.equal(layoutRender["status"], expected.layoutRenderStatus);
     assert.equal(reconciled["screenshotGeometryCoverage"], expected.screenshotGeometryCoverage);
+    if (expected.ancestorClipStatus !== undefined) {
+      assert.equal(object(reconciled["ancestorClip"], `${expected.id} ancestor clip`)["status"], expected.ancestorClipStatus);
+    }
+    const geometry = object(core["geometry"], `${expected.id} geometry`);
+    if (expected.layoutSize !== undefined) {
+      assertSize(object(geometry["layoutBox"], `${expected.id} layout box`)["rect"], expected.layoutSize, `${expected.id} layout size`);
+    }
+    if (expected.renderSize !== undefined) {
+      assertSize(object(geometry["renderBox"], `${expected.id} render box`)["rect"], expected.renderSize, `${expected.id} render size`);
+    }
     assert.equal(object(reconciled["pixelContentMatch"], `${expected.id} pixel match`)["status"], "cantTell");
     if (expected.renderOffset !== undefined) {
       const layout = object(layoutRender["layoutBox"], `${expected.id} layout box`);
@@ -239,6 +344,7 @@ function assertAcquisition(runResult: CaptureRun, oracle: AcquisitionCase): void
 
   assert.equal(object(response["artifactIr"], "Artifact IR response")["sha256"], digest(runResult.artifactIrBytes));
   assert.equal(object(response["screenshot"], "screenshot response")["sha256"], digest(runResult.screenshotBytes));
+  assertMutationEvidence(oracle);
 }
 
 function resultMatches(candidate: Record<string, unknown>, expected: RuleCase["expectedResults"][number]): boolean {
@@ -274,13 +380,25 @@ function assertRuleReport(result: ProcessResult, oracle: RuleCase): RuleMetrics 
   };
 }
 
-test("reviewed browser acquisition and rule oracles pass through the public processes", { timeout: 120_000 }, async () => {
+test("reviewed browser acquisition and rule oracles pass through the public processes", { timeout: 300_000 }, async () => {
   const acquisitionDocument = await loadJson("evaluation/web/annotations/browser-acquisition.json");
   const ruleDocument = await loadJson("evaluation/web/annotations/browser-rules.json");
   const acquisitionCases = array(acquisitionDocument["cases"], "acquisition cases") as unknown as AcquisitionCase[];
+  const requestSet = new Set(acquisitionCases.map((item) => item.request));
+  for (const oracle of acquisitionCases) {
+    if (oracle.classification === "targetedMutation") {
+      assert.ok(oracle.mutation, `${oracle.caseId} mutation contract`);
+      assert.ok(requestSet.has(oracle.mutation.baselineRequest), `${oracle.caseId} baseline request`);
+      assert.notEqual(oracle.mutation.baselineRequest, oracle.request, `${oracle.caseId} distinct baseline`);
+      assert.ok(oracle.mutation.target.length > 0);
+      assert.ok(oracle.mutation.changedProperty.length > 0);
+      assert.ok(oracle.mutation.preservedProperties.length > 0);
+    }
+  }
   const ruleCases = new Map((array(ruleDocument["cases"], "rule cases") as unknown as RuleCase[]).map((item) => [item.caseId, item]));
   const responseValidator = await schemaValidator("adapters/playwright/schemas/capture-response.schema.json");
   const extensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension.schema.json");
+  const previousExtensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension-0.1.schema.json");
   const completed: CaptureRun[] = [];
   let completedCases = 0;
   let acquisitionExpectations = 0;
@@ -304,7 +422,12 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
       const captured = await capture(oracle.request);
       completed.push(captured);
       assertValid(responseValidator, captured.response, `${oracle.caseId} response`);
-      assertValid(extensionValidator, object(object(captured.artifactIr["extensions"], "extensions")[webExtensionKey], "Web extension"), `${oracle.caseId} extension`);
+      const previousAdapterResponse = structuredClone(captured.response);
+      object(previousAdapterResponse["adapter"], "adapter version compatibility")["version"] = "0.1.0";
+      assertValid(responseValidator, previousAdapterResponse, `${oracle.caseId} response with previous adapter metadata`);
+      const webExtension = object(object(captured.artifactIr["extensions"], "extensions")[webExtensionKey], "Web extension");
+      assertValid(extensionValidator, webExtension, `${oracle.caseId} extension`);
+      assert.equal(previousExtensionValidator(webExtension), false, `${oracle.caseId} must not be reinterpreted as extension 0.1`);
       assertAcquisition(captured, oracle);
       const report = await run(sightlintBinary, ["check", join(captured.directory, "artifact-ir.json"), "--format", "json"]);
       const metrics = assertRuleReport(report, ruleOracle);
@@ -317,9 +440,7 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
       ruleAbstentions += metrics.abstentions;
       if (oracle.classification === "targetedMutation") {
         acquisitionMutations += 1;
-        if (oracle.expectations.nodes.some((node) => node.layoutRenderStatus === "conflict")) {
-          detectedAcquisitionMutations += 1;
-        }
+        detectedAcquisitionMutations += 1;
         if (ruleOracle.expectedFailureCount > 0) {
           eligibleRuleMutations += 1;
           if (metrics.matchedFailures > 0) killedRuleMutations += 1;
@@ -339,17 +460,20 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
     const repeatedReport = await run(sightlintBinary, ["check", join(repeatedClean.directory, "artifact-ir.json"), "--format", "json"]);
     assert.deepEqual(repeatedReport, firstReport, "rule report, stderr, and exit code must be stable");
 
-    assert.equal(completedCases, 7);
-    assert.equal(acquisitionAbstentions, 13);
+    assert.equal(completedCases, 19);
+    assert.equal(acquisitionExpectations, 70);
+    assert.equal(acquisitionAbstentions, 37);
     assert.equal(detectedAcquisitionMutations, acquisitionMutations);
-    assert.equal(eligibleRuleMutations, 1);
+    assert.equal(acquisitionMutations, 9);
+    assert.equal(eligibleRuleMutations, 3);
     assert.equal(killedRuleMutations, eligibleRuleMutations);
-    assert.equal(matchedFailures, 1);
-    assert.equal(emittedFailures, 1);
+    assert.equal(matchedFailures, 3);
+    assert.equal(emittedFailures, 3);
     assert.equal(falsePositiveFailures, 0);
+    assert.equal(ruleAbstentions, 38);
     assert.equal(hardNegativeFailures, 0);
     process.stdout.write(
-      `browser evaluation v0: cases=${completedCases}/7, acquisition_expectations=${acquisitionExpectations}, ` +
+      `browser evaluation v1: cases=${completedCases}/19, acquisition_expectations=${acquisitionExpectations}, ` +
       `failure_precision=${matchedFailures}/${emittedFailures}, false_positive_failures=${falsePositiveFailures}, ` +
       `acquisition_abstentions=${acquisitionAbstentions}, rule_abstentions=${ruleAbstentions}, ` +
       `acquisition_mutations_detected=${detectedAcquisitionMutations}/${acquisitionMutations}, ` +
@@ -389,7 +513,7 @@ async function expectAdapterFailure(root: string, request: Record<string, unknow
   assert.deepEqual(second, first, `${expected} diagnostics must be stable`);
 }
 
-test("public adapter rejects unsafe/resource states without partial outputs", { timeout: 60_000 }, async () => {
+test("public adapter rejects unsafe/resource states without partial outputs", { timeout: 180_000 }, async () => {
   const root = await mkdtemp(join(tmpdir(), "sightlint-playwright-invalid-"));
   try {
     await mkdir(join(root, "fixtures"));

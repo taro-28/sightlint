@@ -90,9 +90,9 @@ them. Issue #32 tracks deletion of their branches and other stale refs.
 Issue #34 is the canonical execution epic for the first evidence-backed zero-setup web UI alpha.
 Until it is complete, prefer the earliest unblocked step:
 
-1. #22 — realistic, human-reviewed evaluation corpus and hard negatives;
-2. #23 — isolated Playwright native/pixel web adapter;
-3. #24 — evaluated recommended rule packs that work without per-project setup;
+1. #22 — realistic, human-reviewed evaluation corpus and hard negatives (complete);
+2. #23 — isolated Playwright native/pixel web adapter and acquisition evidence matrix (complete);
+3. #24 — evaluated recommended rule packs that work without per-project setup (next);
 4. the local agent edit/check/fix/rerun loop defined by #34;
 5. #33 — licensing, compatibility, packaging, and first alpha release.
 
@@ -130,7 +130,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0034 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0035 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.

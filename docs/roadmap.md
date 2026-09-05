@@ -15,7 +15,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
-| M4 — Structured adapters | active | initial process-isolated Playwright local-fixture capture with native structure, geometry, screenshot, and reconciliation | broader Web fixture coverage and portability evidence, then other media by demand |
+| M4 — Structured adapters | active | process-isolated Playwright local-fixture capture plus 19-case native/pixel evidence matrix | evaluated zero-setup rules, portability characterization, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
 | M7 — Ecosystem and release | not started | local development CLI only | agent workflow, MCP/GitHub/editor surfaces, packaging, license, release |
@@ -35,20 +35,20 @@ Issue #34 owns this outcome.
 
 ### Required sequence
 
-1. **#22 — Realistic evaluation and annotation gate**
+1. **#22 — Realistic evaluation and annotation gate (complete)**
    - build deterministic repository-owned web fixtures with clean and targeted-mutant states;
    - capture or annotate native structure, rendered geometry, screenshots, peer/hierarchy
      relations, policy applicability, hard negatives, and ambiguity;
    - define acquisition and rule ground truth separately;
    - report precision, coverage, false positives, abstention, mutation kill rate, and a holdout
      process.
-2. **#23 — Playwright structured web adapter**
+2. **#23 — Playwright structured web adapter (complete)**
    - isolate browser automation in TypeScript/Node;
    - capture DOM/accessibility/computed geometry and a synchronized screenshot;
    - preserve layout/render/hit geometry, selectors, units, browser environment, privacy, and
      resource limits;
    - reconcile native and pixel evidence instead of choosing one globally.
-3. **#24 — Recommended zero-setup rule packs**
+3. **#24 — Recommended zero-setup rule packs (next)**
    - admit only narrow, evaluated rules with a named policy source and acceptable precision at
      stated coverage;
    - preserve project/design-system/platform precedence and `cantTell`;
@@ -65,7 +65,7 @@ Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by putting
 logic into the Rust kernel. Do not skip #24 by presenting raw measurements as a complete UI/UX
 reviewer.
 
-### Current #22 foundation and browser slice
+### Completed #22/#23 foundation and browser evidence matrix
 
 ADR 0032 establishes an independently versioned Web evaluation contract and one repository-owned
 dashboard fixture. Six reviewed records separate acquisition annotations from rule verdicts. Three
@@ -73,17 +73,20 @@ smoke cases exercise the existing explicit peer-spacing rule through the public 
 baseline, targeted mutation, and intentional-grouping hard negative; three declared-IR development
 cases keep ambiguous, narrow-viewport, and text-scale acquisition explicitly untested.
 
-ADR 0033 adds a separate seven-case browser companion without overwriting those projections. The
-isolated Node process captures selected DOM/accessibility structure, computed geometry, a
-synchronized viewport screenshot, and explicit native/screenshot reconciliation. Human-authored
-browser acquisition and rule oracles cover clean, targeted mutations, an intentional-grouping hard
-negative, ambiguity, responsive layout, text scale, and abstention. The actual capture and built
-Rust binary are exercised together on Linux.
+ADRs 0033 and 0034 add a separate 19-case browser companion without overwriting those projections.
+The isolated Node process captures selected DOM/accessibility structure, computed geometry,
+client/scroll overflow, rectangular ancestor clipping, render-box-center hit samples, writing
+direction, a synchronized viewport screenshot, and explicit native/screenshot reconciliation.
+Human-authored browser acquisition and rule oracles cover nine targeted acquisition mutations,
+three current-rule mutation kills, two hard negatives, ambiguity, responsive layout, text scale,
+and 37 explicit acquisition abstentions. The actual capture and built Rust binary are exercised
+together on Linux with byte-stability checks.
 
-This remains a reviewable first vertical slice, not completion of issue #22 or #23. It has one
-fictional application family, maintainer-only review, visible development labels, no private
-holdout, no pixel-content identity, no semantic peer inference, and no representative sampling.
-Those gaps remain ahead of rule promotion or real-world accuracy claims.
+This completes the bounded #22 and #23 issue contracts, but it is not evidence of general Web
+accuracy. The corpus has one fictional application family, maintainer-only review, visible
+development labels, no private holdout, no pixel-content identity, no complete hit regions, no
+semantic peer inference, and no representative sampling. Issue #24 must admit rules
+conservatively without turning these acquisition measurements into automatic defects.
 
 ## Scope-selection rules
 
@@ -254,13 +257,14 @@ pixels to verify rendered reality.
 
 ### First adapter: Playwright/web — #23
 
-The initial protocol `0.1.0` slice captures, from one controlled local session:
+Capture protocol `0.1.0` with `org.sightlint.web@0.2.0` captures, from one controlled local session:
 
 - DOM and frame hierarchy;
 - accessibility roles/names/states;
 - computed style and typography;
-- layout/render rectangles, center hit tests, clipping, transforms, scroll offsets, direction, and
-  viewport; full hit rectangles remain unavailable;
+- layout/render rectangles, client/scroll overflow, rectangular ancestor clipping,
+  render-box-center hit samples, transforms, scroll offsets, direction, and viewport; full hit
+  rectangles remain explicitly `cantTell`;
 - device-pixel ratio and deterministic browser/capture environment;
 - synchronized screenshot and evidence reference;
 - stable selectors, adapter/browser versions, privacy/network status, and resource limits;
@@ -269,10 +273,13 @@ The initial protocol `0.1.0` slice captures, from one controlled local session:
 The browser runs in an isolated TypeScript/Node adapter process. It is not linked into the trusted
 Rust kernel. Start with repository-owned local fixtures rather than arbitrary network URLs.
 
-Remaining #23 work includes broader overlap/clipping/overflow/hit-target/hidden/RTL fixtures,
-characterizing macOS and Windows browser output, and deciding later protocol support for iframes,
-shadow DOM, interaction, and arbitrary projects. Pixel-content identity and semantic peer
-relations remain abstentions until independently evaluated evidence exists.
+The #23 matrix includes overlap/occlusion, clipping, overflow, visual/interactive extent,
+hidden/disabled/offscreen, peer-dimension, transformed-text, responsive desktop/mobile,
+RTL/vertical-writing, and intentional-overlay fixtures. Characterizing macOS and Windows browser
+output, and later support for iframes, shadow DOM, interaction, and arbitrary projects, remain
+future compatibility/capability work rather than part of the bounded local-fixture protocol.
+Pixel-content identity, complete hit regions, and semantic peer relations remain abstentions until
+independently evaluated evidence exists.
 
 ### Other adapters — #29
 
@@ -402,7 +409,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0033 or later.
+- New architecture decision numbers continue at 0035 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.

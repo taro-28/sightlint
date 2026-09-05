@@ -2,11 +2,12 @@
 
 `sightlint-web` is SightLint's process-isolated, untrusted browser acquisition adapter. It loads a
 repository-owned local HTML fixture in the Playwright-pinned Chromium build, captures selected DOM
-and accessibility observations, computed layout/render geometry and center hit tests, and a synchronized viewport
-screenshot, then writes Artifact IR for the deterministic Rust `sightlint` binary.
+and accessibility observations, computed layout/render geometry, bounded clipping/overflow and
+center-hit samples, and a synchronized viewport screenshot, then writes Artifact IR for the
+deterministic Rust `sightlint` binary.
 
-The adapter is governed by ADR 0033. It is not part of the Rust kernel and does not decide whether
-a UI is good or bad.
+The adapter is governed by ADRs 0033 and 0034. It is not part of the Rust kernel and does not decide
+whether a UI is good or bad.
 
 ## Compatibility
 
@@ -15,7 +16,9 @@ a UI is good or bad.
 - Playwright: exactly `1.63.0` with its matching Chromium build.
 - Schema validation: AJV exactly `8.20.0` in development/E2E.
 - capture request/response: `0.1.0`.
-- `org.sightlint.web` extension: `0.1.0`.
+- adapter implementation: `0.2.0`.
+- `org.sightlint.web` extension: `0.2.0`; the strict `0.1.0` schema remains available for version
+  dispatch and historical validation.
 - Artifact IR: `0.1.0`.
 
 Install the locked dependencies and browser once:
@@ -62,12 +65,22 @@ Fixture data is fictional and repository-owned. Do not use private/customer page
 as committed test data. The project license remains unresolved, so the fixture and adapter carry no
 independent redistribution grant.
 
+The controlled Atlas fixture has no time-, randomness-, storage-, history-, or network-dependent
+output. Protocol `0.1.0` does not virtualize time or random sources in arbitrary applications.
+Scrollbar presence is not normalized across operating systems; viewport/document sizes and scroll
+offsets are recorded instead.
+
 ## Evidence and non-claims
 
 Core geometry is in document CSS pixels. Viewport dimensions, scroll translation, screenshot
 extent, layout/render disagreement, and partial screenshot coverage stay explicit in the Web
 extension. Native structure never overwrites pixel evidence. Pixel-content identity is
 `cantTell` because this version performs no segmentation, OCR, CV, or visual identity matching.
+
+Extension `0.2.0` also keeps client and scroll sizes, computed white-space/text-overflow values,
+rectangular overflow-ancestor intersections, and the selected element at a render-box-center hit
+sample. These are measurements, not UX verdicts. A center sample is not a complete hit rectangle;
+core `hitBox` remains absent and `hitRegion` is explicitly `cantTell`.
 
 The adapter does not infer semantic peer groups. Consequently, the existing peer-spacing rule is
 `inapplicable` for raw adapter output until a later evaluated relation source exists. The reviewed
@@ -84,7 +97,8 @@ npm --prefix adapters/playwright run test:e2e
 ```
 
 The E2E executes the actual Node process and built Rust binary, validates both versioned schemas,
-checks reviewed clean/mutation/hard-negative/ambiguous/responsive/text-scale cases, exercises
+checks 19 reviewed clean/mutation/hard-negative/ambiguous/responsive/text-scale and evidence-matrix
+cases, exercises
 stable malformed/resource errors, and compares repeated response, IR, screenshot, and rule-report
 bytes within one declared compatibility environment. Linux is the required browser E2E platform;
 cross-platform screenshot byte identity is not claimed.

@@ -319,6 +319,15 @@ async function collectBrowserSnapshot(page: Page): Promise<BrowserSnapshot> {
       }
       return null;
     }
+    function nearestCapturedLocator(element: Element | null): string | null {
+      let current = element;
+      while (current instanceof HTMLElement) {
+        const locator = locators.get(current);
+        if (locator !== undefined) return locator.value;
+        current = current.parentElement;
+      }
+      return null;
+    }
     function isInteractive(element: HTMLElement, role: string | null): boolean {
       const tag = element.tagName.toLowerCase();
       return ["a", "button", "input", "select", "textarea"].includes(tag) ||
@@ -332,14 +341,16 @@ async function collectBrowserSnapshot(page: Page): Promise<BrowserSnapshot> {
         const style = getComputedStyle(parent);
         if (["auto", "clip", "hidden", "scroll"].includes(style.overflowX) ||
             ["auto", "clip", "hidden", "scroll"].includes(style.overflowY)) {
+          const parentRect = parent.getBoundingClientRect();
           ancestors.push({
             locator: locators.get(parent)?.value ?? `css:${structuralPath(parent)}`,
             overflowX: style.overflowX,
             overflowY: style.overflowY,
             rect: {
-              ...rect(parent.getBoundingClientRect()),
-              x: parent.getBoundingClientRect().x + window.scrollX,
-              y: parent.getBoundingClientRect().y + window.scrollY,
+              x: parentRect.x + window.scrollX + parent.clientLeft,
+              y: parentRect.y + window.scrollY + parent.clientTop,
+              width: parent.clientWidth,
+              height: parent.clientHeight,
             },
           });
         }
@@ -357,15 +368,19 @@ async function collectBrowserSnapshot(page: Page): Promise<BrowserSnapshot> {
       const interactive = isInteractive(element, role);
       const centerX = rendered.left + rendered.width / 2;
       const centerY = rendered.top + rendered.height / 2;
-      let hitTest: BrowserNode["hitTest"] = "notInteractive";
+      let hitOutcome: BrowserNode["centerHitSample"]["outcome"] = "notInteractive";
+      let hitLocator: string | null = null;
+      let hitMethod: BrowserNode["centerHitSample"]["method"] = "notSampled";
       if (interactive) {
         if (rendered.width <= 0 || rendered.height <= 0) {
-          hitTest = "zeroArea";
+          hitOutcome = "zeroArea";
         } else if (centerX < 0 || centerY < 0 || centerX >= window.innerWidth || centerY >= window.innerHeight) {
-          hitTest = "offViewport";
+          hitOutcome = "offViewport";
         } else {
           const hit = document.elementFromPoint(centerX, centerY);
-          hitTest = hit !== null && element.contains(hit) ? "hit" : "occluded";
+          hitMethod = "elementFromPointAtRenderBoxCenter";
+          hitLocator = nearestCapturedLocator(hit);
+          hitOutcome = hit !== null && element.contains(hit) ? "hit" : "occluded";
         }
       }
       const layout = layoutBox(element);
@@ -384,13 +399,22 @@ async function collectBrowserSnapshot(page: Page): Promise<BrowserSnapshot> {
           x: rendered.x + window.scrollX,
           y: rendered.y + window.scrollY,
         },
-        hitTest,
+        clientSize: { width: element.clientWidth, height: element.clientHeight },
+        scrollSize: { width: element.scrollWidth, height: element.scrollHeight },
+        centerHitSample: {
+          point: { x: centerX + window.scrollX, y: centerY + window.scrollY },
+          outcome: hitOutcome,
+          hitLocator,
+          method: hitMethod,
+        },
         computedStyle: {
           display: style.display,
           visibility: style.visibility,
           opacity: Number.parseFloat(style.opacity),
           overflowX: style.overflowX,
           overflowY: style.overflowY,
+          whiteSpace: style.whiteSpace,
+          textOverflow: style.textOverflow,
           fontSize: style.fontSize,
           lineHeight: style.lineHeight,
           fontWeight: style.fontWeight,
@@ -472,6 +496,44 @@ function rectanglesAgree(left: RectValue, right: RectValue, tolerance: number): 
   return (["x", "y", "width", "height"] as const).every(
     (field) => Math.abs(left[field] - right[field]) <= tolerance,
   );
+}
+
+function ancestorClip(node: BrowserNode): JsonObject {
+  const render = node.renderBox;
+  if (render.width <= 0 || render.height <= 0) {
+    return {
+      status: "cantTell",
+      reason: "a zero-area render box cannot establish ancestor clipping",
+    };
+  }
+  let left = render.x;
+  let top = render.y;
+  let right = render.x + render.width;
+  let bottom = render.y + render.height;
+  const clippingAncestorLocators: string[] = [];
+  for (const ancestor of node.clippingAncestors) {
+    clippingAncestorLocators.push(ancestor.locator);
+    if (["auto", "clip", "hidden", "scroll"].includes(ancestor.overflowX)) {
+      left = Math.max(left, ancestor.rect.x);
+      right = Math.min(right, ancestor.rect.x + ancestor.rect.width);
+    }
+    if (["auto", "clip", "hidden", "scroll"].includes(ancestor.overflowY)) {
+      top = Math.max(top, ancestor.rect.y);
+      bottom = Math.min(bottom, ancestor.rect.y + ancestor.rect.height);
+    }
+  }
+  const visibleWidth = Math.max(0, right - left);
+  const visibleHeight = Math.max(0, bottom - top);
+  const status = visibleWidth === 0 || visibleHeight === 0
+    ? "fullyClipped"
+    : visibleWidth < render.width || visibleHeight < render.height
+      ? "partiallyClipped"
+      : "notClipped";
+  return {
+    status,
+    clippingAncestorLocators,
+    method: "rectangularOverflowAncestorIntersection",
+  };
 }
 
 function evidenceRecord(
@@ -559,7 +621,27 @@ function buildArtifactIr(
       layoutMethod: node.browser.layoutBox === null ? "unavailable" : "offsetParentBorderBoxToDocument",
       layoutUnavailableReason: node.browser.layoutUnavailableReason,
       renderMethod: "getBoundingClientRect",
-      hitTest: node.browser.hitTest,
+      clientSize: { ...node.browser.clientSize, unit: "cssPixel" },
+      scrollSize: { ...node.browser.scrollSize, unit: "cssPixel" },
+      overflowMeasurement: {
+        horizontal: node.browser.scrollSize.width > node.browser.clientSize.width ? "present" : "absent",
+        vertical: node.browser.scrollSize.height > node.browser.clientSize.height ? "present" : "absent",
+        method: "scrollSizeComparedWithClientSize",
+      },
+      centerHitSample: {
+        point: {
+          x: roundCss(node.browser.centerHitSample.point.x),
+          y: roundCss(node.browser.centerHitSample.point.y),
+          unit: "cssPixel",
+        },
+        outcome: node.browser.centerHitSample.outcome,
+        hitLocator: node.browser.centerHitSample.hitLocator,
+        method: node.browser.centerHitSample.method,
+      },
+      hitRegion: {
+        status: "cantTell",
+        reason: "a center-point sample does not measure the complete activation region",
+      },
       computedStyle: node.browser.computedStyle as unknown as JsonObject,
       clippingAncestors: node.browser.clippingAncestors.map((ancestor) => ({
         locator: ancestor.locator,
@@ -579,7 +661,7 @@ function buildArtifactIr(
         display: node.browser.computedStyle.display,
         visibility: node.browser.computedStyle.visibility,
         opacity: node.browser.computedStyle.opacity,
-        centerHitTest: node.browser.hitTest,
+        centerHitTest: node.browser.centerHitSample.outcome,
       },
       layoutRender: (node.browser.layoutBox === null
         ? { status: "cantTell", reason: node.browser.layoutUnavailableReason }
@@ -591,9 +673,10 @@ function buildArtifactIr(
             layoutBox: roundedRect(node.browser.layoutBox),
             renderBox: roundedRect(node.browser.renderBox),
           }) as unknown as JsonValue,
+      ancestorClip: ancestorClip(node.browser),
       pixelContentMatch: {
         status: "cantTell",
-        reason: "web extension 0.1 does not perform pixel-content segmentation or identity matching",
+        reason: "web extension 0.2 does not perform pixel-content segmentation or identity matching",
       },
     });
   }
@@ -651,7 +734,7 @@ function buildArtifactIr(
       nodes: reconciliationNodes,
       pixelContentComparison: {
         status: "cantTell",
-        reason: "pixel-content identity is outside web extension 0.1",
+        reason: "pixel-content identity is outside web extension 0.2",
       },
     },
   };
@@ -868,6 +951,7 @@ export async function capture(
       },
       limitations: [
         "pixel-content matching is cantTell in protocol 0.1.0",
+        "complete hit regions are cantTell; center-point samples are not hit rectangles",
         "host font and raster differences are recorded but not normalized across platforms",
         "only repository-contained file fixtures are supported",
       ],

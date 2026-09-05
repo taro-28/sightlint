@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sightlint:schema:web-browser-acquisition-oracle:0.2.0",
+  "$id": "urn:sightlint:schema:web-browser-acquisition-oracle:0.1.0",
   "title": "SightLint reviewed browser acquisition oracle",
   "type": "object",
   "additionalProperties": false,
   "required": ["$schema", "schemaVersion", "documentType", "provenance", "cases"],
   "properties": {
     "$schema": { "const": "../browser-acquisition.schema.json" },
-    "schemaVersion": { "const": "0.2.0" },
+    "schemaVersion": { "const": "0.1.0" },
     "documentType": { "const": "browserAcquisitionOracle" },
     "provenance": { "$ref": "#/$defs/provenance" },
     "cases": {
@@ -67,35 +67,6 @@
         "unit": { "const": "cssPixel" }
       }
     },
-    "measuredSize": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["width", "height", "tolerance", "unit"],
-      "properties": {
-        "width": { "type": "number", "minimum": 0 },
-        "height": { "type": "number", "minimum": 0 },
-        "tolerance": { "type": "number", "minimum": 0 },
-        "unit": { "const": "cssPixel" }
-      }
-    },
-    "overflowMeasurement": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["horizontal", "vertical"],
-      "properties": {
-        "horizontal": { "enum": ["present", "absent"] },
-        "vertical": { "enum": ["present", "absent"] }
-      }
-    },
-    "centerHitSample": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["outcome", "hitLocator"],
-      "properties": {
-        "outcome": { "enum": ["hit", "notInteractive", "zeroArea", "offViewport", "occluded"] },
-        "hitLocator": { "oneOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }] }
-      }
-    },
     "node": {
       "type": "object",
       "additionalProperties": false,
@@ -106,27 +77,8 @@
         "accessibilityStatus": { "enum": ["observed", "cantTell"] },
         "role": { "type": ["string", "null"] },
         "name": { "type": ["string", "null"] },
-        "accessibilityStates": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmptyString" } },
         "display": { "$ref": "#/$defs/nonEmptyString" },
-        "visibility": { "$ref": "#/$defs/nonEmptyString" },
-        "opacity": { "type": "number" },
-        "overflowX": { "$ref": "#/$defs/nonEmptyString" },
-        "overflowY": { "$ref": "#/$defs/nonEmptyString" },
-        "whiteSpace": { "$ref": "#/$defs/nonEmptyString" },
-        "textOverflow": { "$ref": "#/$defs/nonEmptyString" },
         "fontSize": { "$ref": "#/$defs/nonEmptyString" },
-        "direction": { "$ref": "#/$defs/nonEmptyString" },
-        "writingMode": { "$ref": "#/$defs/nonEmptyString" },
-        "transform": { "$ref": "#/$defs/nonEmptyString" },
-        "disabled": { "type": "boolean" },
-        "interactive": { "type": "boolean" },
-        "layoutSize": { "$ref": "#/$defs/measuredSize" },
-        "renderSize": { "$ref": "#/$defs/measuredSize" },
-        "clientSize": { "$ref": "#/$defs/measuredSize" },
-        "scrollSize": { "$ref": "#/$defs/measuredSize" },
-        "overflowMeasurement": { "$ref": "#/$defs/overflowMeasurement" },
-        "centerHitSample": { "$ref": "#/$defs/centerHitSample" },
-        "ancestorClipStatus": { "enum": ["notClipped", "partiallyClipped", "fullyClipped", "cantTell"] },
         "layoutRenderStatus": { "enum": ["agreement", "conflict", "cantTell"] },
         "screenshotGeometryCoverage": { "enum": ["zeroArea", "outsideScreenshot", "partiallyOutsideScreenshot", "insideScreenshotExtent"] },
         "renderOffset": { "$ref": "#/$defs/renderOffset" }
@@ -158,20 +110,12 @@
     "mutation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["baselineRequest", "target", "changedProperty", "preservedProperties", "evidenceExpectations"],
+      "required": ["baselineRequest", "target", "changedProperty", "preservedProperties"],
       "properties": {
         "baselineRequest": { "$ref": "#/$defs/relativePath" },
         "target": { "$ref": "#/$defs/nonEmptyString" },
         "changedProperty": { "$ref": "#/$defs/nonEmptyString" },
-        "preservedProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } },
-        "evidenceExpectations": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "enum": ["layoutRenderConflict", "renderOffset", "ancestorClipping", "overflowMeasurement", "centerHitSample", "peerDimensionDifference"]
-          }
-        }
+        "preservedProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmptyString" } }
       }
     },
     "hardNegative": {
@@ -186,16 +130,6 @@
     "case": {
       "type": "object",
       "additionalProperties": false,
-      "allOf": [
-        {
-          "if": { "properties": { "classification": { "const": "targetedMutation" } }, "required": ["classification"] },
-          "then": { "properties": { "mutation": true }, "required": ["mutation"] }
-        },
-        {
-          "if": { "properties": { "classification": { "const": "hardNegative" } }, "required": ["classification"] },
-          "then": { "properties": { "hardNegative": true }, "required": ["hardNegative"] }
-        }
-      ],
       "required": ["caseId", "request", "split", "classification", "expectations", "abstentions", "review"],
       "properties": {
         "caseId": { "$ref": "#/$defs/nonEmptyString" },
@@ -205,12 +139,11 @@
         "expectations": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["sourceFiles", "viewport", "minimumDocumentHeight", "documentDirection", "frameCount", "minimumNodeCount", "coreRelationCount", "screenshotViewport", "pixelContentComparison", "nodes", "gaps"],
+          "required": ["sourceFiles", "viewport", "minimumDocumentHeight", "frameCount", "minimumNodeCount", "coreRelationCount", "screenshotViewport", "pixelContentComparison", "nodes", "gaps"],
           "properties": {
             "sourceFiles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/relativePath" } },
             "viewport": { "$ref": "#/$defs/size" },
             "minimumDocumentHeight": { "type": "number", "minimum": 1 },
-            "documentDirection": { "enum": ["ltr", "rtl"] },
             "frameCount": { "const": 1 },
             "minimumNodeCount": { "type": "integer", "minimum": 1 },
             "coreRelationCount": { "const": 0 },
@@ -228,3 +161,4 @@
     }
   }
 }
+

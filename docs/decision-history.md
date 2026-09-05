@@ -192,7 +192,9 @@ kernel.
 - **Static source analysis only:** misses final rendering, transforms, font/runtime differences,
   clipping, and occlusion.
 
-Issue #23 defines the first web adapter slice and deterministic capture requirements.
+ADRs 0033 and 0034 implement issue #23's bounded local-fixture adapter, deterministic capture
+requirements, and reviewed evidence matrix. Complete hit regions and pixel-content identity remain
+explicitly unresolved rather than inferred.
 
 ## Image path decisions
 
@@ -409,7 +411,7 @@ Important historical detail:
 - branch-only ADRs 0025–0029 described experiments that were never accepted into current `main`;
 - ADR 0030 re-established the verified raster boundary;
 - ADR 0031 defines current advisory image inspection;
-- new ADRs should continue at 0033 or later rather than silently reusing historical numbers.
+- new ADRs should continue at 0035 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
