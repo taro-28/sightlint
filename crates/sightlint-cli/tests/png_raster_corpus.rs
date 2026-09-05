@@ -81,7 +81,10 @@ struct TempPng(PathBuf);
 
 impl TempPng {
     fn new(id: &str, bytes: &[u8]) -> Self {
-        assert!(id.bytes().all(|byte| byte.is_ascii_alphanumeric() || byte == b'-'));
+        assert!(
+            id.bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-')
+        );
         let sequence = TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed);
         let path = std::env::temp_dir().join(format!(
             "sightlint-raster-{}-{sequence}-{id}.png",
@@ -92,7 +95,8 @@ impl TempPng {
             .create_new(true)
             .open(&path)
             .expect("create unique temporary PNG without overwriting");
-        file.write_all(bytes).expect("materialize committed PNG bytes");
+        file.write_all(bytes)
+            .expect("materialize committed PNG bytes");
         Self(path)
     }
 
@@ -116,8 +120,13 @@ fn assert_api(case: &Value, png: &[u8]) {
     let id = text(case, "id");
     let observation = observe_png_raster(png);
     if case["exitCode"] == 2 {
-        let message = observation.expect_err("malformed fixture must fail").to_string();
-        assert!(message.contains(text(case, "errorContains")), "{id}: {message}");
+        let message = observation
+            .expect_err("malformed fixture must fail")
+            .to_string();
+        assert!(
+            message.contains(text(case, "errorContains")),
+            "{id}: {message}"
+        );
         return;
     }
     let observation = observation.unwrap_or_else(|error| panic!("{id}: {error}"));
@@ -142,7 +151,10 @@ fn assert_metadata(case: &Value, ir: &Value) {
     assert_eq!(raster["status"], case["status"], "{id}");
     assert_eq!(raster["encoding"], "pngEncodedRgba8", "{id}");
     assert_eq!(raster["colorManagementApplied"], false, "{id}");
-    assert!(raster.get("pixels").is_none(), "{id}: raw samples leaked into IR");
+    assert!(
+        raster.get("pixels").is_none(),
+        "{id}: raw samples leaked into IR"
+    );
     if case["status"] == "available" {
         assert_eq!(raster["width"], case["width"], "{id}");
         assert_eq!(raster["height"], case["height"], "{id}");
@@ -152,7 +164,10 @@ fn assert_metadata(case: &Value, ir: &Value) {
     } else {
         assert_eq!(raster["reason"], case["reason"], "{id}");
         assert!(raster.get("byteCrc32").is_none(), "{id}: invented samples");
-        assert!(raster.get("byteCount").is_none(), "{id}: invented sample count");
+        assert!(
+            raster.get("byteCount").is_none(),
+            "{id}: invented sample count"
+        );
     }
     let evidence = ir["evidence"]
         .as_array()
@@ -162,9 +177,14 @@ fn assert_metadata(case: &Value, ir: &Value) {
         .expect("raster provenance resolves");
     assert_eq!(evidence["class"], "exactSource", "{id}");
     assert_eq!(evidence["source"]["externalProcessing"], false, "{id}");
-    assert!(evidence["selector"].to_string().contains("IDAT/encoded-rgba8-v1"));
+    assert!(
+        evidence["selector"]
+            .to_string()
+            .contains("IDAT/encoded-rgba8-v1")
+    );
     assert_eq!(ir["nodes"].as_array().expect("nodes").len(), 1, "{id}");
-    assert!(ir["relations"].as_array().expect("relations").is_empty());
+    // ArtifactIr intentionally omits empty relations (model.rs: skip_serializing_if).
+    assert!(ir.get("relations").is_none(), "{id}: invented relations");
     assert!(ir["nodes"][0].get("role").is_none());
     assert!(ir["nodes"][0]["geometry"].get("inkBox").is_none());
 }
@@ -187,10 +207,14 @@ fn assert_success_paths(case: &Value, png: &[u8], file: &TempPng) {
     assert_eq!(report["reportSchemaVersion"], "0.2.0");
     assert_eq!(report["artifactKind"], "image");
     assert_eq!(report["summary"]["failed"], 0);
-    assert!(report["results"].as_array().is_some());
+    let results = report["results"].as_array().expect("rule results");
+    assert!(!results.is_empty());
     let through_ir = stdin(&["check", "-", "--format", "json"], &adapted.stdout);
     json_success(&through_ir, id);
-    assert_eq!(direct.stdout, through_ir.stdout, "{id}: command paths diverged");
+    assert_eq!(
+        direct.stdout, through_ir.stdout,
+        "{id}: command paths diverged"
+    );
     let normalized = stdin(&["normalize", "-"], &adapted.stdout);
     json_success(&normalized, id);
     assert_eq!(adapted.stdout, normalized.stdout, "{id}: IR not canonical");
@@ -198,17 +222,27 @@ fn assert_success_paths(case: &Value, png: &[u8], file: &TempPng) {
     let file_adapted = file.run("adapt-image", false);
     let file_ir = json_success(&file_adapted, id);
     assert_metadata(case, &file_ir);
-    assert_eq!(without_source_name(ir), without_source_name(file_ir), "{id}");
+    assert_eq!(
+        without_source_name(ir),
+        without_source_name(file_ir),
+        "{id}"
+    );
     let file_checked = file.run("check-image", true);
     json_success(&file_checked, id);
-    assert_eq!(direct.stdout, file_checked.stdout, "{id}: file/stdin differ");
+    assert_eq!(
+        direct.stdout, file_checked.stdout,
+        "{id}: file/stdin differ"
+    );
     for _ in 0..3 {
         let repeated_ir = stdin(&["adapt-image", "-"], png);
         json_success(&repeated_ir, id);
         assert_eq!(adapted.stdout, repeated_ir.stdout, "{id}: unstable IR");
         let repeated_report = stdin(&["check-image", "-", "--format", "json"], png);
         json_success(&repeated_report, id);
-        assert_eq!(direct.stdout, repeated_report.stdout, "{id}: unstable report");
+        assert_eq!(
+            direct.stdout, repeated_report.stdout,
+            "{id}: unstable report"
+        );
     }
 }
 
@@ -221,7 +255,10 @@ fn assert_error_paths(case: &Value, png: &[u8], file: &TempPng) {
         for output in [&first, &repeated, &file.run(verb, false)] {
             assert_exit(output, 2, id);
             assert!(output.stdout.is_empty(), "{id}: partial successful output");
-            assert!(String::from_utf8_lossy(&output.stderr).contains(expected), "{id}");
+            assert!(
+                String::from_utf8_lossy(&output.stderr).contains(expected),
+                "{id}"
+            );
         }
         assert_eq!(first.stderr, repeated.stderr, "{id}: unstable error");
     }
@@ -241,7 +278,10 @@ fn native_bytes_match_pixel_oracles_through_api_and_public_binary() {
             assert_success_paths(case, &png, &file);
         }
     }
-    println!("{} committed native cases verified via API, file, stdin, and reports", cases.len());
+    println!(
+        "{} committed native cases verified via API, file, stdin, and reports",
+        cases.len()
+    );
 }
 
 #[test]
@@ -257,9 +297,20 @@ fn corpus_cannot_silently_drop_the_required_format_and_failure_matrix() {
         assert!(ids.contains(format!("adam7-color-{color}").as_str()));
     }
     for id in [
-        "adam7-1x1", "adam7-1x5", "adam7-5x1", "adam7-8x8", "unmanaged-gamma",
-        "indexed", "packed", "sixteen-bit", "trns", "animation-control",
-        "invalid-filter", "invalid-crc", "cards-clean", "cards-mutated",
+        "adam7-1x1",
+        "adam7-1x5",
+        "adam7-5x1",
+        "adam7-8x8",
+        "unmanaged-gamma",
+        "indexed",
+        "packed",
+        "sixteen-bit",
+        "trns",
+        "animation-control",
+        "invalid-filter",
+        "invalid-crc",
+        "cards-clean",
+        "cards-mutated",
     ] {
         assert!(ids.contains(id), "missing {id}");
     }
@@ -278,8 +329,14 @@ fn corpus_cannot_silently_drop_the_required_format_and_failure_matrix() {
 #[test]
 fn future_spacing_oracles_are_consistent_but_not_counted_as_detected() {
     let cases = cases();
-    let clean = cases.iter().find(|case| case["id"] == "cards-clean").expect("baseline");
-    let mutant = cases.iter().find(|case| case["id"] == "cards-mutated").expect("mutant");
+    let clean = cases
+        .iter()
+        .find(|case| case["id"] == "cards-clean")
+        .expect("baseline");
+    let mutant = cases
+        .iter()
+        .find(|case| case["id"] == "cards-mutated")
+        .expect("mutant");
     assert_eq!(mutant["future"]["baseline"], clean["id"]);
     assert_ne!(clean["rgbaHex"], mutant["rgbaHex"]);
     for case in [clean, mutant] {

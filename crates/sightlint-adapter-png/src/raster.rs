@@ -309,8 +309,7 @@ pub(crate) fn attach_raster(
     input: &[u8],
     reconstructed: &ReconstructedPng,
 ) -> Result<(), PngAdapterError> {
-    let status =
-        raster_status(input, reconstructed).map_err(PngAdapterError::InvalidRasterData)?;
+    let status = raster_status(input, reconstructed).map_err(PngAdapterError::InvalidRasterData)?;
     let mut evidence = document.evidence[0].clone();
     evidence.id = Identifier::from("evidence:png-raster");
     evidence.selector = Some(Selector::NativeId {
