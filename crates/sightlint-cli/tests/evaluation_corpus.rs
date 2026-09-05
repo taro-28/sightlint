@@ -26,9 +26,9 @@ struct EvaluatedCase {
 
 #[derive(Debug, Clone)]
 struct MutationExpectation {
-    mutant_case_id: String,
-    baseline_case_id: String,
-    target_rule_id: String,
+    mutant: String,
+    baseline: String,
+    target_rule: String,
 }
 
 #[derive(Debug)]
@@ -68,8 +68,7 @@ fn object<'a>(value: &'a Value, context: &str) -> &'a Map<String, Value> {
 fn array<'a>(value: &'a Value, context: &str) -> &'a [Value] {
     value
         .as_array()
-        .map(Vec::as_slice)
-        .unwrap_or_else(|| panic!("{context} must be a JSON array"))
+        .map_or_else(|| panic!("{context} must be a JSON array"), Vec::as_slice)
 }
 
 fn field<'a>(value: &'a Value, name: &str, context: &str) -> &'a Value {
@@ -334,16 +333,16 @@ fn parse_mutation(case: &Value, case_id: &str) -> Option<MutationExpectation> {
                 &["baselineCaseId", "targetRuleId"],
                 "mutation",
             );
-            let baseline_case_id = string_field(value, "baselineCaseId", "mutation");
-            let target_rule_id = string_field(value, "targetRuleId", "mutation");
+            let baseline = string_field(value, "baselineCaseId", "mutation");
+            let target_rule = string_field(value, "targetRuleId", "mutation");
             assert!(
-                !baseline_case_id.is_empty() && !target_rule_id.is_empty(),
+                !baseline.is_empty() && !target_rule.is_empty(),
                 "evaluation case {case_id:?} has an incomplete mutation relation"
             );
             MutationExpectation {
-                mutant_case_id: case_id.to_owned(),
-                baseline_case_id: baseline_case_id.to_owned(),
-                target_rule_id: target_rule_id.to_owned(),
+                mutant: case_id.to_owned(),
+                baseline: baseline.to_owned(),
+                target_rule: target_rule.to_owned(),
             }
         })
 }
@@ -574,29 +573,27 @@ fn verify_mutations(
         "smoke evaluation must include targeted mutations"
     );
     for mutation in mutations {
-        let baseline = evaluated
-            .get(&mutation.baseline_case_id)
-            .unwrap_or_else(|| {
-                panic!(
-                    "mutation {} references missing baseline {}",
-                    mutation.mutant_case_id, mutation.baseline_case_id
-                )
-            });
+        let baseline = evaluated.get(&mutation.baseline).unwrap_or_else(|| {
+            panic!(
+                "mutation {} references missing baseline {}",
+                mutation.mutant, mutation.baseline
+            )
+        });
         let mutant = evaluated
-            .get(&mutation.mutant_case_id)
+            .get(&mutation.mutant)
             .expect("evaluated mutation case exists");
         assert!(
-            contains_outcome(baseline, &mutation.target_rule_id, "passed"),
+            contains_outcome(baseline, &mutation.target_rule, "passed"),
             "mutation {} baseline {} did not pass target rule {}",
-            mutation.mutant_case_id,
-            mutation.baseline_case_id,
-            mutation.target_rule_id
+            mutation.mutant,
+            mutation.baseline,
+            mutation.target_rule
         );
         assert!(
-            contains_outcome(mutant, &mutation.target_rule_id, "failed"),
+            contains_outcome(mutant, &mutation.target_rule, "failed"),
             "mutation {} was not killed by target rule {}",
-            mutation.mutant_case_id,
-            mutation.target_rule_id
+            mutation.mutant,
+            mutation.target_rule
         );
     }
 }
