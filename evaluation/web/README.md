@@ -91,8 +91,7 @@ rule oracle.
 - The fixture makes no network requests and contains no third-party images, fonts, brands, or code.
 - No customer data, credentials, personal data, or private screenshots are allowed.
 - `externalProcessing` remains false.
-- The repository's license is unresolved; the source record therefore makes no independent OSS
-  grant for the fixture.
+- Repository-authored fixture source and annotations are redistributed under `MIT OR Apache-2.0`.
 - Public smoke, development, and challenge cases are visible to implementers and are not holdout.
 
 Before holdout data is used, document its freeze commit, access policy, evaluator, leakage controls,

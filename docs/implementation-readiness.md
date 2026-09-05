@@ -8,8 +8,9 @@ Functional implementation begins only after milestone M0 is accepted.
 2. Remote CI is green on stable Rust, Rust 1.85.0, Linux, macOS, and Windows.
 3. The maintainer accepts the decisions in `docs/foundation-review.md`, or records explicit
    changes in the review.
-4. Licensing may remain unresolved for local pre-alpha development, but package publication
-   and external code contributions remain disabled.
+4. Licensing was permitted to remain unresolved for the original local pre-alpha M1 start. It was
+   later resolved as `MIT OR Apache-2.0`; package publication remains disabled for the source-only
+   alpha.
 5. M1 work is opened as a separate pull request and does not add image, browser, ML, mobile,
    document, cloud, MCP, or GUI dependencies.
 

@@ -39,7 +39,7 @@
         "implementationOutputUsedAsOracle": { "const": false },
         "sourceId": { "$ref": "#/$defs/nonEmptyString" },
         "ownership": { "const": "sightlintRepository" },
-        "license": { "$ref": "#/$defs/nonEmptyString" },
+        "license": { "const": "MIT OR Apache-2.0" },
         "privacyReview": { "const": "syntheticNoPersonalData" },
         "externalAssets": { "const": false },
         "externalProcessing": { "const": false },

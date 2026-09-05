@@ -25,6 +25,7 @@ background, alternatives, and disposition of historical experiments.
 - [0004 — Isolate probabilistic perception](0004-isolate-probabilistic-perception.md)
 - [0005 — ACT-inspired rule outcomes](0005-act-inspired-rule-outcomes.md)
 - [0006 — Local-first process adapters](0006-local-first-process-adapters.md)
+- [0007 — Dual MIT or Apache-2.0 licensing](0007-licensing.md)
 - [0008 — Development and release gates](0008-development-and-release-gates.md)
 - [0009 — Initial workspace boundaries](0009-initial-workspace-boundaries.md)
 - [0010 — Schema and rule compatibility](0010-schema-and-rule-compatibility.md)
@@ -50,17 +51,11 @@ background, alternatives, and disposition of historical experiments.
 - [0034 — Web evidence matrix and extension evolution](0034-web-evidence-matrix-and-extension-evolution.md)
 - [0035 — Recommended Web profile and advisory enforcement](0035-recommended-web-profile-and-advisory-enforcement.md)
 - [0036 — Local Web check orchestration and agent report](0036-local-web-check-orchestration.md)
+- [0037 — Source-first alpha release and compatibility contract](0037-first-alpha-release-contract.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0036** or later.
-
-## Proposed decisions
-
-- [0007 — Licensing](0007-licensing.md)
-
-Licensing and first-release work are tracked by issue #33. Public repository visibility is not an
-open-source license.
+continue at **0038** or later.
 
 ## Historical branch decisions 0025–0029
 
@@ -96,4 +91,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0036.
+Use [the template](template.md) and the next unused number at or after 0038.

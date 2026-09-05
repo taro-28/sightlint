@@ -276,7 +276,8 @@ semantic reason, not snapshot blessing.
 - Public behavior needs real binary/process E2E and exact final-head plus post-merge CI.
 - The active `Protect main` ruleset and automatic merged-branch cleanup implement administrative
   issues #19 and #32; exact-head and post-merge verification remain mandatory.
-- License, compatibility surfaces, packaging, and release are issue #33.
+- Accepted ADR 0007 and ADR 0037 define dual licensing, surface-specific alpha compatibility,
+  source-only packaging, and the first release boundary from issue #33.
 - MCP, GitHub Checks, editor/browser UI, and other surfaces wrap the same kernel and are issue #31;
   they must not duplicate rule semantics.
 
@@ -294,8 +295,9 @@ Track compatibility independently for:
 - evaluation manifest schemas;
 - package/binary releases.
 
-One package version must not conceal incompatible changes across these surfaces. The first release
-policy remains unresolved in issue #33.
+One package version must not conceal incompatible changes across these surfaces. ADR 0037 and
+`docs/compatibility.md` define the first alpha policy: each surface retains its own version and a
+breaking alpha change requires a surface version change, release note, and migration guidance.
 
 ## Determinism contract
 

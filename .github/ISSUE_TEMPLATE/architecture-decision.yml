@@ -7,7 +7,7 @@ body:
       value: |
         Read the current ADR index, `docs/handoff.md`, and `docs/decision-history.md` before
         proposing a decision. Branch-only historical ADRs 0025–0029 are references, not accepted
-        policy. New ADR numbers continue at 0032 or later.
+        policy. New ADR numbers continue at 0038 or later.
 
   - type: input
     id: issue-roadmap

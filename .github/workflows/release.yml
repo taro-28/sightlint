@@ -1,0 +1,185 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*-alpha.*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+  RELEASE_TAG: ${{ github.ref_name }}
+
+jobs:
+  package-source:
+    name: Package source prerelease
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require the protected main head
+        run: |
+          git fetch --no-tags origin main
+          release_commit="$(git rev-parse "$GITHUB_REF^{commit}")"
+          test "$(git rev-parse origin/main)" = "$release_commit"
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Validate release and dependency licenses
+        run: |
+          python3 tools/release.py validate-tag --tag "$RELEASE_TAG"
+          python3 tools/check_dependency_licenses.py
+          python3 -m unittest tools/test_release.py
+      - name: Create deterministic source archive and checksum
+        run: python3 tools/release.py source-archive --tag "$RELEASE_TAG" --output-dir release-dist
+      - name: Create or refresh the draft prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_draft="$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft 2>/dev/null || true)"
+          if [ -z "$release_draft" ]; then
+            gh release create "$RELEASE_TAG" release-dist/* \
+              --draft --prerelease --verify-tag \
+              --title "SightLint $RELEASE_TAG" \
+              --notes-file "docs/releases/$RELEASE_TAG.md"
+          elif [ "$release_draft" = "true" ]; then
+            gh release edit "$RELEASE_TAG" --draft --prerelease \
+              --title "SightLint $RELEASE_TAG" \
+              --notes-file "docs/releases/$RELEASE_TAG.md"
+            gh release upload "$RELEASE_TAG" release-dist/* --clobber
+          else
+            echo "release $RELEASE_TAG is already published" >&2
+            exit 1
+          fi
+
+  verify-source:
+    name: Verify source on ${{ matrix.name }}
+    needs: package-source
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            os: ubuntu-latest
+            python: python3
+          - name: macOS arm64
+            os: macos-latest
+            python: python3
+          - name: Windows x64
+            os: windows-latest
+            python: python
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - name: Check out verification tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download draft source assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "$RELEASE_TAG" \
+            --pattern "sightlint-$RELEASE_TAG-source.tar.gz*" \
+            --dir release-download
+      - name: Verify and extract source assets
+        shell: bash
+        run: |
+          "${{ matrix.python }}" tools/release.py verify-archive \
+            --tag "$RELEASE_TAG" \
+            --archive "release-download/sightlint-$RELEASE_TAG-source.tar.gz" \
+            --checksum "release-download/sightlint-$RELEASE_TAG-source.tar.gz.sha256" \
+            --extract-dir release-unpacked
+      - name: Install stable Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Test extracted Rust workspace
+        shell: bash
+        run: cargo test --manifest-path "release-unpacked/sightlint-$RELEASE_TAG/Cargo.toml" --locked --workspace --all-features
+      - name: Verify hosted Node compatibility
+        shell: bash
+        run: node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 20 || major > 24) process.exit(1)'
+      - name: Check extracted private Node package
+        shell: bash
+        run: |
+          npm ci --ignore-scripts --prefix "release-unpacked/sightlint-$RELEASE_TAG/adapters/playwright"
+          npm run check --prefix "release-unpacked/sightlint-$RELEASE_TAG/adapters/playwright"
+
+  verify-product-path:
+    name: Verify extracted Linux product path
+    needs: package-source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out verification tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download, verify, and extract source assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "$RELEASE_TAG" \
+            --pattern "sightlint-$RELEASE_TAG-source.tar.gz*" \
+            --dir release-download
+          python3 tools/release.py verify-archive \
+            --tag "$RELEASE_TAG" \
+            --archive "release-download/sightlint-$RELEASE_TAG-source.tar.gz" \
+            --checksum "release-download/sightlint-$RELEASE_TAG-source.tar.gz.sha256" \
+            --extract-dir release-unpacked
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Verify extracted corpus and package contracts
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}
+        run: |
+          python3 tools/generate_e2e_fixtures.py --check
+          python3 tools/generate_raster_corpus.py --check
+          python3 tools/generate_inspection_corpus.py --check
+          python3 tools/check_web_evaluation.py
+          python3 tools/check_dependency_licenses.py
+          python3 -m unittest tools/test_release.py
+      - name: Install the locked browser companion
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}/adapters/playwright
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps chromium
+          npm run check
+      - name: Build public binary and run product E2E
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}
+        run: |
+          cargo build --locked -p sightlint-cli --bin sightlint
+          npm run test:e2e --prefix adapters/playwright
+
+  publish:
+    name: Publish verified prerelease
+    needs:
+      - verify-source
+      - verify-product-path
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Publish the completed draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$RELEASE_TAG" --draft=false --prerelease

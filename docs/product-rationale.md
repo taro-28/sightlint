@@ -463,15 +463,15 @@ SightLint does not aim to:
 
 The following remain intentionally unresolved or evidence-gated:
 
-- exact recommended-profile names and configuration syntax;
+- project/profile override syntax beyond the accepted base/recommended alpha profiles;
 - rule-maturity thresholds for blocking eligibility;
 - severity model;
-- browser capture compatibility policy;
+- arbitrary-project and cross-platform browser product compatibility beyond the bounded policy;
 - first non-web adapter after Playwright;
 - perception models/runtimes and calibration requirements;
 - image decoder/library strategy for unsupported PNG formats;
 - interaction trace schema;
-- license and release/distribution model;
+- later registry/binary distribution, signing, and attestation policy beyond the source alpha;
 - telemetry/hosted-service policy if ever proposed.
 
 Resolve them through current issues and new ADRs from the latest `main`, not by reviving stale

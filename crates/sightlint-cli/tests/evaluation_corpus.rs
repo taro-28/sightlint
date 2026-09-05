@@ -214,10 +214,16 @@ fn validate_sources(manifest: &Value) -> BTreeSet<String> {
             ),
             "evaluation source {id:?} has unknown review status {review_status:?}"
         );
-        for required in ["origin", "license"] {
-            assert!(
-                !string_field(source, required, "evaluation source").is_empty(),
-                "evaluation source {id:?} has an empty {required}"
+        assert!(!string_field(source, "origin", "evaluation source").is_empty());
+        let license = string_field(source, "license", "evaluation source");
+        assert!(
+            !license.is_empty(),
+            "evaluation source {id:?} has an empty license"
+        );
+        if id == "synthetic-artifact-ir-v0" {
+            assert_eq!(
+                license, "MIT OR Apache-2.0",
+                "repository-owned evaluation source must record the accepted project license"
             );
         }
     }
