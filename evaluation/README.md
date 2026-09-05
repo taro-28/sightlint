@@ -24,6 +24,17 @@ introduced. It proves that:
 - Web, mobile, slide, document, PDF, image, and other artifact kinds share the same evaluation
   contract.
 
+The initial required inventory contains:
+
+- 20 smoke cases;
+- 8 clean-baseline-to-mutant relations;
+- all 7 currently modeled static artifact kinds;
+- 2 independent public-binary executions per case in each workspace test run.
+
+These counts are descriptive rather than a quality score. Removing coverage requires an explicit
+manifest and documentation review; adding many near-duplicate cases must not be used to inflate
+apparent precision or recall.
+
 This bootstrap corpus does **not** prove real-world precision or UX value. Those claims require
 human-reviewed native artifacts and rule-specific validation.
 
