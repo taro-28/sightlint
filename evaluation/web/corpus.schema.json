@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-evaluation-corpus:0.1.0",
+  "title": "SightLint web evaluation corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "corpus",
+    "annotationGuide",
+    "sources",
+    "splitPolicy",
+    "gates",
+    "cases"
+  ],
+  "properties": {
+    "$schema": { "const": "./corpus.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "corpus": { "$ref": "#/$defs/corpus" },
+    "annotationGuide": { "$ref": "#/$defs/versionedPath" },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "splitPolicy": { "$ref": "#/$defs/splitPolicy" },
+    "gates": { "$ref": "#/$defs/gates" },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._/-]+$"
+    },
+    "versionedPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "path"],
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "path": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "description", "scope", "limitations"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/version" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "scope": { "$ref": "#/$defs/nonEmptyString" },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "origin",
+        "ownership",
+        "license",
+        "redistribution",
+        "privacyReview",
+        "externalAssets"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "kind": { "const": "repositoryOwnedFixture" },
+        "origin": { "$ref": "#/$defs/relativePath" },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "$ref": "#/$defs/nonEmptyString" },
+        "redistribution": { "$ref": "#/$defs/nonEmptyString" },
+        "privacyReview": {
+          "enum": ["syntheticNoPersonalData", "reviewRequired", "approved"]
+        },
+        "externalAssets": { "type": "boolean" }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "holdout", "challenge"],
+      "properties": {
+        "smoke": { "$ref": "#/$defs/nonEmptyString" },
+        "development": { "$ref": "#/$defs/nonEmptyString" },
+        "holdout": { "$ref": "#/$defs/holdoutPolicy" },
+        "challenge": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "holdoutPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason", "requiredBeforeUse"],
+      "properties": {
+        "status": { "const": "notEstablished" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" },
+        "requiredBeforeUse": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke"],
+      "properties": {
+        "smoke": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "determinismRuns",
+            "requireAllExpectations",
+            "requireAllMutationsKilled",
+            "maximumFalsePositives"
+          ],
+          "properties": {
+            "determinismRuns": { "type": "integer", "minimum": 2, "maximum": 10 },
+            "requireAllExpectations": { "const": true },
+            "requireAllMutationsKilled": { "const": true },
+            "maximumFalsePositives": { "const": 0 }
+          }
+        }
+      }
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entrypoint", "state", "sourceDigest"],
+      "properties": {
+        "entrypoint": { "$ref": "#/$defs/relativePath" },
+        "state": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "viewport",
+        "deviceScaleFactor",
+        "textScale",
+        "locale",
+        "direction",
+        "theme"
+      ],
+      "properties": {
+        "viewport": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height", "unit"],
+          "properties": {
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "unit": { "const": "cssPixel" }
+          }
+        },
+        "deviceScaleFactor": { "type": "number", "exclusiveMinimum": 0 },
+        "textScale": { "type": "number", "exclusiveMinimum": 0 },
+        "locale": { "$ref": "#/$defs/nonEmptyString" },
+        "direction": { "enum": ["ltr", "rtl"] },
+        "theme": { "enum": ["light", "dark"] }
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason", "trackingIssue", "externalProcessing"],
+      "properties": {
+        "status": { "const": "untested" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" },
+        "trackingIssue": { "const": 23 },
+        "externalProcessing": { "const": false }
+      }
+    },
+    "oracleReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document", "caseId"],
+      "properties": {
+        "document": { "$ref": "#/$defs/relativePath" },
+        "caseId": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "execution": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "inputKind", "inputPath"],
+          "properties": {
+            "status": { "const": "runnable" },
+            "inputKind": { "const": "artifactIr" },
+            "inputPath": { "$ref": "#/$defs/relativePath" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": {
+            "status": { "const": "untested" },
+            "reason": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        }
+      ]
+    },
+    "mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineCaseId", "targetRuleId", "changedProperty", "preservedProperties"],
+      "properties": {
+        "baselineCaseId": { "$ref": "#/$defs/nonEmptyString" },
+        "targetRuleId": { "$ref": "#/$defs/nonEmptyString" },
+        "changedProperty": { "$ref": "#/$defs/nonEmptyString" },
+        "preservedProperties": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "hardNegative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "rationale"],
+      "properties": {
+        "category": { "$ref": "#/$defs/nonEmptyString" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "split",
+        "medium",
+        "sourceId",
+        "fixture",
+        "environment",
+        "capture",
+        "acquisitionOracle",
+        "ruleOracle",
+        "execution"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/version" },
+        "split": { "enum": ["smoke", "development", "holdout", "challenge"] },
+        "medium": { "const": "web" },
+        "sourceId": { "$ref": "#/$defs/nonEmptyString" },
+        "fixture": { "$ref": "#/$defs/fixture" },
+        "environment": { "$ref": "#/$defs/environment" },
+        "capture": { "$ref": "#/$defs/capture" },
+        "acquisitionOracle": { "$ref": "#/$defs/oracleReference" },
+        "ruleOracle": { "$ref": "#/$defs/oracleReference" },
+        "execution": { "$ref": "#/$defs/execution" },
+        "mutation": { "$ref": "#/$defs/mutation" },
+        "hardNegative": { "$ref": "#/$defs/hardNegative" }
+      }
+    }
+  }
+}
+
