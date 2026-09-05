@@ -1,0 +1,353 @@
+name: M3 encoded RGBA8 raster bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-png-rgba8-raster
+
+permissions:
+  contents: write
+
+jobs:
+  wire-verify-and-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-png-rgba8-raster
+          fetch-depth: 0
+
+      - name: Wire staged encoded RGBA8 observation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected replacement once, found {count}: {old!r}')
+              file.write_text(text.replace(old, new))
+
+          lib = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = lib.read_text()
+          replacements = [
+              (
+                  '''//! This crate validates PNG metadata and chunk structure, performs bounded zlib inflation, and
+//! reconstructs all standard PNG scanline filters. Samples remain packed and pass-local; palette,
+//! transparency, color, ink, text, component, and semantic interpretation are still excluded.''',
+                  '''//! This crate validates PNG source structure, reconstructs compressed and filtered samples, and
+//! exposes a staged encoded RGBA8 raster for exactly supported formats. Color management, palette
+//! and `tRNS` expansion, ink, text, component, and semantic interpretation remain excluded.''',
+              ),
+              (
+                  '''mod filter;
+mod inflate;
+mod structure;
+
+pub use filter::{
+    PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines,
+};
+pub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};
+pub use structure::{PngStructure, PngStructureError, inspect_png_structure};''',
+                  '''mod filter;
+mod inflate;
+mod raster;
+mod structure;
+
+pub use filter::{
+    PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines,
+};
+pub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};
+pub use raster::{
+    EncodedRgba8Raster, ObservedPngRaster, PngRasterError, PngRasterStatus,
+    PngRasterUnavailable, observe_png_raster,
+};
+pub use structure::{PngStructure, PngStructureError, inspect_png_structure};''',
+              ),
+              (
+                  '''    /// Inflated scanlines contain invalid filter data or an inconsistent pass layout.
+    InvalidFilterData(PngFilterError),
+    /// The adapter produced IR that violates the current core contract.
+    InvalidArtifactIr(String),''',
+                  '''    /// Inflated scanlines contain invalid filter data or an inconsistent pass layout.
+    InvalidFilterData(PngFilterError),
+    /// Reconstructed samples cannot be reconciled into a safe addressable raster.
+    InvalidRasterData(PngRasterError),
+    /// The adapter produced IR that violates the current core contract.
+    InvalidArtifactIr(String),''',
+              ),
+              (
+                  '''            Self::InvalidImageData(error) => error.fmt(formatter),
+            Self::InvalidFilterData(error) => error.fmt(formatter),
+            Self::InvalidArtifactIr(message) => {''',
+                  '''            Self::InvalidImageData(error) => error.fmt(formatter),
+            Self::InvalidFilterData(error) => error.fmt(formatter),
+            Self::InvalidRasterData(error) => error.fmt(formatter),
+            Self::InvalidArtifactIr(message) => {''',
+              ),
+              (
+                  '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let reconstructed = reconstruct_png_scanlines(input)?;
+    let reconstructed_packed_sample_bytes = reconstructed.packed_sample_bytes.len();
+    let non_empty_pass_count = reconstructed.passes.len();
+    let structure = reconstructed.structure;
+    let inflated_scanline_bytes = expected_scanline_bytes(structure.header);
+    let header = structure.header;''',
+                  '''pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
+    let observed_raster = observe_png_raster(input)?;
+    let reconstructed_packed_sample_bytes = observed_raster.reconstructed_packed_sample_bytes;
+    let non_empty_pass_count = observed_raster.non_empty_pass_count;
+    let encoded_rgba8_raster = raster_metadata(&observed_raster.status);
+    let structure = observed_raster.structure;
+    let inflated_scanline_bytes = expected_scanline_bytes(structure.header);
+    let header = structure.header;''',
+              ),
+              (
+                  '''            "reconstructedPackedSampleBytes": reconstructed_packed_sample_bytes,
+            "nonEmptyPassCount": non_empty_pass_count
+''',
+                  '''            "reconstructedPackedSampleBytes": reconstructed_packed_sample_bytes,
+            "nonEmptyPassCount": non_empty_pass_count,
+            "encodedRgba8Raster": encoded_rgba8_raster
+''',
+              ),
+          ]
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'lib.rs: expected replacement once, found {count}: {old!r}')
+              text = text.replace(old, new)
+
+          helper = '''fn raster_metadata(status: &PngRasterStatus) -> serde_json::Value {
+    match status {
+        PngRasterStatus::Available(raster) => json!({
+            "status": "available",
+            "encoding": "encodedRgba8",
+            "width": raster.width,
+            "height": raster.height,
+            "byteCount": raster.pixels.len()
+        }),
+        PngRasterStatus::Unavailable(PngRasterUnavailable::IndexedColor) => json!({
+            "status": "unavailable",
+            "reason": PngRasterUnavailable::IndexedColor.code()
+        }),
+        PngRasterStatus::Unavailable(PngRasterUnavailable::UnsupportedBitDepth {
+            bit_depth,
+            color_type,
+        }) => json!({
+            "status": "unavailable",
+            "reason": PngRasterUnavailable::UnsupportedBitDepth {
+                bit_depth: *bit_depth,
+                color_type: *color_type,
+            }.code(),
+            "bitDepth": bit_depth,
+            "colorType": color_type
+        }),
+        PngRasterStatus::Unavailable(PngRasterUnavailable::TransparencyChunk) => json!({
+            "status": "unavailable",
+            "reason": PngRasterUnavailable::TransparencyChunk.code()
+        }),
+        PngRasterStatus::Unavailable(PngRasterUnavailable::BufferTooLarge { required, limit }) => {
+            json!({
+                "status": "unavailable",
+                "reason": PngRasterUnavailable::BufferTooLarge {
+                    required: *required,
+                    limit: *limit,
+                }.code(),
+                "requiredBytes": required,
+                "limitBytes": limit
+            })
+        }
+    }
+}
+
+'''
+          marker = 'fn validate_header(header: PngHeader) -> Result<(), PngAdapterError> {'
+          if text.count(marker) != 1:
+              raise SystemExit(f'lib.rs helper marker: expected once, found {text.count(marker)}')
+          lib.write_text(text.replace(marker, helper + marker))
+
+          decisions = Path('docs/decisions/README.md')
+          text = decisions.read_text()
+          marker = '- [0024 — Deterministic PNG filter reconstruction](0024-deterministic-png-filter-reconstruction.md)\n'
+          addition = marker + '- [0025 — Staged encoded RGBA8 raster availability](0025-staged-encoded-rgba8-raster.md)\n'
+          if text.count(marker) != 1:
+              raise SystemExit(f'ADR index: expected marker once, found {text.count(marker)}')
+          decisions.write_text(text.replace(marker, addition))
+
+          readme = Path('README.md')
+          text = readme.read_text()
+          old_m3 = '''M3 now validates complete PNG chunk streams, performs bounded zlib/DEFLATE inflation, and
+reconstructs all five standard scanline filters, including pass-local Adam7 history. The result
+is exact packed sample data, but SightLint still does not expand palettes or transparency,
+normalize pixels, infer foreground, calculate ink bounds, or invent text, components, or roles.'''
+          new_m3 = '''M3 now validates complete PNG streams, reconstructs compressed and filtered samples, and makes
+an exact encoded RGBA8 raster available for common 8-bit grayscale, grayscale-alpha, RGB, and
+RGBA screenshots, including Adam7 scatter. Indexed, other bit depths, and `tRNS` remain explicit
+raster-unavailable cases rather than guessed colors or malformed-input failures.'''
+          if text.count(old_m3) != 1:
+              raise SystemExit(f'README M3 block: expected once, found {text.count(old_m3)}')
+          text = text.replace(old_m3, new_m3)
+          old_surface = '''The CLI accepts medium-neutral Artifact IR directly and can also validate and adapt exact PNG
+source facts through filter reconstruction. Browser, slide, PDF, mobile, OCR, CV, and model-based
+acquisition remain separate layers so medium-specific sensing cannot leak into deterministic rule
+verdicts.'''
+          new_surface = '''The CLI accepts medium-neutral Artifact IR directly and can also validate PNG source facts and
+report staged encoded RGBA8 raster availability. Raw pixels remain adapter-local. Browser, slide,
+PDF, mobile, OCR, CV, and model-based acquisition remain separate layers so sensing cannot leak
+into deterministic rule verdicts.'''
+          if text.count(old_surface) != 1:
+              raise SystemExit(f'README command-surface block: expected once, found {text.count(old_surface)}')
+          text = text.replace(old_surface, new_surface)
+          text = text.replace(
+              '- valid PNG color/depth classes, complete chunk streams, split IDAT, zlib, and Adam7 variants',
+              '- valid PNG color/depth classes, chunk streams, zlib, filters, staged RGBA8, and Adam7 variants',
+          )
+          readme.write_text(text)
+
+          cli_test = Path('crates/sightlint-cli/tests/png_raster_e2e.rs')
+          text = cli_test.read_text()
+          old = '''    let scanlines = [
+        0_u8, 1, 2, 3, 4, 0, 5, 6, 7, 8,
+        0, 9, 10, 11, 12, 0, 13, 14, 15, 16,
+    ];'''
+          new = '''    let scanlines = [
+        0_u8, 1, 2, 3, 4, 5, 6, 7, 8,
+        0, 9, 10, 11, 12, 13, 14, 15, 16,
+    ];'''
+          if text.count(old) != 1:
+              raise SystemExit(f'CLI raster fixture marker: expected once, found {text.count(old)}')
+          cli_test.write_text(text.replace(old, new))
+
+          raster = Path('crates/sightlint-adapter-png/src/raster.rs')
+          text = raster.read_text()
+          old_import = '''    use super::{
+        MAX_RGBA8_BYTES, PngRasterUnavailable, classify_raster, expand_pixel, source_channels,
+    };
+    use crate::PngHeader;'''
+          new_import = '''    use super::{
+        MAX_RGBA8_BYTES, PngRasterError, PngRasterUnavailable, classify_raster, expand_pixel,
+        scatter_rgba8, source_channels,
+    };
+    use crate::{PngHeader, PngPass, PngStructure, ReconstructedPng};'''
+          if text.count(old_import) != 1:
+              raise SystemExit(f'raster.rs test import marker: expected once, found {text.count(old_import)}')
+          text = text.replace(old_import, new_import)
+          marker = '''    #[test]
+    fn classifies_rgba_memory_boundary_without_allocating_it() {
+        assert_eq!(classify_raster(header(8_192, 8_192, 8, 0), false), Ok(None));
+        let required = 8_193_u64 * 8_192 * 4;
+        assert_eq!(
+            classify_raster(header(8_193, 8_192, 8, 0), false),
+            Ok(Some(PngRasterUnavailable::BufferTooLarge {
+                required,
+                limit: MAX_RGBA8_BYTES,
+            }))
+        );
+    }
+}'''
+          replacement = '''    #[test]
+    fn classifies_rgba_memory_boundary_without_allocating_it() {
+        assert_eq!(classify_raster(header(8_192, 8_192, 8, 0), false), Ok(None));
+        let required = 8_193_u64 * 8_192 * 4;
+        assert_eq!(
+            classify_raster(header(8_193, 8_192, 8, 0), false),
+            Ok(Some(PngRasterUnavailable::BufferTooLarge {
+                required,
+                limit: MAX_RGBA8_BYTES,
+            }))
+        );
+    }
+
+    #[test]
+    fn malformed_internal_pass_layout_returns_structured_errors() {
+        let structure = PngStructure {
+            header: header(2, 1, 8, 2),
+            chunk_count: 3,
+            idat_chunk_count: 1,
+            idat_bytes: 1,
+            has_palette: false,
+        };
+        let wrong_row = ReconstructedPng {
+            structure,
+            packed_sample_bytes: vec![1, 2, 3, 4, 5],
+            passes: vec![PngPass {
+                index: 1,
+                start_x: 0,
+                start_y: 0,
+                step_x: 1,
+                step_y: 1,
+                width: 2,
+                height: 1,
+                row_bytes: 5,
+                filter_bytes_per_pixel: 3,
+                output_offset: 0,
+            }],
+        };
+        assert_eq!(
+            scatter_rgba8(&wrong_row),
+            Err(PngRasterError::PassRowLayoutMismatch {
+                pass: 1,
+                expected: 6,
+                actual: 5,
+            })
+        );
+
+        let incomplete = ReconstructedPng {
+            structure,
+            packed_sample_bytes: vec![1, 2, 3],
+            passes: vec![PngPass {
+                index: 1,
+                start_x: 0,
+                start_y: 0,
+                step_x: 1,
+                step_y: 1,
+                width: 1,
+                height: 1,
+                row_bytes: 3,
+                filter_bytes_per_pixel: 3,
+                output_offset: 0,
+            }],
+        };
+        assert_eq!(
+            scatter_rgba8(&incomplete),
+            Err(PngRasterError::PixelCoverageMismatch {
+                expected: 2,
+                actual: 1,
+            })
+        );
+    }
+}'''
+          if text.count(marker) != 1:
+              raise SystemExit(f'raster.rs test insertion marker: expected once, found {text.count(marker)}')
+          raster.write_text(text.replace(marker, replacement))
+          PY
+
+      - name: Verify complete workspace and public binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo fmt --all
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test png_raster_e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+
+      - name: Commit verified staged raster support
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/m3-raster-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: expose staged encoded RGBA8 raster availability'
+          git push origin HEAD:feat/m3-png-rgba8-raster
