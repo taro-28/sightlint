@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-extension:0.1.0",
+  "title": "SightLint private Web acquisition extension",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["extensionVersion", "document", "environment", "capture", "nodes", "reconciliation"],
+  "properties": {
+    "extensionVersion": { "const": "0.1.0" },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "frameId", "frames", "frameCount", "sourcePath", "state", "readinessSelector", "scroll", "documentSize", "viewportSize", "direction"],
+      "properties": {
+        "id": { "const": "document-main" },
+        "frameId": { "const": "frame-main" },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "parentId", "kind", "sourcePath"],
+            "properties": {
+              "id": { "const": "frame-main" },
+              "parentId": { "type": "null" },
+              "kind": { "const": "main" },
+              "sourcePath": { "$ref": "#/$defs/repositoryPath" }
+            }
+          }
+        },
+        "frameCount": { "const": 1 },
+        "sourcePath": { "$ref": "#/$defs/repositoryPath" },
+        "state": { "$ref": "#/$defs/nonEmptyString" },
+        "readinessSelector": { "$ref": "#/$defs/nonEmptyString" },
+        "scroll": { "$ref": "#/$defs/pointWithUnit" },
+        "documentSize": { "$ref": "#/$defs/sizeWithUnit" },
+        "viewportSize": { "$ref": "#/$defs/sizeWithUnit" },
+        "direction": { "enum": ["ltr", "rtl"] }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["viewport", "deviceScaleFactor", "textScale", "locale", "timezoneId", "colorScheme", "reducedMotion", "browserName", "browserVersion", "playwrightVersion", "platform", "architecture"],
+      "properties": {
+        "viewport": { "$ref": "#/$defs/sizeWithUnit" },
+        "deviceScaleFactor": { "type": "number", "minimum": 1, "maximum": 2 },
+        "textScale": { "enum": [1, 1.25] },
+        "locale": { "const": "en-US" },
+        "timezoneId": { "const": "UTC" },
+        "colorScheme": { "const": "light" },
+        "reducedMotion": { "const": "reduce" },
+        "browserName": { "const": "chromium" },
+        "browserVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "playwrightVersion": { "const": "1.63.0" },
+        "platform": { "$ref": "#/$defs/nonEmptyString" },
+        "architecture": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceFiles", "sourceDigest", "screenshot", "network", "privacy"],
+      "properties": {
+        "sourceFiles": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/repositoryPath" } },
+        "sourceDigest": { "$ref": "#/$defs/digest" },
+        "screenshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reference", "sha256", "byteLength", "pixelSize", "format", "scale", "animations", "caret", "colorAssumptions"],
+          "properties": {
+            "reference": { "$ref": "#/$defs/repositoryPath" },
+            "sha256": { "$ref": "#/$defs/digest" },
+            "byteLength": { "type": "integer", "minimum": 1 },
+            "pixelSize": { "$ref": "#/$defs/size" },
+            "format": { "const": "png" },
+            "scale": { "const": "css" },
+            "animations": { "const": "disabled" },
+            "caret": { "const": "hide" },
+            "colorAssumptions": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        },
+        "network": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "externalRequests"],
+          "properties": {
+            "mode": { "const": "deny" },
+            "externalRequests": { "type": "array", "items": { "$ref": "#/$defs/nonEmptyString" } }
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["accessibleNameMode", "descendantsRedacted", "externalProcessing"],
+          "properties": {
+            "accessibleNameMode": { "const": "selectedNodes" },
+            "descendantsRedacted": { "const": true },
+            "externalProcessing": { "const": false }
+          }
+        }
+      }
+    },
+    "nodes": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "$ref": "#/$defs/node" } },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["screenshotViewport", "nodes", "pixelContentComparison"],
+      "properties": {
+        "screenshotViewport": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "viewportCssPixels", "screenshotPixels", "screenshotScale"],
+          "properties": {
+            "status": { "enum": ["agreement", "conflict"] },
+            "viewportCssPixels": { "$ref": "#/$defs/sizeWithUnit" },
+            "screenshotPixels": { "$ref": "#/$defs/size" },
+            "screenshotScale": { "const": "css" }
+          }
+        },
+        "nodes": { "type": "array", "minItems": 1, "maxItems": 200, "items": { "$ref": "#/$defs/reconciliationNode" } },
+        "pixelContentComparison": { "$ref": "#/$defs/cantTell" }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "repositoryPath": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9._/-]+$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": { "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 } }
+    },
+    "sizeWithUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "unit"],
+      "properties": { "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 }, "unit": { "const": "cssPixel" } }
+    },
+    "pointWithUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "unit"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "unit": { "const": "cssPixel" } }
+    },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "width": { "type": "number", "minimum": 0 }, "height": { "type": "number", "minimum": 0 } }
+    },
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value", "selector"],
+      "properties": { "type": { "enum": ["testId", "id", "css"] }, "value": { "$ref": "#/$defs/nonEmptyString" }, "selector": { "$ref": "#/$defs/nonEmptyString" } }
+    },
+    "computedStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display", "visibility", "opacity", "overflowX", "overflowY", "fontSize", "lineHeight", "fontWeight", "direction", "writingMode", "transform", "pointerEvents"],
+      "properties": {
+        "display": { "$ref": "#/$defs/nonEmptyString" }, "visibility": { "$ref": "#/$defs/nonEmptyString" }, "opacity": { "type": "number" },
+        "overflowX": { "$ref": "#/$defs/nonEmptyString" }, "overflowY": { "$ref": "#/$defs/nonEmptyString" }, "fontSize": { "$ref": "#/$defs/nonEmptyString" },
+        "lineHeight": { "$ref": "#/$defs/nonEmptyString" }, "fontWeight": { "$ref": "#/$defs/nonEmptyString" }, "direction": { "$ref": "#/$defs/nonEmptyString" },
+        "writingMode": { "$ref": "#/$defs/nonEmptyString" }, "transform": { "$ref": "#/$defs/nonEmptyString" }, "pointerEvents": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "role", "name", "states", "rootLine", "snapshotDigest", "descendantsRedacted"],
+      "properties": {
+        "status": { "enum": ["observed", "cantTell"] }, "role": { "type": ["string", "null"] }, "name": { "type": ["string", "null"] },
+        "states": { "type": "array", "items": { "type": "string" } }, "rootLine": { "type": ["string", "null"] },
+        "snapshotDigest": { "$ref": "#/$defs/digest" }, "descendantsRedacted": { "const": true }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeId", "locator", "tagName", "disabled", "interactive", "layoutMethod", "layoutUnavailableReason", "renderMethod", "hitTest", "computedStyle", "clippingAncestors", "accessibility"],
+      "properties": {
+        "nodeId": { "$ref": "#/$defs/nonEmptyString" }, "locator": { "$ref": "#/$defs/locator" }, "tagName": { "$ref": "#/$defs/nonEmptyString" },
+        "disabled": { "type": "boolean" }, "interactive": { "type": "boolean" },
+        "layoutMethod": { "enum": ["offsetParentBorderBoxToDocument", "unavailable"] }, "layoutUnavailableReason": { "type": ["string", "null"] },
+        "renderMethod": { "const": "getBoundingClientRect" }, "hitTest": { "enum": ["hit", "notInteractive", "zeroArea", "offViewport", "occluded"] },
+        "computedStyle": { "$ref": "#/$defs/computedStyle" },
+        "clippingAncestors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["locator", "overflowX", "overflowY", "rect"],
+            "properties": { "locator": { "$ref": "#/$defs/nonEmptyString" }, "overflowX": { "$ref": "#/$defs/nonEmptyString" }, "overflowY": { "$ref": "#/$defs/nonEmptyString" }, "rect": { "$ref": "#/$defs/rect" } }
+          }
+        },
+        "accessibility": { "$ref": "#/$defs/accessibility" }
+      }
+    },
+    "cantTell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": { "status": { "const": "cantTell" }, "reason": { "$ref": "#/$defs/nonEmptyString" } }
+    },
+    "layoutRender": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "tolerance", "layoutBox", "renderBox"],
+          "properties": {
+            "status": { "enum": ["agreement", "conflict"] },
+            "tolerance": { "type": "object", "additionalProperties": false, "required": ["value", "unit"], "properties": { "value": { "type": "number", "minimum": 0 }, "unit": { "const": "cssPixel" } } },
+            "layoutBox": { "$ref": "#/$defs/rect" }, "renderBox": { "$ref": "#/$defs/rect" }
+          }
+        },
+        { "$ref": "#/$defs/cantTell" }
+      ]
+    },
+    "reconciliationNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeId", "screenshotGeometryCoverage", "nativeVisibility", "layoutRender", "pixelContentMatch"],
+      "properties": {
+        "nodeId": { "$ref": "#/$defs/nonEmptyString" },
+        "screenshotGeometryCoverage": { "enum": ["zeroArea", "outsideScreenshot", "partiallyOutsideScreenshot", "insideScreenshotExtent"] },
+        "nativeVisibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["display", "visibility", "opacity", "centerHitTest"],
+          "properties": { "display": { "$ref": "#/$defs/nonEmptyString" }, "visibility": { "$ref": "#/$defs/nonEmptyString" }, "opacity": { "type": "number" }, "centerHitTest": { "enum": ["hit", "notInteractive", "zeroArea", "offViewport", "occluded"] } }
+        },
+        "layoutRender": { "$ref": "#/$defs/layoutRender" },
+        "pixelContentMatch": { "$ref": "#/$defs/cantTell" }
+      }
+    }
+  }
+}

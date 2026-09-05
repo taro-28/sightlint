@@ -14,6 +14,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
   background: #f3f5f9;
 }
 
@@ -229,6 +230,10 @@ body[data-case="peer-spacing-mutant"] .metric-card-third {
   transform: translateX(16px);
 }
 
+body[data-case="out-of-viewport-mutant"] .metric-card:first-child {
+  transform: translateX(-320px);
+}
+
 body[data-case="intentional-grouping"] .metrics-stage {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
@@ -356,6 +361,10 @@ body[data-case="ambiguous-peer-group"] .metric-card-third {
 
   body[data-case="peer-spacing-mutant"] .metric-card-third {
     transform: translateY(16px);
+  }
+
+  body[data-case="out-of-viewport-mutant"] .metric-card:first-child {
+    transform: translateX(-320px);
   }
 
   .activity-row {

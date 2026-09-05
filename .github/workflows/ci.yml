@@ -85,6 +85,39 @@ jobs:
           RUSTDOCFLAGS: -D warnings
         run: cargo doc --locked --workspace --all-features --no-deps
 
+  web-adapter:
+    name: Playwright Web adapter E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify hosted Node compatibility
+        run: |
+          node --version
+          npm --version
+          node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 20 || major > 24) process.exit(1)'
+      - name: Install locked adapter dependencies
+        run: npm ci --ignore-scripts
+        working-directory: adapters/playwright
+      - name: Validate adapter contracts and unit behavior
+        run: npm run check
+        working-directory: adapters/playwright
+      - name: Install the Playwright-pinned Chromium build
+        run: npx playwright install --with-deps chromium
+        working-directory: adapters/playwright
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Build the public SightLint binary
+        run: cargo build --locked -p sightlint-cli
+      - name: Run browser acquisition and binary E2E
+        run: npm run test:e2e
+        working-directory: adapters/playwright
+
   msrv:
     name: Minimum Rust 1.85.0
     runs-on: ubuntu-latest

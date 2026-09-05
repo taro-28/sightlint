@@ -21,13 +21,23 @@ Acquisition annotations may describe source-reviewed structure:
 - explicitly unknown, disputed, unavailable, or untested aspects.
 
 They must not contain `passed` or `failed`. A source selector or CSS declaration is not proof of a
-rendered rectangle. Until issue #23 captures the page, the following stay `untested`:
+rendered rectangle. Until a browser protocol captures the page, the following stay `untested`:
 
-- computed layout/render/hit rectangles;
+- computed layout/render rectangles and full hit regions;
 - Accessibility Tree output;
 - screenshot and pixel dimensions;
 - clipping, occlusion, transforms, and visible ink;
 - native/pixel agreement or conflict.
+
+The ADR 0033 companion oracle may label those browser observations only when adapter E2E captures
+them in one synchronized run. It uses tolerances for authored CSS relationships rather than
+snapshot-blessing exact platform coordinates. It must keep semantic peer membership and
+pixel-content identity as `untested` or `cantTell` when protocol `0.1.0` does not observe them.
+
+Browser acquisition annotations and browser rule annotations are separate documents. A measured
+layout/render transform is acquisition truth. Whether an existing deterministic rule can act on
+that measurement is rule truth. The implementation's emitted IR, screenshot, or CheckReport must
+not be copied into either document as the expected answer.
 
 A disputed relation lists plausible alternatives. Do not force one peer group only to make an
 existing rule executable.

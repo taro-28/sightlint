@@ -1,0 +1,233 @@
+{
+  "$schema": "../browser-acquisition.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "browserAcquisitionOracle",
+  "provenance": {
+    "authoringBasis": "humanReviewedFixtureContract",
+    "implementationOutputUsedAsOracle": false,
+    "sourceId": "atlas-dashboard-repository-fixture-v0",
+    "ownership": "sightlintRepository",
+    "license": "project-license-pending-repository-test-data",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "externalProcessing": false,
+    "holdoutStatus": "publicDevelopmentData"
+  },
+  "cases": [
+    {
+      "caseId": "dashboard-browser-ambiguous",
+      "request": "evaluation/web/requests/dashboard-browser-ambiguous.json",
+      "split": "development",
+      "classification": "ambiguous",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "minimumDocumentHeight": 800,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+        ],
+        "gaps": [
+          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
+          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 40, "tolerance": 1, "unit": "cssPixel" }
+        ]
+      },
+      "abstentions": [
+        { "aspect": "semanticPeerMembership", "outcome": "cantTell", "rationale": "Source cues intentionally support more than one valid grouping interpretation." },
+        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+      ],
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The unequal visual intervals are measurable, while peer intent remains deliberately unresolved." }
+    },
+    {
+      "caseId": "dashboard-browser-clean",
+      "request": "evaluation/web/requests/dashboard-browser-clean.json",
+      "split": "smoke",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "minimumDocumentHeight": 800,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+        ],
+        "gaps": [
+          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
+          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" }
+        ]
+      },
+      "abstentions": [
+        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "Protocol 0.1 does not infer core peer relations from DOM similarity." },
+        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+      ],
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The fixture contract declares three source siblings with two 24 CSS-pixel grid gaps." }
+    },
+    {
+      "caseId": "dashboard-browser-intentional-grouping",
+      "request": "evaluation/web/requests/dashboard-browser-intentional-grouping.json",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "minimumDocumentHeight": 800,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "cantTell", "role": null, "name": null, "display": "none", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "zeroArea" },
+          { "id": "web-promotion-card", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "complementary", "name": "Prepare the next review", "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+        ],
+        "gaps": [
+          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" }
+        ]
+      },
+      "abstentions": [
+        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "The adapter preserves hierarchy and platform semantics but does not synthesize a peer relation." },
+        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+      ],
+      "hardNegative": { "category": "intentionalGrouping", "rationale": "A complementary promotion next to two metric peers is valid asymmetry and must not be promoted into a spacing defect." },
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "Source role and hierarchy distinguish the visible promotion from the metric group." }
+    },
+    {
+      "caseId": "dashboard-browser-mobile",
+      "request": "evaluation/web/requests/dashboard-browser-mobile.json",
+      "split": "development",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 390, "height": 844, "unit": "cssPixel" },
+        "minimumDocumentHeight": 844,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "partiallyOutsideScreenshot" },
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "partiallyOutsideScreenshot" }
+        ],
+        "gaps": [
+          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "vertical", "value": 16, "tolerance": 1, "unit": "cssPixel" },
+          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "vertical", "value": 16, "tolerance": 1, "unit": "cssPixel" }
+        ]
+      },
+      "abstentions": [
+        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "Responsive geometry is acquired, but no semantic peer relation is inferred." },
+        { "aspect": "belowFoldPixelContent", "outcome": "cantTell", "rationale": "The viewport screenshot does not contain the complete below-the-fold retention card." }
+      ],
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The mobile contract changes the sequence axis and gap without changing metric identity." }
+    },
+    {
+      "caseId": "dashboard-browser-out-of-viewport",
+      "request": "evaluation/web/requests/dashboard-browser-out-of-viewport.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "minimumDocumentHeight": 800,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "conflict", "screenshotGeometryCoverage": "partiallyOutsideScreenshot", "renderOffset": { "x": -320, "y": 0, "tolerance": 1, "unit": "cssPixel" } },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "The native rectangle proves a bounds conflict; protocol 0.1 does not claim pixel identity." }
+      ],
+      "mutation": { "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json", "target": "web-metric-revenue", "changedProperty": "A local transform shifts the revenue card 320 CSS pixels left while layout geometry remains unchanged.", "preservedProperties": ["viewport", "DOM hierarchy", "accessibility role", "layout box", "other metric cards", "fixture content"] },
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The transform is a single targeted inverse of the clean baseline and visibly moves the card beyond document bounds." }
+    },
+    {
+      "caseId": "dashboard-browser-spacing-mutant",
+      "request": "evaluation/web/requests/dashboard-browser-spacing-mutant.json",
+      "split": "development",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "minimumDocumentHeight": 800,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "layoutRenderStatus": "conflict", "screenshotGeometryCoverage": "insideScreenshotExtent", "renderOffset": { "x": 16, "y": 0, "tolerance": 1, "unit": "cssPixel" } }
+        ],
+        "gaps": [
+          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
+          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 40, "tolerance": 1, "unit": "cssPixel" }
+        ]
+      },
+      "abstentions": [
+        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "The adapter measures the offset but does not infer the peer relation required for a spacing verdict." },
+        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+      ],
+      "mutation": { "baselineRequest": "evaluation/web/requests/dashboard-browser-clean.json", "target": "web-metric-retention", "changedProperty": "A local transform shifts the retention card 16 CSS pixels right while layout geometry remains unchanged.", "preservedProperties": ["viewport", "DOM hierarchy", "accessibility role", "layout box", "first two metric cards", "fixture content"] },
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The native acquisition must preserve the 16 CSS-pixel layout/render conflict without turning it into an unsupported peer verdict." }
+    },
+    {
+      "caseId": "dashboard-browser-text-scale",
+      "request": "evaluation/web/requests/dashboard-browser-text-scale.json",
+      "split": "development",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": ["evaluation/web/fixture-app/app.js", "evaluation/web/fixture-app/index.html", "evaluation/web/fixture-app/styles.css"],
+        "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" },
+        "minimumDocumentHeight": 800,
+        "frameCount": 1,
+        "minimumNodeCount": 20,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          { "id": "web-metric-peer-group", "parentId": "web-metrics-stage", "accessibilityStatus": "observed", "role": "group", "name": "Product metrics", "display": "grid", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-revenue", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-activation", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" },
+          { "id": "web-metric-retention", "parentId": "web-metric-peer-group", "accessibilityStatus": "observed", "role": "group", "name": null, "display": "block", "fontSize": "20px", "layoutRenderStatus": "agreement", "screenshotGeometryCoverage": "insideScreenshotExtent" }
+        ],
+        "gaps": [
+          { "from": "web-metric-revenue", "to": "web-metric-activation", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" },
+          { "from": "web-metric-activation", "to": "web-metric-retention", "axis": "horizontal", "value": 24, "tolerance": 1, "unit": "cssPixel" }
+        ]
+      },
+      "abstentions": [
+        { "aspect": "semanticPeerMembership", "outcome": "untested", "rationale": "Scaled geometry is measured, but peer semantics remain outside protocol 0.1." },
+        { "aspect": "pixelContentIdentity", "outcome": "cantTell", "rationale": "Protocol 0.1 records screenshot extent but performs no pixel segmentation or identity matching." }
+      ],
+      "review": { "status": "maintainerReviewed", "reviewedAt": "2026-09-05", "qualification": "repository maintainer product review", "rationale": "The fixture applies a declared 1.25 root text scale, so inherited 16 CSS-pixel text becomes 20 CSS pixels." }
+    }
+  ]
+}

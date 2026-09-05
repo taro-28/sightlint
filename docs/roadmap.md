@@ -14,8 +14,8 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI | hosting protection and release administration |
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
-| M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | browser-captured and representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
-| M4 — Structured adapters | not started | architecture and issue contracts only | Playwright/web first, then other media by demand |
+| M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
+| M4 — Structured adapters | active | initial process-isolated Playwright local-fixture capture with native structure, geometry, screenshot, and reconciliation | broader Web fixture coverage and portability evidence, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
 | M7 — Ecosystem and release | not started | local development CLI only | agent workflow, MCP/GitHub/editor surfaces, packaging, license, release |
@@ -65,17 +65,25 @@ Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by putting
 logic into the Rust kernel. Do not skip #24 by presenting raw measurements as a complete UI/UX
 reviewer.
 
-### Current #22 foundation slice
+### Current #22 foundation and browser slice
 
 ADR 0032 establishes an independently versioned Web evaluation contract and one repository-owned
 dashboard fixture. Six reviewed records separate acquisition annotations from rule verdicts. Three
 smoke cases exercise the existing explicit peer-spacing rule through the public binary with a clean
-baseline, targeted mutation, and intentional-grouping hard negative; three development cases keep
-ambiguous, narrow-viewport, and text-scale acquisition untested.
+baseline, targeted mutation, and intentional-grouping hard negative; three declared-IR development
+cases keep ambiguous, narrow-viewport, and text-scale acquisition explicitly untested.
 
-This is a reviewable dependency for #23 and #24, not completion of issue #22. It has no browser
-capture, screenshot/native reconciliation, dual review, representative sampling, or holdout
-result. Those gaps remain ahead of rule promotion or accuracy claims.
+ADR 0033 adds a separate seven-case browser companion without overwriting those projections. The
+isolated Node process captures selected DOM/accessibility structure, computed geometry, a
+synchronized viewport screenshot, and explicit native/screenshot reconciliation. Human-authored
+browser acquisition and rule oracles cover clean, targeted mutations, an intentional-grouping hard
+negative, ambiguity, responsive layout, text scale, and abstention. The actual capture and built
+Rust binary are exercised together on Linux.
+
+This remains a reviewable first vertical slice, not completion of issue #22 or #23. It has one
+fictional application family, maintainer-only review, visible development labels, no private
+holdout, no pixel-content identity, no semantic peer inference, and no representative sampling.
+Those gaps remain ahead of rule promotion or real-world accuracy claims.
 
 ## Scope-selection rules
 
@@ -246,19 +254,25 @@ pixels to verify rendered reality.
 
 ### First adapter: Playwright/web — #23
 
-The first vertical slice should capture, from one controlled local session:
+The initial protocol `0.1.0` slice captures, from one controlled local session:
 
 - DOM and frame hierarchy;
-- accessibility roles/names/states/actions;
+- accessibility roles/names/states;
 - computed style and typography;
-- layout/render/hit rectangles, clipping, transforms, scroll offsets, direction, and viewport;
+- layout/render rectangles, center hit tests, clipping, transforms, scroll offsets, direction, and
+  viewport; full hit rectangles remain unavailable;
 - device-pixel ratio and deterministic browser/capture environment;
 - synchronized screenshot and evidence reference;
 - stable selectors, adapter/browser versions, privacy/network status, and resource limits;
-- agreement/conflict between native and pixel observations.
+- bounded agreement/conflict between native geometry and screenshot extent.
 
 The browser runs in an isolated TypeScript/Node adapter process. It is not linked into the trusted
 Rust kernel. Start with repository-owned local fixtures rather than arbitrary network URLs.
+
+Remaining #23 work includes broader overlap/clipping/overflow/hit-target/hidden/RTL fixtures,
+characterizing macOS and Windows browser output, and deciding later protocol support for iframes,
+shadow DOM, interaction, and arbitrary projects. Pixel-content identity and semantic peer
+relations remain abstentions until independently evaluated evidence exists.
 
 ### Other adapters — #29
 

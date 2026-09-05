@@ -4,6 +4,7 @@
   const allowedCases = new Set([
     "peer-spacing-clean",
     "peer-spacing-mutant",
+    "out-of-viewport-mutant",
     "intentional-grouping",
     "ambiguous-peer-group",
   ]);

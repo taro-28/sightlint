@@ -486,7 +486,7 @@ def main() -> None:
     print(
         "web evaluation: "
         f"{total} cases, {smoke} smoke, {mutations} mutation, "
-        f"{hard_negatives} hard negative; acquisition remains untested"
+        f"{hard_negatives} hard negative; declared-IR acquisition remains untested"
     )
 
 
