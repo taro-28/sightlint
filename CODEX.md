@@ -24,8 +24,8 @@ Read in this order before editing:
 ## Source of truth
 
 Start from the latest green `main`. Closed PRs and legacy branches are historical reference only.
-Do not reopen or merge superseded Draft PRs #12–#17. Do not use their branches as a base. Issue #32
-tracks branch cleanup.
+Do not reopen or merge superseded Draft PRs #12–#17. Do not recreate or use their deleted branches
+as a base. Issue #32 records the completed branch cleanup.
 
 ```bash
 git fetch --all --prune

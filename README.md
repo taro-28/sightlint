@@ -340,7 +340,6 @@ Read:
 
 | Issue | Purpose |
 |---|---|
-| #19 | branch protection and required checks |
 | #22 | realistic human-reviewed evaluation gate |
 | #23 | Playwright web adapter and reconciliation |
 | #24 | zero-setup recommended rule packs |
@@ -351,13 +350,14 @@ Read:
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states, effects, traces, and recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
-| #32 | legacy branch and repository-setting cleanup |
 | #33 | license, compatibility, packaging, and alpha release |
 | #34 | first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0036 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
-current issues in the ADR index.
+0037 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
+enforces the documented `main` ruleset and automatically removes merged head branches, and the
+legacy branch set has been pruned.
 
 ## Development rules
 
@@ -376,9 +376,11 @@ current issues in the ADR index.
 The complete local gate is in [`AGENTS.md`](AGENTS.md) and
 [`docs/development.md`](docs/development.md).
 
-Branch protection is not currently enabled; #19 tracks the deferred administrative action.
-Legacy branches and automatic deletion are tracked by #32. Do not infer hosting enforcement from a
-green CI badge.
+GitHub's active `Protect main` ruleset requires a pull request, an up-to-date branch, the five
+documented CI contexts, linear history, and resolved review conversations. It blocks force pushes
+and deletion without routine bypass. Squash is the only merge method, and merged head branches are
+deleted automatically. A green CI badge remains commit-specific evidence, not a substitute for
+checking the exact protected head and post-merge `main` run.
 
 ## What SightLint is not
 
