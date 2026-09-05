@@ -14,7 +14,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI | hosting protection and release administration |
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
-| M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases | realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
+| M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | browser-captured and representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
 | M4 — Structured adapters | not started | architecture and issue contracts only | Playwright/web first, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
@@ -64,6 +64,18 @@ Issue #34 owns this outcome.
 Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by putting browser or model
 logic into the Rust kernel. Do not skip #24 by presenting raw measurements as a complete UI/UX
 reviewer.
+
+### Current #22 foundation slice
+
+ADR 0032 establishes an independently versioned Web evaluation contract and one repository-owned
+dashboard fixture. Six reviewed records separate acquisition annotations from rule verdicts. Three
+smoke cases exercise the existing explicit peer-spacing rule through the public binary with a clean
+baseline, targeted mutation, and intentional-grouping hard negative; three development cases keep
+ambiguous, narrow-viewport, and text-scale acquisition untested.
+
+This is a reviewable dependency for #23 and #24, not completion of issue #22. It has no browser
+capture, screenshot/native reconciliation, dual review, representative sampling, or holdout
+result. Those gaps remain ahead of rule promotion or accuracy claims.
 
 ## Scope-selection rules
 
@@ -376,7 +388,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0032 or later.
+- New architecture decision numbers continue at 0033 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.

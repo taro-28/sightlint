@@ -45,18 +45,27 @@
           </div>
 
           <div class="metrics-stage" data-testid="metrics-stage">
-            <div class="metric-peer-group" data-testid="metric-peer-group">
-              <article class="metric-card" data-testid="metric-revenue">
+            <div
+              class="metric-peer-group"
+              role="group"
+              aria-label="Product metrics"
+              data-testid="metric-peer-group"
+            >
+              <article class="metric-card" role="group" data-testid="metric-revenue">
                 <p class="metric-label">Net revenue</p>
                 <p class="metric-value">$184.2k</p>
                 <p class="metric-trend metric-trend-positive">Up 12.4%</p>
               </article>
-              <article class="metric-card" data-testid="metric-activation">
+              <article class="metric-card" role="group" data-testid="metric-activation">
                 <p class="metric-label">Activation</p>
                 <p class="metric-value">68.3%</p>
                 <p class="metric-trend metric-trend-positive">Up 4.8%</p>
               </article>
-              <article class="metric-card metric-card-third" data-testid="metric-retention">
+              <article
+                class="metric-card metric-card-third"
+                role="group"
+                data-testid="metric-retention"
+              >
                 <p class="metric-label">Retention</p>
                 <p class="metric-value">91.7%</p>
                 <p class="metric-trend">Steady this month</p>

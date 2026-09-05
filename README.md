@@ -237,6 +237,8 @@ Current committed assets include:
 - a versioned synthetic rule smoke oracle under `evaluation/`;
 - **38 PNG raster cases** with exact independent pixel, unavailable, or malformed outcomes;
 - **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
+- a repository-owned realistic Web fixture foundation with six separately annotated acquisition
+  and rule cases, including one targeted mutation and one intentional-grouping hard negative;
 - targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
   byte-identical results.
 
@@ -244,8 +246,9 @@ Normal read-only CI verifies corpus drift, rustfmt, Clippy with denied warnings,
 public E2E, rustdoc, Rust 1.85.0, and Linux/macOS/Windows. Public behavior is incomplete until the
 exact final PR head and the merged `main` commit both pass.
 
-Synthetic regression data does not establish real-world precision. Issue #22 defines the required
-realistic, human-reviewed evaluation and holdout process.
+Synthetic and repository-owned regression data does not establish real-world precision. The first
+issue #22 slice defines a reviewed Web evaluation contract, but browser acquisition,
+representative sampling, independent review, and a protected holdout process remain future work.
 
 ## Architecture
 
@@ -297,7 +300,7 @@ Read:
 | #34 | first evidence-backed zero-setup web UI alpha epic |
 
 Issues define future work, not implemented behavior. New architecture decisions continue at ADR
-0032 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0033 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index.
 
 ## Development rules

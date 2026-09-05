@@ -299,9 +299,9 @@ fn evaluate_runnable_case(
     actual
 }
 
-#[test]
-fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavior() {
-    let root = repository_root();
+type MutationRecord = (String, String, String);
+
+fn load_contract(root: &Path) -> (Value, BTreeMap<String, RuleOracle>, BTreeSet<String>) {
     let corpus = load_json(&root.join(CORPUS_PATH), "Web evaluation corpus");
     let corpus_schema = load_json(&root.join(CORPUS_SCHEMA_PATH), "Web corpus schema");
     let annotation_schema = load_json(&root.join(ANNOTATION_SCHEMA_PATH), "annotation schema");
@@ -333,8 +333,11 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
     let rule_oracles = parse_rule_oracles(&rules);
     let rule_ids = rule_oracles.keys().cloned().collect::<BTreeSet<_>>();
     assert_eq!(acquisition_ids, rule_ids);
+    (corpus, rule_oracles, acquisition_ids)
+}
 
-    let sources = array(field(&corpus, "sources", "Web corpus"), "Web sources");
+fn assert_governance_and_determinism(corpus: &Value) -> usize {
+    let sources = array(field(corpus, "sources", "Web corpus"), "Web sources");
     assert_eq!(sources.len(), 1);
     assert_eq!(
         string_field(&sources[0], "ownership", "Web source"),
@@ -350,7 +353,7 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
         "the corpus must not invent a license before issue 33"
     );
 
-    let split_policy = field(&corpus, "splitPolicy", "Web corpus");
+    let split_policy = field(corpus, "splitPolicy", "Web corpus");
     assert_eq!(
         string_field(
             field(split_policy, "holdout", "split policy"),
@@ -359,7 +362,7 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
         ),
         "notEstablished"
     );
-    let smoke_gate = field(field(&corpus, "gates", "Web corpus"), "smoke", "gates");
+    let smoke_gate = field(field(corpus, "gates", "Web corpus"), "smoke", "gates");
     let determinism_runs =
         usize::try_from(unsigned_field(smoke_gate, "determinismRuns", "smoke gate"))
             .expect("determinism runs fit usize");
@@ -378,8 +381,97 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
         unsigned_field(smoke_gate, "maximumFalsePositives", "smoke gate"),
         0
     );
+    determinism_runs
+}
 
-    let cases = array(field(&corpus, "cases", "Web corpus"), "Web cases");
+fn record_runnable_metrics(metrics: &mut Metrics, oracle: &RuleOracle, actual: &str) {
+    if oracle.applicability == "applicable" {
+        metrics.applicable_runnable += 1;
+    }
+    if matches!(actual, "passed" | "failed") {
+        metrics.covered_pass_fail += 1;
+    }
+    if oracle.expected_outcome == "failed" {
+        metrics.expected_failures += 1;
+        if actual == "failed" {
+            metrics.true_positive_failures += 1;
+        }
+    } else if actual == "failed" {
+        metrics.false_positive_failures += 1;
+    }
+}
+
+fn evaluate_case(
+    root: &Path,
+    case: &Value,
+    oracle: &RuleOracle,
+    determinism_runs: usize,
+    metrics: &mut Metrics,
+    actual_outcomes: &mut BTreeMap<String, String>,
+    mutations: &mut Vec<MutationRecord>,
+) {
+    let case_id = string_field(case, "id", "Web case");
+    let capture = field(case, "capture", "Web case");
+    assert_eq!(string_field(capture, "status", "capture"), "untested");
+    assert_eq!(unsigned_field(capture, "trackingIssue", "capture"), 23);
+    assert!(!bool_field(capture, "externalProcessing", "capture"));
+
+    if matches!(oracle.expected_outcome.as_str(), "cantTell" | "untested") {
+        metrics.expected_abstentions += 1;
+    }
+    let execution = field(case, "execution", "Web case");
+    match string_field(execution, "status", "execution") {
+        "runnable" => {
+            metrics.runnable_cases += 1;
+            assert_eq!(
+                string_field(execution, "inputKind", "execution"),
+                "artifactIr"
+            );
+            let input = resolve_repository_path(
+                root,
+                string_field(execution, "inputPath", "execution"),
+                "Web evaluation input",
+            );
+            let actual = evaluate_runnable_case(&input, oracle, case_id, determinism_runs);
+            record_runnable_metrics(metrics, oracle, &actual);
+            actual_outcomes.insert(case_id.to_owned(), actual);
+        }
+        "untested" => {
+            assert!(
+                matches!(oracle.expected_outcome.as_str(), "cantTell" | "untested"),
+                "case {case_id:?} cannot be skipped with a definitive oracle"
+            );
+            metrics.deferred_abstentions += 1;
+        }
+        status => panic!("unsupported execution status {status:?}"),
+    }
+
+    if let Some(mutation) = object(case, "Web case").get("mutation") {
+        metrics.mutations += 1;
+        mutations.push((
+            case_id.to_owned(),
+            string_field(mutation, "baselineCaseId", "mutation").to_owned(),
+            string_field(mutation, "targetRuleId", "mutation").to_owned(),
+        ));
+    }
+    if object(case, "Web case").contains_key("hardNegative") {
+        let actual = actual_outcomes
+            .get(case_id)
+            .unwrap_or_else(|| panic!("hard negative {case_id:?} must be runnable"));
+        assert_ne!(
+            actual, "failed",
+            "hard negative {case_id:?} produced a false-positive failure"
+        );
+    }
+}
+
+fn evaluate_cases(
+    root: &Path,
+    corpus: &Value,
+    rule_oracles: &BTreeMap<String, RuleOracle>,
+    determinism_runs: usize,
+) -> (Metrics, BTreeSet<String>) {
+    let cases = array(field(corpus, "cases", "Web corpus"), "Web cases");
     let mut metrics = Metrics {
         labeled_cases: cases.len(),
         ..Metrics::default()
@@ -402,80 +494,20 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
             case_ids.insert(case_id.to_owned()),
             "duplicate case {case_id:?}"
         );
-
-        let capture = field(case, "capture", "Web case");
-        assert_eq!(string_field(capture, "status", "capture"), "untested");
-        assert_eq!(unsigned_field(capture, "trackingIssue", "capture"), 23);
-        assert!(!bool_field(capture, "externalProcessing", "capture"));
-
         let oracle = rule_oracles
             .get(case_id)
             .unwrap_or_else(|| panic!("missing rule oracle for {case_id:?}"));
-        if matches!(oracle.expected_outcome.as_str(), "cantTell" | "untested") {
-            metrics.expected_abstentions += 1;
-        }
-
-        let execution = field(case, "execution", "Web case");
-        match string_field(execution, "status", "execution") {
-            "runnable" => {
-                metrics.runnable_cases += 1;
-                assert_eq!(
-                    string_field(execution, "inputKind", "execution"),
-                    "artifactIr"
-                );
-                let input = resolve_repository_path(
-                    &root,
-                    string_field(execution, "inputPath", "execution"),
-                    "Web evaluation input",
-                );
-                let actual = evaluate_runnable_case(&input, oracle, case_id, determinism_runs);
-                if oracle.applicability == "applicable" {
-                    metrics.applicable_runnable += 1;
-                }
-                if matches!(actual.as_str(), "passed" | "failed") {
-                    metrics.covered_pass_fail += 1;
-                }
-                if oracle.expected_outcome == "failed" {
-                    metrics.expected_failures += 1;
-                    if actual == "failed" {
-                        metrics.true_positive_failures += 1;
-                    }
-                } else if actual == "failed" {
-                    metrics.false_positive_failures += 1;
-                }
-                actual_outcomes.insert(case_id.to_owned(), actual);
-            }
-            "untested" => {
-                assert!(
-                    matches!(oracle.expected_outcome.as_str(), "cantTell" | "untested"),
-                    "case {case_id:?} cannot be skipped with a definitive oracle"
-                );
-                metrics.deferred_abstentions += 1;
-            }
-            status => panic!("unsupported execution status {status:?}"),
-        }
-
-        if let Some(mutation) = object(case, "Web case").get("mutation") {
-            metrics.mutations += 1;
-            mutations.push((
-                case_id.to_owned(),
-                string_field(mutation, "baselineCaseId", "mutation").to_owned(),
-                string_field(mutation, "targetRuleId", "mutation").to_owned(),
-            ));
-        }
-
-        if object(case, "Web case").contains_key("hardNegative") {
-            let actual = actual_outcomes
-                .get(case_id)
-                .unwrap_or_else(|| panic!("hard negative {case_id:?} must be runnable"));
-            assert_ne!(
-                actual, "failed",
-                "hard negative {case_id:?} produced a false-positive failure"
-            );
-        }
+        evaluate_case(
+            root,
+            case,
+            oracle,
+            determinism_runs,
+            &mut metrics,
+            &mut actual_outcomes,
+            &mut mutations,
+        );
     }
 
-    assert_eq!(case_ids, rule_ids);
     for (mutant, baseline, target_rule) in mutations {
         assert_eq!(target_rule, TARGET_RULE);
         assert_eq!(
@@ -488,7 +520,10 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
         );
         metrics.killed_mutations += 1;
     }
+    (metrics, case_ids)
+}
 
+fn assert_and_print_metrics(metrics: &Metrics) {
     assert_eq!(metrics.labeled_cases, 6);
     assert_eq!(metrics.runnable_cases, 3);
     assert_eq!(metrics.applicable_runnable, 3);
@@ -516,4 +551,15 @@ fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavio
         metrics.killed_mutations,
         metrics.mutations,
     );
+}
+
+#[test]
+fn realistic_web_foundation_preserves_oracles_abstention_and_public_rule_behavior() {
+    let root = repository_root();
+    let (corpus, rule_oracles, annotated_case_ids) = load_contract(&root);
+    let determinism_runs = assert_governance_and_determinism(&corpus);
+    let (metrics, evaluated_case_ids) =
+        evaluate_cases(&root, &corpus, &rule_oracles, determinism_runs);
+    assert_eq!(evaluated_case_ids, annotated_case_ids);
+    assert_and_print_metrics(&metrics);
 }

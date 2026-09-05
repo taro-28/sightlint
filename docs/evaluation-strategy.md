@@ -119,6 +119,20 @@ requires clean/mutation pairs to change the named rule.
 
 This is useful regression evidence but not real-world accuracy.
 
+### Realistic Web evaluation foundation
+
+`evaluation/web/` implements ADR 0032 as the first issue #22 slice. It contains one repository-owned
+fictional dashboard, six environment/state records, separate acquisition and rule annotations,
+review metadata, source/license/privacy declarations, an explicit non-holdout policy, one targeted
+peer-spacing mutation, and one intentional-grouping hard negative.
+
+Three smoke cases execute independently authored Artifact IR projections through the built
+`sightlint` binary and require byte-stable reports. Three development cases preserve ambiguous
+peer intent, a narrow viewport, and increased text scale as deferred abstentions. Browser DOM/
+accessibility/computed geometry, screenshot capture, and native/pixel reconciliation remain
+`untested` until issue #23. The current counts are regression evidence for the evaluation contract,
+not real-world acquisition accuracy or representative rule precision.
+
 ### PNG raster acquisition corpus
 
 `fixtures/png-raster/` contains 38 committed PNG byte cases:

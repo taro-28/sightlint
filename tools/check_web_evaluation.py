@@ -213,7 +213,6 @@ def validate_rule_case(case: dict[str, Any], acquisition_relations: set[str]) ->
     validate_review(case["review"], f"rule review in {case_id!r}")
 
 
-
 def bundle_digest(source_files: list[str]) -> str:
     digest = hashlib.sha256()
     for value in source_files:

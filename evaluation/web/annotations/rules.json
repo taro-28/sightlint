@@ -183,8 +183,7 @@
       },
       "maturity": "experimental",
       "blocking": false,
-      "falsePositiveRisk": "A failure would be false if the third card were an intentionally separated variant; this mutation preserves confirmed peer intent."
-      ,
+      "falsePositiveRisk": "A failure would be false if the third card were an intentionally separated variant; this mutation preserves confirmed peer intent.",
       "review": {
         "status": "maintainerReviewed",
         "qualification": "repository maintainer product review",

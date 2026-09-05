@@ -120,4 +120,3 @@ Rejected because visible artifacts and labels are available for tuning.
 - The clean, mutation, hard-negative, and explicit untested acquisition expectations are asserted.
 - Existing conformance, PNG, image-inspection, and product-evaluation suites remain unchanged and
   green on Linux, macOS, Windows, and Rust 1.85.0.
-
