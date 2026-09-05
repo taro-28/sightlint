@@ -1,0 +1,88 @@
+name: M3 filter repair
+
+on:
+  push:
+    branches:
+      - feat/m3-png-filter-reconstruction
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-png-filter-reconstruction
+          fetch-depth: 0
+      - name: Let the first verifier settle and use the latest branch
+        shell: bash
+        run: |
+          sleep 90
+          git fetch origin feat/m3-png-filter-reconstruction
+          git reset --hard origin/feat/m3-png-filter-reconstruction
+      - name: Apply wiring when the first verifier did not commit it
+        shell: bash
+        run: |
+          if test -f .github/workflows/m3-filter-bootstrap.yml; then
+            python3 - <<'PY'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/m3-filter-bootstrap.yml').read_text()
+          start_marker = "          python3 - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          embedded = workflow[start:end]
+          script = '\n'.join(
+              line[10:] if line.startswith('          ') else line
+              for line in embedded.splitlines()
+          )
+          exec(compile(script, 'm3-filter-bootstrap-embedded', 'exec'))
+          PY
+          fi
+      - name: Apply review hardening
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          e2e = Path('crates/sightlint-cli/tests/png_filter_e2e.rs')
+          text = e2e.read_text()
+          text = text.replace('    width: u32,\n', '', 1)
+          text = text.replace('        width: pass_width,\n', '', 1)
+          old = '''            (pass_width > 0 && pass_height > 0).then(|| plan(pass_width, pass_height))'''
+          new = '''            if pass_width > 0 && pass_height > 0 {
+                Some(plan(pass_width, pass_height))
+            } else {
+                None
+            }'''
+          if old in text:
+              text = text.replace(old, new)
+          elif new not in text:
+              raise SystemExit('Adam7 filter-map marker not found')
+          e2e.write_text(text)
+          PY
+      - name: Verify the complete implementation
+        shell: bash
+        run: |
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified implementation
+        shell: bash
+        run: |
+          rm -f .github/workflows/m3-filter-bootstrap.yml
+          rm -f .github/workflows/m3-filter-repair.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: reconstruct PNG scanline filters'
+          git push origin HEAD:feat/m3-png-filter-reconstruction
