@@ -1,151 +1,311 @@
 # Rule model
 
-## Goal
+SightLint rules are deterministic obligations over normalized, evidence-backed observations. They
+are not free-form review prompts and they do not own artifact acquisition.
 
-SightLint does not execute broad advice such as “make the hierarchy clear.” It executes
-narrow, testable obligations with explicit evidence and applicability.
+Read `docs/product-rationale.md` for the full problem model and issue #24 for the recommended
+zero-setup rule-pack epic.
 
-The rule model is inspired by W3C ACT concepts while extending them to visual artifacts and
-interaction traces.
+## Separation of concerns
 
-## Rule kinds
+A trustworthy rule result is assembled from separate inputs:
 
-### Atomic rule
+```text
+observed facts
+  + semantic applicability and target relations
+  + selected policy/expectation
+  + units, tolerance, and valid alternatives
+  + evidence sufficiency
+  -> deterministic obligation
+  -> outcome and explanation
+```
 
-An atomic rule evaluates one narrow expectation against one or more targets. Examples:
+Do not collapse these stages.
 
-- a rendered node is within its canvas bounds
-- equivalent peer gaps do not exceed a configured tolerance
-- essential text remains visible after a viewport transformation
-- an asynchronous action exposes a pending or optimistic state
+Examples:
 
-### Composite rule
+- “font size is 11 px” is an observation;
+- “this is body text on platform/profile X” is applicability evidence;
+- “profile X requires at least Y for that role” is policy;
+- comparing 11 with Y is the deterministic obligation;
+- whether the result blocks is rule maturity and CI policy.
 
-A composite rule combines atomic outcomes and may permit multiple valid solutions. For an
-irreversible action, a composite obligation might accept a review step, typed confirmation,
-capability token, or another explicitly approved safeguard.
+A gap array `[8, 8, 16]` is not automatically a spacing failure. The rule needs evidence that the
+elements are equivalent peers and that one uniform interval is expected rather than intentional
+grouping.
 
-## Required rule metadata
+## Atomic rule contract
 
-Every rule must define:
+Every atomic rule declares:
 
-- stable identifier and semantic version
-- title and user-visible problem
-- rule kind
-- required input aspects
-- applicability selector
-- expectation
-- accepted tolerances and units
-- evidence requirements
-- assumptions
-- possible outcomes
-- severity derivation inputs
-- passing, failing, inapplicable, and cantTell fixtures
-- known false-positive and false-negative risks
+- stable rule identifier and semantic version;
+- title and user-visible defect class;
+- required input aspects;
+- target selection and applicability;
+- accepted evidence classes and sufficiency threshold;
+- policy source and precedence;
+- exact expectation or accepted alternatives;
+- units, coordinate spaces, tolerance, and rounding;
+- possible outcomes and diagnostics;
+- severity inputs;
+- maturity and default blocking policy;
+- false-positive/false-negative risks;
+- explanation and remediation contract;
+- compatibility and migration behavior;
+- conformance, acquisition, product, hard-negative, and mutation evidence.
+
+Rule metadata is part of the public compatibility surface. A stable ID must not silently change
+meaning. Use a new semantic version or rule ID when an incompatible change cannot be migrated.
+
+## Required input aspects
+
+A rule lists exactly what it needs rather than assuming a complete object:
+
+- source/layout, render/ink, or hit geometry;
+- hierarchy or peer relation;
+- role, name, state, or action;
+- typography/style/color observation;
+- canvas/page/screen properties;
+- viewport, scale, direction, locale, or platform;
+- project/design-system/platform policy;
+- pixel or native reconciliation status;
+- interaction action/effect/state/trace;
+- evidence source, confidence, uncertainty, and conflicts.
+
+Missing a required aspect produces `cantTell` or `untested` according to the contract, not a
+guessed pass/failure.
+
+## Applicability
+
+Applicability answers whether the obligation is meaningful for the targets.
+
+Examples:
+
+- three cards are true peers for spacing consistency;
+- an intentionally separated call-to-action is not part of the card peer group;
+- body-text minimum policy does not apply to a decorative watermark;
+- hit-target policy applies only to an interactive target under a named platform profile;
+- contrast applies only when foreground, background, compositing, and color assumptions are known;
+- an async-feedback rule applies only to an action with an observable latent effect;
+- a destructive-safeguard rule accepts confirmation, undo, soft deletion, history, or another
+  explicit approved alternative.
+
+Applicability can be exact/declared, empirically reconciled, or inferred. Its evidence grade must be
+visible. Inferred applicability with insufficient confidence or source conflict remains advisory or
+`cantTell`.
+
+## Policy resolution
+
+SightLint should eventually provide useful defaults without requiring every project to configure
+every value. Expectations are resolved in this order:
+
+1. explicit project contract or scoped exception;
+2. exact design-system or platform contract;
+3. statistically inferred project norm with visible confidence and support;
+4. platform convention;
+5. conservative built-in baseline.
+
+A result records which source won, its version, scope, and any overridden alternatives. Project
+exceptions must be narrow and reviewable; a broad ignore switch should not hide unrelated results.
+
+Potential future profiles include recommended, web, mobile, slides, documents, platform versions,
+and organization/project overlays. Names and configuration require an ADR before stabilization.
+
+## Inferred project norms
+
+A future policy source may infer spacing scales, typography roles, radii, density, or repeated
+component patterns. It remains evidence, not exact truth.
+
+Requirements:
+
+- record sample count, clusters/modes, support, confidence, and exceptions;
+- tolerate multi-modal systems rather than forcing one value;
+- use robust baselines so existing defects do not become the standard;
+- let explicit project/design-system contracts override inference;
+- evaluate on a frozen holdout;
+- version baseline changes;
+- return `cantTell` when the project does not supply enough representative data.
 
 ## Outcomes
 
-The trusted result set is:
+### `passed`
 
-- `passed`: the applicable expectation is satisfied by sufficient evidence
-- `failed`: the applicable expectation is violated by sufficient evidence
-- `inapplicable`: the target does not meet the rule's applicability conditions
-- `cantTell`: required meaning or evidence cannot be established safely
-- `untested`: the required observation or execution was not performed
+Applicable, sufficient evidence was available and at least one accepted obligation/alternative was
+satisfied.
 
-`cantTell` and `untested` are different. The first means evidence was considered but remains
-ambiguous; the second means the necessary test did not run.
+### `failed`
 
-## Input aspects
+Applicable, sufficient evidence was available and no accepted obligation/alternative was
+satisfied. A failed outcome is not automatically blocking; maturity and CI policy decide that.
 
-Rules declare exactly what they consume, for example:
+### `inapplicable`
 
-- semantic tree
-- source geometry
-- rendered geometry
-- pixels
-- typography
-- color
-- project policy
-- inferred project baseline
-- interaction trace
-- action effects
-- accessibility tree
-- temporal state model
+The artifact/targets are understood, but the rule does not apply. This is different from missing
+evidence.
 
-If an input aspect is unavailable, the rule returns `inapplicable`, `cantTell`, or `untested`
-according to its contract instead of guessing.
+### `cantTell`
 
-## Evidence strength
+The rule was considered, but required observations, semantic applicability, policy, or conflict
+resolution were insufficient for a trustworthy pass/failure.
 
-Reports distinguish verdict outcome from evidence strength. Planned evidence grades include:
+### `untested`
 
-- `provenStatic`
-- `provenRender`
-- `provenTrace`
-- `provenDeclared`
-- `inferred`
-- `empirical`
-- `advisory`
+The relevant acquisition or execution did not run—for example an unavailable adapter, unsupported
+format, timeout, or missing trace. `untested` is never a pass.
 
-A result may be a high-confidence inference and still be non-blocking because it is not proof.
+## Evidence and confidence
+
+Evidence strength describes the source and verification path. Confidence describes uncertainty in
+an inferred observation or relation. Neither is the outcome or severity.
+
+Illustrative evidence categories include:
+
+- exact source/native extraction;
+- exact deterministic transform;
+- project/platform declaration;
+- reconciled native and rendered observation;
+- empirical heuristic with measured precision;
+- model inference with version/calibration;
+- conflicting or incomplete evidence.
+
+A high-confidence cosmetic observation can have low severity. A low-confidence potentially severe
+problem usually needs investigation/`cantTell`, not an inflated severity or automatic failure.
+
+Do not invent numeric confidence when a source does not provide a calibrated probability. Record
+alternatives and repeated-run agreement separately.
 
 ## Severity
 
-Severity is derived from explicit factors rather than a model's free-form label. Candidate
-factors include:
+Severity should be derived from explicit inputs rather than one intuition label:
 
-- user or data harm
-- affected scope
-- exposure or frequency
-- likelihood
-- recoverability
-- task criticality
+- user harm and task criticality;
+- affected scope and reversibility;
+- frequency/likelihood under the evaluated environment;
+- recoverability and available workaround;
+- accessibility, safety, trust, data-loss, or financial implications;
+- whether the issue is visual polish, interaction feedback, or an incorrect/hidden effect.
 
-The precise model belongs in a future ADR. Severity must not be inferred from confidence.
+Severity is independent of evidence confidence. A future severity/CI maturity ADR must define how
+these inputs map to labels and organizational policy before broad stable release.
 
-## Policy precedence
+## Maturity and CI policy
 
-Expectations resolve in this order:
+Rules progress through documented maturity rather than becoming blocking when first implemented:
 
-1. explicit project rule or exception
-2. exact design-system or platform contract
-3. inferred project norm with visible confidence
-4. platform convention
-5. conservative universal baseline
+- **experimental:** semantics and acquisition still changing; visible only when requested or in
+  development profiles;
+- **advisory:** useful evaluated signal, but not eligible to fail the default build;
+- **blocking-eligible:** stable rule/evidence/policy contract with adequate real-case precision,
+  coverage, abstention, hard negatives, compatibility, and remediation;
+- **blocking:** explicitly enabled by the selected project/organization profile.
 
-The chosen source is evidence in the report.
+A rule can be severe but not blocking-eligible if acquisition is unreliable. A rule can be highly
+precise but remain advisory because its policy is subjective.
 
-## CI policy
+Model-only or heuristic-only semantic inference cannot silently block. Project policy may choose a
+stricter gate only when the report exposes the evidence and expected consequences.
 
-The initial CI integration should block only on:
+## Composite rules
 
-- sufficiently evidenced failures in rules configured as blocking
-- schema or engine errors
-- high-risk `cantTell` outcomes when strict policy explicitly requires declaration
+Composite rules combine atomic results into user-level obligations. They must preserve child
+outcomes and evidence rather than hiding them behind one score.
 
-Advisory AI critique, aesthetics, and a single aggregate score must not block by default.
+Examples:
 
-## Example conceptual rule
+- a destructive action is safe if confirmation, undo, soft deletion, version history, or another
+  accepted safeguard is proven;
+- an interactive target satisfies both visual/hit geometry and accessible role/name obligations;
+- a responsive component preserves essential content across declared viewports;
+- a form failure provides actionable error identification, retained input, and a recovery path.
 
-```yaml
-id: visual.spacing.peer-consistency
-version: 0.1.0
-kind: atomic
-inputAspects:
-  - semantic-tree
-  - rendered-geometry
-applicability:
-  repeated peers with equivalent roles and variants
-expectation:
-  corresponding gaps differ by no more than the resolved tolerance
-outcomes:
-  - passed
-  - failed
-  - inapplicable
-  - cantTell
-  - untested
-```
+Composition logic is versioned and deterministic. It defines how `cantTell`, `inapplicable`, and
+`untested` children propagate.
 
-The executable implementation may be Rust rather than YAML. The metadata and semantics must
-remain serializable and inspectable.
+## Current implemented rule areas
+
+Current structured-IR rules/contracts include:
+
+- bounds within canvas;
+- declared non-overlap;
+- explicit peer spacing consistency;
+- parent containment;
+- logical alignment;
+- peer width/height consistency;
+- peer typography consistency;
+- project-supplied minimum font size;
+- direction, coordinate-space, unit, tolerance, evidence, and ambiguity handling.
+
+These rules consume declared/evidence-backed inputs. Current `inspect-image` observations do not
+become trusted semantic peers or blocking spacing failures.
+
+## Recommended first-wave candidates
+
+Final selection is evidence-gated by issues #22–#24, but likely high-confidence areas are:
+
+- out-of-viewport, clipping, and overflow;
+- overlap/occlusion with native/render evidence;
+- repeated peers with spacing, alignment, or extent outliers;
+- text overflow/truncation;
+- exact text-size and hit-target policies under a named platform/profile;
+- responsive loss across declared viewports;
+- missing/hidden focus indication when a controlled trace proves focus.
+
+Contrast requires foreground/background/compositing/color-management evidence. Broad hierarchy,
+density, aesthetics, or “AI-looking” judgments remain advisory until narrow obligations and real
+evaluation exist.
+
+## Rule admission checklist
+
+A rule cannot enter the recommended profile until it has:
+
+- stable versioned semantics;
+- exact applicability and required aspects;
+- named policy source and override model;
+- explicit units/tolerance/rounding;
+- valid alternatives and scoped exceptions;
+- pass, targeted fail/mutation, `cantTell`, inapplicable, and `untested` fixtures where meaningful;
+- malformed/boundary/resource/determinism coverage;
+- hard negatives;
+- public-binary/process E2E;
+- realistic acquisition and rule evaluation under `docs/evaluation-strategy.md`;
+- per-rule precision, coverage, abstention, and mutation evidence;
+- explanation, target navigation, and remediation contract;
+- a declared maturity decision and compatibility policy.
+
+A new rule may ship experimental/advisory earlier, but documentation must not imply default
+blocking maturity.
+
+## Explanation and remediation
+
+Every result should expose:
+
+- rule ID/version and maturity;
+- target IDs/selectors and evidence links;
+- observed values, units, and source;
+- applicability reason;
+- selected policy, precedence, tolerance, and alternatives;
+- conflicting/missing evidence;
+- outcome and blocking policy;
+- severity inputs;
+- narrow remediation choices and known tradeoffs.
+
+Auto-fix is separate from diagnosis. A coding agent may propose a change, but the same rule and
+relevant regression suite must be rerun. Do not let a model edit an artifact and declare its own
+success.
+
+## Testing
+
+Every rule receives the applicable test matrix:
+
+- passing and targeted mutation/failure;
+- `cantTell`, inapplicable, and `untested`;
+- malformed, boundary, resource, direction, scale, and ordering;
+- valid alternative solutions and hard negatives;
+- evidence/conflict permutations;
+- canonical repeated-byte output;
+- public-binary/process E2E;
+- separate acquisition and semantic rule evaluation;
+- frozen holdout before strong maturity/accuracy claims.
+
+Oracle changes require a semantic reason. Never regenerate expected rule outcomes from the engine
+being evaluated.
