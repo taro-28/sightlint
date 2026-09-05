@@ -46,10 +46,11 @@ background, alternatives, and disposition of historical experiments.
 - [0030 — Verified staged raster and byte corpus](0030-verified-staged-raster-and-corpus.md)
 - [0031 — Advisory image-region inspection](0031-advisory-image-region-inspection.md)
 - [0032 — Realistic web evaluation foundation](0032-realistic-web-evaluation-foundation.md)
+- [0033 — Playwright web adapter process and capture protocol](0033-playwright-web-adapter-process.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0033** or later.
+continue at **0034** or later.
 
 ## Proposed decisions
 
@@ -92,4 +93,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0033.
+Use [the template](template.md) and the next unused number at or after 0034.
