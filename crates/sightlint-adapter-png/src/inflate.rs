@@ -172,13 +172,8 @@ fn inflate_exact(
         if more_non_empty_input {
             flags |= TINFL_FLAG_HAS_MORE_INPUT;
         }
-        let (status, consumed, produced) = decompress(
-            &mut decompressor,
-            payload,
-            output,
-            output_position,
-            flags,
-        );
+        let (status, consumed, produced) =
+            decompress(&mut decompressor, payload, output, output_position, flags);
         output_position += produced;
 
         match status {
