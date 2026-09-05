@@ -93,7 +93,7 @@ impl fmt::Display for PngFilterError {
 impl Error for PngFilterError {}
 
 #[derive(Debug, Clone, Copy)]
-struct PassSpec {
+struct PassGeometry {
     index: u8,
     start_x: u32,
     start_y: u32,
@@ -101,6 +101,11 @@ struct PassSpec {
     step_y: u32,
     width: u32,
     height: u32,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct PassSpec {
+    geometry: PassGeometry,
     row_bytes: usize,
     filter_bytes_per_pixel: usize,
 }
@@ -122,53 +127,38 @@ pub fn reconstruct_png_scanlines(input: &[u8]) -> Result<ReconstructedPng, PngAd
 }
 
 fn reconstruct_inflated(inflated: InflatedPng) -> Result<ReconstructedPng, PngFilterError> {
-    let pass_specs = pass_specs(inflated.structure.header)?;
-    let expected_input = filtered_input_length(&pass_specs)?;
-    if inflated.scanline_bytes.len() != expected_input {
+    let specs = pass_specs(inflated.structure.header)?;
+    let expected_input = filtered_input_length(&specs)?;
+    let actual_input = inflated.scanline_bytes.len();
+    if actual_input != expected_input {
         return Err(PngFilterError::ScanlineLayoutMismatch {
             expected: expected_input,
-            actual: inflated.scanline_bytes.len(),
+            actual: actual_input,
         });
     }
 
-    let output_capacity = reconstructed_output_length(&pass_specs)?;
+    let output_capacity = reconstructed_output_length(&specs)?;
     let mut packed_sample_bytes = Vec::with_capacity(output_capacity);
-    let mut passes = Vec::with_capacity(pass_specs.len());
+    let mut passes = Vec::with_capacity(specs.len());
     let mut input_offset = 0_usize;
 
-    for spec in pass_specs {
+    for spec in specs {
         let output_offset = packed_sample_bytes.len();
-        let mut previous_row_start = None;
+        let mut previous_row_start: Option<usize> = None;
 
-        for row_index in 0..spec.height {
-            let filter = *inflated
-                .scanline_bytes
-                .get(input_offset)
-                .ok_or(PngFilterError::ScanlineLayoutMismatch {
-                    expected: expected_input,
-                    actual: input_offset,
-                })?;
-            input_offset = input_offset
-                .checked_add(1)
-                .ok_or(PngFilterError::LayoutOverflow)?;
-            let row_end = input_offset
-                .checked_add(spec.row_bytes)
-                .ok_or(PngFilterError::LayoutOverflow)?;
-            let filtered_row = inflated.scanline_bytes.get(input_offset..row_end).ok_or(
-                PngFilterError::ScanlineLayoutMismatch {
-                    expected: expected_input,
-                    actual: row_end,
-                },
-            )?;
-            let previous_row = previous_row_start.map(|start| {
-                &packed_sample_bytes[start..start + spec.row_bytes]
-            });
+        for row_index in 0..spec.geometry.height {
+            let filter = inflated.scanline_bytes[input_offset];
+            input_offset += 1;
+            let row_end = input_offset + spec.row_bytes;
+            let filtered_row = &inflated.scanline_bytes[input_offset..row_end];
+            let previous_row = previous_row_start
+                .map(|start| &packed_sample_bytes[start..start + spec.row_bytes]);
             let reconstructed_row = reconstruct_row(
                 filter,
                 filtered_row,
                 previous_row,
                 spec.filter_bytes_per_pixel,
-                spec.index,
+                spec.geometry.index,
                 row_index + 1,
             )?;
             previous_row_start = Some(packed_sample_bytes.len());
@@ -177,25 +167,23 @@ fn reconstruct_inflated(inflated: InflatedPng) -> Result<ReconstructedPng, PngFi
         }
 
         passes.push(PngPass {
-            index: spec.index,
-            start_x: spec.start_x,
-            start_y: spec.start_y,
-            step_x: spec.step_x,
-            step_y: spec.step_y,
-            width: spec.width,
-            height: spec.height,
+            index: spec.geometry.index,
+            start_x: spec.geometry.start_x,
+            start_y: spec.geometry.start_y,
+            step_x: spec.geometry.step_x,
+            step_y: spec.geometry.step_y,
+            width: spec.geometry.width,
+            height: spec.geometry.height,
             row_bytes: spec.row_bytes,
             filter_bytes_per_pixel: spec.filter_bytes_per_pixel,
             output_offset,
         });
     }
 
-    if input_offset != inflated.scanline_bytes.len()
-        || packed_sample_bytes.len() != output_capacity
-    {
+    if input_offset != actual_input || packed_sample_bytes.len() != output_capacity {
         return Err(PngFilterError::ScanlineLayoutMismatch {
             expected: expected_input,
-            actual: inflated.scanline_bytes.len(),
+            actual: actual_input,
         });
     }
 
@@ -217,23 +205,29 @@ fn reconstruct_row(
     if filter > 4 {
         return Err(PngFilterError::InvalidFilterType { pass, row, filter });
     }
-    if previous.is_some_and(|bytes| bytes.len() != filtered.len()) {
-        return Err(PngFilterError::ScanlineLayoutMismatch {
-            expected: filtered.len(),
-            actual: previous.map_or(0, <[u8]>::len),
-        });
+    if let Some(previous_row) = previous {
+        if previous_row.len() != filtered.len() {
+            return Err(PngFilterError::ScanlineLayoutMismatch {
+                expected: filtered.len(),
+                actual: previous_row.len(),
+            });
+        }
     }
 
     let mut reconstructed = vec![0_u8; filtered.len()];
     for (index, &byte) in filtered.iter().enumerate() {
-        let left = index
-            .checked_sub(bytes_per_pixel)
-            .map_or(0, |left_index| reconstructed[left_index]);
+        let left = if index >= bytes_per_pixel {
+            reconstructed[index - bytes_per_pixel]
+        } else {
+            0
+        };
         let up = previous.map_or(0, |previous_row| previous_row[index]);
         let upper_left = previous.map_or(0, |previous_row| {
-            index
-                .checked_sub(bytes_per_pixel)
-                .map_or(0, |left_index| previous_row[left_index])
+            if index >= bytes_per_pixel {
+                previous_row[index - bytes_per_pixel]
+            } else {
+                0
+            }
         });
         let predictor = match filter {
             0 => 0,
@@ -278,67 +272,57 @@ fn pass_specs(header: PngHeader) -> Result<Vec<PassSpec>, PngFilterError> {
         .max(1);
 
     if header.interlace_method == 0 {
+        let geometry = PassGeometry {
+            index: 1,
+            start_x: 0,
+            start_y: 0,
+            step_x: 1,
+            step_y: 1,
+            width: header.width,
+            height: header.height,
+        };
         return Ok(vec![pass_spec(
-            1,
-            0,
-            0,
-            1,
-            1,
-            header.width,
-            header.height,
+            geometry,
             bits_per_pixel,
             filter_bytes_per_pixel,
         )?]);
     }
 
-    ADAM7_PASSES
-        .into_iter()
-        .enumerate()
-        .filter_map(|(index, (start_x, start_y, step_x, step_y))| {
-            let width = pass_extent(header.width, start_x, step_x);
-            let height = pass_extent(header.height, start_y, step_y);
-            if width == 0 || height == 0 {
-                None
-            } else {
-                Some(pass_spec(
-                    u8::try_from(index + 1).expect("Adam7 index fits u8"),
-                    start_x,
-                    start_y,
-                    step_x,
-                    step_y,
-                    width,
-                    height,
-                    bits_per_pixel,
-                    filter_bytes_per_pixel,
-                ))
-            }
-        })
-        .collect()
+    let mut passes = Vec::with_capacity(ADAM7_PASSES.len());
+    for (index, (start_x, start_y, step_x, step_y)) in ADAM7_PASSES.into_iter().enumerate() {
+        let width = pass_extent(header.width, start_x, step_x);
+        let height = pass_extent(header.height, start_y, step_y);
+        if width == 0 || height == 0 {
+            continue;
+        }
+        let geometry = PassGeometry {
+            index: u8::try_from(index + 1).expect("Adam7 index fits u8"),
+            start_x,
+            start_y,
+            step_x,
+            step_y,
+            width,
+            height,
+        };
+        passes.push(pass_spec(
+            geometry,
+            bits_per_pixel,
+            filter_bytes_per_pixel,
+        )?);
+    }
+    Ok(passes)
 }
 
-#[allow(clippy::too_many_arguments)]
 fn pass_spec(
-    index: u8,
-    start_x: u32,
-    start_y: u32,
-    step_x: u32,
-    step_y: u32,
-    width: u32,
-    height: u32,
+    geometry: PassGeometry,
     bits_per_pixel: u64,
     filter_bytes_per_pixel: usize,
 ) -> Result<PassSpec, PngFilterError> {
-    let row_bytes_u64 = (u64::from(width) * bits_per_pixel).div_ceil(8);
+    let row_bytes_u64 = (u64::from(geometry.width) * bits_per_pixel).div_ceil(8);
     let row_bytes =
         usize::try_from(row_bytes_u64).map_err(|_| PngFilterError::LayoutOverflow)?;
     Ok(PassSpec {
-        index,
-        start_x,
-        start_y,
-        step_x,
-        step_y,
-        width,
-        height,
+        geometry,
         row_bytes,
         filter_bytes_per_pixel,
     })
@@ -350,10 +334,10 @@ fn filtered_input_length(passes: &[PassSpec]) -> Result<usize, PngFilterError> {
             .row_bytes
             .checked_add(1)
             .ok_or(PngFilterError::LayoutOverflow)?;
+        let height = usize::try_from(pass.geometry.height)
+            .map_err(|_| PngFilterError::LayoutOverflow)?;
         let pass_length = row_with_filter
-            .checked_mul(
-                usize::try_from(pass.height).map_err(|_| PngFilterError::LayoutOverflow)?,
-            )
+            .checked_mul(height)
             .ok_or(PngFilterError::LayoutOverflow)?;
         total
             .checked_add(pass_length)
@@ -363,11 +347,11 @@ fn filtered_input_length(passes: &[PassSpec]) -> Result<usize, PngFilterError> {
 
 fn reconstructed_output_length(passes: &[PassSpec]) -> Result<usize, PngFilterError> {
     passes.iter().try_fold(0_usize, |total, pass| {
+        let height = usize::try_from(pass.geometry.height)
+            .map_err(|_| PngFilterError::LayoutOverflow)?;
         let pass_length = pass
             .row_bytes
-            .checked_mul(
-                usize::try_from(pass.height).map_err(|_| PngFilterError::LayoutOverflow)?,
-            )
+            .checked_mul(height)
             .ok_or(PngFilterError::LayoutOverflow)?;
         total
             .checked_add(pass_length)
@@ -395,7 +379,62 @@ fn pass_extent(size: u32, start: u32, step: u32) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use super::{PngFilterError, average, paeth, reconstruct_row};
+    use super::{
+        PngFilterError, average, filtered_input_length, paeth, pass_specs, reconstruct_row,
+    };
+    use crate::{PngHeader, expected_scanline_bytes};
+
+    fn header(width: u32, height: u32, depth: u8, color_type: u8, interlace: u8) -> PngHeader {
+        PngHeader {
+            width,
+            height,
+            bit_depth: depth,
+            color_type,
+            compression_method: 0,
+            filter_method: 0,
+            interlace_method: interlace,
+        }
+    }
+
+    fn reference_paeth(left: u8, up: u8, upper_left: u8) -> u8 {
+        let estimate = i16::from(left) + i16::from(up) - i16::from(upper_left);
+        let candidates = [left, up, upper_left];
+        let distances = candidates.map(|candidate| (estimate - i16::from(candidate)).abs());
+        let mut selected = 0_usize;
+        if distances[1] < distances[selected] {
+            selected = 1;
+        }
+        if distances[2] < distances[selected] {
+            selected = 2;
+        }
+        candidates[selected]
+    }
+
+    fn encode_row(filter: u8, current: &[u8], previous: Option<&[u8]>, bpp: usize) -> Vec<u8> {
+        current
+            .iter()
+            .enumerate()
+            .map(|(index, &value)| {
+                let left = if index >= bpp { current[index - bpp] } else { 0 };
+                let up = previous.map_or(0, |row| row[index]);
+                let upper_left = previous.map_or(0, |row| {
+                    if index >= bpp { row[index - bpp] } else { 0 }
+                });
+                let predictor = match filter {
+                    0 => 0,
+                    1 => left,
+                    2 => up,
+                    3 => {
+                        u8::try_from((u16::from(left) + u16::from(up)) / 2)
+                            .expect("byte average")
+                    }
+                    4 => reference_paeth(left, up, upper_left),
+                    _ => unreachable!("test filter range"),
+                };
+                value.wrapping_sub(predictor)
+            })
+            .collect()
+    }
 
     #[test]
     fn reconstructs_all_five_filters_from_known_rows() {
@@ -425,6 +464,28 @@ mod tests {
     }
 
     #[test]
+    fn independent_forward_filters_round_trip_across_predictor_widths() {
+        for filter in 0..=4 {
+            for bpp in 1..=8 {
+                let length = bpp * 3 + 2;
+                let previous: Vec<u8> = (0..length)
+                    .map(|index| u8::try_from(index * 17 % 256).expect("test byte"))
+                    .collect();
+                let current: Vec<u8> = (0..length)
+                    .map(|index| u8::try_from((index * 41 + 233) % 256).expect("test byte"))
+                    .collect();
+                let filtered = encode_row(filter, &current, Some(&previous), bpp);
+                assert_eq!(
+                    reconstruct_row(filter, &filtered, Some(&previous), bpp, 1, 2)
+                        .expect("valid filter"),
+                    current,
+                    "filter={filter}, bpp={bpp}"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn reconstruction_wraps_modulo_256() {
         assert_eq!(
             reconstruct_row(1, &[250, 10], None, 1, 1, 1).expect("Sub filter"),
@@ -433,12 +494,31 @@ mod tests {
     }
 
     #[test]
-    fn predictor_helpers_follow_png_integer_rules() {
+    fn predictor_helpers_follow_png_integer_and_tie_rules() {
         assert_eq!(average(1, 2), 1);
         assert_eq!(average(255, 255), 255);
         assert_eq!(paeth(10, 20, 30), 10);
         assert_eq!(paeth(10, 20, 15), 15);
         assert_eq!(paeth(100, 10, 10), 100);
+        assert_eq!(paeth(5, 5, 0), 5);
+    }
+
+    #[test]
+    fn filter_layout_matches_the_independent_inflate_size_contract() {
+        for candidate in [
+            header(9, 3, 1, 0, 0),
+            header(5, 2, 4, 3, 0),
+            header(3, 2, 8, 2, 0),
+            header(2, 2, 16, 6, 0),
+            header(1, 1, 8, 6, 1),
+            header(8, 8, 8, 6, 1),
+            header(17, 13, 2, 0, 1),
+        ] {
+            let specs = pass_specs(candidate).expect("valid layout");
+            let actual = u64::try_from(filtered_input_length(&specs).expect("bounded layout"))
+                .expect("layout fits u64");
+            assert_eq!(actual, expected_scanline_bytes(candidate));
+        }
     }
 
     #[test]
