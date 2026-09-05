@@ -1,14 +1,17 @@
-//! Deterministic PNG metadata adapter for `SightLint`.
+//! Deterministic PNG source adapter for `SightLint`.
 //!
-//! This crate validates PNG metadata, the complete chunk stream, and bounded zlib inflation.
-//! Inflated bytes remain PNG-filtered; the adapter does not yet derive pixel colors, ink bounds,
-//! text, components, or semantic roles.
+//! This crate validates PNG metadata and chunk structure, performs bounded zlib inflation, and
+//! reconstructs standard scanline filters. Samples remain packed and pass-local; palette,
+//! transparency, color, ink, text, component, and semantic interpretation are still excluded.
 
 #![forbid(unsafe_code)]
 
+mod filter;
 mod inflate;
 mod structure;
 
+pub use filter::{PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines};
+use inflate::expected_scanline_bytes;
 pub use inflate::{InflatedPng, PngInflateError, inflate_png_scanlines};
 pub use structure::{PngStructure, PngStructureError, inspect_png_structure};
 
@@ -19,8 +22,8 @@ use std::fmt;
 use serde_json::json;
 use sightlint_ir::{
     ArtifactDescriptor, ArtifactIr, ArtifactKind, Canvas, Evidence, EvidenceClass, EvidenceSource,
-    Geometry, HorizontalDirection, Identifier, Node, NodeKind, Observed, ObservedRect, Rect,
-    Selector, Size, Unit, VerticalDirection,
+    Geometry, HorizontalDirection, Identifier, Node, NodeKind, Observed, ObservedRect, Rect, Selector,
+    Size, Unit, VerticalDirection,
 };
 
 const PNG_SIGNATURE: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
@@ -50,7 +53,7 @@ pub struct PngHeader {
     pub interlace_method: u8,
 }
 
-/// Failure while validating PNG header metadata or producing Artifact IR.
+/// Failure while validating PNG source data or producing Artifact IR.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PngAdapterError {
     /// Input is too short to contain the required PNG header structure.
@@ -98,6 +101,8 @@ pub enum PngAdapterError {
     InvalidStructure(PngStructureError),
     /// The PNG chunk stream is valid but its compressed image data is not.
     InvalidImageData(PngInflateError),
+    /// Inflated scanlines contain invalid filter data or an inconsistent pass layout.
+    InvalidFilterData(PngFilterError),
     /// The adapter produced IR that violates the current core contract.
     InvalidArtifactIr(String),
 }
@@ -148,11 +153,9 @@ impl fmt::Display for PngAdapterError {
             }
             Self::InvalidStructure(error) => error.fmt(formatter),
             Self::InvalidImageData(error) => error.fmt(formatter),
+            Self::InvalidFilterData(error) => error.fmt(formatter),
             Self::InvalidArtifactIr(message) => {
-                write!(
-                    formatter,
-                    "PNG adapter produced invalid Artifact IR: {message}"
-                )
+                write!(formatter, "PNG adapter produced invalid Artifact IR: {message}")
             }
         }
     }
@@ -209,20 +212,20 @@ pub fn inspect_png_header(input: &[u8]) -> Result<PngHeader, PngAdapterError> {
     Ok(header)
 }
 
-/// Converts validated PNG header metadata into evidence-backed Artifact IR.
+/// Validates a PNG through filter reconstruction and emits evidence-backed source facts.
 ///
 /// `source_name` should identify the local source path or display name when available. The
-/// adapter never transmits the input externally.
+/// adapter never transmits the input externally. Packed samples are not serialized into IR and
+/// are not interpreted as colors, visible ink, semantic roles, or UI components.
 ///
 /// # Errors
 ///
-/// Returns [`PngAdapterError`] for invalid PNG metadata or if the constructed document fails the
+/// Returns [`PngAdapterError`] for invalid PNG data or if the constructed document fails the
 /// current Artifact IR validation contract.
 pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
-    let inflated = inflate_png_scanlines(input)?;
-    let structure = inflated.structure;
-    let inflated_scanline_bytes = inflated.scanline_bytes.len();
-    let header = structure.header;
+    let reconstructed = reconstruct_png_scanlines(input)?;
+    let header = reconstructed.structure.header;
+    let metadata = png_metadata(&reconstructed);
     let evidence_id = Identifier::from("evidence:png-header");
     let canvas_id = Identifier::from("canvas");
 
@@ -296,27 +299,31 @@ pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr
         extensions: BTreeMap::default(),
     };
 
-    document.extensions.insert(
-        PNG_EXTENSION_KEY.to_owned(),
-        json!({
-            "version": "0.1.0",
-            "bitDepth": header.bit_depth,
-            "colorType": header.color_type,
-            "compressionMethod": header.compression_method,
-            "filterMethod": header.filter_method,
-            "interlaceMethod": header.interlace_method,
-            "chunkCount": structure.chunk_count,
-            "idatChunkCount": structure.idat_chunk_count,
-            "idatBytes": structure.idat_bytes,
-            "hasPalette": structure.has_palette,
-            "inflatedScanlineBytes": inflated_scanline_bytes
-        }),
-    );
-
+    document.extensions.insert(PNG_EXTENSION_KEY.to_owned(), metadata);
     document
         .validate()
         .map_err(|error| PngAdapterError::InvalidArtifactIr(error.to_string()))?;
     Ok(document)
+}
+
+fn png_metadata(reconstructed: &ReconstructedPng) -> serde_json::Value {
+    let structure = &reconstructed.structure;
+    let header = structure.header;
+    json!({
+        "version": "0.1.0",
+        "bitDepth": header.bit_depth,
+        "colorType": header.color_type,
+        "compressionMethod": header.compression_method,
+        "filterMethod": header.filter_method,
+        "interlaceMethod": header.interlace_method,
+        "chunkCount": structure.chunk_count,
+        "idatChunkCount": structure.idat_chunk_count,
+        "idatBytes": structure.idat_bytes,
+        "hasPalette": structure.has_palette,
+        "inflatedScanlineBytes": expected_scanline_bytes(header),
+        "reconstructedPackedSampleBytes": reconstructed.packed_sample_bytes.len(),
+        "nonEmptyPassCount": reconstructed.passes.len()
+    })
 }
 
 fn validate_header(header: PngHeader) -> Result<(), PngAdapterError> {
@@ -474,10 +481,7 @@ mod tests {
     fn rejects_corrupt_crc() {
         let mut bytes = png_header(1, 1, 8, 6, 0, 0, 0);
         bytes[20] ^= 1;
-        assert_eq!(
-            inspect_png_header(&bytes),
-            Err(PngAdapterError::InvalidIhdrCrc)
-        );
+        assert_eq!(inspect_png_header(&bytes), Err(PngAdapterError::InvalidIhdrCrc));
     }
 
     #[test]
@@ -495,10 +499,7 @@ mod tests {
     #[test]
     fn rejects_zero_and_oversized_dimensions() {
         let zero = png_header(0, 1, 8, 6, 0, 0, 0);
-        assert_eq!(
-            inspect_png_header(&zero),
-            Err(PngAdapterError::ZeroDimension)
-        );
+        assert_eq!(inspect_png_header(&zero), Err(PngAdapterError::ZeroDimension));
 
         let huge = png_header(100_001, 1, 8, 6, 0, 0, 0);
         assert!(matches!(
