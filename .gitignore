@@ -10,3 +10,7 @@ Thumbs.db
 !.env.example
 coverage/
 artifacts/
+/adapters/playwright/dist/
+/adapters/playwright/node_modules/
+/playwright-report/
+/test-results/
