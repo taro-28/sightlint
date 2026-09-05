@@ -151,8 +151,8 @@ fn reconstruct_inflated(inflated: InflatedPng) -> Result<ReconstructedPng, PngFi
             input_offset += 1;
             let row_end = input_offset + spec.row_bytes;
             let filtered_row = &inflated.scanline_bytes[input_offset..row_end];
-            let previous_row = previous_row_start
-                .map(|start| &packed_sample_bytes[start..start + spec.row_bytes]);
+            let previous_row =
+                previous_row_start.map(|start| &packed_sample_bytes[start..start + spec.row_bytes]);
             let reconstructed_row = reconstruct_row(
                 filter,
                 filtered_row,
@@ -304,11 +304,7 @@ fn pass_specs(header: PngHeader) -> Result<Vec<PassSpec>, PngFilterError> {
             width,
             height,
         };
-        passes.push(pass_spec(
-            geometry,
-            bits_per_pixel,
-            filter_bytes_per_pixel,
-        )?);
+        passes.push(pass_spec(geometry, bits_per_pixel, filter_bytes_per_pixel)?);
     }
     Ok(passes)
 }
@@ -319,8 +315,7 @@ fn pass_spec(
     filter_bytes_per_pixel: usize,
 ) -> Result<PassSpec, PngFilterError> {
     let row_bytes_u64 = (u64::from(geometry.width) * bits_per_pixel).div_ceil(8);
-    let row_bytes =
-        usize::try_from(row_bytes_u64).map_err(|_| PngFilterError::LayoutOverflow)?;
+    let row_bytes = usize::try_from(row_bytes_u64).map_err(|_| PngFilterError::LayoutOverflow)?;
     Ok(PassSpec {
         geometry,
         row_bytes,
@@ -334,8 +329,8 @@ fn filtered_input_length(passes: &[PassSpec]) -> Result<usize, PngFilterError> {
             .row_bytes
             .checked_add(1)
             .ok_or(PngFilterError::LayoutOverflow)?;
-        let height = usize::try_from(pass.geometry.height)
-            .map_err(|_| PngFilterError::LayoutOverflow)?;
+        let height =
+            usize::try_from(pass.geometry.height).map_err(|_| PngFilterError::LayoutOverflow)?;
         let pass_length = row_with_filter
             .checked_mul(height)
             .ok_or(PngFilterError::LayoutOverflow)?;
@@ -347,8 +342,8 @@ fn filtered_input_length(passes: &[PassSpec]) -> Result<usize, PngFilterError> {
 
 fn reconstructed_output_length(passes: &[PassSpec]) -> Result<usize, PngFilterError> {
     passes.iter().try_fold(0_usize, |total, pass| {
-        let height = usize::try_from(pass.geometry.height)
-            .map_err(|_| PngFilterError::LayoutOverflow)?;
+        let height =
+            usize::try_from(pass.geometry.height).map_err(|_| PngFilterError::LayoutOverflow)?;
         let pass_length = pass
             .row_bytes
             .checked_mul(height)
@@ -415,19 +410,19 @@ mod tests {
             .iter()
             .enumerate()
             .map(|(index, &value)| {
-                let left = if index >= bpp { current[index - bpp] } else { 0 };
+                let left = if index >= bpp {
+                    current[index - bpp]
+                } else {
+                    0
+                };
                 let up = previous.map_or(0, |row| row[index]);
-                let upper_left = previous.map_or(0, |row| {
-                    if index >= bpp { row[index - bpp] } else { 0 }
-                });
+                let upper_left =
+                    previous.map_or(0, |row| if index >= bpp { row[index - bpp] } else { 0 });
                 let predictor = match filter {
                     0 => 0,
                     1 => left,
                     2 => up,
-                    3 => {
-                        u8::try_from((u16::from(left) + u16::from(up)) / 2)
-                            .expect("byte average")
-                    }
+                    3 => u8::try_from((u16::from(left) + u16::from(up)) / 2).expect("byte average"),
                     4 => reference_paeth(left, up, upper_left),
                     _ => unreachable!("test filter range"),
                 };
@@ -447,18 +442,15 @@ mod tests {
             [10, 20, 30]
         );
         assert_eq!(
-            reconstruct_row(2, &[9, 18, 27], Some(&[1, 2, 3]), 1, 1, 2)
-                .expect("Up filter"),
+            reconstruct_row(2, &[9, 18, 27], Some(&[1, 2, 3]), 1, 1, 2).expect("Up filter"),
             [10, 20, 30]
         );
         assert_eq!(
-            reconstruct_row(3, &[9, 13, 17], Some(&[2, 4, 6]), 1, 1, 2)
-                .expect("Average filter"),
+            reconstruct_row(3, &[9, 13, 17], Some(&[2, 4, 6]), 1, 1, 2).expect("Average filter"),
             [10, 20, 30]
         );
         assert_eq!(
-            reconstruct_row(4, &[7, 10, 10], Some(&[3, 9, 12]), 1, 1, 2)
-                .expect("Paeth filter"),
+            reconstruct_row(4, &[7, 10, 10], Some(&[3, 9, 12]), 1, 1, 2).expect("Paeth filter"),
             [10, 20, 30]
         );
     }

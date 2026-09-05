@@ -145,19 +145,13 @@ fn encode_row(filter: u8, current: &[u8], previous: Option<&[u8]>, bpp: usize) -
                 0
             };
             let up = previous.map_or(0, |row| row[index]);
-            let upper_left = previous.map_or(0, |row| {
-                if index >= bpp {
-                    row[index - bpp]
-                } else {
-                    0
-                }
-            });
+            let upper_left =
+                previous.map_or(0, |row| if index >= bpp { row[index - bpp] } else { 0 });
             let predictor = match filter {
                 0 => 0,
                 1 => left,
                 2 => up,
-                3 => u8::try_from((u16::from(left) + u16::from(up)) / 2)
-                    .expect("byte average"),
+                3 => u8::try_from((u16::from(left) + u16::from(up)) / 2).expect("byte average"),
                 4 => reference_paeth(left, up, upper_left),
                 _ => unreachable!("test filter range"),
             };
@@ -185,7 +179,9 @@ fn all_filters_png() -> Vec<u8> {
     let mut scanlines = Vec::new();
     for (index, row) in rows.iter().enumerate() {
         let filter = u8::try_from(index).expect("filter fits u8");
-        let previous = index.checked_sub(1).map(|previous| rows[previous].as_slice());
+        let previous = index
+            .checked_sub(1)
+            .map(|previous| rows[previous].as_slice());
         scanlines.push(filter);
         scanlines.extend_from_slice(&encode_row(filter, row, previous, 3));
     }
@@ -242,6 +238,7 @@ fn all_five_filters_flow_through_the_public_adapter_and_metadata() {
     for _ in 0..10 {
         let repeated = run_stdin(&["adapt-image", "-"], &png);
         assert_eq!(repeated.status.code(), Some(EXIT_SUCCESS));
+        assert!(repeated.stderr.is_empty());
         assert_eq!(first.stdout, repeated.stdout);
     }
 }
@@ -250,12 +247,14 @@ fn all_five_filters_flow_through_the_public_adapter_and_metadata() {
 fn invalid_filter_is_a_stable_public_input_error() {
     let scanlines = [0_u8, 1, 2, 5, 3, 4];
     let png = png_with_scanlines(2, 2, 8, 0, 0, &scanlines, false);
-    let output = run_stdin(&["adapt-image", "-"], &png);
-    assert_eq!(output.status.code(), Some(EXIT_ERROR));
-    assert!(output.stdout.is_empty());
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("pass 1 row 2"), "{stderr}");
-    assert!(stderr.contains("invalid filter type 5"), "{stderr}");
+    for command in ["adapt-image", "check-image"] {
+        let output = run_stdin(&[command, "-"], &png);
+        assert_eq!(output.status.code(), Some(EXIT_ERROR));
+        assert!(output.stdout.is_empty());
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(stderr.contains("pass 1 row 2"), "{stderr}");
+        assert!(stderr.contains("invalid filter type 5"), "{stderr}");
+    }
 }
 
 #[test]
@@ -268,20 +267,31 @@ fn adam7_pass_reconstruction_remains_deterministic_through_check_image() {
         "{}",
         String::from_utf8_lossy(&first.stderr)
     );
+    assert!(first.stderr.is_empty());
     let report: Value = serde_json::from_slice(&first.stdout).expect("JSON report");
-    assert!(report.get("findings").is_some());
+    // CheckReport has always exposed `results`; `findings` was never its wire contract.
+    assert_eq!(report["reportSchemaVersion"], "0.2.0");
+    assert_eq!(report["artifactKind"], "image");
+    assert_eq!(report["summary"]["failed"], 0);
+    assert!(!report["results"].as_array().expect("rule results").is_empty());
 
     let adapted = run_stdin(&["adapt-image", "-"], &png);
     assert_eq!(adapted.status.code(), Some(EXIT_SUCCESS));
+    assert!(adapted.stderr.is_empty());
     let ir: Value = serde_json::from_slice(&adapted.stdout).expect("canonical IR JSON");
     assert_eq!(
         ir["extensions"]["org.sightlint.adapter.png"]["nonEmptyPassCount"],
         7
     );
+    let via_ir = run_stdin(&["check", "-", "--format", "json"], &adapted.stdout);
+    assert_eq!(via_ir.status.code(), Some(EXIT_SUCCESS));
+    assert!(via_ir.stderr.is_empty());
+    assert_eq!(first.stdout, via_ir.stdout);
 
     for _ in 0..10 {
         let repeated = run_stdin(&["check-image", "-", "--format", "json"], &png);
         assert_eq!(repeated.status.code(), Some(EXIT_SUCCESS));
+        assert!(repeated.stderr.is_empty());
         assert_eq!(first.stdout, repeated.stdout);
     }
 }

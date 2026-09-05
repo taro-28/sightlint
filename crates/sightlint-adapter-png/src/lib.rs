@@ -22,8 +22,8 @@ use std::fmt;
 use serde_json::json;
 use sightlint_ir::{
     ArtifactDescriptor, ArtifactIr, ArtifactKind, Canvas, Evidence, EvidenceClass, EvidenceSource,
-    Geometry, HorizontalDirection, Identifier, Node, NodeKind, Observed, ObservedRect, Rect, Selector,
-    Size, Unit, VerticalDirection,
+    Geometry, HorizontalDirection, Identifier, Node, NodeKind, Observed, ObservedRect, Rect,
+    Selector, Size, Unit, VerticalDirection,
 };
 
 const PNG_SIGNATURE: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
@@ -155,7 +155,10 @@ impl fmt::Display for PngAdapterError {
             Self::InvalidImageData(error) => error.fmt(formatter),
             Self::InvalidFilterData(error) => error.fmt(formatter),
             Self::InvalidArtifactIr(message) => {
-                write!(formatter, "PNG adapter produced invalid Artifact IR: {message}")
+                write!(
+                    formatter,
+                    "PNG adapter produced invalid Artifact IR: {message}"
+                )
             }
         }
     }
@@ -299,7 +302,9 @@ pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr
         extensions: BTreeMap::default(),
     };
 
-    document.extensions.insert(PNG_EXTENSION_KEY.to_owned(), metadata);
+    document
+        .extensions
+        .insert(PNG_EXTENSION_KEY.to_owned(), metadata);
     document
         .validate()
         .map_err(|error| PngAdapterError::InvalidArtifactIr(error.to_string()))?;
@@ -481,7 +486,10 @@ mod tests {
     fn rejects_corrupt_crc() {
         let mut bytes = png_header(1, 1, 8, 6, 0, 0, 0);
         bytes[20] ^= 1;
-        assert_eq!(inspect_png_header(&bytes), Err(PngAdapterError::InvalidIhdrCrc));
+        assert_eq!(
+            inspect_png_header(&bytes),
+            Err(PngAdapterError::InvalidIhdrCrc)
+        );
     }
 
     #[test]
@@ -499,7 +507,10 @@ mod tests {
     #[test]
     fn rejects_zero_and_oversized_dimensions() {
         let zero = png_header(0, 1, 8, 6, 0, 0, 0);
-        assert_eq!(inspect_png_header(&zero), Err(PngAdapterError::ZeroDimension));
+        assert_eq!(
+            inspect_png_header(&zero),
+            Err(PngAdapterError::ZeroDimension)
+        );
 
         let huge = png_header(100_001, 1, 8, 6, 0, 0, 0);
         assert!(matches!(
