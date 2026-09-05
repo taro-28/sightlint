@@ -1,0 +1,517 @@
+{
+  "cases": [
+    {
+      "byteCrc32": "83d61254",
+      "colorType": 0,
+      "exitCode": 0,
+      "filter": 0,
+      "height": 2,
+      "id": "color-0-filter-0",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020800000000b81f39c600000001494441547876e684e6000000104944415401010800f7ff00f1163b002e537809f2ea32d4790000000249444154023c61a2a3bf000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f1ff161616ff3b3b3bff2e2e2eff535353ff787878ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "83d61254",
+      "colorType": 0,
+      "exitCode": 0,
+      "filter": 1,
+      "height": 2,
+      "id": "color-0-filter-1",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020800000000b81f39c600000001494441547876e684e6000000104944415401010800f7ff01f12525012e2525093b3a87e758000000024944415401b647e29a42000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f1ff161616ff3b3b3bff2e2e2eff535353ff787878ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "83d61254",
+      "colorType": 0,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 2,
+      "id": "color-0-filter-2",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020800000000b81f39c600000001494441547876e684e6000000104944415401010800f7ff02f1163b023d3d3d09d0fc87c6e2000000024944415401fe3fe553e0000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f1ff161616ff3b3b3bff2e2e2eff535353ff787878ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "83d61254",
+      "colorType": 0,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 2,
+      "id": "color-0-filter-3",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020800000000b81f39c600000001494441547876e684e6000000104944415401010800f7ff03f19e3003b631310e1c02a96bef000000024944415402de2fa620eb000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f1ff161616ff3b3b3bff2e2e2eff535353ff787878ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "83d61254",
+      "colorType": 0,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 2,
+      "id": "color-0-filter-4",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020800000000b81f39c600000001494441547876e684e6000000104944415401010800f7ff04f12525043d3d2509bc4d52390e000000024944415401e35ce33f39000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f1ff161616ff3b3b3bff2e2e2eff535353ff787878ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "c2af7ac5",
+      "colorType": 2,
+      "exitCode": 0,
+      "filter": 0,
+      "height": 2,
+      "id": "color-2-filter-0",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208020000001216f14d00000001494441547876e684e60000001c4944415401011400ebff00f10e2b1633503b5875002e4b6853708d7895b23b196cc63d94000000024944415406bce876e59b000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2bff163350ff3b5875ff2e4b68ff53708dff7895b2ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "c2af7ac5",
+      "colorType": 2,
+      "exitCode": 0,
+      "filter": 1,
+      "height": 2,
+      "id": "color-2-filter-1",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208020000001216f14d00000001494441547876e684e60000001c4944415401011400ebff01f10e2b252525252525012e4b682525252525252b782a3b7ad0000000024944415403ca2c67c5d7000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2bff163350ff3b5875ff2e4b68ff53708dff7895b2ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "c2af7ac5",
+      "colorType": 2,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 2,
+      "id": "color-2-filter-2",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208020000001216f14d00000001494441547876e684e60000001c4944415401011400ebff02f10e2b1633503b5875023d3d3d3d3d3d3d3d3d35a697a4b51f000000024944415404f5d5407e2d000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2bff163350ff3b5875ff2e4b68ff53708dff7895b2ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "c2af7ac5",
+      "colorType": 2,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 2,
+      "id": "color-2-filter-3",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208020000001216f14d00000001494441547876e684e60000001c4944415401011400ebff03f10e2b9e2c3b303f4d03b644533131313131313d5934d3535d000000024944415405653c54dc28000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2bff163350ff3b5875ff2e4b68ff53708dff7895b2ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "c2af7ac5",
+      "colorType": 2,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 2,
+      "id": "color-2-filter-4",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208020000001216f14d00000001494441547876e684e60000001c4944415401011400ebff04f10e2b252525252525043d3d3d3d25252525252b4c837d7707000000024944415403be7b0f70f2000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2bff163350ff3b5875ff2e4b68ff53708dff7895b2ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "721e3a0a",
+      "colorType": 4,
+      "exitCode": 0,
+      "filter": 0,
+      "height": 2,
+      "id": "color-4-filter-0",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020804000000377dae9100000001494441547876e684e6000000164944415401010e00f1ff00f10016013b7f002e01537f78fe1922ada2e2020000000249444154043ade9ba10c000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f100161616013b3b3b7f2e2e2e015353537f787878fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "721e3a0a",
+      "colorType": 4,
+      "exitCode": 0,
+      "filter": 1,
+      "height": 2,
+      "id": "color-4-filter-1",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020804000000377dae9100000001494441547876e684e6000000164944415401010e00f1ff01f1002501257e012e01257e257f172e13fe62c300000002494441540333e8068f6f000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f100161616013b3b3b7f2e2e2e015353537f787878fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "721e3a0a",
+      "colorType": 4,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 2,
+      "id": "color-4-filter-2",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020804000000377dae9100000001494441547876e684e6000000164944415401010e00f1ff02f10016013b7f023d013d7e3d7f1856fb10c3690000000249444154037c0e65d36e000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f100161616013b3b3b7f2e2e2e015353537f787878fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "721e3a0a",
+      "colorType": 4,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 2,
+      "id": "color-4-filter-3",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020804000000377dae9100000001494441547876e684e6000000164944415401010e00f1ff03f1009e01307f03b601317e317f206e9793d5af0000000249444154045c7a4a6561000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f100161616013b3b3b7f2e2e2e015353537f787878fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "721e3a0a",
+      "colorType": 4,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 2,
+      "id": "color-4-filter-4",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000020804000000377dae9100000001494441547876e684e6000000164944415401010e00f1ff04f1002501257e043d013d7e257f1827c0c5e8cf000000024944415403601a648f21000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f100161616013b3b3b7f2e2e2e015353537f787878fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "3367529b",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 0,
+      "height": 2,
+      "id": "color-6-filter-0",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a00000001494441547876e684e6000000224944415401011a00e5ff00f10e2b00163350013b58757f002e4b680153708d7f7895b2fe5ac089eeec73000000024944415408ba9f966d20000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "3367529b",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 1,
+      "height": 2,
+      "id": "color-6-filter-1",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a00000001494441547876e684e6000000224944415401011a00e5ff01f10e2b00252525012525257e012e4b68012525257e2525257f444ec102a36d00000002494441540547e9349dcc000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "3367529b",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 2,
+      "id": "color-6-filter-2",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a00000001494441547876e684e6000000224944415401011a00e5ff02f10e2b00163350013b58757f023d3d3d013d3d3d7e3d3d3d7f5223adbe9c3200000002494441540673e3ad3aba000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "3367529b",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 2,
+      "id": "color-6-filter-3",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a00000001494441547876e684e6000000224944415401011a00e5ff03f10e2b009e2c3b01303f4d7f03b64453013131317e3131317f5c21360202fd000000024944415406e313a2a9fe000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "3367529b",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 2,
+      "id": "color-6-filter-4",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a00000001494441547876e684e6000000224944415401011a00e5ff04f10e2b00252525012525257e043d3d3d013d25257e2525257f43ef8b1447d80000000249444154053bb087a0db000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "bf5b1705",
+      "colorType": 0,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 3,
+      "id": "adam7-color-0",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000308000000010444daf500000001494441547876e684e6000000174944415401010f00f0ff04f1043b046b4a0416047a042e25251ba23d13710b00000002494441540302b9d88f55000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f1ff161616ff3b3b3bff2e2e2eff535353ff787878ff6b6b6bff909090ffb5b5b5ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "d04f6bd1",
+      "colorType": 2,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 3,
+      "id": "adam7-color-2",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000030802000001ae4d127e00000001494441547876e684e6000000294944415401012100deff04f10e2b043b5875046b88a54a4a4a04163350047a7a7a042e4b682525252525259cba8d0476aa00000002494441540887c7fe2131000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2bff163350ff3b5875ff2e4b68ff53708dff7895b2ff6b88a5ff90adcaffb5d2efff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "e79e40f6",
+      "colorType": 4,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 3,
+      "id": "adam7-color-4",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000308040000018b264da200000001494441547876e684e6000000204944415401011800e7ff04f100043b7f046b7f4a80041601047afd042e01257e257f50d255596f9e0000000249444154067c7312272b000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f1f1f100161616013b3b3b7f2e2e2e015353537f787878fe6b6b6b7f909090feb5b5b5ff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "888a3c22",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 4,
+      "height": 3,
+      "id": "adam7-color-6",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000003000000030806000001212f852900000001494441547876e684e6000000324944415401012a00d5ff04f10e2b00043b58757f046b88a57f4a4a4a800416335001047a7a7afd042e4b68012525257e2525257f0847de20ddb000000002494441540c01a749c220000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe6b88a57f90adcafeb5d2efff",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "63707ebd",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 1,
+      "id": "adam7-1x1",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000010000000108060000016812f41f00000001494441547876e684e60000000d4944415401010500faff03f10e2b00045876f9620d0000000249444154012eb9368134000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00",
+      "status": "available",
+      "width": 1
+    },
+    {
+      "byteCrc32": "063c3342",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 5,
+      "id": "adam7-1x5",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000001000000050806000001f383b60900000001494441547876e684e6000000214944415401011900e6ff03f10e2b0003e5021fff036b88a57f032e4b68010391a0aefe66ed6f665da000000002494441540915c0e4e218000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b002e4b68016b88a57fa8c5e2fee5021fff",
+      "status": "available",
+      "width": 1
+    },
+    {
+      "byteCrc32": "a8a95cda",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 1,
+      "id": "adam7-5x1",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d494844520000000500000001080600000161f9546500000001494441547876e684e6000000204944415401011800e7ff03f10e2b000385a2bfff033b58757f0316335001556472fe63b500880a5e0000000249444154086610f3f3df000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f607d9afe85a2bfff",
+      "status": "available",
+      "width": 5
+    },
+    {
+      "byteCrc32": "ef5ed0c4",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 3,
+      "height": 8,
+      "id": "adam7-8x8",
+      "interlace": 1,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000008000000080806000001b3088e1d00000001494441547876e684e6000001174944415401010f01f0fe03f10e2b000385a2bfff03e5021fff0795a47f033b58757fb2c0cfc20312202fc24444c4ff036b88a57f808e9dc0a5b3c282ca5867fe032a3847c21f1f1f7e1f9f9f819f1f1f000316335001556472fe7a8997819faebc7f038594a2fe626262026262e27fe262628003c2d1df81e2e2627f6262628062626202037f8e9c7f626262806262e202e26262fd032e4b68013c4b597f4f5d6cbf61707e80748291818695a3019927367f2b3a48bf0391a0aefe505050415050d00250d0d082d0d0d07fd05050be505050415050500203ceddeb81d0d05082d050507f505050be50505041505050025050d082d0d0d07f038b9aa87f505050be5050504150d0d002d0d0d082d0d0507f505050be50505041c256abf64b41000000024944415479f83160052b000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f607d9afe85a2bfffaac7e400cfec0901f4112e7f2e4b680153708d7f7895b2fe9dbad7ffc2dffc00e70421010c29467f314e6bfe6b88a57f90adcafeb5d2efffdaf71400ff1c390124415e7f496683fe6e8ba8ffa8c5e2fecdea07fff20f2c00173451013c59767f617e9bfe86a3c0ffabc8e500e5021fff0a2744002f4c690154718e7f7996b3fe9ebbd8ffc3e0fd00e8052201223f5c00476481016c89a67f91aecbfeb6d3f0ffdbf81500001d3a0125425f7f5f7c990184a1be7fa9c6e3feceeb08fff3102d00183552013d5a777f627f9cfe9cb9d67fc1defbfee60320ff0b284500304d6a0155728f7f7a97b4fe9fbcd9ff",
+      "status": "available",
+      "width": 8
+    },
+    {
+      "byteCrc32": "3367529b",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 0,
+      "height": 2,
+      "id": "unmanaged-gamma",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000030000000208060000009d74661a0000000467414d41000186a031e8965f00000001494441547876e684e6000000224944415401011a00e5ff00f10e2b00163350013b58757f002e4b680153708d7f7895b2fe5ac089eeec73000000024944415408ba9f966d20000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f10e2b00163350013b58757f2e4b680153708d7f7895b2fe",
+      "status": "available",
+      "width": 3
+    },
+    {
+      "byteCrc32": "b994d785",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 1,
+      "future": {
+        "capability": "peer-spacing",
+        "expectedDefect": false,
+        "gaps": [
+          1,
+          1
+        ],
+        "peerBounds": [
+          [
+            1,
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            1,
+            2,
+            3
+          ],
+          [
+            7,
+            1,
+            2,
+            3
+          ]
+        ],
+        "status": "untested"
+      },
+      "height": 5,
+      "id": "cards-clean",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d494844520000000c000000050806000000717a0d2f00000001494441547876e684e6000000fd494441540101f5000aff01f0f0f0ff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f0f0f0ff1a242e0000000000e6dcd2001a242e0000000000e6dcd2001a242e0000000000e6dcd200000000000000000001f0f0f0ff1a242e0000000000e6dcd2001a242e0000000000e6dcd2001a242e0000000000e6dcd200000000000000000001f0f0f0ff1a242e0000000000e6dcd2001a242e0000000000e6dcd2001a242e0000000000e6dcd200000000000000000001f0f0f0ff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a5d2fa03983c00000002494441542e111d4c9464000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0fff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0fff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0ff",
+      "status": "available",
+      "width": 12
+    },
+    {
+      "byteCrc32": "75c5d989",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 1,
+      "future": {
+        "baseline": "cards-clean",
+        "capability": "peer-spacing",
+        "expectedDefect": true,
+        "gaps": [
+          1,
+          2
+        ],
+        "peerBounds": [
+          [
+            1,
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            1,
+            2,
+            3
+          ],
+          [
+            8,
+            1,
+            2,
+            3
+          ]
+        ],
+        "status": "untested"
+      },
+      "height": 5,
+      "id": "cards-mutated",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d494844520000000c000000050806000000717a0d2f00000001494441547876e684e6000000fd494441540101f5000aff01f0f0f0ff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f0f0f0ff1a242e0000000000e6dcd2001a242e0000000000e6dcd200000000001a242e0000000000e6dcd2000000000001f0f0f0ff1a242e0000000000e6dcd2001a242e0000000000e6dcd200000000001a242e0000000000e6dcd2000000000001f0f0f0ff1a242e0000000000e6dcd2001a242e0000000000e6dcd200000000001a242e0000000000e6dcd2000000000001f0f0f0ff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000081d2c46a84e700000002494441542e111d4c9464000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "f0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0ff0a141eff0a141efff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0fff0f0f0ff",
+      "status": "available",
+      "width": 12
+    },
+    {
+      "exitCode": 0,
+      "id": "indexed",
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000002000000010803000000c3fc8fb800000006504c5445000000ffffffa5d99fdd0000000e494441547801010300fcff000001000400020b218b710000000049454e44ae426082",
+      "reason": "indexedColor",
+      "status": "unavailable"
+    },
+    {
+      "exitCode": 0,
+      "id": "packed",
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000008000000010100000000cb7bd2ee0000000d494441547801010200fdff00a500a700a651c3b4f40000000049454e44ae426082",
+      "reason": "unsupportedBitDepth",
+      "status": "unavailable"
+    },
+    {
+      "exitCode": 0,
+      "id": "sixteen-bit",
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000010000000110060000004f8518ca00000014494441547801010900f6ff0000010002000300040027000b7c4f26a20000000049454e44ae426082",
+      "reason": "unsupportedBitDepth",
+      "status": "unavailable"
+    },
+    {
+      "exitCode": 0,
+      "id": "trns",
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de0000000674524e53000100020003c94babf50000000f494441547801010400fbff00010203000e00072da233ec0000000049454e44ae426082",
+      "reason": "transparencyChunk",
+      "status": "unavailable"
+    },
+    {
+      "exitCode": 0,
+      "id": "animation-control",
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489000000086163544c0000000100000000b42de9a000000010494441547801010500faff00010203ff01140106519a3b6d0000000049454e44ae426082",
+      "reason": "animationChunks",
+      "status": "unavailable"
+    },
+    {
+      "errorContains": "invalid filter type 5",
+      "exitCode": 2,
+      "id": "invalid-filter",
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000010000000108000000003a7e9b550000000d494441547801010200fdff0512001e001845bfaa570000000049454e44ae426082"
+    },
+    {
+      "errorContains": "CRC",
+      "exitCode": 2,
+      "id": "invalid-crc",
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000010000000108000000003a7e9b550000000d494441547801010200fdff0012001400138f3767bb0000000049454e44ae426082"
+    }
+  ],
+  "origin": "procedural-no-external-assets",
+  "reviewStatus": "synthetic-not-human-validated",
+  "scope": "source-raster-conformance",
+  "version": "0.1.0"
+}

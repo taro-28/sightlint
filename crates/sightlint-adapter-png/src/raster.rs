@@ -6,8 +6,8 @@ use serde_json::{Value, json};
 use sightlint_ir::{ArtifactIr, Identifier, Selector};
 
 use crate::{
-    PNG_EXTENSION_KEY, PngAdapterError, PngHeader, PngPass, PngStructure, ReconstructedPng,
-    crc32, reconstruct_png_scanlines,
+    PNG_EXTENSION_KEY, PngAdapterError, PngHeader, PngPass, PngStructure, ReconstructedPng, crc32,
+    reconstruct_png_scanlines,
 };
 
 const MAX_RGBA8_BYTES: u64 = 256 * 1024 * 1024;
@@ -111,7 +111,8 @@ impl Error for PngRasterError {}
 /// error. Unsupported interpretation returns `Unavailable`, not a fabricated raster.
 pub fn observe_png_raster(input: &[u8]) -> Result<ObservedPngRaster, PngAdapterError> {
     let reconstructed = reconstruct_png_scanlines(input)?;
-    let status = raster_status(input, &reconstructed).map_err(PngAdapterError::InvalidRasterData)?;
+    let status =
+        raster_status(input, &reconstructed).map_err(PngAdapterError::InvalidRasterData)?;
     Ok(ObservedPngRaster {
         structure: reconstructed.structure,
         reconstructed_packed_sample_bytes: reconstructed.packed_sample_bytes.len(),
@@ -126,7 +127,9 @@ fn raster_status(
 ) -> Result<PngRasterStatus, PngRasterError> {
     let (transparency, animation) = unsupported_chunks(input)?;
     if animation {
-        return Ok(PngRasterStatus::Unavailable(PngRasterUnavailable::AnimationChunks));
+        return Ok(PngRasterStatus::Unavailable(
+            PngRasterUnavailable::AnimationChunks,
+        ));
     }
     if let Some(reason) = classify_raster(reconstructed.structure.header, transparency)? {
         return Ok(PngRasterStatus::Unavailable(reason));
@@ -151,10 +154,12 @@ fn classify_raster(
         }));
     }
     let required = rgba_length(header)?;
-    Ok((required > MAX_RGBA8_BYTES).then_some(PngRasterUnavailable::BufferTooLarge {
-        required,
-        limit: MAX_RGBA8_BYTES,
-    }))
+    Ok(
+        (required > MAX_RGBA8_BYTES).then_some(PngRasterUnavailable::BufferTooLarge {
+            required,
+            limit: MAX_RGBA8_BYTES,
+        }),
+    )
 }
 
 fn rgba_length(header: PngHeader) -> Result<u64, PngRasterError> {
@@ -179,7 +184,9 @@ fn scatter_rgba8(source: &ReconstructedPng) -> Result<EncodedRgba8Raster, PngRas
     }
     let length = usize::try_from(length).map_err(|_| PngRasterError::InvalidLayout)?;
     let mut pixels = Vec::new();
-    pixels.try_reserve_exact(length).map_err(|_| PngRasterError::AllocationFailed)?;
+    pixels
+        .try_reserve_exact(length)
+        .map_err(|_| PngRasterError::AllocationFailed)?;
     pixels.resize(length, 0);
     let mut covered = 0_u64;
     for pass in &source.passes {
@@ -189,7 +196,28 @@ fn scatter_rgba8(source: &ReconstructedPng) -> Result<EncodedRgba8Raster, PngRas
     if covered != u64::from(header.width) * u64::from(header.height) {
         return Err(PngRasterError::InvalidLayout);
     }
-    Ok(EncodedRgba8Raster { width: header.width, height: header.height, pixels })
+    Ok(EncodedRgba8Raster {
+        width: header.width,
+        height: header.height,
+        pixels,
+    })
+}
+
+fn sample_offset(
+    pass: &PngPass,
+    row: u32,
+    column: u32,
+    channels: usize,
+) -> Result<usize, PngRasterError> {
+    let row = usize::try_from(row).map_err(|_| PngRasterError::InvalidLayout)?;
+    let column = usize::try_from(column).map_err(|_| PngRasterError::InvalidLayout)?;
+    let column_bytes = column
+        .checked_mul(channels)
+        .ok_or(PngRasterError::InvalidLayout)?;
+    row.checked_mul(pass.row_bytes)
+        .and_then(|offset| offset.checked_add(pass.output_offset))
+        .and_then(|offset| offset.checked_add(column_bytes))
+        .ok_or(PngRasterError::InvalidLayout)
 }
 
 fn scatter_pass(
@@ -203,32 +231,43 @@ fn scatter_pass(
     if width.checked_mul(channels) != Some(pass.row_bytes) {
         return Err(PngRasterError::InvalidLayout);
     }
-    // These descriptors are private-stage output, derived only from validated IHDR. They are
-    // not arbitrary caller input. Adam7 pass disjointness follows the fixed reconstruction plan.
+    // Descriptors originate only from validated IHDR and the fixed, disjoint Adam7 plan.
+    // This private function does not accept arbitrary externally supplied pass descriptors.
     for row in 0..pass.height {
         for column in 0..pass.width {
-            let offset = usize::try_from(row).ok()
-                .and_then(|r| r.checked_mul(pass.row_bytes))
-                .and_then(|r| r.checked_add(pass.output_offset))
-                .and_then(|r| usize::try_from(column).ok().and_then(|c| c.checked_mul(channels)).and_then(|c| r.checked_add(c)))
+            let offset = sample_offset(pass, row, column, channels)?;
+            let end = offset
+                .checked_add(channels)
                 .ok_or(PngRasterError::InvalidLayout)?;
-            let end = offset.checked_add(channels).ok_or(PngRasterError::InvalidLayout)?;
-            let sample = source.packed_sample_bytes.get(offset..end).ok_or(PngRasterError::InvalidLayout)?;
-            let x = column.checked_mul(pass.step_x).and_then(|x| x.checked_add(pass.start_x)).ok_or(PngRasterError::InvalidLayout)?;
-            let y = row.checked_mul(pass.step_y).and_then(|y| y.checked_add(pass.start_y)).ok_or(PngRasterError::InvalidLayout)?;
+            let sample = source
+                .packed_sample_bytes
+                .get(offset..end)
+                .ok_or(PngRasterError::InvalidLayout)?;
+            let x = column
+                .checked_mul(pass.step_x)
+                .and_then(|value| value.checked_add(pass.start_x))
+                .ok_or(PngRasterError::InvalidLayout)?;
+            let y = row
+                .checked_mul(pass.step_y)
+                .and_then(|value| value.checked_add(pass.start_y))
+                .ok_or(PngRasterError::InvalidLayout)?;
             if x >= header.width || y >= header.height {
                 return Err(PngRasterError::InvalidLayout);
             }
-            let position = usize::try_from((u64::from(y) * u64::from(header.width) + u64::from(x)) * 4)
-                .map_err(|_| PngRasterError::InvalidLayout)?;
+            let position =
+                usize::try_from((u64::from(y) * u64::from(header.width) + u64::from(x)) * 4)
+                    .map_err(|_| PngRasterError::InvalidLayout)?;
             let rgba = match sample {
                 [gray] => [*gray, *gray, *gray, 255],
                 [gray, alpha] => [*gray, *gray, *gray, *alpha],
-                [r, g, b] => [*r, *g, *b, 255],
-                [r, g, b, a] => [*r, *g, *b, *a],
+                [red, green, blue] => [*red, *green, *blue, 255],
+                [red, green, blue, alpha] => [*red, *green, *blue, *alpha],
                 _ => return Err(PngRasterError::InvalidLayout),
             };
-            pixels.get_mut(position..position + 4).ok_or(PngRasterError::InvalidLayout)?.copy_from_slice(&rgba);
+            pixels
+                .get_mut(position..position + 4)
+                .ok_or(PngRasterError::InvalidLayout)?
+                .copy_from_slice(&rgba);
         }
     }
     Ok(())
@@ -239,12 +278,19 @@ fn unsupported_chunks(input: &[u8]) -> Result<(bool, bool), PngRasterError> {
     let mut transparency = false;
     let mut animation = false;
     loop {
-        let framing = input.get(offset..offset + 8).ok_or(PngRasterError::InvalidLayout)?;
-        let length = u32::from_be_bytes(framing[..4].try_into().map_err(|_| PngRasterError::InvalidLayout)?);
+        let framing = input
+            .get(offset..offset + 8)
+            .ok_or(PngRasterError::InvalidLayout)?;
+        let length = u32::from_be_bytes(
+            framing[..4]
+                .try_into()
+                .map_err(|_| PngRasterError::InvalidLayout)?,
+        );
         let kind = &framing[4..];
         transparency |= kind == b"tRNS";
         animation |= matches!(kind, b"acTL" | b"fcTL" | b"fdAT");
-        let next = usize::try_from(length).ok()
+        let next = usize::try_from(length)
+            .ok()
             .and_then(|length| offset.checked_add(length))
             .and_then(|end| end.checked_add(12))
             .ok_or(PngRasterError::InvalidLayout)?;
@@ -263,16 +309,21 @@ pub(crate) fn attach_raster(
     input: &[u8],
     reconstructed: &ReconstructedPng,
 ) -> Result<(), PngAdapterError> {
-    let status = raster_status(input, reconstructed).map_err(PngAdapterError::InvalidRasterData)?;
+    let status =
+        raster_status(input, reconstructed).map_err(PngAdapterError::InvalidRasterData)?;
     let mut evidence = document.evidence[0].clone();
     evidence.id = Identifier::from("evidence:png-raster");
     evidence.selector = Some(Selector::NativeId {
         native_id: "IDAT/encoded-rgba8-v1".to_owned(),
     });
     document.evidence.push(evidence);
-    document.extensions.get_mut(PNG_EXTENSION_KEY)
+    document
+        .extensions
+        .get_mut(PNG_EXTENSION_KEY)
         .and_then(Value::as_object_mut)
-        .ok_or_else(|| PngAdapterError::InvalidArtifactIr("missing PNG metadata object".to_owned()))?
+        .ok_or_else(|| {
+            PngAdapterError::InvalidArtifactIr("missing PNG metadata object".to_owned())
+        })?
         .insert("encodedRgba8Raster".to_owned(), raster_metadata(&status));
     Ok(())
 }
@@ -312,13 +363,22 @@ mod tests {
     #[test]
     fn allocation_boundary_is_classified_before_allocation() {
         let mut header = PngHeader {
-            width: 8_192, height: 8_192, bit_depth: 8, color_type: 0,
-            compression_method: 0, filter_method: 0, interlace_method: 0,
+            width: 8_192,
+            height: 8_192,
+            bit_depth: 8,
+            color_type: 0,
+            compression_method: 0,
+            filter_method: 0,
+            interlace_method: 0,
         };
         assert_eq!(classify_raster(header, false), Ok(None));
         header.width += 1;
-        assert_eq!(classify_raster(header, false), Ok(Some(PngRasterUnavailable::BufferTooLarge {
-            required: 8_193 * 8_192 * 4, limit: MAX_RGBA8_BYTES,
-        })));
+        assert_eq!(
+            classify_raster(header, false),
+            Ok(Some(PngRasterUnavailable::BufferTooLarge {
+                required: 8_193 * 8_192 * 4,
+                limit: MAX_RGBA8_BYTES,
+            }))
+        );
     }
 }

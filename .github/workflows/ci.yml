@@ -43,6 +43,9 @@ jobs:
       - name: Verify committed E2E fixtures
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_e2e_fixtures.py --check
+      - name: Verify committed PNG pixel corpus
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: python3 tools/generate_raster_corpus.py --check
       - name: Check formatting
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo fmt --all -- --check
@@ -58,6 +61,9 @@ jobs:
       - name: Run PNG filter CLI E2E explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test png_filter_e2e
+      - name: Run PNG pixel-oracle corpus explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
       - name: Run product evaluation smoke corpus explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test evaluation_corpus
