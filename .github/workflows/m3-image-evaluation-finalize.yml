@@ -1,0 +1,117 @@
+name: M3 image evaluation finalize
+
+on:
+  push:
+    branches:
+      - feat/m3-image-evaluation-corpus
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-image-evaluation-corpus
+          fetch-depth: 0
+      - name: Integrate latest prerequisite branches
+        shell: bash
+        run: |
+          sleep 180
+          git fetch origin main feat/m3-opaque-background-candidates feat/m3-image-evaluation-corpus
+          git reset --hard origin/feat/m3-image-evaluation-corpus
+          git merge --no-edit origin/main
+          git merge --no-edit origin/feat/m3-opaque-background-candidates
+          test -f crates/sightlint-adapter-png/src/background.rs
+      - name: Finalize background candidate wiring when still pending
+        shell: bash
+        run: |
+          if ! grep -q '^mod background;$' crates/sightlint-adapter-png/src/lib.rs; then
+            test -f .github/workflows/m3-background-bootstrap.yml
+            python3 - <<'PY'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/m3-background-bootstrap.yml').read_text()
+          start_marker = "          python3 - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          embedded = workflow[start:end]
+          script = '\n'.join(
+              line[10:] if line.startswith('          ') else line
+              for line in embedded.splitlines()
+          )
+          exec(compile(script, 'm3-background-bootstrap-embedded', 'exec'))
+          PY
+          fi
+          if test -f crates/sightlint-adapter-png/src/background_refactored.rs; then
+            mv crates/sightlint-adapter-png/src/background_refactored.rs \
+               crates/sightlint-adapter-png/src/background.rs
+          fi
+      - name: Generate corpus and apply repository contracts
+        shell: bash
+        run: |
+          python3 tools/generate_image_evaluation_corpus.py
+          if test -f .github/workflows/m3-image-evaluation-bootstrap.yml; then
+            python3 - <<'PY'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/m3-image-evaluation-bootstrap.yml').read_text()
+          start_marker = "          python3 - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          embedded = workflow[start:end]
+          script = '\n'.join(
+              line[10:] if line.startswith('          ') else line
+              for line in embedded.splitlines()
+          )
+          exec(compile(script, 'm3-image-evaluation-bootstrap-embedded', 'exec'))
+          PY
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('crates/sightlint-cli/tests/image_evaluation_corpus.rs')
+          text = path.read_text()
+          old = '''            left.as_f64().zip(right.as_f64()).is_some_and(|(left, right)| left == right)'''
+          new = '''            left.as_f64()
+                .zip(right.as_f64())
+                .is_some_and(|(left, right)| left.total_cmp(&right).is_eq())'''
+          if old in text:
+              path.write_text(text.replace(old, new))
+          elif new not in text:
+              raise SystemExit('numeric comparison marker not found')
+          PY
+      - name: Apply machine-safe fixes and verify all corpus behavior
+        shell: bash
+        run: |
+          chmod +x tools/generate_image_evaluation_corpus.py
+          cargo fmt --all
+          cargo clippy --fix --allow-dirty --allow-staged --locked --workspace --all-targets --all-features -- -D warnings
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          python3 tools/generate_image_evaluation_corpus.py --check
+          cargo fmt --all -- --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          cargo test --locked -p sightlint-cli --test image_evaluation_corpus
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified generated corpus
+        shell: bash
+        run: |
+          rm -f .github/workflows/m3-background-bootstrap.yml
+          rm -f .github/workflows/m3-background-finalize.yml
+          rm -f .github/workflows/m3-image-evaluation-bootstrap.yml
+          rm -f .github/workflows/m3-image-evaluation-finalize.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'test: add layered image evaluation corpus'
+          git push origin HEAD:feat/m3-image-evaluation-corpus
