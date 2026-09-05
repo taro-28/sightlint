@@ -26,23 +26,43 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Record tested commit and tree
+        run: git log -1 --format='commit=%H tree=%T parents=%P'
+      - name: Reject stale integration artifacts
+        run: |
+          test ! -e .github/workflows/m3-filter-bootstrap.yml
+          test ! -e crates/sightlint-adapter-png/src/filter_next.rs
       - name: Install stable Rust
+        id: toolchain
+        if: ${{ !cancelled() }}
         run: |
           rustup toolchain install stable --profile minimal --component clippy --component rustfmt
           rustup default stable
       - name: Verify committed E2E fixtures
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_e2e_fixtures.py --check
       - name: Check formatting
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo fmt --all -- --check
       - name: Run Clippy
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Run tests
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked --workspace --all-features
       - name: Run fixture-driven CLI E2E explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test e2e
+      - name: Run PNG filter CLI E2E explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test png_filter_e2e
       - name: Run product evaluation smoke corpus explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test evaluation_corpus
       - name: Build documentation
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         env:
           RUSTDOCFLAGS: -D warnings
         run: cargo doc --locked --workspace --all-features --no-deps
@@ -54,6 +74,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install minimum Rust
         run: rustup toolchain install 1.85.0 --profile minimal
       - name: Check workspace on MSRV
@@ -73,6 +95,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install stable Rust
         run: |
           rustup toolchain install stable --profile minimal

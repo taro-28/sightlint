@@ -273,7 +273,12 @@ fn adam7_pass_reconstruction_remains_deterministic_through_check_image() {
     assert_eq!(report["reportSchemaVersion"], "0.2.0");
     assert_eq!(report["artifactKind"], "image");
     assert_eq!(report["summary"]["failed"], 0);
-    assert!(!report["results"].as_array().expect("rule results").is_empty());
+    assert!(
+        !report["results"]
+            .as_array()
+            .expect("rule results")
+            .is_empty()
+    );
 
     let adapted = run_stdin(&["adapt-image", "-"], &png);
     assert_eq!(adapted.status.code(), Some(EXIT_SUCCESS));
