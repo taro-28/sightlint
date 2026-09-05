@@ -460,10 +460,10 @@ After merge:
 - verify the expected `main` commit/tree;
 - verify `main` CI on that exact commit;
 - update/close issues and handoff/roadmap as needed;
-- delete the branch when repository settings permit.
+- verify that the merged head branch was deleted automatically.
 
-Branch protection is tracked separately by issue #19. Its absence does not weaken this completion
-gate.
+The active `Protect main` ruleset requires the documented five CI contexts on an up-to-date head,
+but hosting enforcement does not weaken any local, exact-head, or post-merge completion gate.
 
 ## Prohibited shortcuts
 

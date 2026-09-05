@@ -11,8 +11,9 @@ At that point, PNG adaptation stopped after bounded inflation. Filter integratio
 APIs that `lib.rs` did not expose; two unconnected filter implementations and a broken,
 write-enabled bootstrap workflow were present.
 
-The repository API also reported `main` as unprotected. This document has never been evidence that
-branch protection is active. Repository administration remains tracked separately in issue #19.
+The repository API also reported `main` as unprotected at the incident starting point. Issue #19
+later added the active ruleset described below; this historical observation does not describe the
+current hosting state.
 
 ## Repair performed by PR #18
 
@@ -78,9 +79,10 @@ explicit replacement links:
 - #15 and #17: background/segmentation alternatives preserved in issue #25;
 - #16: evaluation intent superseded by current corpora and realistic-data gate #22.
 
-Do not reopen or merge those branches. Branch deletion is tracked by issue #32.
+Do not recreate, reopen, or merge those branches. Issue #32 deleted the retained remote refs after
+their unique intent was preserved in current issues and documentation.
 
-## Repository protection remains separate
+## Repository protection resolution
 
 The desired `main` policy is:
 
@@ -92,9 +94,10 @@ The desired `main` policy is:
 - required checks for administrators, with zero reviewer approvals acceptable for the
   single-maintainer workflow.
 
-Required check names are recorded in issue #19. A source-controlled file or successful CI run
-cannot enable hosting protection. Until a GitHub API/UI read confirms it, report protection as
-unresolved.
+Issue #19 was completed only after a GitHub UI read confirmed an active `Protect main` ruleset with
+the five named checks, no bypass, and the requirements above. The rule is a hosting backstop; a
+source-controlled policy file or successful earlier CI run still is not proof that a particular
+head or merged `main` commit passed.
 
 ## Reporting discipline
 

@@ -427,8 +427,6 @@ inside an unmerged branch and does not make them accepted repository decisions.
 ## Decisions still open
 
 - license and distribution model: ADR 0007 / issue #33;
-- branch protection: issue #19;
-- legacy branch cleanup/settings: issue #32;
 - representative corpus expansion and protected holdout operation beyond the public #22 slice;
 - arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
@@ -443,3 +441,7 @@ inside an unmerged branch and does not make them accepted repository decisions.
 
 Open issues are hypotheses and work contracts. They become normative only through accepted ADRs,
 verified implementation, and merged `main`.
+
+Administrative issues #19 and #32 are resolved. GitHub now enforces the documented `main`
+ruleset, squash-only merging, and automatic head-branch deletion; the legacy remote refs were
+removed after their unique intent was preserved in issues and this history.

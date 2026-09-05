@@ -11,7 +11,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 
 | Milestone | Status | Verified scope | Main remaining gap |
 |---|---|---|---|
-| M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI | hosting protection and release administration |
+| M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI, hosting protection | release administration |
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
@@ -128,14 +128,13 @@ in issues, not long-lived Draft branches.
 - formatting, Clippy, tests, rustdoc, MSRV, and Linux/macOS/Windows CI;
 - explicit unresolved license and release decisions.
 
-### Administrative follow-ups
+### Administrative status
 
-- #19 — enforce branch protection and required checks;
-- #32 — remove legacy branches and enable automatic branch deletion;
+- #19 — complete: active `Protect main` ruleset and required checks;
+- #32 — complete: legacy branches removed and automatic branch deletion enabled;
 - #33 — license and release readiness.
 
-These are not reasons to misstate current hosting settings. They also do not authorize bypassing
-PR and exact-head CI discipline.
+Hosting protection does not authorize bypassing local, PR-head, or post-merge CI discipline.
 
 ## M1 — Deterministic vertical slice
 
@@ -434,7 +433,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0036 or later.
+- New architecture decision numbers continue at 0037 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -442,13 +441,14 @@ Every public behavior must satisfy the applicable matrix:
 - Store future work in issues and this roadmap rather than a chain of Draft implementation
   branches.
 - Never use self-writing feature workflows.
+- Keep the `Protect main` ruleset active and verify automatic deletion after each merge.
 - Update `docs/handoff.md` and this roadmap whenever current facts or priorities change.
 
 ## Issue map
 
 | Issue | Role |
 |---|---|
-| #19 | branch protection and required checks |
+| #19 | completed branch protection and required checks |
 | #22 | realistic human-reviewed UI evaluation gate |
 | #23 | Playwright native/pixel web adapter |
 | #24 | zero-setup recommended rule packs |
@@ -459,7 +459,7 @@ Every public behavior must satisfy the applicable matrix:
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states/effects/traces/recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
-| #32 | legacy branch and repository-setting cleanup |
+| #32 | completed legacy branch and repository-setting cleanup |
 | #33 | license, compatibility, packaging, and alpha release |
 | #34 | first evidence-backed zero-setup web UI alpha execution epic |
 

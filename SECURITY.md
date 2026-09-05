@@ -10,10 +10,9 @@ pre-alpha phase.
 
 ## Reporting a vulnerability
 
-Use GitHub's private vulnerability reporting feature for this repository when available.
-Do not publish exploit details in a public issue. If private reporting is unavailable, open
-a minimal public issue asking the maintainer for a private contact channel without including
-sensitive details.
+Use GitHub's [private vulnerability reporting
+form](https://github.com/taro-28/sightlint/security/advisories/new) for this repository. Do not
+publish exploit details in a public issue.
 
 ## Security expectations
 

@@ -274,7 +274,8 @@ semantic reason, not snapshot blessing.
 - Historical Draft PRs and branch-only ADRs are non-authoritative.
 - Normal CI is read-only; self-writing feature workflows are prohibited.
 - Public behavior needs real binary/process E2E and exact final-head plus post-merge CI.
-- Branch protection and branch cleanup are administrative issues #19 and #32.
+- The active `Protect main` ruleset and automatic merged-branch cleanup implement administrative
+  issues #19 and #32; exact-head and post-merge verification remain mandatory.
 - License, compatibility surfaces, packaging, and release are issue #33.
 - MCP, GitHub Checks, editor/browser UI, and other surfaces wrap the same kernel and are issue #31;
   they must not duplicate rule semantics.

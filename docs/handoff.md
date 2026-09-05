@@ -11,16 +11,16 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of the local-agent-workflow slice, the latest verified baseline was:
+At the start of the repository-settings documentation slice, the latest verified baseline was:
 
-- commit: `c532af42a6f70c6286e635632e3637696ae8f0d5`
-- tree: `4a023e87c31567d7a4b68f3c182e48861a8cf865`
-- merged PR: #41
-- main CI: run 33996175086, all six jobs successful
+- commit: `2dbffba6802151842d4dfb7720b2367f589b6d1b`
+- tree: `ed1b6ce7e492cf5ff069bbd43cc6d5c1c04e4d9e`
+- merged PR: #43
+- main CI: run 33997596273, all six jobs successful
 
-The current focused branch implements issue #42's bounded one-command agent workflow.
+The current focused branch records the already-applied GitHub settings for issues #19 and #32.
 After it merges, its resulting `main` commit supersedes the hash above as the repository starting
-point. Never hard-code the old hash as a branch base. Verify the current `main` and its CI.
+point. Never hard-code this hash as a branch base. Verify the current `main` and its CI.
 
 Use this source-of-truth order:
 
@@ -55,27 +55,39 @@ Do not reopen or merge them:
 
 ### Branches
 
-Many merged, duplicate, and obsolete remote branches remain from the mobile/remote construction
-phase. The current connector cannot delete branch refs or change repository settings. Issue #32
-tracks manual/local cleanup and automatic branch deletion.
+Issue #32 removed the 27 merged, duplicate, and obsolete remote branches retained by the
+mobile/remote construction phase. Only `main` and intentional short-lived branches for current
+pull requests remain. GitHub now deletes a head branch automatically after merge.
 
-Until cleanup is complete:
-
-- never select a branch because its name sounds more advanced;
-- never build new work on a legacy branch;
-- start from the latest green `main` only;
-- compare any historical branch to `main` before extracting an isolated idea;
-- do not merge a historical branch wholesale.
+Historical PRs and Actions runs remain available as evidence, but their deleted branch names are
+never valid development bases. Start from the latest green `main`, and preserve future intent in
+issues and accepted documentation rather than recreating a historical branch.
 
 ### Hosting settings
 
-Branch protection is not enabled. Issue #19 records the intended ruleset and required check names.
-The maintainer explicitly deferred that administrative action. A green workflow does not mean
-GitHub prevents an unverified merge, so local/PR discipline remains mandatory.
+Issue #19 is implemented by an active `Protect main` ruleset targeting the default branch. It
+requires pull requests, up-to-date versions of the five exact CI contexts, linear history, and
+resolved review conversations; it blocks force pushes and deletion with an empty bypass list.
+Zero reviewer approvals remains appropriate for the single-maintainer workflow. Squash is the only
+enabled merge method, GitHub suggests branch updates, and merged head branches are deleted
+automatically.
 
-Repository settings also retained merge commits and did not automatically delete branches at
-handoff time. Issue #32 tracks cleanup. Do not describe either setting as fixed until an API or
-GitHub UI check confirms it.
+The required contexts are exactly:
+
+- `Format, lint, test, and docs`;
+- `Minimum Rust 1.85.0`;
+- `Test on ubuntu-latest`;
+- `Test on macos-latest`;
+- `Test on windows-latest`.
+
+Private vulnerability reporting, the dependency graph, Dependabot alerts/security updates, and
+advisory Rust CodeQL default setup are enabled. Actions default to read-only repository access,
+cannot create or approve pull requests, require full-length action SHAs, and permit only the owner
+plus the explicitly selected `actions/checkout` and `github/codeql-action` families. Secret
+Protection and Push Protection remain enabled. GitHub Apps access is limited to the Codex
+Connector for this repository. No self-hosted runner, webhook, deploy key, Pages site, or
+Environment is configured. Discussions remains disabled and no committed issue-template link
+points to it.
 
 ### Release status
 
@@ -438,12 +450,13 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#29:** structured PPTX, PDF/document, Android, and iOS adapter roadmap.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
-- **#19:** branch protection/ruleset administration.
-- **#32:** legacy branch cleanup and automatic branch deletion.
 - **#33:** licensing/release/compatibility/packaging gate.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
+
+Administrative issues #19 and #32 are complete. Their issue bodies and comments preserve the
+verified policy and cleanup history; they are not product roadmap work.
 
 ## Local Codex session procedure
 
@@ -564,7 +577,7 @@ After merge:
 - confirm `main` CI succeeds on that exact commit;
 - update this handoff and roadmap when current capability or priority changed;
 - close/supersede the issue as appropriate;
-- delete the merged branch when repository settings permit.
+- verify that GitHub deleted the merged head branch automatically.
 
 ## Practices that are specifically prohibited
 
@@ -605,8 +618,8 @@ A local Codex session is continuing SightLint correctly when it can explain, bef
 - why SightLint separates acquisition, evidence, policy, applicability, and judgment;
 - why native structure and pixels are reconciled rather than one replacing the other;
 - why uncertainty is a result rather than an error to hide;
-- why the next product gate is a source-locatable agent fix-and-rerun slice over the evaluated Web
-  path;
+- why the next product gate is the licensing, compatibility, packaging, and alpha distribution
+  work in issue #33;
 - why stale Draft branches are not a shortcut;
 - which exact E2E proves the public claim;
 - what remains unimplemented and what the PR must not claim.

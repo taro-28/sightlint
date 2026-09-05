@@ -36,9 +36,9 @@ Before editing:
 4. search for an existing active branch or PR for that issue;
 5. inspect current source and tests rather than an old implementation branch.
 
-At handoff time, Draft PRs #12–#17 were closed as superseded. Their branches are reference history
-only. Issue #32 tracks branch deletion. Do not revive, merge, or use one as a base because its name
-appears to describe a desired future feature.
+At handoff time, Draft PRs #12–#17 were closed as superseded, and issue #32 later deleted their
+branches. Their PRs and runs are reference history only. Do not recreate, revive, or use one as a
+base because its name appears to describe a desired future feature.
 
 ## Current task sequence
 
@@ -47,10 +47,10 @@ Issue #34 is the near-term execution epic. Unless a repair is required, prefer:
 1. #22 — realistic evaluation corpus and annotation process (complete);
 2. #23 — Playwright web adapter and native/pixel evidence matrix (complete);
 3. #24 — first evaluated advisory recommended Web pack (complete);
-4. the local agent edit/check/fix/rerun demo in #34 (next);
-5. #33 — license, packaging, compatibility, and alpha release.
+4. the local agent edit/check/fix/rerun demo in #34 (complete);
+5. #33 — license, packaging, compatibility, and alpha release (next).
 
-Other work remains available in #25–#32, but a pre-existing stale branch does not make it higher
+Other work remains available in #25–#31, but historical branch code does not make it higher
 priority. Explain any deviation in the issue and PR.
 
 ## Planning before implementation
@@ -186,8 +186,9 @@ Verification is commit-specific:
 `mergeable: true`, a successful earlier workflow, or a green branch that moved afterwards is not
 sufficient evidence.
 
-Branch protection is not active yet and is explicitly deferred in #19. That means GitHub may not
-prevent a bad merge; it does not relax the workflow above. Repository/branch cleanup remains #32.
+GitHub's active `Protect main` ruleset requires pull requests, an up-to-date head, all five named CI
+contexts, linear history, and resolved review conversations. It blocks force pushes and deletion
+without routine bypass. This hosting backstop does not relax the workflow above.
 
 ## Pull request content
 
@@ -258,7 +259,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0036 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0037 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs
@@ -282,13 +283,13 @@ identical to the original.
 - verify `main` CI on that exact commit;
 - update/close the issue and any superseded design records;
 - update handoff/roadmap if facts changed;
-- delete the branch when repository settings permit;
+- verify that GitHub deleted the merged head branch automatically;
 - check that no temporary workflow, duplicate module, generated drift, or open stale Draft remains.
 
 ## Repository administration and release
 
-- #19: branch protection and required checks;
-- #32: legacy branch pruning and automatic deletion/settings;
+- #19 and #32: completed branch protection, legacy branch pruning, and automatic deletion/settings;
 - #33: license, compatibility, packaging, security checks, and alpha distribution.
 
-Do not report any of these as complete before direct repository/release evidence confirms them.
+Do not report release administration as complete before direct repository/release evidence
+confirms it.

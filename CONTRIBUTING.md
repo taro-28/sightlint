@@ -18,8 +18,8 @@ not outrun the evidence, contracts, and sequencing recorded in this repository.
    evaluation, privacy/security/resource model, and explicit non-goals.
 
 Issue #34 is the canonical near-term execution epic. Realistic evaluation (#22), Playwright
-acquisition (#23), and the first advisory recommended Web pack (#24) are complete; the local agent
-fix/rerun loop is next, followed by the alpha release gate (#33).
+acquisition (#23), the first advisory recommended Web pack (#24), and the bounded local agent
+fix/rerun loop (#42) are complete. The alpha release gate (#33) is next.
 
 ## Development workflow
 
@@ -34,8 +34,8 @@ fix/rerun loop is next, followed by the alpha release gate (#33).
 7. Update `docs/handoff.md` and `docs/roadmap.md` when facts or priorities change.
 8. Open a pull request using the repository template and make its claims commit-specific.
 9. Verify all required CI jobs on the exact final head.
-10. After merge, verify the actual `main` tree and its own CI, then update issues and delete the
-    branch when repository settings permit.
+10. After merge, verify the actual `main` tree and its own CI, update issues, and confirm that
+    GitHub deleted the merged head branch automatically.
 
 Do not create placeholder/final/review/ready/bootstrap/repair/`v2` branch chains. Do not use
 self-writing GitHub Actions to assemble, format, repair, commit, or push feature code. Do not leave
@@ -106,8 +106,11 @@ claim general UI/UX accuracy from synthetic data.
 
 ## Repository administration
 
-Branch protection remains deferred in issue #19. Legacy branch cleanup and automatic branch
-deletion are issue #32. Their unresolved state does not relax PR or exact-head CI discipline.
+Administrative issues #19 and #32 are complete. The active `Protect main` ruleset requires an
+up-to-date pull request, the five documented CI contexts, linear history, and resolved review
+conversations; it blocks force pushes and deletion without routine bypass. Squash is the only
+merge method, and merged head branches are deleted automatically. These hosting safeguards do not
+relax local, exact-head, or post-merge CI discipline.
 
 ## Licensing
 

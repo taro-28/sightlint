@@ -41,7 +41,8 @@ proof of implementation. Inspect the source and execute the public path.
 
 Never base new work on a historical branch. At handoff time, legacy Draft PRs #12–#17 were closed
 as superseded, and their remaining value was moved into issues #22–#27. Do not reopen or merge
-them. Issue #32 tracks deletion of their branches and other stale refs.
+them. Issue #32 removed their branches and other stale refs; an old PR or workflow run remains
+historical evidence only even after its branch is gone.
 
 ## Hard invariants
 
@@ -96,8 +97,8 @@ Until it is complete, prefer the earliest unblocked step:
 4. #42 — the local agent edit/check/fix/rerun loop defined by #34 (complete);
 5. #33 — licensing, compatibility, packaging, and first alpha release (next).
 
-Other work is preserved in #25–#32. It is not automatically higher priority because its code
-already exists on a stale branch. Explain any deviation from the sequence in the issue and PR.
+Other work is preserved in #25–#31. It is not automatically higher priority because historical
+code once existed on a stale branch. Explain any deviation from the sequence in the issue and PR.
 
 ## Before editing
 
@@ -130,7 +131,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0036 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0037 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -184,8 +185,10 @@ Normal GitHub CI must also pass on:
 - Linux, macOS, Windows, and the declared MSRV;
 - the actual merged `main` commit.
 
-A successful run on an earlier commit is not reusable evidence. Branch protection is separately
-deferred in issue #19, so discipline is not enforced automatically yet.
+A successful run on an earlier commit is not reusable evidence. GitHub's active `Protect main`
+ruleset requires pull requests, up-to-date versions of all five named CI contexts, linear history,
+and resolved review conversations; it blocks force pushes and branch deletion with no routine
+bypass. Treat the hosting rule as a backstop, not a replacement for exact-head verification.
 
 ## Required test design
 
@@ -248,7 +251,7 @@ Do not claim general UI/UX accuracy from synthetic data.
 - verify that `main` contains the intended tree and no temporary workflow or duplicate module;
 - verify `main` CI on the exact merge/squash commit;
 - update/close the issue and handoff as appropriate;
-- delete the merged branch when repository settings permit;
+- verify that the merged head branch was deleted automatically;
 - never leave a stale Draft PR as the project backlog; preserve future intent in issues/roadmap.
 
 ## Documentation discipline
