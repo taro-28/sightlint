@@ -1,0 +1,113 @@
+name: M3 filter bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-png-filter-reconstruction
+
+permissions:
+  contents: write
+
+jobs:
+  wire-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-png-filter-reconstruction
+          fetch-depth: 0
+      - name: Wire filter reconstruction into the public adapter
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          lib = Path('crates/sightlint-adapter-png/src/lib.rs')
+          text = lib.read_text()
+          replacements = [
+              (
+                  '//! This crate validates PNG metadata, the complete chunk stream, and bounded zlib inflation.\n//! Inflated bytes remain PNG-filtered; the adapter does not yet derive pixel colors, ink bounds,\n//! text, components, or semantic roles.',
+                  '//! This crate validates PNG metadata, the complete chunk stream, bounded zlib inflation,\n//! and deterministic scanline-filter reconstruction. Samples remain packed; the adapter does not\n//! yet derive pixel colors, ink bounds, text, components, or semantic roles.',
+              ),
+              (
+                  'mod inflate;\nmod structure;\n\npub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};',
+                  'mod filter;\nmod inflate;\nmod structure;\n\npub use filter::{\n    PngFilterError, PngPassLayout, ReconstructedPng, reconstruct_png_filters,\n};\npub use inflate::{InflatedPng, PngInflateError, expected_scanline_bytes, inflate_png_scanlines};',
+              ),
+              (
+                  '    /// The PNG chunk stream is valid but its compressed image data is not.\n    InvalidImageData(PngInflateError),\n    /// The adapter produced IR that violates the current core contract.',
+                  '    /// The PNG chunk stream is valid but its compressed image data is not.\n    InvalidImageData(PngInflateError),\n    /// Inflated scanlines contain an invalid filter selector or inconsistent layout.\n    InvalidFilterData(PngFilterError),\n    /// The adapter produced IR that violates the current core contract.',
+              ),
+              (
+                  '            Self::InvalidImageData(error) => error.fmt(formatter),\n            Self::InvalidArtifactIr(message) => {',
+                  '            Self::InvalidImageData(error) => error.fmt(formatter),\n            Self::InvalidFilterData(error) => error.fmt(formatter),\n            Self::InvalidArtifactIr(message) => {',
+              ),
+              (
+                  'pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {\n    let inflated = inflate_png_scanlines(input)?;\n    let structure = inflated.structure;\n    let inflated_scanline_bytes = inflated.scanline_bytes.len();\n    let header = structure.header;',
+                  'pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {\n    let reconstructed = reconstruct_png_filters(input)?;\n    let structure = reconstructed.structure;\n    let header = structure.header;\n    let inflated_scanline_bytes = expected_scanline_bytes(header);\n    let reconstructed_sample_bytes = reconstructed.packed_sample_bytes.len();\n    let reconstructed_sample_crc32 = format!("{:08x}", reconstructed.packed_sample_crc32);\n    let active_pass_count = reconstructed.passes.len();\n    let scanline_count: u64 = reconstructed.filter_counts.iter().sum();\n    let filter_counts = reconstructed.filter_counts;\n    let pass_metadata: Vec<serde_json::Value> = reconstructed\n        .passes\n        .iter()\n        .map(|pass| {\n            json!({\n                "pass": pass.pass,\n                "startX": pass.start_x,\n                "startY": pass.start_y,\n                "stepX": pass.step_x,\n                "stepY": pass.step_y,\n                "width": pass.width,\n                "height": pass.height,\n                "rowBytes": pass.row_bytes,\n                "bytesPerPixel": pass.bytes_per_pixel,\n                "sampleOffset": pass.sample_offset,\n                "sampleLength": pass.sample_length\n            })\n        })\n        .collect();',
+              ),
+              (
+                  '            "hasPalette": structure.has_palette,\n            "inflatedScanlineBytes": inflated_scanline_bytes\n',
+                  '            "hasPalette": structure.has_palette,\n            "inflatedScanlineBytes": inflated_scanline_bytes,\n            "reconstructedSampleBytes": reconstructed_sample_bytes,\n            "reconstructedSampleCrc32": reconstructed_sample_crc32,\n            "activePassCount": active_pass_count,\n            "scanlineCount": scanline_count,\n            "filterCounts": {\n                "none": filter_counts[0],\n                "sub": filter_counts[1],\n                "up": filter_counts[2],\n                "average": filter_counts[3],\n                "paeth": filter_counts[4]\n            },\n            "passes": pass_metadata\n',
+              ),
+          ]
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'lib replacement expected once, found {count}: {old!r}')
+              text = text.replace(old, new)
+          lib.write_text(text)
+
+          decisions = Path('docs/decisions/README.md')
+          text = decisions.read_text()
+          marker = '- [0023 — Bounded PNG IDAT inflation](0023-bounded-png-idat-inflate.md)\n'
+          addition = marker + '- [0024 — Deterministic PNG filter reconstruction](0024-png-filter-reconstruction.md)\n'
+          if text.count(marker) != 1:
+              raise SystemExit(f'ADR index marker mismatch: {text.count(marker)}')
+          decisions.write_text(text.replace(marker, addition))
+
+          readme = Path('README.md')
+          text = readme.read_text()
+          old = '''M3 begins with a deliberately narrow deterministic PNG adapter. It validates the PNG signature
+and `IHDR` metadata, including CRC and format constraints, and emits exact-source Artifact IR
+without decoding pixel samples or inventing text, components, roles, ink bounds, or other
+semantics. Later pixel-analysis work builds on this adapter boundary rather than bypassing it.'''
+          new = '''M3 now validates the complete PNG chunk stream, inflates `IDAT` within an exact decoded-size
+budget, and reconstructs all five PNG scanline filters, including Adam7 pass boundaries. Samples
+remain packed and no text, components, roles, pixel colors, ink bounds, or other semantics are
+invented. Later pixel-analysis work builds on these verified parser boundaries rather than
+bypassing them.'''
+          if old in text:
+              text = text.replace(old, new)
+          elif new not in text:
+              raise SystemExit('README M3 status marker not found')
+          text = text.replace(
+              '# Adapt exact PNG header metadata into canonical Artifact IR.',
+              '# Adapt a structurally validated and exactly reconstructed PNG into canonical Artifact IR.',
+          )
+          text = text.replace(
+              'metadata of PNG images. Browser, slide, PDF, mobile, OCR, CV, and model-based acquisition remain',
+              'parser facts from PNG images. Browser, slide, PDF, mobile, OCR, CV, and model-based acquisition remain',
+          )
+          readme.write_text(text)
+          PY
+      - name: Verify the complete implementation
+        shell: bash
+        run: |
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit verified implementation and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/m3-filter-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: reconstruct PNG scanline filters'
+          git push origin HEAD:feat/m3-png-filter-reconstruction
