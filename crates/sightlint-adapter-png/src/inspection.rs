@@ -6,8 +6,7 @@ use std::fmt::Write as _;
 use serde_json::{Value, json};
 
 use crate::{
-    EncodedRgba8Raster, PngAdapterError, PngRasterError, PngRasterStatus, crc32,
-    observe_png_raster,
+    EncodedRgba8Raster, PngAdapterError, PngRasterError, PngRasterStatus, crc32, observe_png_raster,
 };
 
 const MAX_INSPECTION_PIXELS: usize = 4_194_304;
@@ -20,7 +19,7 @@ pub struct ImageInspection {
 }
 
 impl ImageInspection {
-    /// Serializes observations deterministically. This is not the CheckReport schema.
+    /// Serializes observations deterministically. This is not the `CheckReport` schema.
     ///
     /// # Errors
     /// Returns a serialization error if the observation report cannot be encoded.
@@ -31,9 +30,8 @@ impl ImageInspection {
     /// Formats measured gaps with explicit advisory and semantic-uncertainty labels.
     #[must_use]
     pub fn to_human(&self) -> String {
-        let mut output = String::from(
-            "SightLint image inspection — advisory only, not a UX verdict\n",
-        );
+        let mut output =
+            String::from("SightLint image inspection — advisory only, not a UX verdict\n");
         let _ = writeln!(output, "status: {}", self.report["status"]);
         if let Some(reason) = self.report["reason"].as_str() {
             let _ = writeln!(output, "coverage unavailable: {reason}");
@@ -152,8 +150,10 @@ fn inspect_raster(raster: &EncodedRgba8Raster, report: &mut Value) -> Result<(),
     let width = usize::try_from(raster.width).map_err(|_| PngRasterError::InvalidLayout)?;
     let count = usize::try_from(count).map_err(|_| PngRasterError::InvalidLayout)?;
     let varying_border = (0..count).any(|index| {
-        let border = index < width || index >= count - width
-            || index % width == 0 || index % width == width - 1;
+        let border = index < width
+            || index >= count - width
+            || index % width == 0
+            || index % width == width - 1;
         border && pixel(raster, index) != background
     });
     if varying_border {
@@ -199,10 +199,14 @@ fn components(
     region_limit: usize,
 ) -> Result<Option<Vec<Region>>, PngRasterError> {
     let mut visited = Vec::new();
-    visited.try_reserve_exact(count).map_err(|_| PngRasterError::AllocationFailed)?;
+    visited
+        .try_reserve_exact(count)
+        .map_err(|_| PngRasterError::AllocationFailed)?;
     visited.resize(count, 0_u8);
     let mut stack = Vec::new();
-    stack.try_reserve_exact(count).map_err(|_| PngRasterError::AllocationFailed)?;
+    stack
+        .try_reserve_exact(count)
+        .map_err(|_| PngRasterError::AllocationFailed)?;
     let mut regions = Vec::new();
     for seed in 0..count {
         if visited[seed] != 0 || pixel(raster, seed) == background {
@@ -272,7 +276,12 @@ fn flood(
     }
     Region {
         seed,
-        bounds: [minimum_x, minimum_y, maximum_x - minimum_x + 1, maximum_y - minimum_y + 1],
+        bounds: [
+            minimum_x,
+            minimum_y,
+            maximum_x - minimum_x + 1,
+            maximum_y - minimum_y + 1,
+        ],
         count,
         color,
         uniform_color,
@@ -306,8 +315,10 @@ fn repeated_groups(regions: &[Region]) -> Vec<Value> {
 }
 
 fn intersects(left: [u32; 4], right: [u32; 4]) -> bool {
-    left[0] < right[0] + right[2] && right[0] < left[0] + left[2]
-        && left[1] < right[1] + right[3] && right[1] < left[1] + left[3]
+    left[0] < right[0] + right[2]
+        && right[0] < left[0] + left[2]
+        && left[1] < right[1] + right[3]
+        && right[1] < left[1] + left[3]
 }
 
 fn describe_group(regions: &[Region], indices: &[usize], axis: usize) -> Option<Value> {
@@ -315,16 +326,21 @@ fn describe_group(regions: &[Region], indices: &[usize], axis: usize) -> Option<
     let last = &regions[*indices.last()?];
     let mut strip = first.bounds;
     strip[axis + 2] = last.bounds[axis] + last.bounds[axis + 2] - strip[axis];
-    if regions.iter().enumerate().any(|(index, region)| {
-        !indices.contains(&index) && intersects(strip, region.bounds)
-    }) {
+    if regions
+        .iter()
+        .enumerate()
+        .any(|(index, region)| !indices.contains(&index) && intersects(strip, region.bounds))
+    {
         return None;
     }
-    let gaps = indices.windows(2).map(|pair| {
-        let left = regions[pair[0]].bounds;
-        let right = regions[pair[1]].bounds;
-        right[axis].checked_sub(left[axis] + left[axis + 2])
-    }).collect::<Option<Vec<u32>>>()?;
+    let gaps = indices
+        .windows(2)
+        .map(|pair| {
+            let left = regions[pair[0]].bounds;
+            let right = regions[pair[1]].bounds;
+            right[axis].checked_sub(left[axis] + left[axis + 2])
+        })
+        .collect::<Option<Vec<u32>>>()?;
     let minimum = *gaps.iter().min()?;
     let maximum = *gaps.iter().max()?;
     if minimum == 0 {
@@ -358,17 +374,31 @@ mod tests {
 
     #[test]
     fn invalid_raster_shape_is_an_error_not_partial_success() {
-        let raster = EncodedRgba8Raster { width: 2, height: 1, pixels: vec![0; 4] };
-        assert_eq!(inspect_raster(&raster, &mut json!({})), Err(PngRasterError::InvalidLayout));
+        let raster = EncodedRgba8Raster {
+            width: 2,
+            height: 1,
+            pixels: vec![0; 4],
+        };
+        assert_eq!(
+            inspect_raster(&raster, &mut json!({})),
+            Err(PngRasterError::InvalidLayout)
+        );
     }
 
     #[test]
     fn component_budget_is_exact_and_overflow_discards_partial_observations() {
         let raster = EncodedRgba8Raster {
-            width: 5, height: 1,
-            pixels: [0_u8, 255, 0, 255, 0].into_iter().flat_map(|v| [v, v, v, 255]).collect(),
+            width: 5,
+            height: 1,
+            pixels: [0_u8, 255, 0, 255, 0]
+                .into_iter()
+                .flat_map(|v| [v, v, v, 255])
+                .collect(),
         };
-        assert_eq!(components(&raster, [255; 4], 5, 3).unwrap().unwrap().len(), 3);
+        assert_eq!(
+            components(&raster, [255; 4], 5, 3).unwrap().unwrap().len(),
+            3
+        );
         assert!(components(&raster, [255; 4], 5, 2).unwrap().is_none());
         assert_eq!(MAX_REGIONS, 1_024);
         assert_eq!(MAX_INSPECTION_PIXELS, 4_194_304);
@@ -377,12 +407,58 @@ mod tests {
     #[test]
     fn diagonal_pixels_remain_separate_under_four_connectivity() {
         let raster = EncodedRgba8Raster {
-            width: 2, height: 2,
-            pixels: [0_u8, 255, 255, 0].into_iter().flat_map(|v| [v, v, v, 255]).collect(),
+            width: 2,
+            height: 2,
+            pixels: [0_u8, 255, 255, 0]
+                .into_iter()
+                .flat_map(|v| [v, v, v, 255])
+                .collect(),
         };
         let regions = components(&raster, [255; 4], 4, 2).unwrap().unwrap();
         assert_eq!(regions.len(), 2);
         assert_eq!(regions[0].bounds, [0, 0, 1, 1]);
         assert_eq!(regions[1].bounds, [1, 1, 1, 1]);
+    }
+
+    #[test]
+    fn actual_region_budget_accepts_limit_and_discards_overflow() {
+        for height in [65_u32, 67] {
+            let mut pixels = Vec::new();
+            for row in 0..height {
+                for column in 0..65 {
+                    let gray = if row % 2 == 1 && column % 2 == 1 { 0 } else { 255 };
+                    pixels.extend_from_slice(&[gray, gray, gray, 255]);
+                }
+            }
+            let raster = EncodedRgba8Raster { width: 65, height, pixels };
+            let mut report = json!({"regions": [], "groups": [], "status": "unavailable"});
+            inspect_raster(&raster, &mut report).unwrap();
+            if height == 65 {
+                assert_eq!(report["summary"]["regionCount"], MAX_REGIONS);
+                assert_eq!(report["status"], "observed");
+            } else {
+                assert_eq!(report["reason"], "regionBudgetExceeded");
+                assert_eq!(report["regions"], json!([]));
+                assert_eq!(report["groups"], json!([]));
+            }
+        }
+    }
+
+    #[test]
+    fn actual_pixel_budget_boundary_never_emits_partial_observations() {
+        for width in [2_048_u32, 2_049] {
+            let count = usize::try_from(width * 2_048 * 4).unwrap();
+            let raster = EncodedRgba8Raster { width, height: 2_048, pixels: vec![255; count] };
+            let mut report = json!({"regions": [], "groups": [], "status": "unavailable"});
+            inspect_raster(&raster, &mut report).unwrap();
+            if width == 2_048 {
+                assert_eq!(report["status"], "observed");
+                assert_eq!(report["summary"]["regionCount"], 0);
+            } else {
+                assert_eq!(report["reason"], "pixelBudgetExceeded");
+                assert_eq!(report["regions"], json!([]));
+                assert_eq!(report["groups"], json!([]));
+            }
+        }
     }
 }
