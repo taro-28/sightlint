@@ -18,7 +18,7 @@ jobs:
         with:
           ref: feat/m3-bounded-png-inflate
           fetch-depth: 0
-      - name: Apply API, contract, and interoperability fixes
+      - name: Apply API and interoperability fixes
         shell: bash
         run: |
           python3 - <<'PY'
@@ -40,14 +40,6 @@ jobs:
           if text.count(old) != 1:
               raise SystemExit(f'inflate visibility marker mismatch: {text.count(old)}')
           inflate.write_text(text.replace(old, new))
-
-          adr = Path('docs/decisions/0023-bounded-png-idat-inflate.md')
-          text = adr.read_text()
-          old = '- allocate no more than the exact expected scanline byte count;'
-          new = '- allocate the exact expected scanline byte count plus at most one sentinel byte used only to detect decoded overflow;'
-          if text.count(old) != 1:
-              raise SystemExit(f'ADR allocation marker mismatch: {text.count(old)}')
-          adr.write_text(text.replace(old, new))
 
           e2e = Path('crates/sightlint-cli/tests/png_inflate_e2e.rs')
           text = e2e.read_text()
