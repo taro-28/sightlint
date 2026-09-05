@@ -2,39 +2,68 @@
 
 ## Purpose
 
-Artifact IR is the versioned boundary between observation and policy. It represents what an
-adapter knows, how it knows it, and how certain that knowledge is. It does not encode a final
-quality verdict.
+Artifact IR is the versioned, medium-neutral boundary between acquisition and deterministic
+policy/rules. It represents what an adapter knows, how it knows it, in which units and coordinate
+space, and with what uncertainty. It does not encode a final quality verdict and it does not make
+one medium's native object model universal.
 
-The design borrows proven concepts rather than inventing every field:
+The design borrows useful concepts from:
 
-- accessibility trees for role, name, state, and hierarchy
-- scene-graph and design-tool nodes for geometry, transforms, styles, and clipping
-- COCO-like annotations inside vision adapters for regions and categories
-- Web Annotation-style selectors for linking evidence to source regions
-- ACT-inspired input aspects and outcomes for rule execution
+- accessibility trees for role, name, state, action, and hierarchy;
+- scene graphs and design-tool nodes for canvases, nodes, geometry, transforms, clipping, styles,
+  groups, and z-order;
+- Web Annotation-like selectors for linking observations to source regions/objects;
+- image annotation formats for regions and categories inside adapters;
+- ACT-style input aspects, atomic/composite rules, and outcome distinctions;
+- platform UI-automation hierarchies for semantic and hit geometry;
+- slide/document/PDF object and tag trees for pages, shapes, text, and reading order;
+- versioned JSON schemas for language-neutral compatibility.
 
-SightLint's serialized schema remains independent because no existing structure covers all
-artifact types, rendered geometry, provenance, uncertainty, and interaction extensions.
+No existing structure covers all targeted artifact types, distinct source/render/hit geometry,
+provenance, uncertainty, source conflicts, policy, and future interaction extensions. SightLint
+therefore owns an independent schema while keeping familiar concepts.
 
-## Core entities
+## Implemented core boundary
 
-The planned core contains:
+Current `sightlint-ir` implements and validates the foundations needed by M1–M3:
 
-- `Artifact`: one analyzed source and its metadata
-- `Canvas`: a page, slide, viewport, screen, frame, or other coordinate space
-- `Node`: a visual or semantic entity in a hierarchy
-- `Observed<T>`: a value plus provenance and uncertainty
-- `Evidence`: the observation supporting a value or rule result
-- `Selector`: a stable reference into source structure, text, time, or pixels
-- `Geometry`: layout, render/ink, and hit geometry
-- `Style`: visual properties with explicit units and color spaces
-- `TextContent`: text and optional style runs
-- `Extension`: versioned medium-specific data
+- artifact descriptor and artifact kind;
+- one or more canvases/coordinate spaces with explicit size, unit, and direction;
+- nodes with stable identifiers, hierarchy references, node kind, optional role/name, and
+  geometry;
+- distinct layout, rendered/ink, and hit rectangles where supplied;
+- relations between nodes;
+- observations linked to evidence;
+- evidence source, class, adapter/version, selector, confidence, and uncertainty;
+- versioned namespaced extensions;
+- semantic validation, compatibility handling, and deterministic canonicalization.
 
-## Observation envelope
+The exact Rust types and emitted JSON schema on current `main` are the implementation authority.
+This document describes intent and evolution constraints; it must be updated when public schema
+facts change.
 
-Conceptually, values follow this shape:
+## Planned observation families
+
+The architecture anticipates richer data, but these are not all implemented as stable core fields:
+
+- style and typography observations;
+- text content/style runs and reading order;
+- transforms, clipping, z-order, and occlusion evidence;
+- visual and semantic peer groups;
+- color/compositing/color-space observations;
+- accessibility states/actions and platform semantics;
+- source/render reconciliation and conflict records;
+- policy/baseline references;
+- actions, effects, states, traces, safeguards, and recovery;
+- perception alternatives and calibration metadata.
+
+Add such data through versioned extensions first unless it is truly shared, stable, and needed by
+multiple media. A future promotion into core requires an ADR, migration plan, fixtures, and
+compatibility tests.
+
+## Conceptual observation envelope
+
+A probabilistic observation may conceptually look like:
 
 ```json
 {
@@ -48,80 +77,199 @@ Conceptually, values follow this shape:
 }
 ```
 
-Exact native facts may omit probabilistic alternatives, but they still preserve provenance.
-Confidence must not be used where the source makes an exact declaration; evidence class and
-confidence are different concepts.
+This is illustrative, not a promise that every field is present in the current JSON schema.
 
-## Evidence classes
+Exact native facts normally do not need probabilistic alternatives, but they still require
+provenance. Do not attach a fake confidence of `1.0` to make an exact fact look certain; evidence
+class and confidence are different concepts. Likewise, do not omit version/runtime/capture
+information merely because a value came from a deterministic adapter.
 
-The first schema should support at least:
+## Evidence model
 
-- `exactSource`: DOM, accessibility, PPTX, DOCX, PDF tags, platform API, or user contract
-- `exactRender`: deterministic measurements from rendered output
-- `platformSemantics`: accessibility or test hierarchy supplied by a platform
-- `visionMeasured`: deterministic or bounded pixel measurement
-- `visionInferred`: OCR, classifier, detector, VLM, or other probabilistic inference
-- `interactionTrace`: observed state, focus, event, or network transition
-- `declaredContract`: project, design-system, API, or effect metadata
-- `unknown`: evidence unavailable or unclassified
+Evidence should be expressive enough to distinguish sources such as:
+
+- exact source/native extraction;
+- exact deterministic transformation;
+- platform semantics or UI-automation observation;
+- declared project/design-system/platform contract;
+- deterministic rendered/pixel measurement under stated assumptions;
+- empirical heuristic with measured quality;
+- OCR, detector, classifier, VLM, or other inferred perception;
+- controlled interaction trace;
+- conflicting, partial, unavailable, or unclassified evidence.
+
+The current enum names are defined by the schema/source. Do not add a new label solely for prose
+convenience; update the versioned contract and tests when evidence semantics change.
+
+Every evidence record should make applicable details inspectable:
+
+- adapter/worker/model/runtime and versions;
+- local versus external processing;
+- input identity/digest or source reference;
+- selector into DOM/native structure, pixels, text, page, trace, or file;
+- coordinate/preprocessing/capture assumptions;
+- confidence/calibration/uncertainty/alternatives where real;
+- conflicts and unavailable coverage.
 
 ## Geometry
 
-The IR distinguishes:
+SightLint distinguishes geometry because the same object can have different rectangles:
 
-- `layoutBox`: the space allocated by the source layout system
-- `renderBox` or `inkBox`: pixels actually visible, including or excluding effects as defined
-- `hitBox`: the interactive target area
-- transforms, clipping, and coordinate-space references
+- **source/layout box:** space allocated or declared by the native layout system;
+- **render/ink box:** visible output according to a documented predicate;
+- **hit box:** interactive activation area;
+- **canvas/viewport/page/screen bounds:** containing coordinate space;
+- future transform, clipping, occlusion, and safe-area observations.
 
-Every geometry value has a unit and coordinate-space identifier. Normalized 0–1 coordinates
-may be derived, but they do not replace native units.
+Do not use one box as a substitute for another. Examples:
+
+- transparent image padding makes source bounds larger than visible ink;
+- CSS transforms can change rendered size without changing layout allocation;
+- a control can have a small visual icon but a larger valid hit target;
+- an accessibility node may exist while rendered output is clipped or occluded.
+
+Every numeric geometry value has an explicit unit and coordinate-space identifier. Native units
+such as CSS px, device pixels, points, EMUs, PDF user units, Android dp, or iOS points are not
+interchangeable. Normalized coordinates may be derived for comparison but do not replace source
+units or conversion evidence.
+
+Rectangle edge/inclusion conventions, rounding, transforms, and tolerance must be versioned and
+tested. Non-finite or negative-invalid geometry is rejected.
 
 ## Hierarchy and relations
 
-Parent-child hierarchy is stored as a fact when supplied or reconstructed. Many relations are
-derived by deterministic queries rather than redundantly serialized:
+Parent/child hierarchy is stored when supplied by a source or explicitly reconstructed. Its
+evidence must show which.
 
-- contains
-- overlaps or occludes
-- aligned edges or baselines
-- gap and nearest neighbor
-- same row or column
-- repeated geometry or typography pattern
+Many geometric relations should be derived by deterministic queries rather than redundantly
+serialized:
 
-Semantic peer groups and visual grouping may require inference; their evidence and confidence
-must remain visible.
+- containment;
+- intersection and overlap extent;
+- alignment and centers/baselines;
+- gaps and nearest neighbors;
+- same row/column under a defined tolerance;
+- canvas/safe-area inclusion.
+
+Semantic relations are different:
+
+- equivalent peers;
+- label/control association;
+- reading order;
+- group membership;
+- action/effect ownership;
+- repeated component role.
+
+Equal size or color does not prove semantic peer membership. Image-only grouping remains an
+inferred observation with assumptions and cannot be promoted into exact relations silently.
+
+## Native and rendered reconciliation
+
+Do not overwrite source/native observations with pixel observations or vice versa. The IR and
+extensions must be able to preserve:
+
+- agreement within a declared tolerance;
+- expected loss from one source;
+- native-only observation;
+- pixel-only observation;
+- transform or scale mismatch;
+- clipping/occlusion conflict;
+- semantic role conflict;
+- capture timing/state mismatch;
+- unresolved conflict requiring `cantTell`.
+
+Issue #23 defines the first Playwright-based reconciliation slice. A later generalized conflict
+model may require a core/schema ADR.
+
+## Policy is not an observation
+
+Artifact IR records facts and evidence. Rule policy may be supplied by:
+
+1. explicit project contract/exception;
+2. design-system/platform contract;
+3. inferred project norm;
+4. platform convention;
+5. built-in recommended baseline.
+
+Do not store a selected expected value as though it were an observed artifact property. Reports
+must preserve policy identity/version/scope separately from observations and targets.
+
+## Medium-specific extensions
+
+Extensions are required for rich native data that does not yet belong in core, for example:
+
+- web DOM/accessibility/computed style/frame/capture metadata;
+- PNG raster availability/checksum and advisory inspection;
+- PPTX shapes/theme/placeholder/z-order data;
+- PDF tagged/paint/text information;
+- Android/iOS semantics and device environment;
+- perception-worker alternatives/calibration;
+- action/effect/state/trace contracts;
+- adapter reconciliation details.
+
+Rules may consume an official extension only after its schema, version, validation, and
+compatibility behavior are documented. Unknown extensions must be preserved according to current
+compatibility rules rather than discarded or interpreted heuristically.
+
+## Current PNG use
+
+The PNG adapter emits source and raster evidence while keeping raw pixels internal. Current IR
+contains bounded availability, dimensions/counts, checksum, and provenance. It does not serialize
+all pixels or automatically create semantic component nodes.
+
+`inspect-image` returns a separately versioned advisory acquisition report instead of altering the
+trusted Artifact IR/CheckReport meaning. Its region/gap candidates are conditional hypotheses, not
+accepted semantic relations. ADRs 0030 and 0031 define these boundaries.
 
 ## Interaction extension
 
-Interaction data is not mandatory for static artifacts. A versioned extension may add:
+Interaction data is optional for static artifacts and remains future work under issue #30. A
+versioned extension may represent:
 
-- controls and actions
-- user tasks
-- effects such as destructive, financial, multi-user, or non-idempotent
-- states and state transitions
-- focus movement
-- network or platform events
-- safeguards and recovery paths
+- actions and preconditions;
+- expected effects and affected scope;
+- pending, optimistic, success, empty, failure, partial, retry, undo, and confirmation states;
+- state transitions and causal trace events;
+- focus/navigation behavior;
+- network/platform/application events;
+- idempotency, safeguards, and recovery alternatives.
 
-The static core must remain usable without this extension.
+The static core remains valid without this extension. A static screenshot cannot prove an invisible
+effect or temporal obligation.
 
 ## Schema invariants
 
-The first implementation must enforce:
+The implemented schema and future extensions must preserve:
 
-- globally unique identifiers inside an artifact
-- valid parent-child references and acyclic hierarchy
-- valid canvas and coordinate-space references
-- finite numeric geometry
-- explicit units
-- confidence values in a closed 0–1 interval
-- uncertainty bounds that contain the value when applicable
-- evidence references that resolve
-- deterministic collection ordering during serialization
-- extension namespaces and schema versions
+- globally unique stable identifiers inside an artifact;
+- resolvable parent, canvas, relation, evidence, and selector references;
+- acyclic hierarchy;
+- finite numeric values and explicit units;
+- valid coordinate-space and direction relationships;
+- bounded confidence values only when meaningful;
+- uncertainty compatible with the observed unit/value;
+- deterministic map/collection ordering and canonical serialization;
+- versioned extension namespaces;
+- no silent upgrade from inferred/candidate to exact;
+- no silent loss of unknown extension data where compatibility says preserve;
+- stable validation diagnostics and migration behavior;
+- bounded input/object/output sizes in adapters and parsers.
 
-## Source versus rendered reality
+## Compatibility and evolution
 
-SightLint intentionally keeps declared and rendered observations side by side. A mismatch can
-be the target of a rule. Do not overwrite one with the other during normalization.
+Artifact IR, official extensions, adapter protocols, reports, rule semantics, and package versions
+are separate compatibility surfaces. A package bump alone cannot silently redefine all of them.
+
+For an IR or official-extension change:
+
+- write an ADR when architecture/semantics change;
+- identify compatible additions versus breaking changes;
+- define migration and unknown-field behavior;
+- update JSON schema and Rust types together;
+- add valid old/new and malformed compatibility fixtures;
+- verify canonical/idempotent normalization;
+- update public-binary E2E, handoff, roadmap, and docs;
+- never change an existing stable field's meaning without a versioned transition.
+
+New ADR numbers continue at 0032 or later. Historical branch-only ADRs 0025–0029 are references,
+not accepted current schema decisions.
