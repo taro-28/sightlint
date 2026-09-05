@@ -1,0 +1,123 @@
+name: M3 image evaluation bootstrap
+
+on:
+  push:
+    branches:
+      - feat/m3-image-evaluation-corpus
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/m3-image-evaluation-corpus
+          fetch-depth: 0
+      - name: Integrate current pixel-observation prerequisite
+        shell: bash
+        run: |
+          sleep 150
+          git fetch origin main feat/m3-opaque-background-candidates feat/m3-image-evaluation-corpus
+          git reset --hard origin/feat/m3-image-evaluation-corpus
+          git merge --no-edit origin/main
+          git merge --no-edit origin/feat/m3-opaque-background-candidates
+          test -f crates/sightlint-adapter-png/src/background.rs
+      - name: Generate committed corpus and wire mandatory checks
+        shell: bash
+        run: |
+          python3 tools/generate_image_evaluation_corpus.py
+          python3 - <<'PY'
+          from pathlib import Path
+
+          decisions = Path('docs/decisions/README.md')
+          text = decisions.read_text()
+          marker = '- [0027 — Deterministic opaque-border background candidates](0027-opaque-border-background-candidates.md)\n'
+          addition = marker + '- [0028 — Layered image evaluation corpus](0028-layered-image-evaluation-corpus.md)\n'
+          if '0028-layered-image-evaluation-corpus.md' not in text:
+              if text.count(marker) != 1:
+                  raise SystemExit('ADR index marker mismatch')
+              decisions.write_text(text.replace(marker, addition))
+
+          ci = Path('.github/workflows/ci.yml')
+          text = ci.read_text()
+          generator_check = 'python3 tools/generate_image_evaluation_corpus.py --check'
+          if generator_check not in text:
+              marker = 'python3 tools/generate_e2e_fixtures.py --check'
+              if text.count(marker) != 1:
+                  raise SystemExit(f'CI fixture marker mismatch: {text.count(marker)}')
+              text = text.replace(marker, marker + '\n          ' + generator_check)
+              ci.write_text(text)
+
+          agents = Path('AGENTS.md')
+          text = agents.read_text()
+          if generator_check not in text:
+              marker = 'python3 tools/generate_e2e_fixtures.py --check\n'
+              if text.count(marker) != 1:
+                  raise SystemExit('AGENTS fixture marker mismatch')
+              agents.write_text(text.replace(marker, marker + generator_check + '\n'))
+
+          strategy = Path('docs/testing-strategy.md')
+          text = strategy.read_text()
+          section = '''
+
+## Layered product-evaluation corpora
+
+Implementation E2E is necessary but not sufficient to prove that SightLint is becoming the
+intended product. `fixtures/evaluation/image/manifest.json` therefore separates executable
+current assertions from annotated future regions, peer groups, and defect mutations. CI verifies
+that the corpus is byte-reproducible and executes every artifact through the public binary.
+
+A future detector must strengthen the relevant corpus obligation before completion. Unsupported
+ground truth remains explicit and must not be counted as a pass or collapsed into a universal
+quality score. See [Image evaluation](image-evaluation.md).
+'''
+          if '## Layered product-evaluation corpora' not in text:
+              strategy.write_text(text.rstrip() + section + '\n')
+
+          readme = Path('README.md')
+          text = readme.read_text()
+          marker = '''A new public rule or adapter is not complete without corresponding pass, fail/mutation,
+ambiguity, inapplicable, malformed-input, boundary, resource-limit, and determinism coverage
+where those outcomes apply.'''
+          addition = marker + '''
+
+The separate [image evaluation corpus](docs/image-evaluation.md) also records future region,
+peer-group, and defect ground truth. Unsupported target capabilities remain visible rather than
+being misreported as passes.'''
+          if 'docs/image-evaluation.md' not in text:
+              if text.count(marker) != 1:
+                  raise SystemExit('README corpus marker mismatch')
+              readme.write_text(text.replace(marker, addition))
+          PY
+      - name: Apply machine-safe fixes and verify the complete corpus
+        shell: bash
+        run: |
+          chmod +x tools/generate_image_evaluation_corpus.py
+          cargo fmt --all
+          cargo clippy --fix --allow-dirty --allow-staged --locked --workspace --all-targets --all-features -- -D warnings
+          cargo fmt --all
+          python3 tools/generate_e2e_fixtures.py --check
+          python3 tools/generate_image_evaluation_corpus.py --check
+          cargo fmt --all -- --check
+          cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+          cargo test --locked --workspace --all-features
+          cargo test --locked -p sightlint-cli --test e2e
+          cargo test --locked -p sightlint-cli --test image_evaluation_corpus
+          RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
+      - name: Commit generated and verified corpus
+        shell: bash
+        run: |
+          rm -f .github/workflows/m3-background-bootstrap.yml
+          rm -f .github/workflows/m3-background-finalize.yml
+          rm -f .github/workflows/m3-image-evaluation-bootstrap.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'test: add layered image evaluation corpus'
+          git push origin HEAD:feat/m3-image-evaluation-corpus
