@@ -1,29 +1,96 @@
+## Issue and milestone
+
+<!-- Link one primary issue and the roadmap milestone/epic. Explain any deviation from issue #34's sequence. -->
+
+## Base and scope
+
+- Base branch/commit:
+- Final head commit:
+- User-visible claim made reachable by this PR:
+
+<!-- Confirm this branch started from the latest green main, not a historical branch. -->
+
 ## Summary
 
-<!-- What changes, and which milestone or contract does it advance? -->
+<!-- What changes? Describe the smallest complete vertical path, not only internal modules. -->
 
-## Architectural fit
+## Architectural fit and decisions
 
-<!-- Link relevant principles, ADRs, rule contracts, or explain why none are affected. -->
+<!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
+compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
+0032 or later. -->
 
-## Evidence and uncertainty
+## Evidence, applicability, and policy
 
-<!-- What observations prove the behavior? What remains cantTell or untested? -->
+<!-- Identify exact/declared/empirical/inferred observations, evidence grade, selectors, units,
+coordinate spaces, applicability, policy source, tolerance, alternatives, conflicts, and what
+becomes cantTell/inapplicable/untested. Do not treat confidence as outcome or severity. -->
 
-## Fixture and E2E coverage
+## Privacy, security, and resources
 
-<!-- Name the pass, fail/mutation, cantTell, inapplicable, and malformed cases added or explain why a category is not applicable. -->
+<!-- Describe untrusted inputs/processes, network/transmission behavior, time/memory/node/output
+limits, dependency/supply-chain effects, and fixture provenance/license/privacy. -->
 
-## Validation
+## Compatibility
+
+<!-- Address Artifact IR, report, adapter/perception protocol, extension, rule semantics,
+configuration/profile, CLI/exit codes, and evaluation manifest as applicable. -->
+
+## Fixture and evaluation coverage
+
+<!-- Name the applicable pass, targeted mutation/fail, cantTell, inapplicable, untested, malformed,
+boundary, resource, determinism, metamorphic, differential, hard-negative, acquisition-oracle, and
+rule-oracle cases. Explain why a category is not applicable rather than silently omitting it. -->
+
+## Non-claims and remaining risks
+
+<!-- State what this PR does not prove. Synthetic success is not real-world UI/UX accuracy. An
+observation/advisory report is not a trusted CheckReport failure. -->
+
+## Documentation and handoff
+
+- [ ] `docs/handoff.md` was updated if current behavior, commands, status, priority, or risk changed
+- [ ] `docs/roadmap.md` was updated if sequencing, milestone status, or exit criteria changed
+- [ ] relevant ADR/index, rationale, evaluation, development, and user documentation were updated
+- [ ] no historical Draft PR or legacy branch is being treated as authoritative
+
+## Local validation
 
 - [ ] `python3 tools/generate_e2e_fixtures.py --check`
+- [ ] `python3 tools/generate_raster_corpus.py --check`
+- [ ] `python3 tools/generate_inspection_corpus.py --check`
 - [ ] `cargo fmt --all -- --check`
 - [ ] `cargo clippy --locked --workspace --all-targets --all-features -- -D warnings`
 - [ ] `cargo test --locked --workspace --all-features`
 - [ ] `cargo test --locked -p sightlint-cli --test e2e`
-- [ ] `RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --all-features --no-deps`
-- [ ] User-visible behavior is exercised through the built binary, not only library APIs
-- [ ] Each new rule has a passing fixture and targeted mutation fixture
-- [ ] Schema, fixtures, and documentation are updated when applicable
-- [ ] No probabilistic result is presented as deterministic evidence
-- [ ] Privacy and untrusted-input implications were considered
+- [ ] `cargo test --locked -p sightlint-cli --test png_filter_e2e`
+- [ ] `cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture`
+- [ ] `cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture`
+- [ ] `cargo test --locked -p sightlint-cli --test evaluation_corpus`
+- [ ] `RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps`
+- [ ] `cargo +1.85.0 check --workspace --all-targets --all-features --locked`
+- [ ] any new generator/process-adapter/public-E2E command is also in CI, `AGENTS.md`, and handoff
+
+## Remote verification
+
+- [ ] all required jobs passed on the exact final head, not an older commit
+- [ ] Linux, macOS, Windows, and MSRV coverage passed as applicable
+- [ ] changed files and trust/evidence boundaries were reviewed after the final push
+- [ ] no self-writing or temporary write-enabled workflow was added
+- [ ] no duplicate/unconnected implementation remains
+- [ ] user-visible behavior is exercised through the built binary/process, not only library APIs
+- [ ] no oracle was weakened merely to match implementation output
+
+### Final-head CI evidence
+
+- Workflow run:
+- Required job results:
+
+## Post-merge verification
+
+<!-- Complete after merge or record in the issue/PR conversation. -->
+
+- [ ] `main` points to the intended commit/tree
+- [ ] `main` CI passed on that exact commit
+- [ ] no temporary workflow, stale Draft PR, or generated drift remains
+- [ ] issue/status/handoff were updated and the branch is scheduled for deletion
