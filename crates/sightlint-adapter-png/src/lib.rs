@@ -1,18 +1,23 @@
 //! Deterministic PNG source adapter for `SightLint`.
 //!
-//! This crate validates PNG metadata and chunk structure, performs bounded zlib inflation, and
-//! reconstructs standard scanline filters. Samples remain packed and pass-local; palette,
-//! transparency, color, ink, text, component, and semantic interpretation are still excluded.
+//! Validates source structure, inflates bounded data, reconstructs filters, and expands supported
+//! eight-bit samples to encoded RGBA. No color management, visible ink, text, or semantics are
+//! inferred. Unsupported raster interpretations are explicitly unavailable.
 
 #![forbid(unsafe_code)]
 
 mod filter;
 mod inflate;
+mod raster;
 mod structure;
 
 pub use filter::{PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines};
 use inflate::expected_scanline_bytes;
 pub use inflate::{InflatedPng, PngInflateError, inflate_png_scanlines};
+pub use raster::{
+    EncodedRgba8Raster, ObservedPngRaster, PngRasterError, PngRasterStatus, PngRasterUnavailable,
+    observe_png_raster,
+};
 pub use structure::{PngStructure, PngStructureError, inspect_png_structure};
 
 use std::collections::BTreeMap;
@@ -103,6 +108,8 @@ pub enum PngAdapterError {
     InvalidImageData(PngInflateError),
     /// Inflated scanlines contain invalid filter data or an inconsistent pass layout.
     InvalidFilterData(PngFilterError),
+    /// Raster layout or allocation failed after source validation.
+    InvalidRasterData(PngRasterError),
     /// The adapter produced IR that violates the current core contract.
     InvalidArtifactIr(String),
 }
@@ -154,6 +161,7 @@ impl fmt::Display for PngAdapterError {
             Self::InvalidStructure(error) => error.fmt(formatter),
             Self::InvalidImageData(error) => error.fmt(formatter),
             Self::InvalidFilterData(error) => error.fmt(formatter),
+            Self::InvalidRasterData(error) => error.fmt(formatter),
             Self::InvalidArtifactIr(message) => {
                 write!(
                     formatter,
@@ -215,16 +223,16 @@ pub fn inspect_png_header(input: &[u8]) -> Result<PngHeader, PngAdapterError> {
     Ok(header)
 }
 
-/// Validates a PNG through filter reconstruction and emits evidence-backed source facts.
+/// Validates PNG source stages and emits source facts plus staged raster availability.
 ///
-/// `source_name` should identify the local source path or display name when available. The
-/// adapter never transmits the input externally. Packed samples are not serialized into IR and
-/// are not interpreted as colors, visible ink, semantic roles, or UI components.
+/// `source_name` identifies a local source when available. The adapter never transmits input.
+/// Raw samples remain in the adapter; colors are not display-corrected and no ink or semantics
+/// are inferred. Unsupported raster interpretation is explicit, not a full PNG conformance claim.
 ///
 /// # Errors
 ///
-/// Returns [`PngAdapterError`] for invalid PNG data or if the constructed document fails the
-/// current Artifact IR validation contract.
+/// Returns [`PngAdapterError`] for invalid supported source stages, raster allocation/layout
+/// failure, or an Artifact IR validation error.
 pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr, PngAdapterError> {
     let reconstructed = reconstruct_png_scanlines(input)?;
     let header = reconstructed.structure.header;
@@ -305,6 +313,7 @@ pub fn adapt_png(input: &[u8], source_name: Option<String>) -> Result<ArtifactIr
     document
         .extensions
         .insert(PNG_EXTENSION_KEY.to_owned(), metadata);
+    raster::attach_raster(&mut document, input, &reconstructed)?;
     document
         .validate()
         .map_err(|error| PngAdapterError::InvalidArtifactIr(error.to_string()))?;
