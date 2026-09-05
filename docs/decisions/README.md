@@ -33,6 +33,7 @@ Accepted decisions:
 - [0021 — Deterministic PNG adapter boundary](0021-deterministic-png-adapter.md)
 - [0022 — Bounded full-stream PNG chunk validation](0022-bounded-png-chunk-validation.md)
 - [0023 — Bounded PNG IDAT inflation](0023-bounded-png-idat-inflate.md)
+- [0024 — Separate conformance tests from product evaluation](0024-product-evaluation-corpus.md)
 
 Proposed decisions:
 
