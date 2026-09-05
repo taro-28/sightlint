@@ -219,7 +219,9 @@ transformed text, programmatic names, and desktop/mobile positioning; hard negat
 text-scale, RTL/vertical-writing, disabled/hidden/offscreen-control, scrollable clipping, and
 ambiguous states. E2E invokes the actual Node process and built `sightlint` binary, validates
 current and retained previous schemas, checks stable error/resource/recognized-extension behavior,
-and compares repeated response, IR, screenshot, and report bytes on Linux.
+and compares repeated response, IR, screenshot, and report bytes on Linux. Accessibility snapshot
+root parsing uses disjoint escaped/unescaped name branches and includes an adversarial repeated-
+escape regression so untrusted names do not induce regex backtracking growth.
 
 Current development-corpus metrics are 23/23 cases, 76 reviewed acquisition expectations, 45
 reviewed acquisition abstentions, 11/11 acquisition mutations observed, 6/6 rule-eligible
