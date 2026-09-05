@@ -1,0 +1,236 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "ruleOracle",
+  "cases": [
+    {
+      "caseId": "dashboard-ambiguous-peer-group",
+      "ruleId": "visual.spacing.peer-consistency",
+      "ruleVersion": "0.1.0",
+      "targetRelationId": null,
+      "applicability": {
+        "status": "cantTell",
+        "rationale": "The third container may be a peer or an intentionally separated variant, and no reviewed relation resolves the alternatives."
+      },
+      "policy": null,
+      "expectedOutcome": "cantTell",
+      "minimumEvidence": "A confirmed peer relation and comparable rendered boxes are required.",
+      "validAlternatives": [
+        "Treat all three as peers if native evidence confirms equivalence.",
+        "Treat only the first two as peers if the third is a distinct variant."
+      ],
+      "severityInputs": {
+        "userHarm": "unknown while applicability is unresolved",
+        "affectedScope": "one dashboard metric region",
+        "reversibility": "a local layout edit would be reversible",
+        "accessibilityImpact": "none established"
+      },
+      "maturity": "experimental",
+      "blocking": false,
+      "falsePositiveRisk": "Forcing the three containers into one peer set would turn intentional grouping into a failure.",
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "Ambiguity is retained as cantTell and is not projected into runnable IR."
+      }
+    },
+    {
+      "caseId": "dashboard-intentional-grouping",
+      "ruleId": "visual.spacing.peer-consistency",
+      "ruleVersion": "0.1.0",
+      "targetRelationId": "relation-metrics",
+      "applicability": {
+        "status": "applicable",
+        "rationale": "The spacing obligation applies to the two metric cards and excludes the adjacent promotion."
+      },
+      "policy": {
+        "id": "atlas.metric-gap.desktop.v0",
+        "source": "explicitFixtureContract",
+        "expectation": "uniformAdjacentGap",
+        "value": 24.0,
+        "unit": "cssPixel",
+        "tolerance": 0.0
+      },
+      "expectedOutcome": "passed",
+      "minimumEvidence": "Confirmed source peer membership plus reviewed declared render geometry.",
+      "validAlternatives": [
+        "A promotion may use a different adjacent gap because it is outside the metric peer relation."
+      ],
+      "severityInputs": {
+        "userHarm": "minor visual inconsistency if a true metric peer drifts",
+        "affectedScope": "one dashboard metric region",
+        "reversibility": "local CSS change",
+        "accessibilityImpact": "none established"
+      },
+      "maturity": "experimental",
+      "blocking": false,
+      "falsePositiveRisk": "A geometry-only grouper could include the promotion and incorrectly report its intentional separation.",
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The hard negative must remain nonfailing because peer membership is narrower than visual adjacency."
+      }
+    },
+    {
+      "caseId": "dashboard-mobile-clean",
+      "ruleId": "visual.spacing.peer-consistency",
+      "ruleVersion": "0.1.0",
+      "targetRelationId": "relation-metrics",
+      "applicability": {
+        "status": "applicable",
+        "rationale": "The three metrics remain peers and form a vertical sequence at the narrow viewport."
+      },
+      "policy": {
+        "id": "atlas.metric-gap.mobile.v0",
+        "source": "explicitFixtureContract",
+        "expectation": "uniformAdjacentGap",
+        "value": 16.0,
+        "unit": "cssPixel",
+        "tolerance": 0.0
+      },
+      "expectedOutcome": "untested",
+      "minimumEvidence": "Comparable browser-acquired vertical render boxes are required.",
+      "validAlternatives": [
+        "The responsive sequence may change axis while preserving peer membership."
+      ],
+      "severityInputs": {
+        "userHarm": "minor visual inconsistency if a true metric peer drifts",
+        "affectedScope": "one responsive dashboard region",
+        "reversibility": "local responsive CSS change",
+        "accessibilityImpact": "none established"
+      },
+      "maturity": "experimental",
+      "blocking": false,
+      "falsePositiveRisk": "Reusing desktop coordinates or axis would create a false failure.",
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The case remains untested until responsive geometry is captured."
+      }
+    },
+    {
+      "caseId": "dashboard-peer-spacing-clean",
+      "ruleId": "visual.spacing.peer-consistency",
+      "ruleVersion": "0.1.0",
+      "targetRelationId": "relation-metrics",
+      "applicability": {
+        "status": "applicable",
+        "rationale": "All three cards are confirmed equivalent metric peers in one horizontal sequence."
+      },
+      "policy": {
+        "id": "atlas.metric-gap.desktop.v0",
+        "source": "explicitFixtureContract",
+        "expectation": "uniformAdjacentGap",
+        "value": 24.0,
+        "unit": "cssPixel",
+        "tolerance": 0.0
+      },
+      "expectedOutcome": "passed",
+      "minimumEvidence": "Confirmed source peer membership plus reviewed declared render geometry.",
+      "validAlternatives": [
+        "A responsive environment may change the sequence axis and use a separately declared gap."
+      ],
+      "severityInputs": {
+        "userHarm": "minor visual inconsistency",
+        "affectedScope": "one dashboard metric region",
+        "reversibility": "local CSS change",
+        "accessibilityImpact": "none established"
+      },
+      "maturity": "experimental",
+      "blocking": false,
+      "falsePositiveRisk": "The outcome would be invalid if the three cards were not true peers.",
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The reviewed 24 CSS-pixel gaps satisfy the explicit fixture contract."
+      }
+    },
+    {
+      "caseId": "dashboard-peer-spacing-mutant",
+      "ruleId": "visual.spacing.peer-consistency",
+      "ruleVersion": "0.1.0",
+      "targetRelationId": "relation-metrics",
+      "applicability": {
+        "status": "applicable",
+        "rationale": "The targeted offset does not change the three cards' peer relation."
+      },
+      "policy": {
+        "id": "atlas.metric-gap.desktop.v0",
+        "source": "explicitFixtureContract",
+        "expectation": "uniformAdjacentGap",
+        "value": 24.0,
+        "unit": "cssPixel",
+        "tolerance": 0.0
+      },
+      "expectedOutcome": "failed",
+      "minimumEvidence": "Confirmed source peer membership plus reviewed declared render geometry.",
+      "validAlternatives": [
+        "Changing the peer relation would be valid only if the component purpose actually changed."
+      ],
+      "severityInputs": {
+        "userHarm": "minor visual inconsistency",
+        "affectedScope": "one dashboard metric region",
+        "reversibility": "remove one local CSS transform",
+        "accessibilityImpact": "none established"
+      },
+      "maturity": "experimental",
+      "blocking": false,
+      "falsePositiveRisk": "A failure would be false if the third card were an intentionally separated variant; this mutation preserves confirmed peer intent."
+      ,
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The reviewed projection changes adjacent gaps from 24/24 to 24/40 CSS pixels."
+      }
+    },
+    {
+      "caseId": "dashboard-text-scale-clean",
+      "ruleId": "visual.spacing.peer-consistency",
+      "ruleVersion": "0.1.0",
+      "targetRelationId": "relation-metrics",
+      "applicability": {
+        "status": "applicable",
+        "rationale": "Text scaling does not by itself change peer identity, but it may change rendered geometry."
+      },
+      "policy": {
+        "id": "atlas.metric-gap.desktop.v0",
+        "source": "explicitFixtureContract",
+        "expectation": "uniformAdjacentGap",
+        "value": 24.0,
+        "unit": "cssPixel",
+        "tolerance": 0.0
+      },
+      "expectedOutcome": "untested",
+      "minimumEvidence": "Browser-acquired render boxes at textScale 1.25 are required.",
+      "validAlternatives": [
+        "Cards may grow vertically while preserving the horizontal gap contract."
+      ],
+      "severityInputs": {
+        "userHarm": "unknown until the scaled layout is observed",
+        "affectedScope": "one dashboard metric region",
+        "reversibility": "responsive typography or layout change",
+        "accessibilityImpact": "increased text scale may expose clipping or overflow"
+      },
+      "maturity": "experimental",
+      "blocking": false,
+      "falsePositiveRisk": "Applying unscaled geometry would mistake an acquisition mismatch for a design defect.",
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The case remains untested until scaled rendered geometry is captured."
+      }
+    }
+  ]
+}

@@ -1,0 +1,436 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "acquisitionOracle",
+  "cases": [
+    {
+      "caseId": "dashboard-ambiguous-peer-group",
+      "nodes": [
+        {
+          "id": "metric-peer-group",
+          "selector": { "type": "testId", "value": "metric-peer-group" },
+          "kind": "container",
+          "role": "group",
+          "parentId": null
+        },
+        {
+          "id": "metric-revenue",
+          "selector": { "type": "testId", "value": "metric-revenue" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-activation",
+          "selector": { "type": "testId", "value": "metric-activation" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-retention",
+          "selector": { "type": "testId", "value": "metric-retention" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        }
+      ],
+      "relations": [
+        {
+          "id": "relation-metrics-candidate",
+          "type": "peerSequence",
+          "status": "disputed",
+          "nodeIds": ["metric-revenue", "metric-activation", "metric-retention"],
+          "axis": "horizontal",
+          "evidenceBasis": "The three containers share a parent, but the third uses a distinct dashed treatment and shifted grouping cue.",
+          "alternatives": [
+            "All three containers are equivalent metric peers.",
+            "The first two are peers and the third is an intentionally separated variant."
+          ]
+        }
+      ],
+      "unavailableAspects": [
+        {
+          "aspect": "computedLayoutRenderAndHitGeometry",
+          "status": "untested",
+          "reason": "No browser adapter has captured this state.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "accessibilityTree",
+          "status": "untested",
+          "reason": "Source roles are reviewed, but platform accessibility output has not been captured.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "screenshotAndNativePixelReconciliation",
+          "status": "untested",
+          "reason": "No synchronized screenshot exists in this slice.",
+          "trackingIssue": 23
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The unresolved grouping is intentionally preserved instead of forcing applicability."
+      }
+    },
+    {
+      "caseId": "dashboard-intentional-grouping",
+      "nodes": [
+        {
+          "id": "metric-peer-group",
+          "selector": { "type": "testId", "value": "metric-peer-group" },
+          "kind": "container",
+          "role": "group",
+          "parentId": null
+        },
+        {
+          "id": "metric-revenue",
+          "selector": { "type": "testId", "value": "metric-revenue" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-activation",
+          "selector": { "type": "testId", "value": "metric-activation" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "promotion-card",
+          "selector": { "type": "testId", "value": "promotion-card" },
+          "kind": "container",
+          "role": "complementary",
+          "parentId": null
+        }
+      ],
+      "relations": [
+        {
+          "id": "relation-metrics",
+          "type": "peerSequence",
+          "status": "confirmed",
+          "nodeIds": ["metric-revenue", "metric-activation"],
+          "axis": "horizontal",
+          "evidenceBasis": "Only the two metric cards share the metric group; the adjacent promotion is a complementary sibling.",
+          "alternatives": []
+        }
+      ],
+      "unavailableAspects": [
+        {
+          "aspect": "computedLayoutRenderAndHitGeometry",
+          "status": "untested",
+          "reason": "The reviewed IR projection is a rule fixture, not a browser measurement.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "accessibilityTree",
+          "status": "untested",
+          "reason": "Source roles are reviewed, but platform accessibility output has not been captured.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "screenshotAndNativePixelReconciliation",
+          "status": "untested",
+          "reason": "No synchronized screenshot exists in this slice.",
+          "trackingIssue": 23
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "Source hierarchy and content purpose establish that the promotion is not a metric peer."
+      }
+    },
+    {
+      "caseId": "dashboard-mobile-clean",
+      "nodes": [
+        {
+          "id": "metric-peer-group",
+          "selector": { "type": "testId", "value": "metric-peer-group" },
+          "kind": "container",
+          "role": "group",
+          "parentId": null
+        },
+        {
+          "id": "metric-revenue",
+          "selector": { "type": "testId", "value": "metric-revenue" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-activation",
+          "selector": { "type": "testId", "value": "metric-activation" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-retention",
+          "selector": { "type": "testId", "value": "metric-retention" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        }
+      ],
+      "relations": [
+        {
+          "id": "relation-metrics",
+          "type": "peerSequence",
+          "status": "confirmed",
+          "nodeIds": ["metric-revenue", "metric-activation", "metric-retention"],
+          "axis": "vertical",
+          "evidenceBasis": "The responsive source retains peer membership and declares a one-column sequence.",
+          "alternatives": []
+        }
+      ],
+      "unavailableAspects": [
+        {
+          "aspect": "computedLayoutRenderAndHitGeometry",
+          "status": "untested",
+          "reason": "The responsive breakpoint has not been captured by a browser adapter.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "accessibilityTree",
+          "status": "untested",
+          "reason": "Platform accessibility output has not been captured.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "screenshotAndNativePixelReconciliation",
+          "status": "untested",
+          "reason": "No synchronized mobile-viewport screenshot exists in this slice.",
+          "trackingIssue": 23
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "This development case records the expected responsive relation without inventing geometry."
+      }
+    },
+    {
+      "caseId": "dashboard-peer-spacing-clean",
+      "nodes": [
+        {
+          "id": "metric-peer-group",
+          "selector": { "type": "testId", "value": "metric-peer-group" },
+          "kind": "container",
+          "role": "group",
+          "parentId": null
+        },
+        {
+          "id": "metric-revenue",
+          "selector": { "type": "testId", "value": "metric-revenue" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-activation",
+          "selector": { "type": "testId", "value": "metric-activation" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-retention",
+          "selector": { "type": "testId", "value": "metric-retention" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        }
+      ],
+      "relations": [
+        {
+          "id": "relation-metrics",
+          "type": "peerSequence",
+          "status": "confirmed",
+          "nodeIds": ["metric-revenue", "metric-activation", "metric-retention"],
+          "axis": "horizontal",
+          "evidenceBasis": "All three metric cards share one labeled group, component structure, and content purpose.",
+          "alternatives": []
+        }
+      ],
+      "unavailableAspects": [
+        {
+          "aspect": "computedLayoutRenderAndHitGeometry",
+          "status": "untested",
+          "reason": "The reviewed IR projection is a rule fixture, not a browser measurement.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "accessibilityTree",
+          "status": "untested",
+          "reason": "Source roles are reviewed, but platform accessibility output has not been captured.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "screenshotAndNativePixelReconciliation",
+          "status": "untested",
+          "reason": "No synchronized screenshot exists in this slice.",
+          "trackingIssue": 23
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "The source structure supports one explicit three-card peer sequence."
+      }
+    },
+    {
+      "caseId": "dashboard-peer-spacing-mutant",
+      "nodes": [
+        {
+          "id": "metric-peer-group",
+          "selector": { "type": "testId", "value": "metric-peer-group" },
+          "kind": "container",
+          "role": "group",
+          "parentId": null
+        },
+        {
+          "id": "metric-revenue",
+          "selector": { "type": "testId", "value": "metric-revenue" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-activation",
+          "selector": { "type": "testId", "value": "metric-activation" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-retention",
+          "selector": { "type": "testId", "value": "metric-retention" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        }
+      ],
+      "relations": [
+        {
+          "id": "relation-metrics",
+          "type": "peerSequence",
+          "status": "confirmed",
+          "nodeIds": ["metric-revenue", "metric-activation", "metric-retention"],
+          "axis": "horizontal",
+          "evidenceBasis": "The targeted transform does not change shared hierarchy or peer purpose.",
+          "alternatives": []
+        }
+      ],
+      "unavailableAspects": [
+        {
+          "aspect": "computedLayoutRenderAndHitGeometry",
+          "status": "untested",
+          "reason": "The 16 CSS-pixel offset is represented only in the reviewed rule projection until issue 23 captures it.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "accessibilityTree",
+          "status": "untested",
+          "reason": "Source roles are reviewed, but platform accessibility output has not been captured.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "screenshotAndNativePixelReconciliation",
+          "status": "untested",
+          "reason": "No synchronized screenshot exists in this slice.",
+          "trackingIssue": 23
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "Peer identity is preserved while only the target spacing projection changes."
+      }
+    },
+    {
+      "caseId": "dashboard-text-scale-clean",
+      "nodes": [
+        {
+          "id": "metric-peer-group",
+          "selector": { "type": "testId", "value": "metric-peer-group" },
+          "kind": "container",
+          "role": "group",
+          "parentId": null
+        },
+        {
+          "id": "metric-revenue",
+          "selector": { "type": "testId", "value": "metric-revenue" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-activation",
+          "selector": { "type": "testId", "value": "metric-activation" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        },
+        {
+          "id": "metric-retention",
+          "selector": { "type": "testId", "value": "metric-retention" },
+          "kind": "container",
+          "role": "group",
+          "parentId": "metric-peer-group"
+        }
+      ],
+      "relations": [
+        {
+          "id": "relation-metrics",
+          "type": "peerSequence",
+          "status": "confirmed",
+          "nodeIds": ["metric-revenue", "metric-activation", "metric-retention"],
+          "axis": "horizontal",
+          "evidenceBasis": "Text scale changes typography but not the declared source peer membership.",
+          "alternatives": []
+        }
+      ],
+      "unavailableAspects": [
+        {
+          "aspect": "computedLayoutRenderAndHitGeometry",
+          "status": "untested",
+          "reason": "Text-scale-dependent geometry has not been captured by a browser adapter.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "accessibilityTree",
+          "status": "untested",
+          "reason": "Platform accessibility output has not been captured.",
+          "trackingIssue": 23
+        },
+        {
+          "aspect": "screenshotAndNativePixelReconciliation",
+          "status": "untested",
+          "reason": "No synchronized text-scale screenshot exists in this slice.",
+          "trackingIssue": 23
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "qualification": "repository maintainer product review",
+        "guideVersion": "0.1.0",
+        "reviewedAt": "2026-09-05",
+        "rationale": "This development case preserves the environment change without assuming rendered equivalence."
+      }
+    }
+  ]
+}

@@ -35,6 +35,10 @@ accuracy or recommended/blocking maturity.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
 - `inputs/`: independently authored Artifact IR projections for currently runnable rule cases.
 
+Each case's `sourceDigest` is SHA-256 over its sorted `sourceFiles`, with every repository-relative
+UTF-8 path followed by a zero byte and then the exact file bytes. The validation script recomputes
+this bundle digest; it does not generate annotations or expected outcomes.
+
 The annotations are reviewed oracles, not generated snapshots. Do not regenerate them from
 SightLint output. A change to an expected observation or outcome requires a semantic explanation,
 review-version decision, and review of related baseline, mutation, hard-negative, and split data.
@@ -74,4 +78,3 @@ cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 
 It reports explicit counts for labeled cases, applicability, covered pass/fail decisions, false
 positives, correct abstentions, and mutation kills. Those counts are not a quality score.
-

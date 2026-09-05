@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SightLint fixture — Atlas workspace</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell" data-testid="app-shell">
+      <aside class="sidebar" aria-label="Workspace navigation" data-testid="sidebar">
+        <a class="brand" href="#overview" aria-label="Atlas home">
+          <span class="brand-mark" aria-hidden="true">A</span>
+          <span>Atlas</span>
+        </a>
+        <nav aria-label="Primary navigation">
+          <a class="nav-item nav-item-active" href="#overview" aria-current="page">Overview</a>
+          <a class="nav-item" href="#activity">Activity</a>
+          <a class="nav-item" href="#members">Members</a>
+          <a class="nav-item" href="#settings">Settings</a>
+        </nav>
+        <div class="sidebar-note">
+          <strong>Prototype workspace</strong>
+          <span>Repository-owned fictional data</span>
+        </div>
+      </aside>
+
+      <main class="main-content" id="overview" data-testid="main-content">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Workspace overview</p>
+            <h1>Good morning, Morgan</h1>
+            <p class="lede">Track delivery signals without losing the context behind them.</p>
+          </div>
+          <button class="primary-action" type="button">Create report</button>
+        </header>
+
+        <section aria-labelledby="metrics-heading" data-testid="metrics-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Last 30 days</p>
+              <h2 id="metrics-heading">Product signals</h2>
+            </div>
+            <button class="quiet-action" type="button">View details</button>
+          </div>
+
+          <div class="metrics-stage" data-testid="metrics-stage">
+            <div class="metric-peer-group" data-testid="metric-peer-group">
+              <article class="metric-card" data-testid="metric-revenue">
+                <p class="metric-label">Net revenue</p>
+                <p class="metric-value">$184.2k</p>
+                <p class="metric-trend metric-trend-positive">Up 12.4%</p>
+              </article>
+              <article class="metric-card" data-testid="metric-activation">
+                <p class="metric-label">Activation</p>
+                <p class="metric-value">68.3%</p>
+                <p class="metric-trend metric-trend-positive">Up 4.8%</p>
+              </article>
+              <article class="metric-card metric-card-third" data-testid="metric-retention">
+                <p class="metric-label">Retention</p>
+                <p class="metric-value">91.7%</p>
+                <p class="metric-trend">Steady this month</p>
+              </article>
+            </div>
+
+            <aside class="promotion-card" data-testid="promotion-card" aria-labelledby="promo-title">
+              <p class="metric-label">Planning guide</p>
+              <h3 id="promo-title">Prepare the next review</h3>
+              <a href="#guide">Open guide</a>
+            </aside>
+          </div>
+        </section>
+
+        <section class="activity-panel" id="activity" aria-labelledby="activity-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Team pulse</p>
+              <h2 id="activity-heading">Recent activity</h2>
+            </div>
+            <span class="status-pill">All systems normal</span>
+          </div>
+          <div class="activity-list" role="list">
+            <article class="activity-row" role="listitem">
+              <span class="avatar" aria-hidden="true">JD</span>
+              <div><strong>Jordan</strong><p>Published the September product brief.</p></div>
+              <span class="activity-time">18 min</span>
+            </article>
+            <article class="activity-row" role="listitem">
+              <span class="avatar avatar-coral" aria-hidden="true">SK</span>
+              <div><strong>Sam</strong><p>Resolved three onboarding follow-ups.</p></div>
+              <span class="activity-time">42 min</span>
+            </article>
+            <article class="activity-row" role="listitem">
+              <span class="avatar avatar-green" aria-hidden="true">MP</span>
+              <div><strong>Morgan</strong><p>Updated the workspace objectives.</p></div>
+              <span class="activity-time">1 hr</span>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
