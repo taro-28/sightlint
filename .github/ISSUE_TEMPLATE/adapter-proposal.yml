@@ -1,41 +1,115 @@
 name: Adapter proposal
-description: Propose a new artifact or platform sensor
+description: Propose a new artifact, platform, browser, or perception sensor
 title: "adapter: "
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Start from the latest green `main`. Read `AGENTS.md`, `docs/handoff.md`,
+        `docs/product-rationale.md`, `docs/decision-history.md`, and `docs/roadmap.md`.
+        A proposal is not permission to revive a historical branch or merge branch-only ADRs.
+
+  - type: input
+    id: issue-roadmap
+    attributes:
+      label: Parent issue and roadmap milestone
+      description: Link the current issue/epic and explain why this is the earliest unblocked slice.
+      placeholder: "#23 / M4"
+    validations:
+      required: true
+
   - type: input
     id: medium
     attributes:
-      label: Artifact or platform
-      placeholder: PPTX, Playwright, Android semantics, image, PDF
+      label: Artifact, platform, or acquisition source
+      placeholder: Playwright web, PPTX, Android semantics, image, PDF, OCR worker
     validations:
       required: true
+
+  - type: textarea
+    id: user-outcome
+    attributes:
+      label: User-visible outcome and first vertical slice
+      description: Describe the complete native-input-to-public-report path, not only a parser module.
+    validations:
+      required: true
+
   - type: textarea
     id: exact-data
     attributes:
-      label: Exact native data available
+      label: Exact or declared native data available
+      description: Include source APIs/formats, versions, selectors, IDs, geometry, styles, states, actions, and evidence grade.
     validations:
       required: true
+
   - type: textarea
     id: inferred-data
     attributes:
-      label: Inferred or probabilistic data
+      label: Inferred, empirical, or probabilistic data
+      description: Include confidence/calibration, alternatives, conflicts, missing data, and when to return cantTell/untested.
     validations:
       required: true
+
   - type: textarea
     id: transforms
     attributes:
-      label: Units and coordinate transforms
+      label: Units, coordinate spaces, transforms, and compatibility environment
+      description: Distinguish source/layout, render/ink, and hit geometry; include scale, viewport/page/screen, renderer/runtime versions, and rounding.
     validations:
       required: true
+
+  - type: textarea
+    id: reconciliation
+    attributes:
+      label: Reconciliation with pixels or another source
+      description: Explain agreement, expected loss, conflict categories, and why neither source is blindly authoritative.
+    validations:
+      required: true
+
   - type: textarea
     id: security
     attributes:
-      label: Trust, privacy, and resource-limit model
+      label: Trust, privacy, network, and resource-limit model
+      description: Process isolation, allowed inputs/URLs, time/memory/node/output limits, local/remote data transmission, and failure behavior.
     validations:
       required: true
+
   - type: textarea
-    id: validation
+    id: protocol
     attributes:
-      label: Validation and differential-test plan
+      label: Versioned protocol and Artifact IR mapping
+      description: Identify core fields versus namespaced extensions, stable IDs/selectors, provenance, compatibility, and migration behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evaluation
+    attributes:
+      label: Native fixtures, acquisition ground truth, hard negatives, and metrics
+      description: Include malformed/boundary/resource/determinism/public-E2E cases and realistic data governed by docs/evaluation-strategy.md.
+    validations:
+      required: true
+
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: Non-goals, unsupported inputs, and false-claim risks
+      description: State what success would not prove and which observations remain advisory.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include doing nothing, richer native data, pixels, existing libraries/tools, isolated processes, and maintenance tradeoffs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: exit
+    attributes:
+      label: Exit criteria
+      description: Specify accepted ADRs, public behavior, complete E2E, exact-head CI, post-merge verification, and handoff/roadmap updates.
     validations:
       required: true
