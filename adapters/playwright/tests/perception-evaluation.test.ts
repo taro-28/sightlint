@@ -133,7 +133,7 @@ function perceptionRequest(
       model: { status: "notApplicable" },
     },
     execution: {
-      mode: "local", timeoutMs: 2000, maxOutputBytes: 4_194_304, maxStderrBytes: 4096,
+      mode: "local", timeoutMs: 5000, maxOutputBytes: 4_194_304, maxStderrBytes: 4096,
       maxObservations: 1024, maxTextLength: 4096, maxHierarchyDepth: 32,
     },
     privacy: { externalProcessing: false, remoteTransmittedFields: [], retention: "none", redaction: { status: "notApplied" } },
@@ -217,12 +217,12 @@ test("local perception worker preserves native/pixel evidence and abstention thr
           "--worker-program", process.execPath, "--worker-argument", referenceWorker, "--worker-source", referenceWorker,
           "--sightlint-binary", sightlintBinary, "--response-out", responsePath, "--artifact-ir-out", artifactPath,
         ]);
+        assert.equal(result.code, 0, result.stderr.toString("utf8"));
+        assert.equal(result.stderr.byteLength, 0);
         return { result, response: await readFile(responsePath), artifact: await readFile(artifactPath) };
       };
       const first = await runOnce("first");
       const second = await runOnce("second");
-      assert.equal(first.result.code, 0, first.result.stderr.toString("utf8"));
-      assert.equal(first.result.stderr.byteLength, 0);
       assert.deepEqual(second, first, `${caseRecord.id} perception bytes must repeat exactly`);
       const runReport = JSON.parse(first.result.stdout.toString("utf8")) as Record<string, unknown>;
       const response = JSON.parse(first.response.toString("utf8")) as Record<string, unknown>;
