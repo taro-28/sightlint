@@ -11,13 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #26 started from this verified green `main` baseline:
+The branch for issue #27 started from this verified green `main` baseline:
 
-- commit: `a23fc2fe663e52f61d179d90e2f319f37c92ba06`
-- tree: `c076f28989385c5db29c4a40383f5aee3481081a`
-- merged PR: #49
-- main CI: run 34003163077, all six jobs successful
-- main CodeQL: run 34003162804, Rust and JavaScript/TypeScript successful
+- commit: `c0c4b31d2e95d531b015138abc98807ccd3d854f`
+- tree: `4af7bd2145d1f56c811338331ef2eb7faf24499f`
+- merged PR: #50
+- main CI: run 34004833179, all six jobs successful
+- main CodeQL: run 34004833107, Rust and JavaScript/TypeScript successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -47,7 +47,7 @@ Do not reopen or merge them:
 | PR | Historical idea | Current disposition |
 |---|---|---|
 | #12 | alternative PNG filter reconstruction | already implemented and verified through #10/#18; no remaining task |
-| #13 | full PNG sample/palette/`tRNS` normalization | optional remaining scope is issue #27 |
+| #13 | full PNG sample/palette/`tRNS` normalization | reconsidered and not admitted by ADR 0041 without product need |
 | #14 | exact alpha-visible geometry | superseded; current implementation is ADR 0040 / issue #26 |
 | #15 | ranked opaque border/background candidates | research candidate under issue #25 |
 | #16 | layered image evaluation corpus | replaced by current corpora; real-data work is issue #22 |
@@ -192,6 +192,14 @@ links nonempty visible bounds to the image node's device-pixel `inkBox`; entirel
 images omit the box, and unsupported rasters repeat their explicit unavailable reason without
 alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blocking result is
 implemented.
+
+ADR 0041 resolves the optional broader-format decision without expanding the decoder. A versioned
+assessment inventories all five repository PNGs and verifies the nine pinned-browser product
+captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`, and animation cases remain
+synthetic unavailable controls rather than product-demand evidence. No decoder dependency,
+automatic conversion, telemetry, protected holdout, prevalence claim, command/schema change, or
+broader accuracy claim is introduced. A caller-selected conversion proves facts about the
+converted bytes only. A future observed gap requires a new issue and ADR.
 
 ### Advisory image inspection
 
@@ -498,14 +506,14 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#25 (complete):** compared strict/current background policy with ranked-border and
   95%-qualified row-run candidates; neither broader policy was admitted.
 - **#26 (complete):** exact source-alpha geometry for transparent assets; no rule admitted.
-- **#27:** optional PNG palette/sub-byte/16-bit/`tRNS` support, only if product evidence justifies
-  more codec maintenance and after an explicit library-versus-custom decision.
+- **#27 (complete):** PNG format-demand and decoder strategy decision; ADR 0041 retains the
+  explicit unavailable boundary and adds no decoder dependency.
 - **#28:** isolated OCR/CV/VLM perception-worker protocol and calibration.
 - **#29:** structured PPTX, PDF/document, Android, and iOS adapter roadmap.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The earliest remaining implementation gate is #27. Later issues remain demand- and evidence-gated;
+The earliest remaining implementation gate is #28. Later issues remain demand- and evidence-gated;
 the completed alpha and benchmark do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
@@ -588,6 +596,7 @@ python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
+python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
@@ -683,7 +692,7 @@ A local Codex session is continuing SightLint correctly when it can explain, bef
 - why uncertainty is a result rather than an error to hide;
 - why issue #25 retained the strict baseline after broader background hypotheses failed realistic
   hard-negative and false-grouping evidence, why source-alpha geometry does not establish a UX
-  defect, and why issue #27 is next;
+  defect, and why ADR 0041 did not admit broader PNG decoding without a product gap;
 - why stale Draft branches are not a shortcut;
 - which exact E2E proves the public claim;
 - what remains unimplemented and what the PR must not claim.

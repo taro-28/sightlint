@@ -48,8 +48,10 @@ Issue #34's bounded execution sequence is complete:
 5. #33 — license, compatibility, packaging, and first alpha release (complete).
 
 Issue #25 is complete as an evaluation-only benchmark and did not admit a broader segmentation
-policy. Issue #26 adds exact source-alpha geometry without admitting an alpha-padding rule. The
-earliest remaining implementation gate is #27. Other preserved work is tracked in #28–#31.
+policy. Issue #26 adds exact source-alpha geometry without admitting an alpha-padding rule. Issue
+#27 is complete through ADR 0041 without broadening PNG decoding: current product evidence did not
+establish a format gap, unsupported formats remain explicit, and no decoder dependency was added.
+The earliest remaining implementation gate is #28. Other preserved work is tracked in #29–#31.
 Existing stale code does not change priority.
 
 ## Non-negotiable workflow

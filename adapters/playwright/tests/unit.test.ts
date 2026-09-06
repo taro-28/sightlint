@@ -101,6 +101,7 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ["evaluation/image-alpha/corpus.schema.json", "evaluation/image-alpha/corpus.json"],
     ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/acquisition.json"],
     ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/rules.json"],
+    ["evaluation/png-format-demand/assessment.schema.json", "evaluation/png-format-demand/assessment.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {

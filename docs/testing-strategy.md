@@ -385,6 +385,7 @@ python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
+python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser

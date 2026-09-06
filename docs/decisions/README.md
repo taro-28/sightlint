@@ -69,7 +69,7 @@ has been transferred as follows:
 
 | Historical ADR | Subject | Current disposition |
 |---|---|---|
-| 0025 | broad PNG-encoded RGBA8 normalization, palette, sub-byte, 16-bit, `tRNS` | optional strategy and requirements in issue #27 |
+| 0025 | broad PNG-encoded RGBA8 normalization, palette, sub-byte, 16-bit, `tRNS` | not admitted by ADR 0041; future evidence requires a new issue/ADR |
 | 0026 | exact alpha-visible bounds, insets, edge counts, `inkBox` | clean current-main implementation contract in issue #26 |
 | 0027 | ranked exact corner/edge background candidates | benchmark candidate in issue #25 |
 | 0028 | layered image bytes/current assertions/future ground truth corpus | current raster/inspection corpora plus real evaluation gate #22 |

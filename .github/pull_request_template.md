@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0041 or later. -->
+0042 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -61,6 +61,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/generate_alpha_assets.py --check`
 - [ ] `python3 tools/generate_inspection_corpus.py --check`
 - [ ] `python3 tools/check_alpha_evaluation.py`
+- [ ] `python3 tools/check_png_format_demand.py`
 - [ ] `python3 tools/check_web_evaluation.py`
 - [ ] `python3 tools/release.py validate-tag --tag v0.1.0-alpha.2`
 - [ ] `python3 tools/check_dependency_licenses.py`

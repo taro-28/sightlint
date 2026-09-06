@@ -28,6 +28,12 @@ Adding a package with an allowed license still requires ordinary ownership, main
 security, MSRV/runtime, determinism, privacy, and resource review. Updating the allowed set is a
 policy change and must not be smuggled in through a dependency update.
 
+ADR 0041 reviewed `png` 0.18.1 as the preferred library candidate if a future product gap admits
+broader decoding, but did not add it. Its upstream license/MSRV/security claims are review inputs,
+not a dependency admission or proof of a clean vulnerability history. The locked package counts
+and allowed license set above remain unchanged; a future admission must review the exact feature
+and transitive graph, including any unsafe optional backend.
+
 ## Advisory and code scanning
 
 GitHub's dependency graph, Dependabot alerts/security updates, secret scanning/push protection,

@@ -302,6 +302,17 @@ function emptyMetrics(): PolicyMetrics {
   };
 }
 
+function assertSupportedScreenshotPng(bytes: Buffer, caseId: string): void {
+  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.ok(bytes.byteLength >= 33, `${caseId} screenshot must contain IHDR`);
+  assert.deepEqual(bytes.subarray(0, 8), signature, `${caseId} screenshot signature`);
+  assert.equal(bytes.readUInt32BE(8), 13, `${caseId} IHDR length`);
+  assert.equal(bytes.subarray(12, 16).toString("ascii"), "IHDR", `${caseId} first chunk`);
+  assert.equal(bytes[24], 8, `${caseId} browser screenshot bit depth`);
+  assert.equal(bytes[25], 2, `${caseId} browser screenshot color type`);
+  assert.equal(bytes[28], 0, `${caseId} browser screenshot interlace method`);
+}
+
 test("repository-owned screenshots compare segmentation policies without becoming rule truth", { timeout: 300_000 }, async () => {
   const corpus = await loadJson("evaluation/image-segmentation/corpus.json");
   const acquisitionDocument = await loadJson("evaluation/image-segmentation/annotations/acquisition.json");
@@ -382,6 +393,7 @@ test("repository-owned screenshots compare segmentation policies without becomin
       assert.equal(captureResponse["status"], "captured");
       const externalRequests = object(captureResponse["capture"], "capture")["externalRequests"];
       assert.ok(Array.isArray(externalRequests) && externalRequests.length === 0);
+      assertSupportedScreenshotPng(await readFile(screenshotPath), caseRecord.id);
 
       const first = await run(sightlintBinary, ["benchmark-image-segmentation", screenshotPath]);
       const second = await run(sightlintBinary, ["benchmark-image-segmentation", screenshotPath]);

@@ -74,7 +74,8 @@ Draft PRs #12–#17 were created before or around the recovery and later diverge
 explicit replacement links:
 
 - #12: duplicate filter work already integrated through #10/#18;
-- #13: optional broader PNG normalization preserved in issue #27;
+- #13: broader PNG normalization was reconsidered in ADR 0041 and not admitted without product
+  need;
 - #14: alpha-visible geometry superseded by the clean ADR 0040 / issue #26 implementation;
 - #15 and #17: background/segmentation alternatives preserved in issue #25;
 - #16: evaluation intent superseded by current corpora and realistic-data gate #22.
@@ -118,5 +119,6 @@ screenshot UI/UX accuracy. A heuristic observation is not a blocking rule result
 
 The incident is closed as an implementation recovery. Issue #34's sequence—realistic evaluation
 (#22), Playwright native/pixel acquisition (#23), evaluated recommended rules (#24), the local
-Codex fix-and-rerun workflow (#42), and the source-only release gate (#33)—is complete. The earliest
-remaining research gate is #25.
+Codex fix-and-rerun workflow (#42), and the source-only release gate (#33)—is complete. Issues #25
+and #26 are complete, and ADR 0041 closes #27 without admitting broader decoding. The earliest
+remaining implementation gate is #28.

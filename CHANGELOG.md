@@ -5,6 +5,11 @@ independent compatibility surfaces changed by the release.
 
 ## Unreleased
 
+- Accepted ADR 0041 after a versioned PNG format-demand assessment found no current product gap:
+  retained explicit unavailability for indexed, sub-byte, 16-bit, `tRNS`, and animated inputs,
+  added no decoder dependency, and made no format-prevalence or broader product-accuracy claim.
+- Added a repository PNG inventory drift check and pinned-browser PNG-header assertion while
+  keeping unsupported conformance controls separate from product-demand evidence.
 - Added exact source-alpha geometry for supported PNG rasters under ADR 0040: half-open visible and
   opaque bounds, alpha-class counts, transparent insets, edge occupancy, dedicated exact-source
   evidence, and an evidence-linked `inkBox` without compositing or semantic rule claims.

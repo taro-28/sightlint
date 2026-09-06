@@ -369,7 +369,9 @@ No single method is expected to solve the complete problem. Every observation ca
 confidence, uncertainty, and alternatives. The current `inspect-image` implementation is a
 controlled proof of the data-flow idea, not the planned general algorithm.
 
-Issue #25 preserves broader background/segmentation experiments. Issue #28 preserves the
+Issue #25 preserves broader background/segmentation experiments. ADR 0041 retains explicit
+unavailability for broader PNG formats because current product inputs establish no coverage gap;
+future format work requires new evidence and a new issue. Issue #28 preserves the
 perception-worker protocol. Issue #22 is required before promoting broad heuristics.
 
 ## Interaction quality
@@ -469,7 +471,7 @@ The following remain intentionally unresolved or evidence-gated:
 - arbitrary-project and cross-platform browser product compatibility beyond the bounded policy;
 - first non-web adapter after Playwright;
 - perception models/runtimes and calibration requirements;
-- image decoder/library strategy for unsupported PNG formats;
+- exact formats and decoder strategy if new product evidence re-admits unsupported PNG coverage;
 - interaction trace schema;
 - later registry/binary distribution, signing, and attestation policy beyond the source alpha;
 - telemetry/hosted-service policy if ever proposed.

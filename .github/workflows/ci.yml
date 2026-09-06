@@ -51,6 +51,9 @@ jobs:
         run: |
           python3 tools/generate_alpha_assets.py --check
           python3 tools/check_alpha_evaluation.py
+      - name: Verify PNG format-demand assessment
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: python3 tools/check_png_format_demand.py
       - name: Verify committed image inspection corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_inspection_corpus.py --check

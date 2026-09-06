@@ -111,7 +111,9 @@ semantic peer inference, and no representative sampling. The three new rules the
 advisory. The scripted edit is not a claim about autonomous agent quality or arbitrary
 repositories. Issue #25 provides the bounded comparison without admitting a broader segmentation
 default. ADR 0040 and issue #26 add exact source-alpha geometry without admitting a padding rule.
-The earliest remaining implementation gate is #27.
+ADR 0041 and issue #27 retain explicit unavailability for broader PNG formats because current
+product evidence does not establish a coverage gap. The earliest remaining implementation gate is
+#28.
 
 ## Scope-selection rules
 
@@ -271,8 +273,8 @@ blocking product path.
 - #22 — realistic UI acquisition/rule corpus (complete foundation);
 - #25 — broader background and scalable segmentation benchmark (complete; no admission);
 - #26 — exact source-alpha geometry for transparent assets (complete; no rule admitted);
-- #27 — optional palette/sub-byte/16-bit/`tRNS` support after a custom-vs-library strategy and
-  demonstrated product need.
+- #27 — PNG format-demand and decoder strategy decision (complete; broader coverage and a decoder
+  dependency were not admitted).
 
 ### M3 exit criteria
 
@@ -472,7 +474,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0041 or later.
+- New architecture decision numbers continue at 0042 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -493,7 +495,7 @@ Every public behavior must satisfy the applicable matrix:
 | #24 | zero-setup recommended rule packs |
 | #25 | completed background/segmentation benchmark research; strict default retained |
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
-| #27 | optional broader PNG format coverage and decoder strategy |
+| #27 | completed PNG format-demand and decoder strategy decision; broader coverage not admitted |
 | #28 | OCR/CV/VLM perception-worker protocol |
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states/effects/traces/recovery |

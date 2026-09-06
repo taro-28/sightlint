@@ -44,8 +44,10 @@ The bounded first-alpha execution epic,
    first alpha release (complete).
 
 The #25 benchmark is complete without changing the strict image-inspection default. Issue #26 adds
-exact source-alpha geometry without introducing a padding rule. The earliest remaining
-implementation gate is [#27](https://github.com/taro-28/sightlint/issues/27).
+exact source-alpha geometry without introducing a padding rule. Issue #27 is complete through ADR
+0041 without broadening PNG coverage because current product evidence did not establish a format
+gap. The earliest remaining implementation gate is
+[#28](https://github.com/taro-28/sightlint/issues/28).
 
 ## Why
 
@@ -175,6 +177,12 @@ PNG signature/IHDR validation
 Supported raster inputs are eight-bit grayscale, RGB, grayscale-alpha, and RGBA without `tRNS`.
 Palette/indexed, sub-byte, 16-bit, `tRNS`, animation, and over-budget cases are explicitly
 unavailable instead of guessed.
+
+ADR 0041 keeps that boundary after a versioned format-demand assessment found that all five
+repository PNG assets and the nine pinned-browser product captures use the supported subset.
+Unsupported formats remain conformance controls rather than product-demand evidence; no decoder
+dependency, automatic conversion, compatibility change, prevalence claim, or protected holdout is
+introduced. A future observed gap requires a new issue and ADR.
 
 The bytes are unassociated PNG-encoded samples, not display-corrected sRGB or linear-light color.
 No gamma/ICC/chromaticity transform or alpha compositing is applied, so these values alone cannot
@@ -383,7 +391,7 @@ Read:
 | #24 | zero-setup recommended rule packs |
 | #25 | completed background/segmentation benchmark research; no production admission |
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
-| #27 | optional broader PNG coverage and decoder strategy |
+| #27 | completed PNG format-demand/decoder strategy decision; broader coverage not admitted |
 | #28 | isolated OCR/CV/VLM worker protocol |
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states, effects, traces, and recovery |
@@ -392,7 +400,7 @@ Read:
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0041 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0042 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.
