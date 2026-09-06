@@ -69,6 +69,9 @@ jobs:
           python3 tools/check_web_evaluation_v1.py
           python3 tools/check_web_holdout_foundation.py
           python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
+          python3 tools/prepare_web_review.py --check
+          python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
+          python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json > /dev/null
       - name: Verify perception evaluation governance
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/check_perception_evaluation.py
@@ -293,6 +296,11 @@ jobs:
         run: |
           ${{ matrix.python }} tools/generate_github_actions_schemas.py --check
           ${{ matrix.python }} tools/check_github_actions_evaluation.py
+      - name: Verify source-only Web review operations
+        run: |
+          ${{ matrix.python }} tools/prepare_web_review.py --check
+          ${{ matrix.python }} tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
+          ${{ matrix.python }} tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E

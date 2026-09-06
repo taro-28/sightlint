@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-reviewer-submission:1.0.0",
+  "title": "SightLint Web reviewer submission",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "submissionId",
+    "submissionDigest",
+    "lifecycle",
+    "recordPurpose",
+    "evidenceStatus",
+    "packetBinding",
+    "reviewScope",
+    "reviewer",
+    "declarations",
+    "cases",
+    "submissionLimitations"
+  ],
+  "properties": {
+    "$schema": { "const": "./reviewer-submission.schema.json" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "webReviewerSubmission" },
+    "submissionId": { "$ref": "#/$defs/id" },
+    "submissionDigest": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }]
+    },
+    "lifecycle": { "enum": ["draft", "finalized"] },
+    "recordPurpose": { "enum": ["humanReviewCandidate", "fictionalConformance"] },
+    "evidenceStatus": { "enum": ["requiresGovernanceReview", "ineligibleConformance"] },
+    "packetBinding": { "$ref": "#/$defs/packetBinding" },
+    "reviewScope": { "$ref": "#/$defs/reviewScope" },
+    "reviewer": { "$ref": "#/$defs/reviewer" },
+    "declarations": { "$ref": "#/$defs/declarations" },
+    "cases": {
+      "type": "array",
+      "maxItems": 27,
+      "items": { "$ref": "#/$defs/case" }
+    },
+    "submissionLimitations": { "$ref": "#/$defs/textList" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "lifecycle": { "const": "draft" } }, "required": ["lifecycle"] },
+      "then": { "properties": { "submissionDigest": { "type": "null" } } },
+      "else": { "properties": { "submissionDigest": { "$ref": "#/$defs/sha256" } } }
+    },
+    {
+      "if": { "properties": { "recordPurpose": { "const": "fictionalConformance" } }, "required": ["recordPurpose"] },
+      "then": { "properties": { "evidenceStatus": { "const": "ineligibleConformance" } } },
+      "else": { "properties": { "evidenceStatus": { "const": "requiresGovernanceReview" } } }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "textList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "idList": {
+      "type": "array",
+      "maxItems": 27,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "packetBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packetId", "packetDigest"],
+      "properties": {
+        "packetId": { "$ref": "#/$defs/id" },
+        "packetDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "reviewScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["familyIds", "caseIds", "completeForDeclaredScope"],
+      "properties": {
+        "familyIds": { "$ref": "#/$defs/idList" },
+        "caseIds": { "$ref": "#/$defs/idList" },
+        "completeForDeclaredScope": { "type": "boolean" }
+      }
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stableProjectId",
+        "qualification",
+        "independentFromAnnotationAuthors",
+        "independenceRationale",
+        "priorExpectedLabelExposure",
+        "conflictOfInterest",
+        "reviewedOn"
+      ],
+      "properties": {
+        "stableProjectId": { "$ref": "#/$defs/id" },
+        "qualification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["category", "rationale"],
+          "properties": {
+            "category": { "enum": ["accessibility", "other", "productReview", "webUi"] },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        },
+        "independentFromAnnotationAuthors": {
+          "enum": ["declaredFalse", "declaredTrue", "undeclared", "unknown"]
+        },
+        "independenceRationale": { "$ref": "#/$defs/text" },
+        "priorExpectedLabelExposure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "caseIds", "rationale"],
+          "properties": {
+            "status": { "enum": ["none", "partial", "full", "undeclared", "unknown"] },
+            "caseIds": { "$ref": "#/$defs/idList" },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        },
+        "conflictOfInterest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "rationale"],
+          "properties": {
+            "status": { "enum": ["noneDeclared", "declared", "undeclared", "unknown"] },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        },
+        "reviewedOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+      }
+    },
+    "declarations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceFirstNotBlind",
+        "sightlintOutputUsedBeforeFinalization",
+        "existingOracleViewedBeforeFinalization",
+        "generatedCaptureOrReportUsedAsAnswer",
+        "implementationOutputUsedAsAnswer",
+        "containsProtectedOrPrivateData",
+        "containsCredentials",
+        "externalProcessingUsed",
+        "identityOrQualificationVerifiedBySightLint",
+        "signatureVerifiedBySightLint"
+      ],
+      "properties": {
+        "sourceFirstNotBlind": { "const": true },
+        "sightlintOutputUsedBeforeFinalization": { "const": false },
+        "existingOracleViewedBeforeFinalization": { "const": false },
+        "generatedCaptureOrReportUsedAsAnswer": { "const": false },
+        "implementationOutputUsedAsAnswer": { "const": false },
+        "containsProtectedOrPrivateData": { "const": false },
+        "containsCredentials": { "const": false },
+        "externalProcessingUsed": { "const": false },
+        "identityOrQualificationVerifiedBySightLint": { "const": false },
+        "signatureVerifiedBySightLint": { "const": false }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "rationale"],
+      "properties": {
+        "status": { "enum": ["available", "unavailable", "notApplicable", "untested"] },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["case", "node", "abstention"] },
+        "id": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+            }
+          ]
+        }
+      }
+    },
+    "acquisitionJudgment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "judgmentId",
+        "subject",
+        "aspect",
+        "status",
+        "value",
+        "unitOrCoordinateSpace",
+        "confidence",
+        "rationale",
+        "nativeEvidence",
+        "pixelEvidence",
+        "nativePixelRelationship",
+        "unavailableEvidence"
+      ],
+      "properties": {
+        "judgmentId": { "$ref": "#/$defs/id" },
+        "subject": { "$ref": "#/$defs/subject" },
+        "aspect": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$"
+        },
+        "status": { "enum": ["observed", "cantTell", "untested"] },
+        "value": true,
+        "unitOrCoordinateSpace": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/text" }]
+        },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "rationale": { "$ref": "#/$defs/text" },
+        "nativeEvidence": { "$ref": "#/$defs/evidence" },
+        "pixelEvidence": { "$ref": "#/$defs/evidence" },
+        "nativePixelRelationship": { "enum": ["agreement", "conflict", "notCompared", "untested"] },
+        "unavailableEvidence": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "$ref": "#/$defs/text" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "enum": ["cantTell", "untested"] } },
+            "required": ["status"]
+          },
+          "then": { "properties": { "value": { "type": "null" } } }
+        }
+      ]
+    },
+    "ruleJudgment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "judgmentId",
+        "ruleId",
+        "ruleVersion",
+        "targetKind",
+        "targetId",
+        "targetAspect",
+        "applicability",
+        "requiredEvidence",
+        "outcome",
+        "policyBasis",
+        "validAlternativeOrHardNegative",
+        "falsePositiveRisk",
+        "falseNegativeRisk",
+        "confidence",
+        "rationale"
+      ],
+      "properties": {
+        "judgmentId": { "$ref": "#/$defs/id" },
+        "ruleId": { "$ref": "#/$defs/id" },
+        "ruleVersion": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "targetKind": { "enum": ["artifact", "node", "relation"] },
+        "targetId": { "$ref": "#/$defs/id" },
+        "targetAspect": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/text" }] },
+        "applicability": { "enum": ["applicable", "cantTell", "inapplicable", "untested"] },
+        "requiredEvidence": { "enum": ["sufficient", "insufficient", "conflicting", "untested"] },
+        "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] },
+        "policyBasis": { "$ref": "#/$defs/text" },
+        "validAlternativeOrHardNegative": { "$ref": "#/$defs/text" },
+        "falsePositiveRisk": { "$ref": "#/$defs/text" },
+        "falseNegativeRisk": { "$ref": "#/$defs/text" },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "caseContext", "acquisitionJudgments", "ruleJudgments"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/id" },
+        "caseContext": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reviewedAs", "rationale"],
+          "properties": {
+            "reviewedAs": { "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous", "other"] },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        },
+        "acquisitionJudgments": {
+          "type": "array",
+          "maxItems": 512,
+          "items": { "$ref": "#/$defs/acquisitionJudgment" }
+        },
+        "ruleJudgments": {
+          "type": "array",
+          "maxItems": 512,
+          "items": { "$ref": "#/$defs/ruleJudgment" }
+        }
+      }
+    }
+  }
+}

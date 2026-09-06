@@ -57,6 +57,15 @@ malformed, and resource-boundary classes, but is permanently `evidenceEligible: 
 `holdout-run.json` remains the authoritative public `notRun` status while admission is
 `notOperational`.
 
+ADR 0053 and issue #78 add a source-only review packet for the real human task in issue #77.
+`review-packet.json` embeds only the six Atlas/Harbor fixture source files and 27 capture requests;
+`reviewer-submission.blank.json` contains no answers. Strict submission records separate
+acquisition observations from rule verdicts and lock reviewer-authored bytes before a read-only
+comparison may open the existing oracles. Comparison metrics keep category-specific integer
+numerators and denominators, including explicit zero denominators. The committed conformance
+reviewer/submission is wholly fictional, fully exposed, and permanently ineligible as
+independent-review or product evidence.
+
 ## Files and authority
 
 - `corpus.schema.json`: versioned artifact, provenance, split, environment, and execution contract.
@@ -93,6 +102,16 @@ malformed, and resource-boundary classes, but is permanently `evidenceEligible: 
   zero denominators are explicit and no aggregate quality score exists.
 - `conformance/holdout/`: public fictional positive and negative protocol fixtures. They validate
   joins and disclosure rules but are not product-accuracy or protected-holdout evidence.
+- `review-packet.schema.json`, `reviewer-submission.schema.json`, and
+  `review-comparison.schema.json`: strict source-input, independently authored judgment, and
+  post-finalization comparison authorities.
+- `review-guide-v1.md`: the source-only authoring, finalization, comparison, disagreement, and
+  non-claim procedure for a real issue #77 reviewer.
+- `review-packet.json` and `reviewer-submission.blank.json`: generated Atlas/Harbor source-only
+  input and no-answer template, checked byte for byte for drift.
+- `conformance/review/fictional-submission.json`: fully exposed fictional values covering
+  agreement, disagreement, unresolved, hard-negative, abstention, and outcome semantics; never
+  eligible as issue #77 evidence.
 - `annotation-guide-v1.md`: family, review, oracle, leakage, holdout, and reporting guidance.
 - `support-inbox-app/`, `annotations/support-inbox-acquisition.json`, and
   `annotations/support-inbox-rules.json`: the second realistic family and its separate public
@@ -152,12 +171,28 @@ identity, or accessing an external store:
 ```bash
 python3 tools/check_web_holdout_foundation.py
 python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
+python3 tools/prepare_web_review.py --check
+python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
+python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
 ```
 
 The second command proves only canonical digests, file containment, acquisition/rule truth
 separation, bounded integer metrics, small-cell suppression, and stable fail-closed diagnostics.
 Operationalization still requires issue #74's external authority, qualified independent evaluator,
 second verifier, protected bundle, exposure log, and detached signature process.
+
+For issue #77, copy the generated blank submission outside the repository, reduce its declared
+scope if reviewing Harbor first, replace every placeholder, fill judgments from packet source,
+and finalize it before opening current oracle files:
+
+```bash
+python3 tools/prepare_web_review.py --finalize-submission REVIEWER-DRAFT.json > REVIEWER-FINAL.json
+python3 tools/compare_web_review.py --submission REVIEWER-FINAL.json > REVIEW-COMPARISON.json
+```
+
+The reviewer owns the answers. Finalization supplies only lifecycle and digest; comparison does
+not edit or adjudicate either record. Do not commit a real review if it contains private data, and
+do not treat structural validation as proof of the reviewer's identity or independence.
 
 ## Evaluation command
 

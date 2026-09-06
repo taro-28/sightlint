@@ -1,0 +1,540 @@
+{
+  "$schema": "./review-packet.schema.json",
+  "schemaVersion": "1.0.0",
+  "documentType": "webReviewPacket",
+  "packetId": "sightlint-atlas-harbor-source-review-v1",
+  "packetDigest": "sha256:1a3d68b377ab30681d71e0cb0b3634a341c8d0b899fae70079c6f935e02652a3",
+  "recordPurpose": "publicSourceOnlyReviewInput",
+  "evidenceEligible": false,
+  "protocol": {
+    "sourceFirstNotBlind": true,
+    "oracleExposure": "forbiddenUntilFinalizedSubmission",
+    "allowedInputKinds": [
+      "captureRequest",
+      "fixtureSource"
+    ],
+    "prohibitedInputKinds": [
+      "capturedArtifactIr",
+      "diagnostic",
+      "existingAcquisitionOracle",
+      "existingRuleOracle",
+      "expectedVerdict",
+      "generatedScreenshot",
+      "implementationOutput",
+      "sightlintReport"
+    ],
+    "acquisitionAndRuleAuthoritySeparated": true,
+    "implementationOutputMaySupplyJudgment": false,
+    "unavailableMeasurementMayBeGuessed": false
+  },
+  "governance": {
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "redistribution": "permittedUnderRepositoryLicense",
+    "privacyReview": "syntheticNoPersonalData",
+    "containsPersonalOrCustomerData": false,
+    "containsCredentials": false,
+    "externalAssets": false,
+    "externalNetwork": false,
+    "externalProcessing": false,
+    "exposure": "publicTuningVisible"
+  },
+  "reviewFields": {
+    "acquisition": [
+      "availability and exact reviewed value",
+      "stable native subject and aspect",
+      "viewport, coordinate space, units, and tolerance basis",
+      "native evidence and pixel evidence separately",
+      "native/pixel agreement, conflict, or absence",
+      "unavailable evidence, confidence, and rationale"
+    ],
+    "rule": [
+      "rule ID, version, target, and applicability",
+      "required-evidence sufficiency",
+      "passed, failed, cantTell, inapplicable, or untested outcome",
+      "policy basis and valid alternative or hard-negative rationale",
+      "false-positive risk, false-negative risk, confidence, and rationale"
+    ]
+  },
+  "families": [
+    {
+      "familyId": "atlas-dashboard-settings-v1",
+      "name": "Atlas dashboard and settings",
+      "sourcePaths": [
+        "evaluation/web/fixture-app/app.js",
+        "evaluation/web/fixture-app/index.html",
+        "evaluation/web/fixture-app/styles.css"
+      ],
+      "caseIds": [
+        "dashboard-browser-ambiguous",
+        "dashboard-browser-ambiguous-control",
+        "dashboard-browser-clean",
+        "dashboard-browser-clipping",
+        "dashboard-browser-control-boundaries",
+        "dashboard-browser-control-clip",
+        "dashboard-browser-control-offscreen",
+        "dashboard-browser-intentional-grouping",
+        "dashboard-browser-intentional-overlay",
+        "dashboard-browser-mobile",
+        "dashboard-browser-notification-clean",
+        "dashboard-browser-occlusion",
+        "dashboard-browser-occlusion-clean",
+        "dashboard-browser-out-of-viewport",
+        "dashboard-browser-overflow",
+        "dashboard-browser-peer-dimension",
+        "dashboard-browser-responsive-mobile-mutant",
+        "dashboard-browser-rtl-vertical",
+        "dashboard-browser-scrollable-control",
+        "dashboard-browser-spacing-mutant",
+        "dashboard-browser-text-scale",
+        "dashboard-browser-transformed-text",
+        "dashboard-browser-unnamed-control"
+      ]
+    },
+    {
+      "familyId": "harbor-support-inbox-v1",
+      "name": "Harbor support inbox",
+      "sourcePaths": [
+        "evaluation/web/support-inbox-app/app.js",
+        "evaluation/web/support-inbox-app/index.html",
+        "evaluation/web/support-inbox-app/styles.css"
+      ],
+      "caseIds": [
+        "support-inbox-ambiguous-control",
+        "support-inbox-clean",
+        "support-inbox-labelledby-hard-negative",
+        "support-inbox-unnamed-control"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "evaluation/web/fixture-app/app.js",
+      "kind": "fixtureSource",
+      "byteLength": 1669,
+      "sha256": "sha256:f18c35f85e73e6e88aa61af572fae972c65060beb333af9288d12cf0ec4496a8",
+      "contentUtf8": "(() => {\n  \"use strict\";\n\n  const allowedCases = new Set([\n    \"peer-spacing-clean\",\n    \"peer-spacing-mutant\",\n    \"out-of-viewport-mutant\",\n    \"intentional-grouping\",\n    \"ambiguous-peer-group\",\n    \"clipping-mutant\",\n    \"control-clip-mutant\",\n    \"control-boundaries\",\n    \"control-offscreen-mutant\",\n    \"ambiguous-control\",\n    \"intentional-overlay\",\n    \"notification-clean\",\n    \"occlusion-clean\",\n    \"occlusion-mutant\",\n    \"overflow-mutant\",\n    \"peer-dimension-mutant\",\n    \"responsive-mobile-mutant\",\n    \"rtl-vertical\",\n    \"transformed-text-mutant\",\n    \"unnamed-control-mutant\",\n    \"scrollable-control-hard-negative\",\n  ]);\n  const parameters = new URLSearchParams(window.location.search);\n  const requestedCase = parameters.get(\"case\") || \"peer-spacing-clean\";\n  const fixtureCase = allowedCases.has(requestedCase) ? requestedCase : \"peer-spacing-clean\";\n  const requestedTextScale = Number(parameters.get(\"textScale\") || \"1\");\n  const textScale = requestedTextScale === 1.25 ? 1.25 : 1;\n\n  document.body.dataset.case = fixtureCase;\n  document.documentElement.dir = fixtureCase === \"rtl-vertical\" ? \"rtl\" : \"ltr\";\n  document.documentElement.style.fontSize = `${16 * textScale}px`;\n  if (fixtureCase === \"unnamed-control-mutant\") {\n    document.querySelector(\"[data-testid='help-action']\")?.removeAttribute(\"aria-label\");\n  }\n  document.documentElement.dataset.fixtureReady = \"true\";\n\n  Object.defineProperty(window, \"__SIGHTLINT_FIXTURE__\", {\n    configurable: false,\n    enumerable: true,\n    writable: false,\n    value: Object.freeze({\n      caseId: fixtureCase,\n      textScale,\n      externalAssets: false,\n      ready: true,\n    }),\n  });\n})();\n"
+    },
+    {
+      "path": "evaluation/web/fixture-app/index.html",
+      "kind": "fixtureSource",
+      "byteLength": 8188,
+      "sha256": "sha256:24c9e964a21a2b1e5014ddc41048a91ef5291d20a181f40cfff95109fa1cc0e2",
+      "contentUtf8": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>SightLint fixture — Atlas workspace</title>\n    <link rel=\"stylesheet\" href=\"./styles.css\" />\n  </head>\n  <body>\n    <div class=\"app-shell\" data-testid=\"app-shell\">\n      <aside class=\"sidebar\" aria-label=\"Workspace navigation\" data-testid=\"sidebar\">\n        <a class=\"brand\" href=\"#overview\" aria-label=\"Atlas home\">\n          <span class=\"brand-mark\" aria-hidden=\"true\">A</span>\n          <span>Atlas</span>\n        </a>\n        <nav aria-label=\"Primary navigation\">\n          <a class=\"nav-item nav-item-active\" href=\"#overview\" aria-current=\"page\">Overview</a>\n          <a class=\"nav-item\" href=\"#activity\">Activity</a>\n          <a class=\"nav-item\" href=\"#members\">Members</a>\n          <a class=\"nav-item\" href=\"#settings\">Settings</a>\n        </nav>\n        <div class=\"sidebar-note\">\n          <strong>Prototype workspace</strong>\n          <span>Repository-owned fictional data</span>\n        </div>\n      </aside>\n\n      <main class=\"main-content\" id=\"overview\" data-testid=\"main-content\">\n        <header class=\"page-header\">\n          <div>\n            <p class=\"eyebrow\">Workspace overview</p>\n            <h1>Good morning, Morgan</h1>\n            <p class=\"lede\">Track delivery signals without losing the context behind them.</p>\n          </div>\n          <button class=\"primary-action\" type=\"button\" data-testid=\"create-report-action\">Create report</button>\n        </header>\n\n        <section aria-labelledby=\"metrics-heading\" data-testid=\"metrics-section\">\n          <div class=\"section-heading\">\n            <div>\n              <p class=\"eyebrow\">Last 30 days</p>\n              <h2 id=\"metrics-heading\">Product signals</h2>\n            </div>\n            <button class=\"quiet-action\" type=\"button\">View details</button>\n          </div>\n\n          <div class=\"metrics-stage\" data-testid=\"metrics-stage\">\n            <div\n              class=\"metric-peer-group\"\n              role=\"group\"\n              aria-label=\"Product metrics\"\n              data-testid=\"metric-peer-group\"\n            >\n              <article class=\"metric-card\" role=\"group\" data-testid=\"metric-revenue\">\n                <p class=\"metric-label\">Net revenue</p>\n                <p class=\"metric-value\">$184.2k</p>\n                <p class=\"metric-trend metric-trend-positive\">Up 12.4%</p>\n              </article>\n              <article class=\"metric-card\" role=\"group\" data-testid=\"metric-activation\">\n                <p class=\"metric-label\">Activation</p>\n                <p class=\"metric-value\">68.3%</p>\n                <p class=\"metric-trend metric-trend-positive\">Up 4.8%</p>\n              </article>\n              <article\n                class=\"metric-card metric-card-third\"\n                role=\"group\"\n                data-testid=\"metric-retention\"\n              >\n                <p class=\"metric-label\">Retention</p>\n                <p class=\"metric-value\" data-testid=\"metric-retention-value\">91.7%</p>\n                <p class=\"metric-trend\">Steady this month</p>\n              </article>\n            </div>\n\n            <aside class=\"promotion-card\" data-testid=\"promotion-card\" aria-labelledby=\"promo-title\">\n              <p class=\"metric-label\">Planning guide</p>\n              <h3 id=\"promo-title\">Prepare the next review</h3>\n              <a href=\"#guide\">Open guide</a>\n            </aside>\n          </div>\n        </section>\n\n        <section class=\"activity-panel\" id=\"activity\" aria-labelledby=\"activity-heading\">\n          <div class=\"section-heading\">\n            <div>\n              <p class=\"eyebrow\">Team pulse</p>\n              <h2 id=\"activity-heading\">Recent activity</h2>\n            </div>\n            <span class=\"status-pill\">All systems normal</span>\n          </div>\n          <div class=\"activity-list\" role=\"list\">\n            <article class=\"activity-row\" role=\"listitem\">\n              <span class=\"avatar\" aria-hidden=\"true\">JD</span>\n              <div><strong>Jordan</strong><p>Published the September product brief.</p></div>\n              <span class=\"activity-time\">18 min</span>\n            </article>\n            <article class=\"activity-row\" role=\"listitem\">\n              <span class=\"avatar avatar-coral\" aria-hidden=\"true\">SK</span>\n              <div><strong>Sam</strong><p>Resolved three onboarding follow-ups.</p></div>\n              <span class=\"activity-time\">42 min</span>\n            </article>\n            <article class=\"activity-row\" role=\"listitem\">\n              <span class=\"avatar avatar-green\" aria-hidden=\"true\">MP</span>\n              <div><strong>Morgan</strong><p>Updated the workspace objectives.</p></div>\n              <span class=\"activity-time\">1 hr</span>\n            </article>\n          </div>\n        </section>\n\n        <section class=\"operations-panel\" aria-labelledby=\"operations-heading\" data-testid=\"operations-panel\">\n          <div class=\"section-heading\">\n            <div>\n              <p class=\"eyebrow\">Delivery desk</p>\n              <h2 id=\"operations-heading\">Review operations</h2>\n            </div>\n            <span class=\"queue-label\" data-testid=\"queue-label\">Queue 04</span>\n          </div>\n\n          <div class=\"operations-grid\">\n            <div class=\"notification-viewport\" data-testid=\"notification-viewport\">\n              <article class=\"notification-card\" data-testid=\"notification-card\">\n                <p class=\"metric-label\">Next checkpoint</p>\n                <h3 class=\"notification-title\" data-testid=\"notification-title\">\n                  Confirm onboarding evidence before the weekly delivery review\n                </h3>\n                <p class=\"notification-copy\">Three owners have attached their supporting notes.</p>\n              </article>\n            </div>\n\n            <div class=\"control-boundaries\" data-testid=\"control-boundaries\">\n              <div class=\"compact-visual-card\" data-testid=\"compact-visual-card\">\n                <span>Review one flagged item</span>\n                <button class=\"compact-hit-action\" type=\"button\" data-testid=\"compact-hit-action\">Open</button>\n              </div>\n              <button class=\"large-hit-action\" type=\"button\" data-testid=\"large-hit-action\">\n                <span class=\"small-visual-glyph\" data-testid=\"small-visual-glyph\" aria-hidden=\"true\">+</span>\n                <span class=\"visually-hidden\">Add a review note</span>\n              </button>\n              <button\n                class=\"help-action\"\n                type=\"button\"\n                data-testid=\"help-action\"\n                aria-label=\"Open help center\"\n              >\n                <span aria-hidden=\"true\">?</span>\n              </button>\n              <button type=\"button\" data-testid=\"disabled-action\" disabled>Publish summary</button>\n              <button class=\"disclosure-action\" type=\"button\" data-testid=\"hidden-action\">Archive report</button>\n              <button class=\"offscreen-action\" type=\"button\" data-testid=\"offscreen-action\">Export evidence</button>\n            </div>\n          </div>\n\n          <div class=\"review-action-wrap\">\n            <button class=\"quiet-action\" type=\"button\" data-testid=\"review-action\">Review queue</button>\n            <div class=\"accidental-blocker\" data-testid=\"accidental-blocker\" aria-hidden=\"true\">Syncing</div>\n            <aside class=\"intentional-popover\" role=\"dialog\" aria-label=\"Review guidance\" data-testid=\"intentional-popover\">\n              <strong>Review guidance</strong>\n              <p>Compare the source note before publishing.</p>\n            </aside>\n          </div>\n\n          <div class=\"control-clip-viewport\" data-testid=\"control-clip-viewport\">\n            <button class=\"clipped-action\" type=\"button\" data-testid=\"clipped-action\">\n              Open inspector\n            </button>\n          </div>\n\n          <div\n            class=\"ambiguous-action\"\n            tabindex=\"0\"\n            data-testid=\"ambiguous-action\"\n          >\n            Keyboard surface with unknown role\n          </div>\n        </section>\n      </main>\n    </div>\n    <script src=\"./app.js\"></script>\n  </body>\n</html>\n"
+    },
+    {
+      "path": "evaluation/web/fixture-app/styles.css",
+      "kind": "fixtureSource",
+      "byteLength": 12494,
+      "sha256": "sha256:942f550a0e135808472e6a8a4ab128ed9cc76decb020048ee8ee9624f9bb216a",
+      "contentUtf8": ":root {\n  color-scheme: light;\n  font-family: Arial, Helvetica, sans-serif;\n  font-size: 16px;\n  color: #172033;\n  background: #f3f5f9;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n  min-width: 320px;\n  min-height: 100vh;\n  overflow-x: hidden;\n  background: #f3f5f9;\n}\n\nbutton,\na {\n  font: inherit;\n}\n\nbutton {\n  cursor: pointer;\n}\n\n.app-shell {\n  display: grid;\n  grid-template-columns: 240px minmax(0, 1fr);\n  min-height: 100vh;\n}\n\n.sidebar {\n  position: sticky;\n  top: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 32px;\n  height: 100vh;\n  padding: 28px 20px;\n  color: #f8fafc;\n  background: #172033;\n}\n\n.brand {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  color: inherit;\n  font-size: 1.125rem;\n  font-weight: 700;\n  text-decoration: none;\n}\n\n.brand-mark {\n  display: grid;\n  width: 36px;\n  height: 36px;\n  place-items: center;\n  border-radius: 10px;\n  color: #172033;\n  background: #8ee3c3;\n}\n\nnav {\n  display: grid;\n  gap: 8px;\n}\n\n.nav-item {\n  padding: 10px 12px;\n  border-radius: 9px;\n  color: #b9c2d3;\n  text-decoration: none;\n}\n\n.nav-item-active {\n  color: #ffffff;\n  background: #28344d;\n}\n\n.sidebar-note {\n  display: grid;\n  gap: 6px;\n  margin-top: auto;\n  padding: 14px;\n  border: 1px solid #34415c;\n  border-radius: 12px;\n  color: #d8deea;\n  font-size: 0.75rem;\n}\n\n.sidebar-note span {\n  color: #9faac0;\n}\n\n.main-content {\n  width: min(1100px, 100%);\n  margin: 0 auto;\n  padding: 48px;\n}\n\n.page-header,\n.section-heading {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 24px;\n}\n\n.page-header {\n  margin-bottom: 40px;\n}\n\nh1,\nh2,\nh3,\np {\n  margin-top: 0;\n}\n\nh1 {\n  margin-bottom: 10px;\n  font-size: 2rem;\n  line-height: 1.15;\n}\n\nh2 {\n  margin-bottom: 0;\n  font-size: 1.25rem;\n}\n\nh3 {\n  margin-bottom: 20px;\n  font-size: 1rem;\n  line-height: 1.35;\n}\n\n.eyebrow {\n  margin-bottom: 8px;\n  color: #68758c;\n  font-size: 0.75rem;\n  font-weight: 700;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.lede {\n  margin-bottom: 0;\n  color: #68758c;\n}\n\n.primary-action,\n.quiet-action {\n  min-height: 42px;\n  padding: 0 18px;\n  border-radius: 10px;\n  font-weight: 700;\n}\n\n.primary-action {\n  border: 1px solid #245f50;\n  color: #ffffff;\n  background: #287b66;\n}\n\n.quiet-action {\n  border: 1px solid #d3d9e4;\n  color: #33405a;\n  background: #ffffff;\n}\n\n.metrics-stage {\n  margin-top: 20px;\n}\n\n.metric-peer-group {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 24px;\n}\n\n.metric-card,\n.promotion-card,\n.activity-panel {\n  border: 1px solid #dfe4ec;\n  border-radius: 16px;\n  background: #ffffff;\n  box-shadow: 0 8px 24px rgb(31 42 66 / 6%);\n}\n\n.metric-card,\n.promotion-card {\n  min-height: 160px;\n  padding: 22px;\n}\n\n.metric-card {\n  align-self: start;\n}\n\n.metric-label {\n  margin-bottom: 18px;\n  color: #68758c;\n  font-size: 0.8125rem;\n  font-weight: 700;\n}\n\n.metric-value {\n  margin-bottom: 12px;\n  font-size: 1.75rem;\n  font-weight: 750;\n  letter-spacing: -0.03em;\n}\n\n.metric-trend {\n  margin-bottom: 0;\n  color: #68758c;\n  font-size: 0.8125rem;\n}\n\n.metric-trend-positive {\n  color: #287b66;\n}\n\n.promotion-card {\n  display: none;\n}\n\nbody[data-case=\"peer-spacing-mutant\"] .metric-card-third {\n  transform: translateX(16px);\n}\n\nbody[data-case=\"out-of-viewport-mutant\"] .metric-card:first-child {\n  transform: translateX(-320px);\n}\n\nbody[data-case=\"intentional-grouping\"] .metrics-stage {\n  display: grid;\n  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);\n  gap: 40px;\n}\n\nbody[data-case=\"intentional-grouping\"] .metric-peer-group {\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n\nbody[data-case=\"intentional-grouping\"] .metric-card-third {\n  display: none;\n}\n\nbody[data-case=\"intentional-grouping\"] .promotion-card {\n  display: block;\n}\n\nbody[data-case=\"ambiguous-peer-group\"] .metric-card-third {\n  margin-left: 16px;\n  border-style: dashed;\n}\n\n.promotion-card a {\n  color: #245f50;\n  font-weight: 700;\n}\n\n.activity-panel {\n  margin-top: 32px;\n  padding: 24px;\n}\n\n.status-pill {\n  padding: 7px 10px;\n  border-radius: 999px;\n  color: #236451;\n  background: #e2f5ee;\n  font-size: 0.75rem;\n  font-weight: 700;\n}\n\n.activity-list {\n  margin-top: 18px;\n  border-top: 1px solid #e5e9f0;\n}\n\n.activity-row {\n  display: grid;\n  grid-template-columns: 40px minmax(0, 1fr) auto;\n  align-items: center;\n  gap: 14px;\n  padding: 16px 0;\n  border-bottom: 1px solid #e5e9f0;\n}\n\n.activity-row p {\n  margin: 4px 0 0;\n  color: #68758c;\n  font-size: 0.875rem;\n}\n\n.avatar {\n  display: grid;\n  width: 36px;\n  height: 36px;\n  place-items: center;\n  border-radius: 50%;\n  color: #263349;\n  background: #dbe8ff;\n  font-size: 0.75rem;\n  font-weight: 700;\n}\n\n.avatar-coral {\n  background: #ffe1d8;\n}\n\n.avatar-green {\n  background: #d8f3e9;\n}\n\n.activity-time {\n  color: #7b879b;\n  font-size: 0.75rem;\n}\n\n.operations-panel {\n  position: relative;\n  margin-top: 32px;\n  padding: 24px;\n  border: 1px solid #dfe4ec;\n  border-radius: 16px;\n  background: #ffffff;\n  box-shadow: 0 8px 24px rgb(31 42 66 / 6%);\n}\n\n.queue-label {\n  color: #526078;\n  font-size: 0.75rem;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.operations-grid {\n  display: grid;\n  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);\n  gap: 24px;\n  margin-top: 20px;\n}\n\n.notification-viewport {\n  overflow: hidden;\n  border: 1px solid #dfe4ec;\n  border-radius: 12px;\n  background: #f8fafc;\n}\n\n.notification-card {\n  width: 100%;\n  min-height: 164px;\n  padding: 20px;\n  background: #f8fafc;\n}\n\n.notification-title {\n  margin-bottom: 10px;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n\n.notification-copy {\n  margin-bottom: 0;\n  color: #68758c;\n  font-size: 0.875rem;\n}\n\n.control-boundaries {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;\n  align-items: center;\n  gap: 12px;\n}\n\n.compact-visual-card {\n  display: flex;\n  min-height: 72px;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 14px;\n  border: 1px solid #d3d9e4;\n  border-radius: 12px;\n  color: #33405a;\n  background: #ffffff;\n  font-size: 0.8125rem;\n  font-weight: 700;\n}\n\n.compact-hit-action {\n  min-width: 42px;\n  min-height: 30px;\n  border: 1px solid #c4ccd9;\n  border-radius: 8px;\n  color: #33405a;\n  background: #f8fafc;\n}\n\n.large-hit-action {\n  display: grid;\n  width: 52px;\n  height: 52px;\n  place-items: center;\n  border: 1px solid #c4ccd9;\n  border-radius: 12px;\n  color: #245f50;\n  background: #eef9f5;\n}\n\n.help-action {\n  display: none;\n  width: 42px;\n  height: 42px;\n  place-items: center;\n  border: 1px solid #c4ccd9;\n  border-radius: 10px;\n  color: #33405a;\n  background: #ffffff;\n  font-weight: 800;\n}\n\nbody[data-case=\"control-boundaries\"] .help-action,\nbody[data-case=\"unnamed-control-mutant\"] .help-action {\n  position: fixed;\n  z-index: 4;\n  top: 300px;\n  right: 48px;\n  display: grid;\n}\n\n.small-visual-glyph {\n  display: grid;\n  width: 18px;\n  height: 18px;\n  place-items: center;\n  border-radius: 50%;\n  color: #ffffff;\n  background: #287b66;\n  font-weight: 700;\n}\n\n.control-boundaries > button:not(.large-hit-action, .compact-hit-action) {\n  min-height: 38px;\n  border: 1px solid #c4ccd9;\n  border-radius: 8px;\n  background: #ffffff;\n}\n\n.disclosure-action {\n  display: none;\n}\n\n.review-action-wrap {\n  position: relative;\n  width: max-content;\n  margin-top: 20px;\n}\n\n.accidental-blocker,\n.intentional-popover,\n.control-clip-viewport,\n.ambiguous-action {\n  display: none;\n}\n\n.control-clip-viewport {\n  width: 176px;\n  height: 52px;\n  border: 1px solid #c4ccd9;\n  border-radius: 10px;\n  background: #f8fafc;\n}\n\n.clipped-action {\n  width: 148px;\n  height: 40px;\n  margin: 5px 0 0 -24px;\n  border: 1px solid #245f50;\n  border-radius: 8px;\n  color: #ffffff;\n  background: #287b66;\n}\n\n.ambiguous-action {\n  padding: 12px 16px;\n  border: 1px dashed #7b879b;\n  border-radius: 10px;\n  color: #33405a;\n  background: #ffffff;\n}\n\nbody[data-case=\"clipping-mutant\"] .notification-card {\n  transform: translateX(300px);\n}\n\nbody[data-case=\"clipping-mutant\"] .notification-viewport,\nbody[data-case=\"notification-clean\"] .notification-viewport,\nbody[data-case=\"overflow-mutant\"] .notification-viewport {\n  position: fixed;\n  z-index: 3;\n  top: 520px;\n  left: 360px;\n  width: 560px;\n}\n\nbody[data-case=\"overflow-mutant\"] .notification-title {\n  width: 148px;\n}\n\nbody[data-case=\"peer-dimension-mutant\"] .metric-card-third {\n  min-height: 208px;\n}\n\nbody[data-case=\"transformed-text-mutant\"] .metric-card-third .metric-value {\n  transform: scale(0.65);\n  transform-origin: left center;\n}\n\nbody[data-case=\"occlusion-mutant\"] .accidental-blocker {\n  position: absolute;\n  inset: 0;\n  z-index: 2;\n  display: grid;\n  place-items: center;\n  border-radius: 10px;\n  color: #7a2e2e;\n  background: rgb(255 225 216 / 96%);\n  font-size: 0.75rem;\n  font-weight: 700;\n}\n\nbody[data-case=\"occlusion-mutant\"] .review-action-wrap,\nbody[data-case=\"occlusion-clean\"] .review-action-wrap,\nbody[data-case=\"intentional-overlay\"] .review-action-wrap {\n  position: fixed;\n  z-index: 3;\n  top: 132px;\n  left: 760px;\n  margin-top: 0;\n}\n\nbody[data-case=\"intentional-overlay\"] .intentional-popover {\n  position: absolute;\n  z-index: 2;\n  inset: -8px;\n  display: grid;\n  width: 170px;\n  min-height: 58px;\n  padding: 14px;\n  border: 1px solid #c4ccd9;\n  border-radius: 12px;\n  background: #ffffff;\n  box-shadow: 0 12px 30px rgb(31 42 66 / 16%);\n}\n\nbody[data-case=\"control-boundaries\"] .control-clip-viewport,\nbody[data-case=\"control-clip-mutant\"] .control-clip-viewport,\nbody[data-case=\"scrollable-control-hard-negative\"] .control-clip-viewport {\n  position: fixed;\n  z-index: 3;\n  top: 360px;\n  right: 48px;\n  display: block;\n  overflow: visible;\n}\n\nbody[data-case=\"control-clip-mutant\"] .control-clip-viewport {\n  overflow: hidden;\n}\n\nbody[data-case=\"scrollable-control-hard-negative\"] .control-clip-viewport {\n  overflow: auto;\n}\n\nbody[data-case=\"ambiguous-control\"] .ambiguous-action {\n  position: fixed;\n  z-index: 3;\n  top: 360px;\n  right: 48px;\n  display: block;\n}\n\nbody[data-case=\"intentional-overlay\"] .intentional-popover p {\n  margin: 6px 0 0;\n  color: #68758c;\n  font-size: 0.8125rem;\n}\n\nbody[data-case=\"control-offscreen-mutant\"] .offscreen-action {\n  transform: translateX(-1800px);\n}\n\nbody[data-case=\"control-boundaries\"] .control-boundaries,\nbody[data-case=\"control-offscreen-mutant\"] .control-boundaries,\nbody[data-case=\"unnamed-control-mutant\"] .control-boundaries {\n  position: fixed;\n  z-index: 3;\n  top: 116px;\n  right: 48px;\n  width: 360px;\n  padding: 16px;\n  border: 1px solid #c4ccd9;\n  border-radius: 14px;\n  background: #ffffff;\n  box-shadow: 0 12px 30px rgb(31 42 66 / 16%);\n}\n\nbody[data-case=\"rtl-vertical\"] .queue-label {\n  position: fixed;\n  z-index: 3;\n  top: 116px;\n  right: 48px;\n  padding: 10px;\n  border-radius: 8px;\n  background: #e2f5ee;\n  writing-mode: vertical-rl;\n}\n\nbody[data-case=\"responsive-mobile-mutant\"] .metric-card:first-child {\n  transform: translateX(-360px);\n}\n\n.visually-hidden {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  white-space: nowrap;\n  border: 0;\n}\n\n@media (max-width: 760px) {\n  .app-shell {\n    display: block;\n  }\n\n  .sidebar {\n    position: static;\n    display: block;\n    height: auto;\n    padding: 18px 20px;\n  }\n\n  .sidebar nav,\n  .sidebar-note {\n    display: none;\n  }\n\n  .main-content {\n    padding: 28px 20px;\n  }\n\n  .page-header,\n  .section-heading {\n    align-items: flex-start;\n  }\n\n  .page-header {\n    flex-direction: column;\n    margin-bottom: 32px;\n  }\n\n  .metric-peer-group,\n  body[data-case=\"intentional-grouping\"] .metrics-stage {\n    display: grid;\n    grid-template-columns: 1fr;\n    gap: 16px;\n  }\n\n  body[data-case=\"peer-spacing-mutant\"] .metric-card-third {\n    transform: translateY(16px);\n  }\n\n  body[data-case=\"out-of-viewport-mutant\"] .metric-card:first-child {\n    transform: translateX(-320px);\n  }\n\n  .activity-row {\n    grid-template-columns: 40px minmax(0, 1fr);\n  }\n\n  .activity-time {\n    grid-column: 2;\n  }\n\n  .operations-grid {\n    grid-template-columns: 1fr;\n  }\n\n  body[data-case=\"clipping-mutant\"] .notification-card {\n    transform: translateX(180px);\n  }\n\n  body[data-case=\"clipping-mutant\"] .notification-viewport,\n  body[data-case=\"notification-clean\"] .notification-viewport,\n  body[data-case=\"overflow-mutant\"] .notification-viewport {\n    top: 520px;\n    left: 20px;\n    width: 300px;\n  }\n\n  body[data-case=\"responsive-mobile-mutant\"] .metric-card:first-child {\n    transform: translateX(-360px);\n  }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-ambiguous-control.json",
+      "kind": "captureRequest",
+      "byteLength": 923,
+      "sha256": "sha256:4ecf95bf59d74000b8deedb50d92849a4822d2af5ac2b5debd5f55f057a36aaa",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-ambiguous-control\",\n    \"title\": \"Atlas dashboard — ambiguous interactive semantics\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"ambiguous-control\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-ambiguous-control.png\"\n  }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-ambiguous.json",
+      "kind": "captureRequest",
+      "byteLength": 840,
+      "sha256": "sha256:bc8bfd27fb216b4c27dc92994679a36e8d37d54acf0bd51a4fe2b8efbe7657d0",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": { \"id\": \"web-dashboard-browser-ambiguous\", \"title\": \"Atlas dashboard — ambiguous peers\" },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"ambiguous-peer-group\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": { \"accessibleNameMode\": \"selectedNodes\", \"externalProcessing\": false },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-ambiguous.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-clean.json",
+      "kind": "captureRequest",
+      "byteLength": 848,
+      "sha256": "sha256:d72277b675cc47b7dcb2c95746b3bccddd3c914b044f1cdaf9f5afc46d6e1859",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-clean\",\n    \"title\": \"Atlas dashboard — browser clean\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"peer-spacing-clean\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-clean.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-clipping.json",
+      "kind": "captureRequest",
+      "byteLength": 888,
+      "sha256": "sha256:558947a2251160f2fb151775dfa56be0b9f452a9024eefb6194b05807f05ab1a",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-clipping\",\n    \"title\": \"Atlas dashboard — clipping mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"clipping-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-clipping.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+      "kind": "captureRequest",
+      "byteLength": 919,
+      "sha256": "sha256:b92a6fe0b248f3eda984c7eacd3d6c8028eeecccbc1e566117d60faff5a04ebf",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-control-boundaries\",\n    \"title\": \"Atlas dashboard — control boundary states\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"control-boundaries\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-control-boundaries.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-control-clip.json",
+      "kind": "captureRequest",
+      "byteLength": 908,
+      "sha256": "sha256:98f959942d580a4f380a7b55ef8754a7e888308224e2c9de8e8a9a50e9a3bc05",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-control-clip\",\n    \"title\": \"Atlas dashboard — clipped control mutation\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"control-clip-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-control-clip.png\"\n  }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-control-offscreen.json",
+      "kind": "captureRequest",
+      "byteLength": 889,
+      "sha256": "sha256:728c0ae644002cd4d7bc10d12212f89a402d17771b0be4a91ee264551838fb4c",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-control-offscreen\",\n    \"title\": \"Atlas dashboard — offscreen control mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"control-offscreen-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-control-offscreen.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-intentional-grouping.json",
+      "kind": "captureRequest",
+      "byteLength": 867,
+      "sha256": "sha256:1090e96aa9ce0c69db2f3369f9d5958cf294161c91150f774ae598b8509be8d0",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": { \"id\": \"web-dashboard-browser-intentional-grouping\", \"title\": \"Atlas dashboard — intentional grouping\" },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"intentional-grouping\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": { \"accessibleNameMode\": \"selectedNodes\", \"externalProcessing\": false },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-intentional-grouping.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-intentional-overlay.json",
+      "kind": "captureRequest",
+      "byteLength": 932,
+      "sha256": "sha256:cfb3dbb0edbceee200e91cfa301c8791999fe8526bbf5286fe104610ecd8e337",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-intentional-overlay\",\n    \"title\": \"Atlas dashboard — intentional overlay hard negative\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"intentional-overlay\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-intentional-overlay.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-mobile.json",
+      "kind": "captureRequest",
+      "byteLength": 828,
+      "sha256": "sha256:5435ac9742d4c0b1e3c8dc9edb4fae29b580dbf8850bf4e90a7e5ef9a76b8c7b",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": { \"id\": \"web-dashboard-browser-mobile\", \"title\": \"Atlas dashboard — mobile clean\" },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"peer-spacing-clean\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 390, \"height\": 844, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": { \"accessibleNameMode\": \"selectedNodes\", \"externalProcessing\": false },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-mobile.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-notification-clean.json",
+      "kind": "captureRequest",
+      "byteLength": 888,
+      "sha256": "sha256:e0932a7a2b2df6f77d168ce8bb143eb10028bb99aa20acb359c11518fb06fd6d",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-notification-clean\",\n    \"title\": \"Atlas dashboard — notification clean baseline\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"notification-clean\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-notification-clean.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-occlusion-clean.json",
+      "kind": "captureRequest",
+      "byteLength": 878,
+      "sha256": "sha256:ac9631b1507443488c6fc59e9aaa746c630be7e5f50aa3d4d9d77546afa57e26",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-occlusion-clean\",\n    \"title\": \"Atlas dashboard — unobstructed review action\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"occlusion-clean\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-occlusion-clean.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-occlusion.json",
+      "kind": "captureRequest",
+      "byteLength": 899,
+      "sha256": "sha256:1c923b8cfde12808199c3ccce976dd13f4d133fba5d19c0c14e2a16c5da8f214",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-occlusion\",\n    \"title\": \"Atlas dashboard — center occlusion mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"occlusion-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-occlusion.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-out-of-viewport.json",
+      "kind": "captureRequest",
+      "byteLength": 883,
+      "sha256": "sha256:46160ffc12033808c75f16ef80ffb5090c0ebc61d50587051bb011b5632b62c5",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-out-of-viewport\",\n    \"title\": \"Atlas dashboard — out-of-viewport mutation\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"out-of-viewport-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-out-of-viewport.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-overflow.json",
+      "kind": "captureRequest",
+      "byteLength": 888,
+      "sha256": "sha256:95e50cee780809fdfcf8f597d0fc2e4340b925a7f5a1ac5144e12c0d65560f9c",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-overflow\",\n    \"title\": \"Atlas dashboard — overflow mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"overflow-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-overflow.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-peer-dimension.json",
+      "kind": "captureRequest",
+      "byteLength": 912,
+      "sha256": "sha256:c3c54ae82937a4c9ea0aa8c4976db4836615c03740fad3ad8768e9f4a07e5e9c",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-peer-dimension\",\n    \"title\": \"Atlas dashboard — peer dimension mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"peer-dimension-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-peer-dimension.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-responsive-mobile-mutant.json",
+      "kind": "captureRequest",
+      "byteLength": 937,
+      "sha256": "sha256:5b7e9db53e818c53f7b855ed550c571b309fd682d96ea06d07abc48bc99f8995",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-responsive-mobile-mutant\",\n    \"title\": \"Atlas dashboard — responsive mobile mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"responsive-mobile-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 390,\n      \"height\": 844,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-responsive-mobile-mutant.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-rtl-vertical.json",
+      "kind": "captureRequest",
+      "byteLength": 902,
+      "sha256": "sha256:ff2621d9df48b067f4f8e652c0e836c04f367d600875ca32182b25b365e8aad9",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-rtl-vertical\",\n    \"title\": \"Atlas dashboard — RTL and vertical writing\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"rtl-vertical\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-rtl-vertical.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-scrollable-control.json",
+      "kind": "captureRequest",
+      "byteLength": 941,
+      "sha256": "sha256:e3ad51749ed6121187a9f52b73380802335157c0e502234dd6277b8f2f26bcd7",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-scrollable-control\",\n    \"title\": \"Atlas dashboard — scrollable control hard negative\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"scrollable-control-hard-negative\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-scrollable-control.png\"\n  }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-spacing-mutant.json",
+      "kind": "captureRequest",
+      "byteLength": 862,
+      "sha256": "sha256:e4c7cccae363f4317f2f7f8647d1cef9c6e9313bba9a3965684560cdcd712b55",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": { \"id\": \"web-dashboard-browser-spacing-mutant\", \"title\": \"Atlas dashboard — spacing measurement mutation\" },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"peer-spacing-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": { \"accessibleNameMode\": \"selectedNodes\", \"externalProcessing\": false },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-spacing-mutant.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-text-scale.json",
+      "kind": "captureRequest",
+      "byteLength": 850,
+      "sha256": "sha256:5ad77f48cb4da9165a7b2f90fc7b5c5aace070f0bb27437a3ffbf65777ae435b",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": { \"id\": \"web-dashboard-browser-text-scale\", \"title\": \"Atlas dashboard — 125 percent text scale\" },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"peer-spacing-clean\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1280, \"height\": 800, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1.25,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": { \"accessibleNameMode\": \"selectedNodes\", \"externalProcessing\": false },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/dashboard-browser-text-scale.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-transformed-text.json",
+      "kind": "captureRequest",
+      "byteLength": 920,
+      "sha256": "sha256:6a57ceb42975876df1cdaea9e9c1e52531f8b00fc98f47cf809aaa09110d1a34",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-transformed-text\",\n    \"title\": \"Atlas dashboard — transformed text mutant\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"transformed-text-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-transformed-text.png\"\n  }\n}\n\n"
+    },
+    {
+      "path": "evaluation/web/requests/dashboard-browser-unnamed-control.json",
+      "kind": "captureRequest",
+      "byteLength": 917,
+      "sha256": "sha256:8d3a209e4ebe72b9623dd5a916e92b645fc64db2bea8c0a62e8e8cdc0cfc3f3b",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-dashboard-browser-unnamed-control\",\n    \"title\": \"Atlas dashboard — unnamed control mutation\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/fixture-app/index.html\",\n    \"state\": \"unnamed-control-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": {\n      \"width\": 1280,\n      \"height\": 800,\n      \"unit\": \"cssPixel\"\n    },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": {\n    \"mode\": \"deny\"\n  },\n  \"screenshot\": {\n    \"reference\": \"capture/dashboard-browser-unnamed-control.png\"\n  }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/support-inbox-ambiguous-control.json",
+      "kind": "captureRequest",
+      "byteLength": 883,
+      "sha256": "sha256:807e3fd1fc98b15e3f0c8c779f980f972f38c6a0e2a9da8da883a49fc9d506f2",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-support-inbox-ambiguous-control\",\n    \"title\": \"Harbor support inbox — ambiguous send surface\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/support-inbox-app/index.html\",\n    \"state\": \"ambiguous-control\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1366, \"height\": 900, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/support-inbox-ambiguous-control.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/support-inbox-clean.json",
+      "kind": "captureRequest",
+      "byteLength": 830,
+      "sha256": "sha256:93e4f2d81d38acf7e13ebaa7c0f88b7e50fbffe41378a160868e07046edb4d1b",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-support-inbox-clean\",\n    \"title\": \"Harbor support inbox — clean\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/support-inbox-app/index.html\",\n    \"state\": \"clean\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1366, \"height\": 900, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/support-inbox-clean.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json",
+      "kind": "captureRequest",
+      "byteLength": 905,
+      "sha256": "sha256:5bdffed88c1c87eeb6550d3efc8bcbac6515bc102dd19fb69729773402a3e25d",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-support-inbox-labelledby-hard-negative\",\n    \"title\": \"Harbor support inbox — labelled-by icon action\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/support-inbox-app/index.html\",\n    \"state\": \"labelledby-hard-negative\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1366, \"height\": 900, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/support-inbox-labelledby-hard-negative.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/requests/support-inbox-unnamed-control.json",
+      "kind": "captureRequest",
+      "byteLength": 882,
+      "sha256": "sha256:575d03c6c77024cbf536c8c6254530b10a21c2577eb578d900b54961aab14925",
+      "contentUtf8": "{\n  \"$schema\": \"../../../adapters/playwright/schemas/capture-request.schema.json\",\n  \"protocolVersion\": \"0.1.0\",\n  \"artifact\": {\n    \"id\": \"web-support-inbox-unnamed-control\",\n    \"title\": \"Harbor support inbox — unnamed send control\"\n  },\n  \"fixture\": {\n    \"entrypoint\": \"evaluation/web/support-inbox-app/index.html\",\n    \"state\": \"unnamed-control-mutant\",\n    \"readinessSelector\": \"html[data-fixture-ready=\\\"true\\\"]\"\n  },\n  \"environment\": {\n    \"viewport\": { \"width\": 1366, \"height\": 900, \"unit\": \"cssPixel\" },\n    \"deviceScaleFactor\": 1,\n    \"textScale\": 1,\n    \"locale\": \"en-US\",\n    \"timezoneId\": \"UTC\",\n    \"colorScheme\": \"light\",\n    \"reducedMotion\": \"reduce\"\n  },\n  \"privacy\": {\n    \"accessibleNameMode\": \"selectedNodes\",\n    \"externalProcessing\": false\n  },\n  \"network\": { \"mode\": \"deny\" },\n  \"screenshot\": { \"reference\": \"capture/support-inbox-unnamed-control.png\" }\n}\n"
+    },
+    {
+      "path": "evaluation/web/support-inbox-app/app.js",
+      "kind": "fixtureSource",
+      "byteLength": 1478,
+      "sha256": "sha256:c471e899f7df095512c82119790669d639b43312b91cca4a8d14a1e67477652e",
+      "contentUtf8": "(() => {\n  \"use strict\";\n\n  const allowedCases = new Set([\n    \"ambiguous-control\",\n    \"clean\",\n    \"labelledby-hard-negative\",\n    \"unnamed-control-mutant\",\n  ]);\n  const parameters = new URLSearchParams(window.location.search);\n  const requestedCase = parameters.get(\"case\") || \"clean\";\n  const fixtureCase = allowedCases.has(requestedCase) ? requestedCase : \"clean\";\n  const sendAction = document.querySelector(\"[data-testid='reply-send']\");\n\n  document.body.dataset.case = fixtureCase;\n  if (fixtureCase === \"unnamed-control-mutant\") {\n    sendAction?.removeAttribute(\"aria-label\");\n  } else if (fixtureCase === \"labelledby-hard-negative\") {\n    sendAction?.removeAttribute(\"aria-label\");\n    sendAction?.setAttribute(\"aria-labelledby\", \"reply-send-label\");\n  } else if (fixtureCase === \"ambiguous-control\" && sendAction instanceof HTMLButtonElement) {\n    const ambiguous = document.createElement(\"div\");\n    ambiguous.className = sendAction.className;\n    ambiguous.dataset.testid = \"reply-send\";\n    ambiguous.tabIndex = 0;\n    ambiguous.innerHTML = '<span aria-hidden=\"true\">➜</span>';\n    sendAction.replaceWith(ambiguous);\n  }\n\n  document.documentElement.dataset.fixtureReady = \"true\";\n  Object.defineProperty(window, \"__SIGHTLINT_FIXTURE__\", {\n    configurable: false,\n    enumerable: true,\n    writable: false,\n    value: Object.freeze({\n      caseId: fixtureCase,\n      externalAssets: false,\n      externalNetwork: false,\n      ready: true,\n    }),\n  });\n})();\n"
+    },
+    {
+      "path": "evaluation/web/support-inbox-app/index.html",
+      "kind": "fixtureSource",
+      "byteLength": 7137,
+      "sha256": "sha256:7d90d01d62a91211bd893fedd43d36a8ea7cbc0b535c7e4fe74c1779326b2336",
+      "contentUtf8": "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>SightLint fixture — Harbor support inbox</title>\n    <link rel=\"stylesheet\" href=\"./styles.css\" />\n  </head>\n  <body>\n    <div class=\"support-app\" data-testid=\"support-inbox\">\n      <header class=\"topbar\" data-testid=\"support-topbar\">\n        <a class=\"brand\" href=\"#inbox\" aria-label=\"Harbor support home\">\n          <span class=\"brand-mark\" aria-hidden=\"true\">H</span>\n          <span>Harbor</span>\n        </a>\n        <label class=\"search-field\">\n          <span class=\"visually-hidden\">Search conversations</span>\n          <span aria-hidden=\"true\">⌕</span>\n          <input type=\"search\" placeholder=\"Search conversations\" />\n        </label>\n        <button class=\"account-action\" type=\"button\" aria-label=\"Open account menu\">\n          <span aria-hidden=\"true\">MC</span>\n        </button>\n      </header>\n\n      <div class=\"workspace\">\n        <aside class=\"queue-navigation\" aria-label=\"Support queues\" data-testid=\"queue-navigation\">\n          <div>\n            <p class=\"eyebrow\">Workspace</p>\n            <h1>Support inbox</h1>\n          </div>\n          <nav aria-label=\"Conversation views\">\n            <a class=\"queue-link queue-link-active\" href=\"#inbox\" aria-current=\"page\">\n              <span>Inbox</span><strong>12</strong>\n            </a>\n            <a class=\"queue-link\" href=\"#assigned\"><span>Assigned to me</span><strong>4</strong></a>\n            <a class=\"queue-link\" href=\"#waiting\"><span>Waiting</span><strong>3</strong></a>\n            <a class=\"queue-link\" href=\"#resolved\"><span>Resolved</span></a>\n          </nav>\n          <section class=\"coverage-note\" aria-labelledby=\"coverage-heading\">\n            <p class=\"eyebrow\">Today</p>\n            <h2 id=\"coverage-heading\">Coverage until 18:00</h2>\n            <p>Mae and Imani are handling the current queue.</p>\n          </section>\n        </aside>\n\n        <main class=\"inbox-layout\" id=\"inbox\" data-testid=\"inbox-main\">\n          <section class=\"ticket-list\" aria-labelledby=\"ticket-list-heading\" data-testid=\"ticket-list\">\n            <header class=\"panel-heading\">\n              <div>\n                <p class=\"eyebrow\">Priority view</p>\n                <h2 id=\"ticket-list-heading\">Open conversations</h2>\n              </div>\n              <button class=\"filter-action\" type=\"button\">Filter</button>\n            </header>\n\n            <article class=\"ticket ticket-active\" aria-label=\"Selected conversation from Mina Chen\">\n              <span class=\"avatar avatar-coral\" aria-hidden=\"true\">MC</span>\n              <div class=\"ticket-copy\">\n                <div><strong>Mina Chen</strong><time datetime=\"2026-09-06T09:24:00Z\">9:24</time></div>\n                <p>Inviting another reviewer</p>\n                <span>I can open the workspace, but the invite…</span>\n              </div>\n            </article>\n            <article class=\"ticket\" aria-label=\"Conversation from Luis Romero\">\n              <span class=\"avatar avatar-blue\" aria-hidden=\"true\">LR</span>\n              <div class=\"ticket-copy\">\n                <div><strong>Luis Romero</strong><time datetime=\"2026-09-06T08:51:00Z\">8:51</time></div>\n                <p>Export completed</p>\n                <span>The report arrived and the totals look right.</span>\n              </div>\n            </article>\n            <article class=\"ticket\" aria-label=\"Conversation from Jules Okafor\">\n              <span class=\"avatar avatar-gold\" aria-hidden=\"true\">JO</span>\n              <div class=\"ticket-copy\">\n                <div><strong>Jules Okafor</strong><time datetime=\"2026-09-06T08:17:00Z\">8:17</time></div>\n                <p>Billing owner changed</p>\n                <span>Could you confirm which receipts move over?</span>\n              </div>\n            </article>\n          </section>\n\n          <section class=\"conversation\" aria-labelledby=\"conversation-heading\" data-testid=\"conversation-panel\">\n            <header class=\"conversation-heading\">\n              <div>\n                <p class=\"eyebrow\">Atlas Research · Priority</p>\n                <h2 id=\"conversation-heading\">Inviting another reviewer</h2>\n              </div>\n              <button class=\"more-action\" type=\"button\" aria-label=\"More conversation actions\">\n                <span aria-hidden=\"true\">•••</span>\n              </button>\n            </header>\n\n            <div class=\"message-thread\" role=\"log\" aria-label=\"Conversation messages\">\n              <article class=\"message message-customer\">\n                <header><strong>Mina Chen</strong><time datetime=\"2026-09-06T09:24:00Z\">9:24</time></header>\n                <p>Hi! I can open the workspace, but the invite button is unavailable for our new reviewer.</p>\n              </article>\n              <article class=\"message message-agent\">\n                <header><strong>Mae from Harbor</strong><time datetime=\"2026-09-06T09:31:00Z\">9:31</time></header>\n                <p>Thanks, Mina. I am checking the workspace role and will send the safest next step.</p>\n              </article>\n            </div>\n\n            <form class=\"reply-composer\" data-testid=\"reply-composer\">\n              <label for=\"reply-message\">Reply</label>\n              <textarea id=\"reply-message\" rows=\"4\">I confirmed the reviewer role. Please try the invite again.</textarea>\n              <button class=\"hidden-template-action\" type=\"button\" data-testid=\"hidden-template-action\">\n                Use saved reply\n              </button>\n              <div class=\"composer-actions\">\n                <button class=\"attach-action\" type=\"button\" aria-label=\"Attach a file\">\n                  <span aria-hidden=\"true\">＋</span>\n                </button>\n                <span id=\"reply-send-label\" class=\"visually-hidden\">Send reply</span>\n                <button\n                  class=\"send-action\"\n                  type=\"button\"\n                  aria-label=\"Send reply\"\n                  data-testid=\"reply-send\"\n                >\n                  <span aria-hidden=\"true\">➜</span>\n                </button>\n              </div>\n            </form>\n          </section>\n\n          <aside class=\"customer-panel\" aria-labelledby=\"customer-heading\" data-testid=\"customer-panel\">\n            <div class=\"customer-profile\">\n              <span class=\"profile-avatar\" aria-hidden=\"true\">MC</span>\n              <h2 id=\"customer-heading\">Mina Chen</h2>\n              <p>Atlas Research</p>\n            </div>\n            <dl>\n              <div><dt>Plan</dt><dd>Studio</dd></div>\n              <div><dt>Region</dt><dd>North America</dd></div>\n              <div><dt>Conversations</dt><dd>6</dd></div>\n            </dl>\n            <section class=\"context-card\" aria-labelledby=\"context-heading\">\n              <p class=\"eyebrow\">Context</p>\n              <h3 id=\"context-heading\">Review access</h3>\n              <p>The account has two active reviewer seats.</p>\n            </section>\n          </aside>\n        </main>\n      </div>\n    </div>\n    <script src=\"./app.js\"></script>\n  </body>\n</html>\n"
+    },
+    {
+      "path": "evaluation/web/support-inbox-app/styles.css",
+      "kind": "fixtureSource",
+      "byteLength": 7059,
+      "sha256": "sha256:662704d7ae01da400e0a57ed192a4fedf25b84d763ff04d51617b61345d6c978",
+      "contentUtf8": ":root {\n  color-scheme: light;\n  font-family: Arial, Helvetica, sans-serif;\n  font-size: 16px;\n  color: #24303f;\n  background: #edf1f5;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  min-width: 1024px;\n  min-height: 100vh;\n  margin: 0;\n  overflow: hidden;\n  background: #edf1f5;\n}\n\nbutton,\ninput,\ntextarea {\n  font: inherit;\n}\n\nbutton,\na {\n  color: inherit;\n}\n\nbutton {\n  cursor: pointer;\n}\n\n.visually-hidden {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  white-space: nowrap;\n  border: 0;\n}\n\n.support-app {\n  min-height: 100vh;\n  background: #ffffff;\n}\n\n.topbar {\n  display: grid;\n  grid-template-columns: 260px minmax(320px, 560px) 1fr;\n  align-items: center;\n  gap: 28px;\n  height: 64px;\n  padding: 0 24px;\n  border-bottom: 1px solid #dce2e8;\n  background: #ffffff;\n}\n\n.brand {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  font-weight: 750;\n  text-decoration: none;\n}\n\n.brand-mark {\n  display: grid;\n  width: 34px;\n  height: 34px;\n  place-items: center;\n  border-radius: 11px;\n  color: #ffffff;\n  background: #176b62;\n}\n\n.search-field {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  height: 38px;\n  padding: 0 14px;\n  border: 1px solid #d5dce3;\n  border-radius: 10px;\n  color: #697687;\n  background: #f7f9fb;\n}\n\n.search-field input {\n  width: 100%;\n  border: 0;\n  outline: 0;\n  color: #24303f;\n  background: transparent;\n}\n\n.account-action {\n  display: grid;\n  width: 38px;\n  height: 38px;\n  margin-left: auto;\n  place-items: center;\n  border: 0;\n  border-radius: 50%;\n  color: #ffffff;\n  font-size: 0.75rem;\n  font-weight: 700;\n  background: #9a5a48;\n}\n\n.workspace {\n  display: grid;\n  grid-template-columns: 260px minmax(0, 1fr);\n  height: calc(100vh - 64px);\n}\n\n.queue-navigation {\n  display: flex;\n  flex-direction: column;\n  gap: 28px;\n  padding: 28px 20px;\n  border-right: 1px solid #dce2e8;\n  background: #f7f9fb;\n}\n\nh1,\nh2,\nh3,\np {\n  margin-top: 0;\n}\n\nh1 {\n  margin-bottom: 0;\n  font-size: 1.4rem;\n}\n\nh2 {\n  margin-bottom: 0;\n  font-size: 1.05rem;\n}\n\nh3 {\n  margin-bottom: 8px;\n  font-size: 0.95rem;\n}\n\n.eyebrow {\n  margin-bottom: 7px;\n  color: #768294;\n  font-size: 0.68rem;\n  font-weight: 750;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\nnav {\n  display: grid;\n  gap: 6px;\n}\n\n.queue-link {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  min-height: 40px;\n  padding: 0 12px;\n  border-radius: 9px;\n  color: #556274;\n  font-size: 0.875rem;\n  text-decoration: none;\n}\n\n.queue-link-active {\n  color: #155d56;\n  background: #dff0eb;\n}\n\n.queue-link strong {\n  font-size: 0.75rem;\n}\n\n.coverage-note {\n  margin-top: auto;\n  padding: 16px;\n  border: 1px solid #d9e2e0;\n  border-radius: 12px;\n  background: #ffffff;\n}\n\n.coverage-note h2 {\n  margin-bottom: 8px;\n  font-size: 0.9rem;\n}\n\n.coverage-note p:last-child {\n  margin-bottom: 0;\n  color: #687586;\n  font-size: 0.78rem;\n  line-height: 1.5;\n}\n\n.inbox-layout {\n  display: grid;\n  grid-template-columns: 300px minmax(420px, 1fr) 240px;\n  min-width: 0;\n  height: 100%;\n}\n\n.ticket-list,\n.conversation,\n.customer-panel {\n  min-width: 0;\n  background: #ffffff;\n}\n\n.ticket-list,\n.conversation {\n  border-right: 1px solid #dce2e8;\n}\n\n.panel-heading,\n.conversation-heading {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  min-height: 78px;\n  padding: 16px 18px;\n  border-bottom: 1px solid #e4e8ed;\n}\n\n.filter-action,\n.more-action,\n.attach-action {\n  min-height: 34px;\n  padding: 0 12px;\n  border: 1px solid #d4dbe2;\n  border-radius: 9px;\n  background: #ffffff;\n}\n\n.more-action,\n.attach-action {\n  display: grid;\n  width: 38px;\n  padding: 0;\n  place-items: center;\n}\n\n.ticket {\n  display: grid;\n  grid-template-columns: 38px minmax(0, 1fr);\n  gap: 12px;\n  min-height: 108px;\n  padding: 18px;\n  border-bottom: 1px solid #edf0f3;\n}\n\n.ticket-active {\n  box-shadow: inset 3px 0 #2b8176;\n  background: #edf7f4;\n}\n\n.avatar {\n  display: grid;\n  width: 38px;\n  height: 38px;\n  place-items: center;\n  border-radius: 50%;\n  color: #5b3025;\n  font-size: 0.7rem;\n  font-weight: 750;\n}\n\n.avatar-coral {\n  background: #f2c7bb;\n}\n\n.avatar-blue {\n  color: #254b67;\n  background: #c9dfef;\n}\n\n.avatar-gold {\n  color: #654e19;\n  background: #f1dda5;\n}\n\n.ticket-copy {\n  min-width: 0;\n}\n\n.ticket-copy div {\n  display: flex;\n  justify-content: space-between;\n  gap: 8px;\n  margin-bottom: 6px;\n  font-size: 0.8rem;\n}\n\n.ticket-copy time,\n.message time {\n  color: #7b8797;\n  font-size: 0.72rem;\n}\n\n.ticket-copy p {\n  margin-bottom: 5px;\n  font-size: 0.82rem;\n  font-weight: 700;\n}\n\n.ticket-copy > span {\n  display: block;\n  overflow: hidden;\n  color: #697687;\n  font-size: 0.75rem;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.conversation {\n  display: grid;\n  grid-template-rows: auto 1fr auto;\n}\n\n.message-thread {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n  padding: 28px;\n  overflow-y: auto;\n  background: #fbfcfd;\n}\n\n.message {\n  max-width: 78%;\n  padding: 16px;\n  border: 1px solid #dce3e9;\n  border-radius: 14px;\n  background: #ffffff;\n  box-shadow: 0 5px 16px rgb(33 48 63 / 5%);\n}\n\n.message-agent {\n  align-self: end;\n  border-color: #c9e1da;\n  background: #e8f5f1;\n}\n\n.message header {\n  display: flex;\n  justify-content: space-between;\n  gap: 18px;\n  margin-bottom: 8px;\n  font-size: 0.8rem;\n}\n\n.message p {\n  margin-bottom: 0;\n  color: #4e5b6c;\n  font-size: 0.86rem;\n  line-height: 1.55;\n}\n\n.reply-composer {\n  position: relative;\n  display: grid;\n  gap: 10px;\n  padding: 18px;\n  border-top: 1px solid #dce2e8;\n  background: #ffffff;\n}\n\n.reply-composer > label {\n  font-size: 0.78rem;\n  font-weight: 750;\n}\n\n.reply-composer textarea {\n  width: 100%;\n  min-height: 88px;\n  resize: none;\n  padding: 12px;\n  border: 1px solid #cfd8df;\n  border-radius: 10px;\n  color: #354253;\n  line-height: 1.45;\n}\n\n.composer-actions {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.hidden-template-action {\n  display: none;\n}\n\n.send-action {\n  display: grid;\n  width: 46px;\n  height: 46px;\n  padding: 0;\n  place-items: center;\n  border: 1px solid #145c54;\n  border-radius: 12px;\n  color: #ffffff;\n  background: #176b62;\n}\n\n.customer-panel {\n  padding: 28px 20px;\n}\n\n.customer-profile {\n  display: grid;\n  justify-items: center;\n  margin-bottom: 28px;\n  text-align: center;\n}\n\n.profile-avatar {\n  display: grid;\n  width: 64px;\n  height: 64px;\n  margin-bottom: 12px;\n  place-items: center;\n  border-radius: 50%;\n  color: #5b3025;\n  font-weight: 750;\n  background: #f2c7bb;\n}\n\n.customer-profile p {\n  margin: 6px 0 0;\n  color: #758193;\n  font-size: 0.8rem;\n}\n\ndl {\n  display: grid;\n  gap: 12px;\n  margin: 0 0 26px;\n}\n\ndl div {\n  display: flex;\n  justify-content: space-between;\n  gap: 12px;\n  font-size: 0.78rem;\n}\n\ndt {\n  color: #788495;\n}\n\ndd {\n  margin: 0;\n  font-weight: 700;\n}\n\n.context-card {\n  padding: 15px;\n  border: 1px solid #dce3e9;\n  border-radius: 12px;\n  background: #f8fafb;\n}\n\n.context-card p:last-child {\n  margin-bottom: 0;\n  color: #697687;\n  font-size: 0.78rem;\n  line-height: 1.45;\n}\n"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "dashboard-browser-ambiguous",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-ambiguous.json",
+      "requestDigest": "sha256:bc8bfd27fb216b4c27dc92994679a36e8d37d54acf0bd51a4fe2b8efbe7657d0",
+      "fixtureState": "ambiguous-peer-group"
+    },
+    {
+      "caseId": "dashboard-browser-ambiguous-control",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-ambiguous-control.json",
+      "requestDigest": "sha256:4ecf95bf59d74000b8deedb50d92849a4822d2af5ac2b5debd5f55f057a36aaa",
+      "fixtureState": "ambiguous-control"
+    },
+    {
+      "caseId": "dashboard-browser-clean",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-clean.json",
+      "requestDigest": "sha256:d72277b675cc47b7dcb2c95746b3bccddd3c914b044f1cdaf9f5afc46d6e1859",
+      "fixtureState": "peer-spacing-clean"
+    },
+    {
+      "caseId": "dashboard-browser-clipping",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-clipping.json",
+      "requestDigest": "sha256:558947a2251160f2fb151775dfa56be0b9f452a9024eefb6194b05807f05ab1a",
+      "fixtureState": "clipping-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-control-boundaries",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-control-boundaries.json",
+      "requestDigest": "sha256:b92a6fe0b248f3eda984c7eacd3d6c8028eeecccbc1e566117d60faff5a04ebf",
+      "fixtureState": "control-boundaries"
+    },
+    {
+      "caseId": "dashboard-browser-control-clip",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-control-clip.json",
+      "requestDigest": "sha256:98f959942d580a4f380a7b55ef8754a7e888308224e2c9de8e8a9a50e9a3bc05",
+      "fixtureState": "control-clip-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-control-offscreen",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-control-offscreen.json",
+      "requestDigest": "sha256:728c0ae644002cd4d7bc10d12212f89a402d17771b0be4a91ee264551838fb4c",
+      "fixtureState": "control-offscreen-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-intentional-grouping",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-intentional-grouping.json",
+      "requestDigest": "sha256:1090e96aa9ce0c69db2f3369f9d5958cf294161c91150f774ae598b8509be8d0",
+      "fixtureState": "intentional-grouping"
+    },
+    {
+      "caseId": "dashboard-browser-intentional-overlay",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-intentional-overlay.json",
+      "requestDigest": "sha256:cfb3dbb0edbceee200e91cfa301c8791999fe8526bbf5286fe104610ecd8e337",
+      "fixtureState": "intentional-overlay"
+    },
+    {
+      "caseId": "dashboard-browser-mobile",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-mobile.json",
+      "requestDigest": "sha256:5435ac9742d4c0b1e3c8dc9edb4fae29b580dbf8850bf4e90a7e5ef9a76b8c7b",
+      "fixtureState": "peer-spacing-clean"
+    },
+    {
+      "caseId": "dashboard-browser-notification-clean",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-notification-clean.json",
+      "requestDigest": "sha256:e0932a7a2b2df6f77d168ce8bb143eb10028bb99aa20acb359c11518fb06fd6d",
+      "fixtureState": "notification-clean"
+    },
+    {
+      "caseId": "dashboard-browser-occlusion",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-occlusion.json",
+      "requestDigest": "sha256:1c923b8cfde12808199c3ccce976dd13f4d133fba5d19c0c14e2a16c5da8f214",
+      "fixtureState": "occlusion-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-occlusion-clean",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-occlusion-clean.json",
+      "requestDigest": "sha256:ac9631b1507443488c6fc59e9aaa746c630be7e5f50aa3d4d9d77546afa57e26",
+      "fixtureState": "occlusion-clean"
+    },
+    {
+      "caseId": "dashboard-browser-out-of-viewport",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-out-of-viewport.json",
+      "requestDigest": "sha256:46160ffc12033808c75f16ef80ffb5090c0ebc61d50587051bb011b5632b62c5",
+      "fixtureState": "out-of-viewport-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-overflow",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-overflow.json",
+      "requestDigest": "sha256:95e50cee780809fdfcf8f597d0fc2e4340b925a7f5a1ac5144e12c0d65560f9c",
+      "fixtureState": "overflow-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-peer-dimension",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-peer-dimension.json",
+      "requestDigest": "sha256:c3c54ae82937a4c9ea0aa8c4976db4836615c03740fad3ad8768e9f4a07e5e9c",
+      "fixtureState": "peer-dimension-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-responsive-mobile-mutant",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-responsive-mobile-mutant.json",
+      "requestDigest": "sha256:5b7e9db53e818c53f7b855ed550c571b309fd682d96ea06d07abc48bc99f8995",
+      "fixtureState": "responsive-mobile-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-rtl-vertical",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-rtl-vertical.json",
+      "requestDigest": "sha256:ff2621d9df48b067f4f8e652c0e836c04f367d600875ca32182b25b365e8aad9",
+      "fixtureState": "rtl-vertical"
+    },
+    {
+      "caseId": "dashboard-browser-scrollable-control",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-scrollable-control.json",
+      "requestDigest": "sha256:e3ad51749ed6121187a9f52b73380802335157c0e502234dd6277b8f2f26bcd7",
+      "fixtureState": "scrollable-control-hard-negative"
+    },
+    {
+      "caseId": "dashboard-browser-spacing-mutant",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-spacing-mutant.json",
+      "requestDigest": "sha256:e4c7cccae363f4317f2f7f8647d1cef9c6e9313bba9a3965684560cdcd712b55",
+      "fixtureState": "peer-spacing-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-text-scale",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-text-scale.json",
+      "requestDigest": "sha256:5ad77f48cb4da9165a7b2f90fc7b5c5aace070f0bb27437a3ffbf65777ae435b",
+      "fixtureState": "peer-spacing-clean"
+    },
+    {
+      "caseId": "dashboard-browser-transformed-text",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-transformed-text.json",
+      "requestDigest": "sha256:6a57ceb42975876df1cdaea9e9c1e52531f8b00fc98f47cf809aaa09110d1a34",
+      "fixtureState": "transformed-text-mutant"
+    },
+    {
+      "caseId": "dashboard-browser-unnamed-control",
+      "familyId": "atlas-dashboard-settings-v1",
+      "requestPath": "evaluation/web/requests/dashboard-browser-unnamed-control.json",
+      "requestDigest": "sha256:8d3a209e4ebe72b9623dd5a916e92b645fc64db2bea8c0a62e8e8cdc0cfc3f3b",
+      "fixtureState": "unnamed-control-mutant"
+    },
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "familyId": "harbor-support-inbox-v1",
+      "requestPath": "evaluation/web/requests/support-inbox-ambiguous-control.json",
+      "requestDigest": "sha256:807e3fd1fc98b15e3f0c8c779f980f972f38c6a0e2a9da8da883a49fc9d506f2",
+      "fixtureState": "ambiguous-control"
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "familyId": "harbor-support-inbox-v1",
+      "requestPath": "evaluation/web/requests/support-inbox-clean.json",
+      "requestDigest": "sha256:93e4f2d81d38acf7e13ebaa7c0f88b7e50fbffe41378a160868e07046edb4d1b",
+      "fixtureState": "clean"
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "familyId": "harbor-support-inbox-v1",
+      "requestPath": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json",
+      "requestDigest": "sha256:5bdffed88c1c87eeb6550d3efc8bcbac6515bc102dd19fb69729773402a3e25d",
+      "fixtureState": "labelledby-hard-negative"
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "familyId": "harbor-support-inbox-v1",
+      "requestPath": "evaluation/web/requests/support-inbox-unnamed-control.json",
+      "requestDigest": "sha256:575d03c6c77024cbf536c8c6254530b10a21c2577eb578d900b54961aab14925",
+      "fixtureState": "unnamed-control-mutant"
+    }
+  ],
+  "nonClaims": [
+    "Fixture state names and source are visible, so this is source-first review rather than blind evaluation.",
+    "This packet contains no review answer and is not independent-review evidence by itself.",
+    "Public Atlas and Harbor data is tuning-visible and is not a protected holdout.",
+    "The workflow does not establish reviewer identity, qualification, independence, WCAG conformance, representative accuracy, or blocking maturity."
+  ]
+}

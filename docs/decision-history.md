@@ -490,7 +490,7 @@ Important historical detail:
 - ADR 0052 defines versioned external holdout manifests, canonical digest bindings, private
   integer result cells, sanitized public attestations, small-cell suppression, and an explicit
   non-claim boundary for fictional conformance data;
-- new ADRs should continue at 0053 or later rather than silently reusing historical numbers.
+- new ADRs should continue at 0054 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.

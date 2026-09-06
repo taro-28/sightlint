@@ -1,0 +1,359 @@
+{
+  "$schema": "./reviewer-submission.schema.json",
+  "schemaVersion": "1.0.0",
+  "documentType": "webReviewerSubmission",
+  "submissionId": "fictional-review-conformance-v1",
+  "submissionDigest": "sha256:18c663dfb79f108902dfd201cddbb0a9bb0dca2e99a593c04923e76a207639bd",
+  "lifecycle": "finalized",
+  "recordPurpose": "fictionalConformance",
+  "evidenceStatus": "ineligibleConformance",
+  "packetBinding": {
+    "packetId": "sightlint-atlas-harbor-source-review-v1",
+    "packetDigest": "sha256:1a3d68b377ab30681d71e0cb0b3634a341c8d0b899fae70079c6f935e02652a3"
+  },
+  "reviewScope": {
+    "familyIds": [
+      "atlas-dashboard-settings-v1",
+      "harbor-support-inbox-v1"
+    ],
+    "caseIds": [
+      "dashboard-browser-clean",
+      "support-inbox-ambiguous-control",
+      "support-inbox-clean",
+      "support-inbox-labelledby-hard-negative",
+      "support-inbox-unnamed-control"
+    ],
+    "completeForDeclaredScope": true
+  },
+  "reviewer": {
+    "stableProjectId": "fictional-conformance-reviewer",
+    "qualification": {
+      "category": "other",
+      "rationale": "Fictional protocol-test identity with no human qualification claim."
+    },
+    "independentFromAnnotationAuthors": "declaredFalse",
+    "independenceRationale": "This record is repository-authored conformance data, not an independent review."
+    ,
+    "priorExpectedLabelExposure": {
+      "status": "full",
+      "caseIds": [
+        "dashboard-browser-clean",
+        "support-inbox-ambiguous-control",
+        "support-inbox-clean",
+        "support-inbox-labelledby-hard-negative",
+        "support-inbox-unnamed-control"
+      ],
+      "rationale": "The fictional answers deliberately exercise comparison branches against public visible labels."
+    },
+    "conflictOfInterest": {
+      "status": "noneDeclared",
+      "rationale": "No real person or interest exists; this statement is only a conformance value."
+    },
+    "reviewedOn": "2026-09-07"
+  },
+  "declarations": {
+    "sourceFirstNotBlind": true,
+    "sightlintOutputUsedBeforeFinalization": false,
+    "existingOracleViewedBeforeFinalization": false,
+    "generatedCaptureOrReportUsedAsAnswer": false,
+    "implementationOutputUsedAsAnswer": false,
+    "containsProtectedOrPrivateData": false,
+    "containsCredentials": false,
+    "externalProcessingUsed": false,
+    "identityOrQualificationVerifiedBySightLint": false,
+    "signatureVerifiedBySightLint": false
+  },
+  "cases": [
+    {
+      "caseId": "dashboard-browser-clean",
+      "caseContext": {
+        "reviewedAs": "clean",
+        "rationale": "Fictional clean-state classification used only to exercise protocol conformance."
+      },
+      "acquisitionJudgments": [
+        {
+          "judgmentId": "a-atlas-clean-peer-untested",
+          "subject": {
+            "kind": "abstention",
+            "id": "semanticPeerMembership"
+          },
+          "aspect": "outcome",
+          "status": "untested",
+          "value": null,
+          "unitOrCoordinateSpace": null,
+          "confidence": "high",
+          "rationale": "The fictional reviewer leaves semantic peer inference untested."
+          ,
+          "nativeEvidence": {
+            "status": "unavailable",
+            "rationale": "The admitted capture protocol does not infer semantic peer membership."
+          },
+          "pixelEvidence": {
+            "status": "untested",
+            "rationale": "No screenshot output is admitted into a source-only answer."
+          },
+          "nativePixelRelationship": "untested",
+          "unavailableEvidence": [
+            "Reviewed semantic peer membership evidence"
+          ]
+        },
+        {
+          "judgmentId": "a-atlas-clean-unknown-node",
+          "subject": {
+            "kind": "node",
+            "id": "web-fictional-missing"
+          },
+          "aspect": "role",
+          "status": "observed",
+          "value": "group",
+          "unitOrCoordinateSpace": null,
+          "confidence": "low",
+          "rationale": "An intentionally unmatched fictional subject exercises unresolved comparison."
+          ,
+          "nativeEvidence": {
+            "status": "available",
+            "rationale": "Fictional conformance input asserts a value without product-evidence meaning."
+          },
+          "pixelEvidence": {
+            "status": "notApplicable",
+            "rationale": "Pixels do not establish this fictional native role assertion."
+          },
+          "nativePixelRelationship": "notCompared",
+          "unavailableEvidence": []
+        }
+      ],
+      "ruleJudgments": [
+        {
+          "judgmentId": "r-atlas-clean-unavailable-untested",
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "targetKind": "node",
+          "targetId": "web-not-reviewed",
+          "targetAspect": null,
+          "applicability": "untested",
+          "requiredEvidence": "untested",
+          "outcome": "untested",
+          "policyBasis": "No policy application is asserted for the fictional unreviewed target.",
+          "validAlternativeOrHardNegative": "No alternative is evaluated because the target remains untested.",
+          "falsePositiveRisk": "Forcing an untested target into failure would create unsupported output.",
+          "falseNegativeRisk": "An untested target provides no defect coverage.",
+          "confidence": "low",
+          "rationale": "This unmatched fictional entry proves untested remains distinct and unresolved."
+        }
+      ]
+    },
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "caseContext": {
+        "reviewedAs": "ambiguous",
+        "rationale": "The generic focusable control is used to exercise abstention without guessing."
+      },
+      "acquisitionJudgments": [
+        {
+          "judgmentId": "a-harbor-ambiguous-role-canttell",
+          "subject": {
+            "kind": "node",
+            "id": "web-reply-send"
+          },
+          "aspect": "accessibilityStatus",
+          "status": "cantTell",
+          "value": null,
+          "unitOrCoordinateSpace": null,
+          "confidence": "medium",
+          "rationale": "The fictional reviewer does not upgrade an unavailable platform role to a fact."
+          ,
+          "nativeEvidence": {
+            "status": "unavailable",
+            "rationale": "No supported platform role is available in the source-only record."
+          },
+          "pixelEvidence": {
+            "status": "notApplicable",
+            "rationale": "The arrow pixels cannot prove an accessibility role."
+          },
+          "nativePixelRelationship": "notCompared",
+          "unavailableEvidence": [
+            "Supported platform role and accessible name"
+          ]
+        }
+      ],
+      "ruleJudgments": [
+        {
+          "judgmentId": "r-harbor-ambiguous-name-canttell",
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null,
+          "applicability": "cantTell",
+          "requiredEvidence": "insufficient",
+          "outcome": "cantTell",
+          "policyBasis": "WCAG 2.2 success criterion 4.1.2 Name Role Value",
+          "validAlternativeOrHardNegative": "No valid alternative is asserted while role applicability is unavailable.",
+          "falsePositiveRisk": "Guessing a button role from source appearance would create a false failure.",
+          "falseNegativeRisk": "Abstention may leave a real unnamed control undetected.",
+          "confidence": "medium",
+          "rationale": "The fictional rule judgment preserves insufficient applicability evidence."
+        }
+      ]
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "caseContext": {
+        "reviewedAs": "clean",
+        "rationale": "Fictional clean-state input includes both agreement and deliberate disagreement branches."
+      },
+      "acquisitionJudgments": [
+        {
+          "judgmentId": "a-harbor-clean-role-disagreement",
+          "subject": {
+            "kind": "node",
+            "id": "web-reply-send"
+          },
+          "aspect": "role",
+          "status": "observed",
+          "value": "link",
+          "unitOrCoordinateSpace": null,
+          "confidence": "low",
+          "rationale": "The intentionally differing fictional value proves disagreement is preserved."
+          ,
+          "nativeEvidence": {
+            "status": "available",
+            "rationale": "Fictional conformance data supplies a deliberately disagreeing native value."
+          },
+          "pixelEvidence": {
+            "status": "notApplicable",
+            "rationale": "Pixels cannot establish a native accessibility role."
+          },
+          "nativePixelRelationship": "notCompared",
+          "unavailableEvidence": []
+        }
+      ],
+      "ruleJudgments": [
+        {
+          "judgmentId": "r-harbor-clean-hidden-inapplicable",
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "targetKind": "node",
+          "targetId": "web-hidden-template-action",
+          "targetAspect": null,
+          "applicability": "inapplicable",
+          "requiredEvidence": "sufficient",
+          "outcome": "inapplicable",
+          "policyBasis": "The named policy applies only to rendered supported controls.",
+          "validAlternativeOrHardNegative": "A hidden template action is outside the rule applicability boundary.",
+          "falsePositiveRisk": "Evaluating hidden templates would report inert implementation structure.",
+          "falseNegativeRisk": "Incorrect visibility evidence could exclude a rendered control.",
+          "confidence": "high",
+          "rationale": "The fictional judgment keeps inapplicability separate from a passing verdict."
+        },
+        {
+          "judgmentId": "r-harbor-clean-send-passed",
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null,
+          "applicability": "applicable",
+          "requiredEvidence": "sufficient",
+          "outcome": "passed",
+          "policyBasis": "WCAG 2.2 success criterion 4.1.2 Name Role Value",
+          "validAlternativeOrHardNegative": "The clean button has a programmatic name.",
+          "falsePositiveRisk": "A source label alone would be insufficient without native role and name evidence.",
+          "falseNegativeRisk": "This narrow rule does not evaluate complete accessible interaction quality.",
+          "confidence": "high",
+          "rationale": "The fictional value exercises a passing rule comparison."
+        }
+      ]
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "caseContext": {
+        "reviewedAs": "hardNegative",
+        "rationale": "The source uses a valid alternative programmatic-name mechanism with unchanged icon pixels."
+      },
+      "acquisitionJudgments": [
+        {
+          "judgmentId": "a-harbor-hardnegative-label-untested",
+          "subject": {
+            "kind": "abstention",
+            "id": "visualLabelPresence"
+          },
+          "aspect": "outcome",
+          "status": "untested",
+          "value": null,
+          "unitOrCoordinateSpace": null,
+          "confidence": "high",
+          "rationale": "Visible label presence is outside the source-only programmatic-name judgment."
+          ,
+          "nativeEvidence": {
+            "status": "notApplicable",
+            "rationale": "Native naming evidence does not establish visible text."
+          },
+          "pixelEvidence": {
+            "status": "untested",
+            "rationale": "No generated screenshot is included in the packet."
+          },
+          "nativePixelRelationship": "untested",
+          "unavailableEvidence": [
+            "Reviewed pixel-to-visible-label evidence"
+          ]
+        }
+      ],
+      "ruleJudgments": [
+        {
+          "judgmentId": "r-harbor-hardnegative-name-passed",
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null,
+          "applicability": "applicable",
+          "requiredEvidence": "sufficient",
+          "outcome": "passed",
+          "policyBasis": "WCAG 2.2 success criterion 4.1.2 Name Role Value",
+          "validAlternativeOrHardNegative": "A referenced text node can provide a valid name without an aria-label attribute.",
+          "falsePositiveRisk": "Requiring one specific naming attribute would reject a valid alternative.",
+          "falseNegativeRisk": "A matching source reference could still fail in an unsupported platform snapshot.",
+          "confidence": "high",
+          "rationale": "The fictional hard-negative judgment exercises a valid alternative without generalizing beyond it."
+        }
+      ]
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "caseContext": {
+        "reviewedAs": "targetedMutation",
+        "rationale": "The fictional mutation removes the only named reference while retaining native button semantics."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": [
+        {
+          "judgmentId": "r-harbor-unnamed-name-failed",
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null,
+          "applicability": "applicable",
+          "requiredEvidence": "sufficient",
+          "outcome": "failed",
+          "policyBasis": "WCAG 2.2 success criterion 4.1.2 Name Role Value",
+          "validAlternativeOrHardNegative": "No alternate programmatic name is present in this targeted fictional mutation."
+          ,
+          "falsePositiveRisk": "A capture failure could look like an absent name unless platform role evidence remains available."
+          ,
+          "falseNegativeRisk": "This rule does not evaluate other interaction or presentation defects."
+          ,
+          "confidence": "high",
+          "rationale": "The fictional rule value exercises a targeted failed outcome through the comparison contract."
+        }
+      ]
+    }
+  ],
+  "submissionLimitations": [
+    "Every identity, declaration, and judgment in this record is fictional conformance data.",
+    "The record was authored with full public-label exposure and cannot support issue 77.",
+    "No product output supplied these fictional answers and no expected output is changed by them.",
+    "This record is not independent review, protected holdout evidence, representative accuracy, or a product maturity claim."
+  ]
+}

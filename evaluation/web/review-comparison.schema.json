@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-review-comparison:1.0.0",
+  "title": "SightLint read-only Web review comparison",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "comparisonDigest",
+    "recordPurpose",
+    "evidenceStatus",
+    "packetBinding",
+    "submissionBinding",
+    "oracleBindings",
+    "counts",
+    "comparisons",
+    "adjudication",
+    "nonClaims"
+  ],
+  "properties": {
+    "$schema": { "const": "./review-comparison.schema.json" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "webReviewComparison" },
+    "comparisonDigest": { "$ref": "#/$defs/sha256" },
+    "recordPurpose": { "enum": ["humanReviewCandidate", "fictionalConformance"] },
+    "evidenceStatus": { "enum": ["requiresGovernanceReview", "ineligibleConformance"] },
+    "packetBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packetId", "packetDigest"],
+      "properties": {
+        "packetId": { "$ref": "#/$defs/id" },
+        "packetDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "submissionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submissionId", "submissionDigest"],
+      "properties": {
+        "submissionId": { "$ref": "#/$defs/id" },
+        "submissionDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "oracleBindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry", "documents"],
+      "properties": {
+        "registry": { "$ref": "#/$defs/fileBinding" },
+        "documents": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 16,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/fileBinding" },
+              {
+                "type": "object",
+                "required": ["authority"],
+                "properties": { "authority": { "enum": ["acquisition", "rule"] } }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acquisitionAgreement",
+        "ruleAgreement",
+        "disagreement",
+        "unresolved",
+        "adjudicated",
+        "abstentionAgreement"
+      ],
+      "properties": {
+        "acquisitionAgreement": { "$ref": "#/$defs/countCell" },
+        "ruleAgreement": { "$ref": "#/$defs/countCell" },
+        "disagreement": { "$ref": "#/$defs/countCell" },
+        "unresolved": { "$ref": "#/$defs/countCell" },
+        "adjudicated": { "$ref": "#/$defs/countCell" },
+        "abstentionAgreement": { "$ref": "#/$defs/countCell" }
+      }
+    },
+    "comparisons": {
+      "type": "array",
+      "maxItems": 512,
+      "items": { "$ref": "#/$defs/comparison" }
+    },
+    "adjudication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performedByTool", "adjudicatedCount", "rationale"],
+      "properties": {
+        "performedByTool": { "const": false },
+        "adjudicatedCount": { "const": 0 },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "nonClaims": { "$ref": "#/$defs/textList" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "recordPurpose": { "const": "fictionalConformance" } }, "required": ["recordPurpose"] },
+      "then": { "properties": { "evidenceStatus": { "const": "ineligibleConformance" } } },
+      "else": { "properties": { "evidenceStatus": { "const": "requiresGovernanceReview" } } }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?/)(?!.*\\\\)(?!.*:)[A-Za-z0-9._/-]+$"
+    },
+    "textList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "count": { "type": "integer", "minimum": 0, "maximum": 512 },
+    "countCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numerator", "denominator"],
+      "properties": {
+        "numerator": { "$ref": "#/$defs/count" },
+        "denominator": { "$ref": "#/$defs/count" }
+      }
+    },
+    "fileBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "authority": { "enum": ["acquisition", "rule"] }
+      }
+    },
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "rationale"],
+      "properties": {
+        "value": true,
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "document": { "$ref": "#/$defs/path" },
+        "source": { "$ref": "#/$defs/text" },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority",
+        "caseId",
+        "judgmentId",
+        "status",
+        "unresolved",
+        "reviewer",
+        "oracle",
+        "adjudication"
+      ],
+      "properties": {
+        "authority": { "enum": ["acquisition", "rule"] },
+        "caseId": { "$ref": "#/$defs/id" },
+        "judgmentId": { "$ref": "#/$defs/id" },
+        "status": { "enum": ["agreement", "disagreement", "unresolved"] },
+        "unresolved": { "type": "boolean" },
+        "reviewer": {
+          "allOf": [
+            { "$ref": "#/$defs/side" },
+            { "type": "object", "required": ["confidence"] }
+          ]
+        },
+        "oracle": {
+          "allOf": [
+            { "$ref": "#/$defs/side" },
+            { "type": "object", "required": ["document", "source"] }
+          ]
+        },
+        "adjudication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "rationale"],
+          "properties": {
+            "status": { "const": "notPerformed" },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        }
+      }
+    }
+  }
+}

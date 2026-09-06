@@ -118,7 +118,7 @@ perception protocol foundation without semantic promotion or model-accuracy clai
 0043–0046 add bounded PPTX, PDF, instrumented Android, and UIKit/XCUITest iOS slices under #29.
 They establish public regression paths, not representative medium accuracy.
 
-### Current evidence expansion — #71 / #72 / #75 / #74
+### Current evidence expansion — #71 / #72 / #75 / #78 / #77 / #74
 
 Issue #71 is the post-alpha evidence-first roadmap epic. Its first child, #72, adds ADR 0051 and an
 additive multi-family Web registry without changing the historical `0.1.0` declared-IR corpus.
@@ -140,6 +140,15 @@ suppression, and byte-stable diagnostics, but is tuning-visible and permanently 
 holdout evidence. Issue #74 remains the next gate because only a real external authority,
 independent evaluator, second verifier, protected freeze/exposure log, and actual execution can
 make admission operational or create evidence.
+
+Issue #78 and ADR 0053 add the intervening review-operation foundation for issue #77. A generated
+packet embeds only the public Atlas/Harbor fixture source and capture requests, a strict submission
+keeps acquisition and rule judgments separate, canonical finalization locks reviewer-authored
+bytes, and a separate read-only process compares only after that lock. Fictional conformance data
+exercises agreement, disagreement, unresolved, abstention, hard-negative, and all five outcome
+states but is explicitly ineligible evidence. The tools cannot supply human judgment or verify
+reviewer identity, qualification, independence, conflicts, or signatures. Issue #77 remains the
+next human gate; issue #74 remains separately gated on protected data and external authorities.
 
 ## Scope-selection rules
 
@@ -601,7 +610,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0053 or later.
+- New architecture decision numbers continue at 0054 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -635,6 +644,8 @@ Every public behavior must satisfy the applicable matrix:
 | #71 | post-alpha evidence-first product maturity epic |
 | #72 | second realistic Web fixture family and protected-holdout admission contract |
 | #75 | external holdout manifests, sanitized run attestation, and conformance verifier foundation |
+| #78 | deterministic source-only public Web review packet, finalized submission, and read-only comparison foundation |
+| #77 | real independent human review of the public Atlas and Harbor annotations; remains a human gate |
 | #74 | independent human review and externally operated protected holdout; remains externally gated |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
