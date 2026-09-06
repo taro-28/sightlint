@@ -107,6 +107,8 @@ A render conflict is evidence, not an automatic rule result.
 Repository evaluation renders are reviewed artifacts produced from the matching PPTX with a named
 LibreOffice build and conversion command. CI verifies their bytes and the adapter path; it does not
 regenerate them under an unpinned host renderer or treat adapter output as ground truth.
+All three renders are non-interlaced eight-bit RGB PNGs within the existing decoder subset and are
+included in ADR 0041's repository-wide format-demand inventory; this slice adds no codec scope.
 
 ## Resource and failure contract
 

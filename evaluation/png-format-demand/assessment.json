@@ -22,7 +22,43 @@
   },
   "committedAssets": {
     "sourceManifest": "evaluation/image-alpha/corpus.json",
+    "additionalSourceManifests": [
+      "evaluation/pptx/corpus.json"
+    ],
     "cases": [
+      {
+        "caseId": "atlas-pptx-asymmetric-hard-negative",
+        "path": "evaluation/pptx/renders/atlas-asymmetric-hard-negative.png",
+        "byteSha256": "912d5272519f03b5a704252288a8837aa0ef519b1e0fc02396f48cf27d379a1f",
+        "width": 960,
+        "height": 540,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-pptx-clean",
+        "path": "evaluation/pptx/renders/atlas-clean.png",
+        "byteSha256": "3b2d1379c416235dbd03d38e7bd0b6416c7276189524e97638aa7ad2c16332ed",
+        "width": 960,
+        "height": 540,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-pptx-off-slide-mutant",
+        "path": "evaluation/pptx/renders/atlas-off-slide-mutant.png",
+        "byteSha256": "3a9d9c5ce782cf5133f704beebb12dc4eb6193d37fd2713ebded97f4900309b4",
+        "width": 960,
+        "height": 540,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
       {
         "caseId": "northstar-compass",
         "path": "evaluation/image-alpha/assets/northstar-compass.png",

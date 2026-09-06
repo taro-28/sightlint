@@ -194,8 +194,9 @@ alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blo
 implemented.
 
 ADR 0041 resolves the optional broader-format decision without expanding the decoder. A versioned
-assessment inventories all five repository PNGs and verifies the nine pinned-browser product
-captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`, and animation cases remain
+assessment inventories five source-alpha assets plus three later PPTX renders and verifies the
+nine pinned-browser product captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`,
+and animation cases remain
 synthetic unavailable controls rather than product-demand evidence. No decoder dependency,
 automatic conversion, telemetry, protected holdout, prevalence claim, command/schema change, or
 broader accuracy claim is introduced. A caller-selected conversion proves facts about the
