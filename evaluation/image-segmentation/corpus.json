@@ -1,0 +1,177 @@
+{
+  "$schema": "./corpus.schema.json",
+  "schemaVersion": "0.1.0",
+  "corpus": {
+    "id": "sightlint-image-segmentation-benchmark",
+    "version": "0.1.0",
+    "scope": "Compare exact-color background hypotheses and bounded four-connected segmentation on one repository-owned Web UI family without producing a UX verdict.",
+    "limitations": [
+      "One fictional application family is not representative of real-world Web UI diversity.",
+      "Public maintainer-authored labels are development evidence, not an independent or private holdout.",
+      "Visible-surface rectangles do not establish semantic objects, peer groups, or rule applicability.",
+      "Exact encoded RGB samples are not color-managed display values and lossy inputs are not evaluated.",
+      "Linux Chromium is the browser evaluation environment; cross-platform screenshot byte identity is not claimed."
+    ]
+  },
+  "source": {
+    "id": "northstar-segmentation-fixture-v1",
+    "kind": "repositoryOwnedWebFixture",
+    "origin": "evaluation/image-segmentation/fixture-app",
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "redistribution": "Redistribution is permitted under MIT OR Apache-2.0.",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "fictionalData": true,
+    "sourceFiles": [
+      "evaluation/image-segmentation/fixture-app/app.js",
+      "evaluation/image-segmentation/fixture-app/index.html",
+      "evaluation/image-segmentation/fixture-app/styles.css"
+    ]
+  },
+  "dataGovernance": {
+    "oracleAuthor": "maintainerSourceReview",
+    "implementationOutputIsOracle": false,
+    "capturedArtifactsCommitted": false,
+    "prohibitedData": [
+      "private or customer artifacts",
+      "credentials, account identifiers, or personal data",
+      "implementation-generated expected reports",
+      "unlicensed external screenshots, fonts, photographs, or illustrations"
+    ],
+    "reviewStatus": "publicDevelopmentLabelsNotIndependentReview"
+  },
+  "splitPolicy": {
+    "smoke": "Required clean and targeted edge-contamination cases protect the contract and narrow coverage comparison.",
+    "development": "Public metamorphic cases may be inspected while implementing and tuning the benchmark algorithms.",
+    "challenge": "Public hard negatives and stress inputs expose unsafe hypotheses and bounded abstention; they are not secret holdout data.",
+    "holdout": {
+      "status": "notEstablished",
+      "reason": "All artifacts and labels are public and available during implementation.",
+      "requiredBeforeUse": [
+        "Freeze artifact identities and labels before tuning.",
+        "Restrict label access or use an independent evaluator.",
+        "Record every exposure and oracle correction.",
+        "Report split-specific sampling, precision, coverage, abstention, and reviewer agreement."
+      ]
+    }
+  },
+  "gates": {
+    "determinismRuns": 2,
+    "maximumBlockingFindings": 0,
+    "strictDefaultChanged": false,
+    "requiredPolicies": [
+      "qualified-corner-95-row-runs-v1",
+      "ranked-exact-border-flood-v1",
+      "strict-uniform-perimeter-flood-v1"
+    ]
+  },
+  "annotations": {
+    "guide": "evaluation/image-segmentation/annotation-guide.md",
+    "schema": "evaluation/image-segmentation/annotation.schema.json",
+    "acquisition": "evaluation/image-segmentation/annotations/acquisition.json",
+    "rules": "evaluation/image-segmentation/annotations/rules.json"
+  },
+  "cases": [
+    {
+      "id": "checkerboard-stress",
+      "split": "challenge",
+      "classification": "stress",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/checkerboard-stress.json",
+      "features": ["checkerboard", "component-stress", "run-stress", "uniform-perimeter"]
+    },
+    {
+      "id": "device-scale-canvas",
+      "split": "development",
+      "classification": "metamorphic",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/device-scale-canvas.json",
+      "features": ["device-scale", "rounded-surfaces", "uniform-perimeter"],
+      "relation": {
+        "baselineCaseId": "uniform-canvas",
+        "changedProperty": "Browser device scale factor changes from one to two while screenshot scale remains CSS.",
+        "preservedProperties": ["fixture state", "viewport CSS dimensions", "source-authored surface geometry"]
+      }
+    },
+    {
+      "id": "edge-noise",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/edge-noise.json",
+      "features": ["edge-content", "opaque", "rounded-surfaces"],
+      "relation": {
+        "baselineCaseId": "uniform-canvas",
+        "changedProperty": "One 20 by 1 pixel status indicator reaches the top edge.",
+        "preservedProperties": ["dashboard surfaces", "viewport", "all other pixels and source structure"]
+      }
+    },
+    {
+      "id": "gradient-edge-hard-negative",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/gradient-edge-hard-negative.json",
+      "features": ["antialias", "gradient", "illustration", "multiple-background-surfaces"],
+      "hardNegative": {
+        "category": "continuous-edge-color",
+        "rationale": "An arbitrary exact edge sample is not a global background for a gradient illustration."
+      }
+    },
+    {
+      "id": "modal-surface",
+      "split": "development",
+      "classification": "baseline",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/modal-surface.json",
+      "features": ["dimmed-backdrop", "modal", "rounded-surface", "uniform-perimeter"]
+    },
+    {
+      "id": "recolored-canvas",
+      "split": "development",
+      "classification": "metamorphic",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/recolored-canvas.json",
+      "features": ["exact-recolor", "rounded-surfaces", "uniform-perimeter"],
+      "relation": {
+        "baselineCaseId": "uniform-canvas",
+        "changedProperty": "Canvas and surface colors change without a geometry change.",
+        "preservedProperties": ["surface count", "source-authored bounds", "layout and text"]
+      }
+    },
+    {
+      "id": "split-pane-hard-negative",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/split-pane-hard-negative.json",
+      "features": ["edge-content", "multiple-background-surfaces", "split-pane"],
+      "hardNegative": {
+        "category": "multi-surface-canvas",
+        "rationale": "Neither full-height pane is a globally valid background and the larger pane must not win by frequency alone."
+      }
+    },
+    {
+      "id": "translated-canvas",
+      "split": "development",
+      "classification": "metamorphic",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/translated-canvas.json",
+      "features": ["rounded-surfaces", "translation", "uniform-perimeter"],
+      "relation": {
+        "baselineCaseId": "uniform-canvas",
+        "changedProperty": "Dashboard padding translates and narrows every surface.",
+        "preservedProperties": ["surface topology", "content", "canvas color"]
+      }
+    },
+    {
+      "id": "uniform-canvas",
+      "split": "smoke",
+      "classification": "baseline",
+      "sourceId": "northstar-segmentation-fixture-v1",
+      "request": "evaluation/image-segmentation/requests/uniform-canvas.json",
+      "features": ["opaque", "rounded-surfaces", "shadows", "uniform-perimeter"]
+    }
+  ]
+}

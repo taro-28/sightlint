@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:image-segmentation-corpus:0.1.0",
+  "title": "SightLint image segmentation benchmark corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "corpus", "source", "dataGovernance", "splitPolicy", "gates", "annotations", "cases"],
+  "properties": {
+    "$schema": { "const": "./corpus.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "scope", "limitations"],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" },
+        "version": { "const": "0.1.0" },
+        "scope": { "$ref": "#/$defs/text" },
+        "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "origin", "ownership", "license", "redistribution", "privacyReview", "externalAssets", "fictionalData", "sourceFiles"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "kind": { "const": "repositoryOwnedWebFixture" },
+        "origin": { "$ref": "#/$defs/path" },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "$ref": "#/$defs/text" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "externalAssets": { "const": false },
+        "fictionalData": { "const": true },
+        "sourceFiles": { "type": "array", "minItems": 3, "items": { "$ref": "#/$defs/path" }, "uniqueItems": true }
+      }
+    },
+    "dataGovernance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oracleAuthor", "implementationOutputIsOracle", "capturedArtifactsCommitted", "prohibitedData", "reviewStatus"],
+      "properties": {
+        "oracleAuthor": { "const": "maintainerSourceReview" },
+        "implementationOutputIsOracle": { "const": false },
+        "capturedArtifactsCommitted": { "const": false },
+        "prohibitedData": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "reviewStatus": { "const": "publicDevelopmentLabelsNotIndependentReview" }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge", "holdout"],
+      "properties": {
+        "smoke": { "$ref": "#/$defs/text" },
+        "development": { "$ref": "#/$defs/text" },
+        "challenge": { "$ref": "#/$defs/text" },
+        "holdout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason", "requiredBeforeUse"],
+          "properties": {
+            "status": { "const": "notEstablished" },
+            "reason": { "$ref": "#/$defs/text" },
+            "requiredBeforeUse": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["determinismRuns", "maximumBlockingFindings", "strictDefaultChanged", "requiredPolicies"],
+      "properties": {
+        "determinismRuns": { "type": "integer", "minimum": 2, "maximum": 10 },
+        "maximumBlockingFindings": { "const": 0 },
+        "strictDefaultChanged": { "const": false },
+        "requiredPolicies": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/policy" }
+        }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guide", "schema", "acquisition", "rules"],
+      "properties": {
+        "guide": { "$ref": "#/$defs/path" },
+        "schema": { "$ref": "#/$defs/path" },
+        "acquisition": { "$ref": "#/$defs/path" },
+        "rules": { "$ref": "#/$defs/path" }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+    "path": { "type": "string", "pattern": "^[A-Za-z0-9._/-]+$" },
+    "policy": {
+      "enum": [
+        "qualified-corner-95-row-runs-v1",
+        "ranked-exact-border-flood-v1",
+        "strict-uniform-perimeter-flood-v1"
+      ]
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "split", "classification", "sourceId", "request", "features"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "split": { "enum": ["smoke", "development", "challenge"] },
+        "classification": { "enum": ["baseline", "targetedMutation", "metamorphic", "hardNegative", "stress"] },
+        "sourceId": { "$ref": "#/$defs/token" },
+        "request": { "$ref": "#/$defs/path" },
+        "features": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/token" }, "uniqueItems": true },
+        "relation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["baselineCaseId", "changedProperty", "preservedProperties"],
+          "properties": {
+            "baselineCaseId": { "$ref": "#/$defs/token" },
+            "changedProperty": { "$ref": "#/$defs/text" },
+            "preservedProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+          }
+        },
+        "hardNegative": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["category", "rationale"],
+          "properties": {
+            "category": { "$ref": "#/$defs/token" },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        }
+      }
+    }
+  }
+}

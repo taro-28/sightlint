@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SightLint fixture — Northstar operations</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="scene dashboard-scene" data-testid="dashboard-scene">
+      <header class="surface masthead" data-testid="masthead">
+        <div>
+          <span class="eyebrow">Northstar operations</span>
+          <h1>Release readiness</h1>
+        </div>
+        <span class="status">All systems reviewed</span>
+      </header>
+      <section class="metric-grid" aria-label="Release metrics" data-testid="metric-grid">
+        <article class="surface metric" data-testid="metric-builds">
+          <span>Verified builds</span><strong>128</strong><small>Across three hosted systems</small>
+        </article>
+        <article class="surface metric" data-testid="metric-findings">
+          <span>Open findings</span><strong>4</strong><small>Two require human review</small>
+        </article>
+        <article class="surface metric" data-testid="metric-coverage">
+          <span>Measured coverage</span><strong>82%</strong><small>Abstentions remain visible</small>
+        </article>
+      </section>
+      <section class="surface activity" data-testid="activity-panel">
+        <div>
+          <span class="eyebrow">Latest evaluation</span>
+          <h2>Evidence checks</h2>
+        </div>
+        <div class="bars" aria-hidden="true">
+          <span style="--height: 42%"></span><span style="--height: 65%"></span>
+          <span style="--height: 54%"></span><span style="--height: 78%"></span>
+          <span style="--height: 70%"></span><span style="--height: 88%"></span>
+        </div>
+      </section>
+      <span class="edge-mark" data-testid="edge-mark" aria-label="Capture status"></span>
+    </main>
+
+    <main class="scene modal-scene" data-testid="modal-scene">
+      <section class="surface review-dialog" role="dialog" aria-label="Review release" data-testid="review-dialog">
+        <span class="eyebrow">Evidence required</span>
+        <h1>Review release candidate</h1>
+        <p>Confirm the source archive and retain every unresolved abstention.</p>
+        <div class="dialog-actions"><button>Cancel</button><button>Review evidence</button></div>
+      </section>
+    </main>
+
+    <main class="scene split-scene" data-testid="split-scene">
+      <section class="split-primary" data-testid="split-primary">
+        <span class="eyebrow">Workspace</span><h1>Evidence queue</h1>
+        <div class="split-tile">Source capture</div><div class="split-tile">Rule review</div>
+      </section>
+      <aside class="split-secondary" data-testid="split-secondary">
+        <span class="eyebrow">Inspector</span><h2>Selected run</h2>
+        <p>Native structure and rendered pixels disagree at one boundary.</p>
+      </aside>
+    </main>
+
+    <main class="scene gradient-scene" data-testid="gradient-scene">
+      <section class="gradient-card" data-testid="gradient-card">
+        <span class="eyebrow">Illustrated report</span><h1>Signal map</h1>
+        <div class="orbit" aria-hidden="true"><span></span></div>
+      </section>
+    </main>
+
+    <main class="scene checker-scene" data-testid="checker-scene">
+      <div class="checkerboard" data-testid="checkerboard" aria-label="Checkerboard stress artwork"></div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
