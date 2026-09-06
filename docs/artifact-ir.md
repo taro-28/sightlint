@@ -237,6 +237,20 @@ and render dimensions are both retained when their declared scale conflicts. No 
 `inkBox` is inferred for a source node, and shape-to-pixel identity remains `cantTell`. The shared
 canvas-containment rule may consume exact source `layoutBox` facts without learning PPTX concepts.
 
+## Current PDF use
+
+ADR 0044 also leaves core Artifact IR at `0.1.0`. Each supported explicit CropBox becomes a
+top-left `pdfPoint` canvas. A rectangular internal Link annotation with sufficient exact source
+evidence becomes a `control`/`link` node carrying only `hitBox`; source PDF coordinates, object
+references, page order, action class, coverage, tag-presence status, unsupported features, and
+render reconciliation stay in `org.sightlint.pdf@0.1.0`.
+
+An optional page PNG is a separate `devicePixel` canvas with exact-render evidence. Extent
+agreement or conflict is recorded without changing either coordinate space. `QuadPoints`, paths,
+rotation, unsupported actions, and uncertain page geometry do not create approximate core hit
+boxes. Rendered annotation identity and viewer behavior remain `cantTell`, while text, tags, paint,
+and reading order remain `untested`.
+
 ## Interaction extension
 
 Interaction data is optional for static artifacts and remains future work under issue #30. A
@@ -309,5 +323,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0044 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0045 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

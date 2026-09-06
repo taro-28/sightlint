@@ -62,7 +62,7 @@ background, alternatives, and disposition of historical experiments.
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0044** or later.
+continue at **0045** or later.
 
 ## Historical branch decisions 0025–0029
 

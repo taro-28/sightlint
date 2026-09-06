@@ -114,6 +114,10 @@ ADR 0043 also uses Python 3.9+ standard-library ZIP/XML parsing for the first bo
 It remains a separate local process: the Rust kernel receives only normalized medium-neutral facts
 and never depends on OOXML parsing code.
 
+ADR 0044 uses an exact hash-locked pypdf wheel in a second local Python process for a bounded PDF
+page/Link-annotation slice. The parser and object graph remain untrusted; only normalized exact
+source facts cross into the medium-neutral kernel.
+
 Early development prefers versioned process protocols to a shared in-process plugin ABI. Process
 isolation limits crashes, memory, dependency conflicts, runtime choice, and untrusted content.
 
@@ -148,6 +152,21 @@ agreement/conflict but does not manufacture node-to-pixel identity. Master/layou
 theme-resolved styles, strict OOXML, rotated/flipped geometry, other DrawingML objects, rendered
 ink, and text layout remain partial/unsupported/`cantTell`. The Python ZIP/XML implementation is
 an untrusted sensor and is not an operating-system sandbox.
+
+## Current PDF adapter boundary
+
+The `sightlint-pdf` process validates a strict digest-pinned local request, checks the exact pypdf
+version, rejects encryption, inventories cross-reference objects, and walks the raw page tree with
+cycle and page limits. Only explicit integral unrotated MediaBox/CropBox values and indirect
+rectangular internal Link annotations with zero flags and no `QuadPoints`/`Path` become exact
+source `pdfPoint` canvases and core `hitBox` nodes. Candidate IR passes public
+`sightlint normalize` before it is written.
+
+Optional repository-contained PNG page renders pass public `adapt-image` and remain separate
+`devicePixel` canvases. Extent agreement/conflict is retained, while annotation-to-pixel identity
+and viewer hit testing remain `cantTell`. Text, tag interpretation, paint/ink, reading order,
+forms, actions, attachments, and metadata are not mapped. The pypdf/Python process is an untrusted
+sensor with request budgets, not an operating-system sandbox.
 
 ## Current PNG adapter boundary
 

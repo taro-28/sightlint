@@ -11,13 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #27 started from this verified green `main` baseline:
+The branch for issue #54, a focused child of #29, started from this verified green `main` baseline:
 
-- commit: `c0c4b31d2e95d531b015138abc98807ccd3d854f`
-- tree: `4af7bd2145d1f56c811338331ef2eb7faf24499f`
-- merged PR: #50
-- main CI: run 34004833179, all six jobs successful
-- main CodeQL: run 34004833107, Rust and JavaScript/TypeScript successful
+- commit: `3b28c5c0f7c25d6d4eba34b217e63e8351e2c208`
+- tree: `64efb067cc640bd28af73f87b9c5b6b24198b72e`
+- merged PR: #53
+- main CI: run 34011301947, all six jobs successful
+- main CodeQL: run 34011301644, Rust and JavaScript/TypeScript successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -194,7 +194,7 @@ alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blo
 implemented.
 
 ADR 0041 resolves the optional broader-format decision without expanding the decoder. A versioned
-assessment inventories five source-alpha assets plus three later PPTX renders and verifies the
+assessment inventories five source-alpha assets plus three PPTX and three PDF renders and verifies the
 nine pinned-browser product captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`,
 and animation cases remain
 synthetic unavailable controls rather than product-demand evidence. No decoder dependency,
@@ -285,6 +285,31 @@ The process always reports partial source coverage. It does not map master/layou
 theme-resolved styles, full text, pictures/charts/tables/media, unsupported transforms, rendered
 ink/text layout, or shape-to-pixel identity. The three public synthetic cases have maintainer-only
 review and no protected holdout, so their perfect regression metrics are not real-world accuracy.
+
+### Bounded PDF source adapter
+
+ADR 0044 and `adapters/pdf/` add the second non-Web structured process adapter. Strict `0.1.0`
+request/response and `org.sightlint.pdf@0.1.0` extension surfaces bind repository-contained source
+and page-render paths, SHA-256 identity, geometry/type-only privacy, resource limits, parser/runtime
+provenance, and explicitly partial coverage. The only package is the universal
+`pypdf==6.17.0` wheel, locked by SHA-256 and license-reviewed as BSD-3-Clause; parsing remains
+outside the Rust kernel and is not an OS sandbox.
+
+The process iteratively walks the raw page tree with cycle detection so inherited page properties
+are not silently promoted. It maps only explicit integral unrotated MediaBox/CropBox geometry and
+indirect rectangular internal Link annotations with zero flags and no `QuadPoints`/`Path` to exact
+source `pdfPoint` canvases and `hitBox` nodes. It records tag-tree presence without interpreting
+it, does not follow destinations/actions, and serializes no document text, URI, metadata, content
+stream, or pixels. Optional PNG pages pass public `adapt-image` and remain separate device-pixel
+canvases with extent-only agreement/conflict and node identity `cantTell`.
+
+The three public repository-owned cases recover eight exact link rectangles, kill one source-only
+off-page mutation whose rendered bytes are unchanged, and retain one `QuadPoints` link as an
+abstention with no unexpected failure. Acquisition and rule truth are separate, implementation
+output is not an oracle, provenance/license/privacy/public split/no-holdout status are explicit,
+and perfect regression metrics do not establish representative PDF, accessibility, interaction,
+or document-quality accuracy. Text, paint, tags, viewer hit testing, broader annotation/actions,
+and PDF-specific rules remain unimplemented or untested.
 
 ### Realistic Web evaluation foundation
 
@@ -450,6 +475,24 @@ It exits 0 with canonical response bytes and explicitly partial Artifact IR, or 
 request/path/archive/XML/resource/Rust-validation failures. A subsequent public `sightlint check`
 owns rule outcomes and exit 1. The process is an untrusted adapter, not a Rust-kernel dependency.
 
+The bounded PDF adapter is also a separate local Python process and requires the exact locked
+parser first:
+
+```bash
+python3 -m pip install --require-hashes -r adapters/pdf/requirements.txt
+python3 adapters/pdf/sightlint_pdf.py \
+  --request evaluation/pdf/requests/atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-clean-pdf.ir.json
+target/debug/sightlint check /tmp/atlas-clean-pdf.ir.json --profile base --format json
+```
+
+It exits 0 with a canonical partial response and normalized IR, or 2 for dependency, request,
+path, digest, parser, encryption, resource, Rust-validation, or output errors. The subsequent
+trusted check owns exit 1. The adapter never follows PDF destinations/actions or performs external
+processing.
+
 For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
 `cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
 failures remain visible with exit 0. `inspect-image` never exits 1 for a heuristic; observations or
@@ -530,6 +573,23 @@ SightLint treats tests as part of the product specification.
 - source geometry coverage remains `partial`; master/layout/theme resolution, full text, ink,
   rendering fidelity, and shape-to-pixel identity are not claimed.
 
+### PDF source-adapter fixtures
+
+- ADR 0044 plus strict request, response, `org.sightlint.pdf@0.1.0`, dependency-lock, corpus,
+  acquisition-annotation, rule-annotation, and metric schemas;
+- three deterministic fictional PDF 1.7 report pages and three reviewed Poppler 26.05.0
+  612×792 RGB renders with exact source/render/request digests and dual-license/privacy provenance;
+- separate acquisition and rule truth for a clean page, one source-only off-page Link mutation,
+  and one asymmetric `QuadPoints` abstention hard negative across public smoke/development/
+  challenge splits with no protected holdout;
+- an exact hash-locked pypdf 6.17.0 wheel record, parser/geometry/page-tree unit tests, static drift
+  and governance checks, and no network/action following;
+- public-process E2E through `adapt-image`, `normalize`, and `check`, including repeated-byte,
+  digest, object-budget, dependency, malformed, encrypted, output-collision, mutation-kill,
+  false-positive, non-leakage, and abstention assertions;
+- page/link coverage remains `partial`; text, tags, paint/ink, reading order, actions, forms,
+  viewer behavior, and rendered annotation identity are not claimed.
+
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
 ### Required normal CI
@@ -562,7 +622,8 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - color management, compositing, or trusted contrast from PNG samples;
 - arbitrary-URL, iframe, shadow-DOM, full accessibility-tree, or interaction capture;
 - automatic semantic peer inference from Playwright output;
-- PDF/document, Android, or iOS adapters;
+- broad PDF/document parsing beyond explicit page boxes and rectangular internal Link annotations,
+  including text/tags/paint/actions/forms/viewer behavior, plus Android or iOS adapters;
 - broad PPTX coverage beyond direct unrotated shapes/groups, or a PPTX-specific recommended rule;
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
@@ -626,14 +687,14 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#28 (complete for protocol v0):** isolated local perception process, typed OCR/CV/VLM
   observation families, bounded deterministic reference wrapper, non-promotion boundary, and
   three-state differential regression. Real model calibration/accuracy remains `untested`.
-- **#29 (PPTX slice implemented):** ADR 0043 provides the first bounded PPTX source-geometry
-  adapter and regression corpus; PDF/document is the next candidate, with Android/iOS later.
+- **#29 (PPTX and PDF slices implemented):** ADRs 0043–0044 provide bounded local source-geometry
+  adapters and separate regression corpora; Android is the next candidate, with iOS later.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The remaining work inside #29 starts with a focused PDF/document evidence and adapter decision.
-Later issues remain demand- and evidence-gated; the completed alpha, benchmark, and bounded PPTX
-slice do not make stale branches authoritative.
+The remaining work inside #29 starts with a focused Android native-semantics/screenshot evidence
+and adapter decision. Later issues remain demand- and evidence-gated; the completed alpha,
+benchmark, and bounded PPTX/PDF slices do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -721,6 +782,10 @@ python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py
 python3 -m unittest adapters/pptx/tests/test_adapter.py
+python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+python3 tools/generate_pdf_fixtures.py --check
+python3 tools/check_pdf_evaluation.py
+python3 -m unittest adapters/pdf/tests/test_adapter.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
@@ -744,6 +809,7 @@ cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- 
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

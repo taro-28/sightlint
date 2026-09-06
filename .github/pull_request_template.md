@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0042 or later. -->
+0045 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -67,6 +67,10 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/generate_pptx_fixtures.py --check`
 - [ ] `python3 tools/check_pptx_evaluation.py`
 - [ ] `python3 -m unittest adapters/pptx/tests/test_adapter.py`
+- [ ] `python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt`
+- [ ] `python3 tools/generate_pdf_fixtures.py --check`
+- [ ] `python3 tools/check_pdf_evaluation.py`
+- [ ] `python3 -m unittest adapters/pdf/tests/test_adapter.py`
 - [ ] `python3 tools/release.py validate-tag --tag v0.1.0-alpha.2`
 - [ ] `python3 tools/check_dependency_licenses.py`
 - [ ] `python3 -m unittest tools/test_release.py`
@@ -90,6 +94,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `cargo test --locked -p sightlint-cli --test evaluation_corpus`
 - [ ] `cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture`
+- [ ] `cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture`
 - [ ] `RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps`
 - [ ] `cargo +1.85.0 check --workspace --all-targets --all-features --locked`
 - [ ] any new generator/process-adapter/public-E2E command is also in CI, `AGENTS.md`, and handoff

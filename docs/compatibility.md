@@ -32,7 +32,7 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 
 The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation, exact PNG
 source-alpha geometry, the PNG format-demand decision, the local perception protocol foundation,
-and the first bounded PPTX source-adapter slice. They are not part of the published alpha.2
+and the first bounded PPTX and PDF source-adapter slices. They are not part of the published alpha.2
 archive and therefore do not retroactively change that release.
 
 | Surface | Version or contract | Compatibility rule |
@@ -54,6 +54,11 @@ archive and therefore do not retroactively change that release.
 | PPTX adapter implementation | `0.1.0` | Unreleased Python 3.9+ source-tree process using transitional OOXML; runtime version is provenance, not a protocol version. |
 | PPTX evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth and no protected holdout; implementation output cannot rewrite an oracle. |
 | PPTX metric contract | `0.1.0` | Defines public-corpus coverage/precision/abstention/false-positive/mutation metrics without storing observed implementation output as truth. |
+| PDF request/response protocol | `0.1.0` | Strict local digest-pinned source/render fields, resource bounds, and explicitly partial coverage; incompatible fields or semantics require a new version. |
+| PDF extension | `org.sightlint.pdf@0.1.0` | Page/object identity, original PDF rectangles, exact geometry status, action class, tag-presence status, unsupported features, and extent reconciliation remain outside core IR. |
+| PDF adapter implementation | `0.1.0` | Unreleased Python 3.9+ source-tree process requiring exactly pypdf 6.17.0; parser/runtime identity is provenance, not a protocol version. |
+| PDF evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth and no protected holdout; implementation output cannot rewrite an oracle. |
+| PDF metric contract | `0.1.0` | Defines separate public-corpus coverage/precision/abstention/false-positive/mutation expectations without storing observed implementation output as truth. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.
@@ -75,9 +80,10 @@ from package version alone. Ordering and repeated output are byte-stable only wi
 normalized inputs and compatibility environment documented by the applicable adapter/report.
 
 `sightlint-web`, `sightlint-web-check`, and `sightlint-perception` require Node `>=20 <25`.
-`sightlint-pptx` requires Python 3.9+ and reports the exact runtime patch version; repeated canonical
-bytes are guaranteed for the same declared input and compatibility environment, not across
-different Python/runtime versions. The evaluated browser path uses
+`sightlint-pptx` requires Python 3.9+. `sightlint-pdf` requires Python 3.9+ and exactly pypdf
+6.17.0. Both report the exact runtime patch version; repeated canonical bytes are guaranteed for
+the same declared input and compatibility environment, not across different Python/runtime
+versions. The evaluated browser path uses
 the lockfile's Playwright/Chromium build on Linux. The private Node package can build on the hosted
 macOS arm64 and Windows x64 runners, but cross-platform screenshot byte identity and browser E2E
 support are not claimed.

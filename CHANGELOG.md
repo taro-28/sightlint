@@ -5,6 +5,15 @@ independent compatibility surfaces changed by the release.
 
 ## Unreleased
 
+- Accepted ADR 0044 and added bounded PDF request/response and `org.sightlint.pdf` extension
+  `0.1.0` surfaces backed by exactly hash-locked `pypdf==6.17.0` in an untrusted local process.
+- Added deterministic repository-owned PDF pages and reviewed page renders with separate
+  acquisition/rule annotations, one source-only off-page Link mutation, one `QuadPoints` hard
+  negative, explicit provenance/license/privacy/non-holdout records, and public-process E2E
+  through `adapt-image`, `normalize`, and `check` on the supported CI systems.
+- Kept PDF coverage explicitly partial: text, tags, paint/ink, reading order, actions, forms,
+  viewer hit testing, rendered annotation identity, protected holdout evidence, and general
+  PDF/document-quality accuracy remain unimplemented or untested.
 - Accepted ADR 0043 and added a bounded local PPTX process protocol/extension `0.1.0` that maps
   directly declared unrotated slide shapes/groups and exact source EMU layout geometry while
   preserving separate digest-pinned PNG extent evidence and rendered-node `cantTell`.

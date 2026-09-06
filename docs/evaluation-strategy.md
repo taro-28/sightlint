@@ -63,6 +63,13 @@ extent reconciliation. A different rule annotation then evaluates only
 and shape-to-pixel identity remains `cantTell`. Its in-memory CI metrics are public-regression
 measurements, not a protected-holdout or real-world presentation-accuracy estimate.
 
+ADR 0044 applies the same separation to PDF. Its acquisition oracle specifies explicit page boxes,
+indirect Link annotation references, source-to-top-left hit-box transforms, action/type facts,
+render extent, and a required `QuadPoints` abstention. A different rule oracle covers only the
+exact rectangular hit boxes consumed by `visual.bounds.within-canvas`. The source-only off-page
+mutation leaves rendered pixels unchanged, so source and render disagreement is preserved rather
+than using one as truth for the other.
+
 ### 3. Rule/product evaluation
 
 **Question:** Given sufficient observations, applicability, and policy, did SightLint return the
@@ -155,6 +162,22 @@ disappear without a new failure. It also preserves one ambiguous control and one
 overlay as `cantTell`. Repeated JSON and human bytes are checked within the declared environment.
 This is a deterministic product-path regression, not representative agent user-outcome evidence:
 the task, locator, edit, and labels are public and visible to the implementation.
+
+### PDF source-adapter evaluation
+
+`evaluation/pdf/` implements ADR 0044 with three deterministic repository-owned report pages and
+separate acquisition/rule annotations. The clean case has three rectangular internal links, the
+targeted mutation moves only one source annotation rectangle beyond the CropBox while keeping the
+render bytes identical, and the asymmetric hard negative gives one link disjoint `QuadPoints`
+that must not become an exact core hit box.
+
+The public process and built binary recover eight reviewed exact hit boxes, retain the one required
+non-rectangular abstention, kill the one declared mutation, and emit no clean/hard-negative
+failure. Source and render digests, Poppler render provenance, fictional ownership, dual license,
+privacy, public smoke/development/challenge exposure, and missing holdout are explicit. These are
+three maintainer-authored regression cases, not representative PDF, accessibility, interaction,
+or document-quality accuracy. Text, tags, paint, viewer hit testing, and node-to-pixel identity
+remain `untested` or `cantTell`.
 
 ### PNG raster acquisition corpus
 

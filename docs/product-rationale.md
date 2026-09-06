@@ -376,6 +376,10 @@ perception protocol foundation while leaving real OCR/model accuracy and calibra
 ADR 0043 selects a bounded PPTX source-geometry process as the first post-Web structured medium;
 it deliberately leaves rendered node identity, master/layout/theme resolution, and representative
 slide-quality evaluation unresolved.
+ADR 0044 adds the next bounded PDF slice, mapping only explicit page and rectangular internal-Link
+activation geometry while preserving rendered extent separately and abstaining on `QuadPoints`.
+It deliberately leaves text, tags, paint, viewer behavior, and representative document-quality
+evaluation unresolved.
 Issue #22 remains the evaluation basis before promoting broad heuristics.
 
 ## Interaction quality
@@ -473,8 +477,8 @@ The following remain intentionally unresolved or evidence-gated:
 - rule-maturity thresholds for blocking eligibility;
 - severity model;
 - arbitrary-project and cross-platform browser product compatibility beyond the bounded policy;
-- representative PPTX expansion and the next non-Web medium after the bounded ADR 0043
-  source-geometry slice;
+- representative PPTX/PDF expansion and Android as the next native structured medium after the
+  bounded ADR 0043–0044 source-geometry slices;
 - perception models/runtimes and calibration requirements;
 - exact formats and decoder strategy if new product evidence re-admits unsupported PNG coverage;
 - interaction trace schema;

@@ -400,6 +400,10 @@ python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py
 python3 -m unittest adapters/pptx/tests/test_adapter.py
+python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+python3 tools/generate_pdf_fixtures.py --check
+python3 tools/check_pdf_evaluation.py
+python3 -m unittest adapters/pdf/tests/test_adapter.py
 npm --prefix adapters/perception ci --ignore-scripts
 npm --prefix adapters/perception run check
 npm --prefix adapters/playwright ci --ignore-scripts
@@ -420,6 +424,7 @@ cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- 
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

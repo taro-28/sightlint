@@ -196,6 +196,18 @@ def main() -> None:
         == {"smoke", "development", "challenge"},
         "smoke/development/challenge split is incomplete",
     )
+    require(
+        {
+            case_id: case.get("split")
+            for case_id, case in cases.items()
+        }
+        == {
+            "pdf-atlas-clean": "smoke",
+            "pdf-atlas-off-page-mutant": "development",
+            "pdf-atlas-quadpoints-hard-negative": "challenge",
+        },
+        "case split roles differ from the reviewed contract",
+    )
 
     exact_nodes = 0
     rule_targets = 0
