@@ -202,7 +202,7 @@ def main() -> None:
     verify_unsupported_controls(assessment)
     verify_decision(assessment)
     print(
-        "PNG format demand: 14/14 committed assets and 9 browser cases use the supported subset; "
+        "PNG format demand: 17/17 committed assets and 9 browser cases use the supported subset; "
         "5 unsupported controls remain conformance-only; broader decoding stays untested"
     )
 

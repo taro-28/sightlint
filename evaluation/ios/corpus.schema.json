@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:ios-corpus:0.1.0",
+  "title": "SightLint iOS evaluation corpus 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["corpusVersion", "fixtureSourceSha256", "source", "splitPolicy", "holdout", "cases"],
+  "properties": {
+    "corpusVersion": { "const": "0.1.0" },
+    "fixtureSourceSha256": { "$ref": "#/$defs/digest" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "ownership", "application", "license", "privacy", "redistribution", "review", "capturePipeline", "xcodeVersion", "xcodeBuild", "runtimeVersion", "runtimeBuild", "deviceType", "modelIdentifier"],
+      "properties": {
+        "origin": { "const": "repositoryOwnedFixtureApplication" },
+        "ownership": { "const": "SightLint project" },
+        "application": { "const": "fixtures/ios/atlas-app" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "privacy": { "const": "fictionalNoPersonalOrCustomerData" },
+        "redistribution": { "const": "permitted" },
+        "review": { "const": "maintainerAuthoredAndVisuallyReviewedNotIndependent" },
+        "capturePipeline": { "const": "instrumented-uikit-then-screenshot-then-xcui" },
+        "xcodeVersion": { "const": "26.3" },
+        "xcodeBuild": { "const": "17C529" },
+        "runtimeVersion": { "const": "26.3.1" },
+        "runtimeBuild": { "const": "23D8133" },
+        "deviceType": { "const": "iPhone 17 Pro" },
+        "modelIdentifier": { "const": "iPhone18,1" }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge"],
+      "properties": {
+        "smoke": { "$ref": "#/$defs/nonEmptyString" },
+        "development": { "$ref": "#/$defs/nonEmptyString" },
+        "challenge": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": { "const": "notEstablished" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "split", "relation", "capture", "screenshot", "request", "acquisitionAnnotationId", "ruleAnnotationId"],
+        "properties": {
+          "id": { "$ref": "#/$defs/token" },
+          "split": { "enum": ["smoke", "development", "challenge"] },
+          "relation": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["kind"],
+                "properties": { "kind": { "const": "baseline" } }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["kind", "baselineId", "changedProperty"],
+                "properties": {
+                  "kind": { "enum": ["targetedMutation", "hardNegative"] },
+                  "baselineId": { "$ref": "#/$defs/token" },
+                  "changedProperty": { "$ref": "#/$defs/nonEmptyString" }
+                }
+              }
+            ]
+          },
+          "capture": { "$ref": "#/$defs/artifact" },
+          "screenshot": { "$ref": "#/$defs/artifact" },
+          "request": { "$ref": "#/$defs/artifact" },
+          "acquisitionAnnotationId": { "$ref": "#/$defs/token" },
+          "ruleAnnotationId": { "$ref": "#/$defs/token" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}

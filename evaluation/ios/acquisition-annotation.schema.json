@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:ios-acquisition-annotations:0.1.0",
+  "title": "SightLint iOS acquisition annotations 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "kind", "provenance", "annotations"],
+  "properties": {
+    "annotationVersion": { "const": "0.1.0" },
+    "kind": { "const": "acquisitionGroundTruth" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringMethod", "captureIsAdapterOutput", "guideVersion", "implementationOutputUsed", "reviewer"],
+      "properties": {
+        "authoringMethod": { "const": "fixtureSourcePlatformCaptureAndHumanVisualReview" },
+        "captureIsAdapterOutput": { "const": false },
+        "guideVersion": { "const": "0.1.0" },
+        "implementationOutputUsed": { "const": false },
+        "reviewer": { "const": "maintainerOnly" }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/annotation" }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number", "minimum": -1048576, "maximum": 1048576 },
+        "y": { "type": "number", "minimum": -1048576, "maximum": 1048576 },
+        "width": { "type": "number", "minimum": 0, "maximum": 1048576 },
+        "height": { "type": "number", "minimum": 0, "maximum": 1048576 }
+      }
+    },
+    "nullableRect": { "anyOf": [{ "$ref": "#/$defs/rect" }, { "type": "null" }] },
+    "stringFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["utf8ByteLength", "sha256"],
+      "properties": {
+        "utf8ByteLength": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "className", "mappingStatus", "coreKind", "layoutBoundsPoints", "windowVisible", "xcuiFrameStatus", "xcuiFramePoints", "xcuiHittable", "xcuiReconciliation"],
+      "properties": {
+        "identifier": { "$ref": "#/$defs/nonEmptyString" },
+        "className": { "$ref": "#/$defs/nonEmptyString" },
+        "mappingStatus": { "enum": ["mappedExactLayout", "notMappedHidden", "notMappedTransparent", "notMappedDetached", "notMappedNotWindowVisible", "notMappedClippedScrollContent", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
+        "coreKind": { "enum": ["container", "control", "text", "other", null] },
+        "layoutBoundsPoints": { "$ref": "#/$defs/rect" },
+        "windowVisible": { "type": "boolean" },
+        "xcuiFrameStatus": { "enum": ["exact", "unavailable"] },
+        "xcuiFramePoints": { "$ref": "#/$defs/nullableRect" },
+        "xcuiHittable": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
+        "xcuiReconciliation": { "enum": ["frameAgreement", "frameConflict", "xcuiUnavailable"] },
+        "label": { "$ref": "#/$defs/stringFact" },
+        "value": { "$ref": "#/$defs/stringFact" }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "caseId", "display", "safeAreaInsetsPoints", "counts", "screenshot", "abstentions", "nodes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "caseId": { "$ref": "#/$defs/token" },
+        "display": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["widthPoints", "heightPoints", "scale", "widthPixels", "heightPixels", "orientation"],
+          "properties": {
+            "widthPoints": { "type": "number", "exclusiveMinimum": 0 },
+            "heightPoints": { "type": "number", "exclusiveMinimum": 0 },
+            "scale": { "type": "number", "exclusiveMinimum": 0 },
+            "widthPixels": { "type": "integer", "minimum": 1 },
+            "heightPixels": { "type": "integer", "minimum": 1 },
+            "orientation": { "enum": ["portrait", "landscapeLeft", "landscapeRight", "portraitUpsideDown"] }
+          }
+        },
+        "safeAreaInsetsPoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["left", "top", "right", "bottom"],
+          "properties": {
+            "left": { "type": "number", "minimum": 0 },
+            "top": { "type": "number", "minimum": 0 },
+            "right": { "type": "number", "minimum": 0 },
+            "bottom": { "type": "number", "minimum": 0 }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceNodes", "xcuiNodes", "mappedCoreNodes", "unidentifiedSourceNodes", "unmatchedXcuiQueries"],
+          "properties": {
+            "sourceNodes": { "type": "integer", "minimum": 1 },
+            "xcuiNodes": { "type": "integer", "minimum": 1 },
+            "mappedCoreNodes": { "type": "integer", "minimum": 0 },
+            "unidentifiedSourceNodes": { "type": "integer", "minimum": 0 },
+            "unmatchedXcuiQueries": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "screenshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["widthPixels", "heightPixels", "extentReconciliation", "nodeIdentity"],
+          "properties": {
+            "widthPixels": { "type": "integer", "minimum": 1 },
+            "heightPixels": { "type": "integer", "minimum": 1 },
+            "extentReconciliation": { "const": "extentAndScaleAgree" },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        },
+        "abstentions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/node" }
+        }
+      }
+    }
+  }
+}

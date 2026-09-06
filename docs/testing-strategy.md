@@ -233,6 +233,12 @@ extent agreement but does not invent native-to-pixel identity. The offscreen-scr
 must retain invalid raw platform bounds while producing no core box or rule verdict for those
 nodes.
 
+The ADR 0046 iOS suite independently retains UIKit source allocation, XCUITest platform
+semantics, and screenshot evidence from one named fixture state. It requires point/pixel
+extent-and-scale agreement but does not invent native-to-pixel identity or activation geometry.
+Its hard negative keeps fully offscreen children and the direct clipped scroll-content container
+out of core geometry and rule verdicts.
+
 ## Layer 8 — Public-binary and process E2E
 
 End-to-end tests invoke the actual built `sightlint` binary and any real adapter process.
@@ -415,6 +421,9 @@ python3 -m unittest adapters/pdf/tests/test_adapter.py
 python3 tools/generate_android_fixtures.py --check
 python3 tools/check_android_evaluation.py
 python3 -m py_compile adapters/android/sightlint_android.py
+python3 tools/generate_ios_fixtures.py --check
+python3 tools/check_ios_evaluation.py
+python3 -m py_compile adapters/ios/sightlint_ios.py
 npm --prefix adapters/perception ci --ignore-scripts
 npm --prefix adapters/perception run check
 npm --prefix adapters/playwright ci --ignore-scripts
@@ -437,6 +446,7 @@ cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test ios_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

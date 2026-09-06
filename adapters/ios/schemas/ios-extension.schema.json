@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:ir-extension:org.sightlint.ios:0.1.0",
+  "title": "SightLint iOS IR extension 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["extensionVersion", "capture", "screen", "sourceNodes", "xcuiNodes", "coverage", "unsupported", "privacy"],
+  "properties": {
+    "extensionVersion": { "const": "0.1.0" },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scenario", "sha256", "fixtureSourceSha256", "application", "runner", "build", "device", "sequence", "atomic", "animationsDisabled", "testCommand", "limitations", "sourceRootIdentifier", "xcuiQueryRoot"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "scenario": { "enum": ["clean", "off-canvas-control-mutant", "scroll-offscreen-hard-negative"] },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "fixtureSourceSha256": { "$ref": "#/$defs/digest" },
+        "application": { "$ref": "#/$defs/application" },
+        "runner": { "$ref": "#/$defs/runner" },
+        "build": { "$ref": "#/$defs/build" },
+        "device": { "$ref": "#/$defs/device" },
+        "sequence": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "waitForQuiescence" },
+            { "const": "sourceHierarchy" },
+            { "const": "screenshot" },
+            { "const": "xcuiHierarchy" }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "atomic": { "const": false },
+        "animationsDisabled": { "const": true },
+        "testCommand": { "$ref": "#/$defs/nonEmptyString" },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "sourceRootIdentifier": { "$ref": "#/$defs/identifier" },
+        "xcuiQueryRoot": { "const": "XCUIApplication" }
+      }
+    },
+    "screen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointCoordinateSpaceId", "display", "safeAreaInsetsPoints", "displayEvidenceId", "screenshot"],
+      "properties": {
+        "pointCoordinateSpaceId": { "const": "ios:screen:points" },
+        "display": { "$ref": "#/$defs/display" },
+        "safeAreaInsetsPoints": { "$ref": "#/$defs/insets" },
+        "displayEvidenceId": { "$ref": "#/$defs/nonEmptyString" },
+        "screenshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reference", "sha256", "widthPixels", "heightPixels", "canvasId", "evidenceId", "extentReconciliation", "nodeIdentity"],
+          "properties": {
+            "reference": { "type": "string", "minLength": 1, "maxLength": 1024 },
+            "sha256": { "$ref": "#/$defs/digest" },
+            "widthPixels": { "const": 1206 },
+            "heightPixels": { "const": 2622 },
+            "canvasId": { "const": "ios:screen:pixels" },
+            "evidenceId": { "$ref": "#/$defs/nonEmptyString" },
+            "extentReconciliation": { "const": "extentAndScaleAgree" },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        }
+      }
+    },
+    "sourceNodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "identifier", "parentIdentifier", "depth", "className", "mappingStatus", "layoutBoundsPoints", "identityTransform", "windowIntersectionPoints", "safeAreaIntersectionPoints", "state", "label", "value", "evidenceId", "xcuiReconciliation"],
+        "properties": {
+          "id": { "$ref": "#/$defs/nonEmptyString" },
+          "identifier": { "$ref": "#/$defs/identifier" },
+          "parentIdentifier": { "$ref": "#/$defs/nullableIdentifier" },
+          "depth": { "type": "integer", "minimum": 0, "maximum": 64 },
+          "className": { "$ref": "#/$defs/nonEmptyString" },
+          "mappingStatus": { "enum": ["mappedExactLayout", "notMappedHidden", "notMappedTransparent", "notMappedDetached", "notMappedNotWindowVisible", "notMappedClippedScrollContent", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
+          "layoutBoundsPoints": { "$ref": "#/$defs/rect" },
+          "identityTransform": { "type": "boolean" },
+          "windowIntersectionPoints": { "$ref": "#/$defs/nullableRect" },
+          "safeAreaIntersectionPoints": { "$ref": "#/$defs/nullableRect" },
+          "state": { "$ref": "#/$defs/sourceState" },
+          "label": { "$ref": "#/$defs/nullableStringFact" },
+          "value": { "$ref": "#/$defs/nullableStringFact" },
+          "evidenceId": { "$ref": "#/$defs/nonEmptyString" },
+          "xcuiReconciliation": { "enum": ["frameAgreement", "frameConflict", "xcuiUnavailable"] }
+        }
+      }
+    },
+    "xcuiNodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/xcuiNode" },
+          {
+            "type": "object",
+            "required": ["evidenceId"],
+            "properties": { "evidenceId": { "$ref": "#/$defs/nonEmptyString" } }
+          }
+        ]
+      }
+    },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "unsupported": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unidentifiedSourceNodeCount", "unmatchedXcuiQueryCount", "features"],
+      "properties": {
+        "unidentifiedSourceNodeCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "unmatchedXcuiQueryCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "features": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "contentPolicy", "transmittedFields"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "contentPolicy": { "const": "digestsAndGeometry" },
+        "transmittedFields": { "type": "array", "maxItems": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "identifier": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,127}$" },
+    "nullableIdentifier": { "anyOf": [{ "$ref": "#/$defs/identifier" }, { "type": "null" }] },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number", "minimum": -1048576, "maximum": 1048576 },
+        "y": { "type": "number", "minimum": -1048576, "maximum": 1048576 },
+        "width": { "type": "number", "minimum": 0, "maximum": 1048576 },
+        "height": { "type": "number", "minimum": 0, "maximum": 1048576 }
+      }
+    },
+    "nullableRect": { "anyOf": [{ "$ref": "#/$defs/rect" }, { "type": "null" }] },
+    "insets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom"],
+      "properties": {
+        "left": { "const": 0 },
+        "top": { "const": 62 },
+        "right": { "const": 0 },
+        "bottom": { "const": 34 }
+      }
+    },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundleIdentifier", "version", "buildNumber", "testBundleIdentifier"],
+      "properties": {
+        "bundleIdentifier": { "const": "org.sightlint.fixtures.atlas.ios" },
+        "version": { "const": "0.1.0" },
+        "buildNumber": { "const": "1" },
+        "testBundleIdentifier": { "const": "org.sightlint.fixtures.atlas.ios.capture-tests" }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "captureApi"],
+      "properties": {
+        "name": { "const": "sightlint-atlas-ios-capture" },
+        "version": { "const": "0.1.0" },
+        "captureApi": { "const": "instrumented-uikit-and-xcui" }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["xcodeVersion", "xcodeBuild", "swiftVersion", "sdkVersion", "deploymentTarget"],
+      "properties": {
+        "xcodeVersion": { "const": "26.3" },
+        "xcodeBuild": { "const": "17C529" },
+        "swiftVersion": { "const": "6.2.4" },
+        "sdkVersion": { "const": "26.2" },
+        "deploymentTarget": { "const": "26.0" }
+      }
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["widthPoints", "heightPoints", "scale", "widthPixels", "heightPixels", "orientation"],
+      "properties": {
+        "widthPoints": { "const": 402 },
+        "heightPoints": { "const": 874 },
+        "scale": { "const": 3 },
+        "widthPixels": { "const": 1206 },
+        "heightPixels": { "const": 2622 },
+        "orientation": { "const": "portrait" }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locale", "layoutDirection", "contentSizeCategory", "interfaceStyle", "reduceMotion"],
+      "properties": {
+        "locale": { "const": "en-US" },
+        "layoutDirection": { "const": "ltr" },
+        "contentSizeCategory": { "const": "large" },
+        "interfaceStyle": { "const": "light" },
+        "reduceMotion": { "const": false }
+      }
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtimeVersion", "runtimeBuild", "deviceType", "modelIdentifier", "architecture", "display", "configuration", "safeAreaInsetsPoints"],
+      "properties": {
+        "runtimeVersion": { "const": "26.3.1" },
+        "runtimeBuild": { "const": "23D8133" },
+        "deviceType": { "const": "iPhone 17 Pro" },
+        "modelIdentifier": { "const": "iPhone18,1" },
+        "architecture": { "const": "arm64" },
+        "display": { "$ref": "#/$defs/display" },
+        "configuration": { "$ref": "#/$defs/configuration" },
+        "safeAreaInsetsPoints": { "$ref": "#/$defs/insets" }
+      }
+    },
+    "sourceState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hidden", "alpha", "userInteractionEnabled", "enabled", "selected", "windowAttached"],
+      "properties": {
+        "hidden": { "type": "boolean" },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+        "userInteractionEnabled": { "type": "boolean" },
+        "enabled": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
+        "selected": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
+        "windowAttached": { "type": "boolean" }
+      }
+    },
+    "stringFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["utf8ByteLength", "sha256"],
+      "properties": {
+        "utf8ByteLength": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "nullableStringFact": { "anyOf": [{ "$ref": "#/$defs/stringFact" }, { "type": "null" }] },
+    "xcuiNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "query", "elementType", "exists", "enabled", "selected", "hittable", "focusStatus", "frameStatus", "framePoints", "label", "value", "title", "placeholder", "evidenceId"],
+      "properties": {
+        "identifier": { "$ref": "#/$defs/identifier" },
+        "query": { "$ref": "#/$defs/nonEmptyString" },
+        "elementType": { "enum": ["application", "window", "other", "scrollView", "staticText", "button", "switch", "textField"] },
+        "exists": { "type": "boolean" },
+        "enabled": { "type": "boolean" },
+        "selected": { "type": "boolean" },
+        "hittable": { "type": "boolean" },
+        "focusStatus": { "enum": ["focused", "notFocused", "unavailable"] },
+        "frameStatus": { "enum": ["exact", "unavailable"] },
+        "framePoints": { "$ref": "#/$defs/nullableRect" },
+        "label": { "$ref": "#/$defs/nullableStringFact" },
+        "value": { "$ref": "#/$defs/nullableStringFact" },
+        "title": { "$ref": "#/$defs/nullableStringFact" },
+        "placeholder": { "$ref": "#/$defs/nullableStringFact" },
+        "evidenceId": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceHierarchy", "sourceLayout", "accessibilitySemantics", "touchHitRegions", "renderedExtent", "renderedNodeIdentity", "safeArea", "swiftUISemantics", "focusNavigation", "dynamicBehavior"],
+      "properties": {
+        "sourceHierarchy": { "const": "partial" },
+        "sourceLayout": { "const": "partial" },
+        "accessibilitySemantics": { "const": "partial" },
+        "touchHitRegions": { "const": "cantTell" },
+        "renderedExtent": { "const": "observed" },
+        "renderedNodeIdentity": { "const": "cantTell" },
+        "safeArea": { "const": "observed" },
+        "swiftUISemantics": { "const": "untested" },
+        "focusNavigation": { "const": "untested" },
+        "dynamicBehavior": { "const": "untested" }
+      }
+    }
+  }
+}

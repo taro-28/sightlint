@@ -41,8 +41,8 @@
         "sourceManifest": { "const": "evaluation/image-alpha/corpus.json" },
         "additionalSourceManifests": {
           "type": "array",
-          "items": { "enum": ["evaluation/android/corpus.json", "evaluation/pptx/corpus.json", "evaluation/pdf/corpus.json"] },
-          "maxItems": 3,
+          "items": { "enum": ["evaluation/android/corpus.json", "evaluation/ios/corpus.json", "evaluation/pptx/corpus.json", "evaluation/pdf/corpus.json"] },
+          "maxItems": 4,
           "uniqueItems": true
         },
         "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/asset" } }

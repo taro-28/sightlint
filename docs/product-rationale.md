@@ -477,8 +477,8 @@ The following remain intentionally unresolved or evidence-gated:
 - rule-maturity thresholds for blocking eligibility;
 - severity model;
 - arbitrary-project and cross-platform browser product compatibility beyond the bounded policy;
-- representative PPTX/PDF expansion and Android as the next native structured medium after the
-  bounded ADR 0043–0044 source-geometry slices;
+- representative PPTX/PDF/Android/iOS expansion after the bounded ADR 0043–0046 structured-media
+  slices;
 - perception models/runtimes and calibration requirements;
 - exact formats and decoder strategy if new product evidence re-admits unsupported PNG coverage;
 - interaction trace schema;

@@ -11,12 +11,12 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #56, a focused child of #29, started from this verified green `main` baseline:
+The branch for issue #60, a focused child of #29, started from this verified green `main` baseline:
 
-- commit: `29fd63177ba465f2f90baf5693d03415ec02354c`
-- tree: `e6ac14006ac1a915791d5e11c41064121884848e`
-- merged PR: #58
-- main CI: run 34016009257, all six jobs successful
+- commit: `0896a1742e9283e92aa72d7ef7db93c2b33153d0`
+- tree: `c44da0ef5fe3052b40af6cf3349578f0d2dd54e0`
+- merged PR: #59
+- main CI: run 34017702706, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -195,9 +195,9 @@ alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blo
 implemented.
 
 ADR 0041 resolves the optional broader-format decision without expanding the decoder. A versioned
-assessment inventories five source-alpha assets plus three PPTX, three PDF, and three Android
-renders and verifies the nine pinned-browser product captures as current-subset inputs; indexed,
-packed, 16-bit, `tRNS`,
+assessment inventories five source-alpha assets plus three PPTX, three PDF, three Android, and
+three iOS renders and verifies the nine pinned-browser product captures as current-subset inputs;
+indexed, packed, 16-bit, `tRNS`,
 and animation cases remain
 synthetic unavailable controls rather than product-demand evidence. No decoder dependency,
 automatic conversion, telemetry, protected holdout, prevalence claim, command/schema change, or
@@ -336,6 +336,31 @@ provenance/license/privacy/public split/no-holdout status are explicit. This pro
 behavior only. Live capture, Compose, arbitrary applications/devices, touch regions, dynamic
 behavior, occlusion/ink, rendered node identity, Android-specific rules, and representative
 mobile/UI/UX accuracy remain unimplemented, `untested`, or `cantTell`.
+
+### Bounded iOS capture adapter
+
+ADR 0046 and `adapters/ios/` add the fourth non-Web structured process slice. Strict `0.1.0`
+request/response, capture, and `org.sightlint.ios@0.1.0` extension surfaces bind a local paired
+UIKit/XCUITest manifest and PNG by repository-contained paths and SHA-256 identity. The
+dependency-free Python 3.9+ adapter does not operate Xcode or `simctl`, boot a simulator,
+install/launch an app, execute an XCUI action, parse an `.xcresult`, or use the network.
+
+The repository-owned Atlas fixture application records UIKit hierarchy/allocation facts, a
+pre-query screenshot, and independently queried XCUITest platform semantics on Xcode 26.3 with
+an iOS 26.3.1 iPhone 17 Pro simulator. Only attached, visible, identity-transform UIKit Views with
+unique identifiers, nonempty allocations, and nonempty window intersections become exact-source
+point-valued `layoutBox` nodes. A direct clipped scroll-content container and fully offscreen
+Views remain extension-only. XCUITest frames remain `platformSemantics`; source/XCUI disagreement
+remains conflict evidence; the PNG stays on a separate exact-render device-pixel canvas with
+extent-and-scale-only reconciliation.
+
+The three public cases match 122 reviewed acquisition facts, kill one Save-allocation mutation,
+retain four hard-negative exclusions, and emit no clean/hard-negative failure. Acquisition and
+rule truth remain separate, implementation output is not an oracle, and capture-order/provenance/
+license/privacy/public-split/no-holdout status are explicit. This proves regression behavior only.
+Live capture, SwiftUI, arbitrary applications/devices, activation regions, dynamic behavior,
+occlusion/ink, rendered node identity, iOS-specific rules, and representative mobile/UI/UX
+accuracy remain unimplemented, `untested`, or `cantTell`.
 
 ### Realistic Web evaluation foundation
 
@@ -538,6 +563,23 @@ digest, resource, extent, Rust-validation, or output errors. The subsequent trus
 exit 1. Device acquisition is an explicit maintainer fixture operation, not part of this adapter
 command.
 
+The bounded iOS adapter is likewise a dependency-free local file process over a previously
+captured paired UIKit/XCUITest manifest and PNG:
+
+```bash
+python3 adapters/ios/sightlint_ios.py \
+  --request evaluation/ios/requests/ios-atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-ios-clean.ir.json
+target/debug/sightlint check /tmp/atlas-ios-clean.ir.json --profile base --format json
+```
+
+It exits 0 with a canonical partial response and normalized IR, or 2 for request, capture, path,
+digest, resource, compatibility, extent/scale, Rust-validation, or output errors. The subsequent
+trusted check owns exit 1. Xcode/simulator acquisition is an explicit pinned maintainer fixture
+operation, not part of this adapter command.
+
 For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
 `cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
 failures remain visible with exit 0. `inspect-image` never exits 1 for a heuristic; observations or
@@ -654,6 +696,26 @@ SightLint treats tests as part of the product specification.
   device capture, Compose, dynamic behavior, arbitrary apps/devices, or general UI/UX accuracy are
   not claimed.
 
+### iOS capture-adapter fixtures
+
+- ADR 0046 plus strict request, response, capture, `org.sightlint.ios@0.1.0`, corpus,
+  acquisition-annotation, rule-annotation, and metric schemas;
+- one realistic repository-owned UIKit account/settings fixture application and paired
+  source/XCUITest capture target pinned to Xcode 26.3, iOS Simulator 26.3.1, iPhone 17 Pro,
+  Swift 6.2.4, and a fixed light/locale/content-size/orientation profile;
+- three committed native manifests and RGB screenshots with exact source/request/render digests,
+  fictional-data ownership, dual-license/privacy provenance, explicit non-atomic capture order,
+  and tool/device/build provenance;
+- separate acquisition and rule truth for clean, targeted off-canvas mutation, and offscreen
+  scroll hard-negative cases across public smoke/development/challenge splits with no protected
+  holdout;
+- public-process E2E through `adapt-image`, `normalize`, and `check`, including 122 acquisition
+  facts, repeated bytes, digest/node/output/path/schema/extent/output-collision boundaries,
+  mutation kill, false-positive, non-leakage, source/XCUI conflict, and abstention assertions;
+- coverage remains `partial`; XCUITest frames do not become layout/hit/render geometry, and live
+  capture, SwiftUI, dynamic behavior, arbitrary apps/devices, activation geometry, or general
+  UI/UX accuracy are not claimed.
+
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
 ### Required normal CI
@@ -690,7 +752,10 @@ Do not infer these capabilities from the architecture or closed experimental bra
   including text/tags/paint/actions/forms/viewer behavior;
 - broad Android support beyond the repository-owned classic-View capture, including live-device
   acquisition, Compose, multiple windows, touch regions, dynamic behavior, and representative
-  device/application evaluation; any iOS adapter;
+  device/application evaluation;
+- broad iOS support beyond the repository-owned paired UIKit/XCUITest capture, including live
+  acquisition, SwiftUI, custom accessibility containers, multiple windows, activation geometry,
+  dynamic behavior, focus navigation, and representative device/application evaluation;
 - broad PPTX coverage beyond direct unrotated shapes/groups, or a PPTX-specific recommended rule;
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
@@ -754,14 +819,15 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#28 (complete for protocol v0):** isolated local perception process, typed OCR/CV/VLM
   observation families, bounded deterministic reference wrapper, non-promotion boundary, and
   three-state differential regression. Real model calibration/accuracy remains `untested`.
-- **#29 (PPTX, PDF, and Android slices implemented):** ADRs 0043–0045 provide bounded local
-  source/capture adapters and separate regression corpora; iOS is next.
+- **#29 (PPTX, PDF, Android, and iOS slices implemented):** ADRs 0043–0046 provide bounded local
+  source/capture adapters and separate regression corpora.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The remaining work inside #29 starts with a focused iOS XCUI/accessibility/screenshot evidence and
-adapter decision. Later issues remain demand- and evidence-gated; the completed alpha, benchmark,
-and bounded PPTX/PDF/Android slices do not make stale branches authoritative.
+The bounded first slices inside #29 are implemented. The next preserved product issue is #30 for
+interaction actions/effects/states/traces and recovery. Later expansion remains demand- and
+evidence-gated; the completed alpha, benchmark, and bounded structured-adapter slices do not make
+stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -858,6 +924,9 @@ python3 -m unittest adapters/pdf/tests/test_adapter.py
 python3 tools/generate_android_fixtures.py --check
 python3 tools/check_android_evaluation.py
 python3 -m py_compile adapters/android/sightlint_android.py
+python3 tools/generate_ios_fixtures.py --check
+python3 tools/check_ios_evaluation.py
+python3 -m py_compile adapters/ios/sightlint_ios.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
@@ -883,6 +952,7 @@ cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test ios_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

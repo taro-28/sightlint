@@ -84,6 +84,12 @@ jobs:
           python3 tools/generate_android_fixtures.py --check
           python3 tools/check_android_evaluation.py
           python3 -m py_compile adapters/android/sightlint_android.py
+      - name: Verify iOS capture fixtures and evaluation governance
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 tools/generate_ios_fixtures.py --check
+          python3 tools/check_ios_evaluation.py
+          python3 -m py_compile adapters/ios/sightlint_ios.py
       - name: Verify release and dependency-license contracts
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
@@ -132,6 +138,9 @@ jobs:
       - name: Run Android capture-adapter evaluation explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
+      - name: Run iOS capture-adapter evaluation explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test ios_evaluation_e2e -- --nocapture
       - name: Build documentation
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         env:
@@ -249,6 +258,11 @@ jobs:
           ${{ matrix.python }} tools/generate_android_fixtures.py --check
           ${{ matrix.python }} tools/check_android_evaluation.py
           ${{ matrix.python }} -m py_compile adapters/android/sightlint_android.py
+      - name: Verify iOS fixture and evaluation contracts
+        run: |
+          ${{ matrix.python }} tools/generate_ios_fixtures.py --check
+          ${{ matrix.python }} tools/check_ios_evaluation.py
+          ${{ matrix.python }} -m py_compile adapters/ios/sightlint_ios.py
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E

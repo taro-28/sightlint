@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "id": "ios-atlas-off-canvas-control-mutant",
+    "title": "Atlas iOS off-canvas Save mutation"
+  },
+  "capture": {
+    "reference": "evaluation/ios/captures/off-canvas-control-mutant.capture.json",
+    "sha256": "sha256:e5b040e303bac15354f79aa3e3466b25529962869d2e836a8b574796b4d3449c"
+  },
+  "execution": {
+    "maxAttributesPerNode": 32,
+    "maxCaptureBytes": 2097152,
+    "maxDepth": 16,
+    "maxNodes": 64,
+    "maxOutputBytes": 4194304,
+    "maxScreenshotBytes": 8388608,
+    "maxStringBytes": 1024
+  },
+  "privacy": {
+    "contentPolicy": "digestsAndGeometry",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "requestId": "ios-atlas-off-canvas-control-mutant",
+  "screenshot": {
+    "reference": "evaluation/ios/captures/off-canvas-control-mutant.png",
+    "sha256": "sha256:9d6115b9458f92daa925a0961df6c7ea3fb3c32958f1f93b1a8831d8ce707e9a"
+  }
+}

@@ -122,6 +122,10 @@ ADR 0045 uses a dependency-free Python 3.9+ file adapter over output from a repo
 Android instrumentation runner. Device capture stays outside the adapter and kernel. Exact View
 allocation, accessibility semantics, and PNG render evidence remain separately typed.
 
+ADR 0046 applies the same file/process boundary to paired output from repository-owned UIKit
+instrumentation and XCUITest. Simulator capture stays outside the adapter and kernel. Exact UIKit
+allocation, XCUITest platform semantics, and PNG render evidence remain separately typed.
+
 Early development prefers versioned process protocols to a shared in-process plugin ABI. Process
 isolation limits crashes, memory, dependency conflicts, runtime choice, and untrusted content.
 
@@ -192,6 +196,31 @@ The current boundary covers one repository-owned classic-View application and on
 profile. Compose, arbitrary applications, live capture, touch delegates, multiple windows,
 dynamic behavior, occlusion, and native-to-pixel identity remain unsupported, `untested`, or
 `cantTell`. Python and Android tooling are untrusted sensors, not an operating-system sandbox.
+
+## Current iOS adapter boundary
+
+The `sightlint-ios` process reads one strict digest-pinned capture manifest and paired PNG below
+an explicit repository root. It does not run `xcodebuild` or `simctl`, boot a simulator, install
+or launch an app, execute an XCUI action, parse an `.xcresult`, or access the network. The
+repository-owned fixture records UIKit source facts, then a screenshot, then independently queried
+XCUITest platform semantics on one pinned simulator profile; the non-atomic capture order remains
+explicit.
+
+Only attached, visible, identity-transform UIKit Views with unique accessibility identifiers,
+nonempty allocations, and nonempty window intersections become exact-source point-valued
+`layoutBox` nodes. A direct clipped `UIScrollView` content container and fully offscreen Views
+remain extension-only. XCUITest frames remain `PlatformSemantics` in
+`org.sightlint.ios@0.1.0`; they never become `layoutBox`, `hitBox`, `renderBox`, or `inkBox`, and
+source/XCUI disagreement is preserved as conflict evidence. The PNG passes public `adapt-image`,
+stays on a separate device-pixel canvas, and is reconciled only by screen extent and scale.
+Candidate IR passes public `normalize` before exclusive output creation.
+
+The current boundary covers one repository-owned UIKit application and one pinned
+Xcode/iOS-simulator/device profile. SwiftUI, arbitrary or production applications, live capture,
+activation geometry, custom accessibility containers, multiple windows, dynamic behavior,
+occlusion, focus navigation, and native-to-pixel identity remain unsupported, `untested`, or
+`cantTell`. Python, Xcode, UIKit, and XCUITest are untrusted sensors, not an operating-system
+sandbox.
 
 ## Current PNG adapter boundary
 
