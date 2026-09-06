@@ -111,6 +111,66 @@ projection. Optional ecosystem expansion requires a new demand-led issue. Later 
 automatically outrank current evidence needs because historical code once existed on a stale
 branch. Explain any deviation from the remaining sequence in the issue and PR.
 
+## Opportunistic managed-loopback dogfood
+
+The maintainer authorizes coding agents working on SightLint to rerun the existing tabisaifu
+managed-loopback dogfood without asking for confirmation on every run. Use this authority only
+when a current change could materially affect managed Web acquisition, server lifecycle, Web IR,
+policy, rule outcomes, evidence, or reports, or when a rerun would resolve a concrete uncertainty.
+It is not a requirement for unrelated changes and is not permission to create a schedule or other
+background trigger.
+
+The canonical probe is the existing local tabisaifu checkout, target
+`/test/login?next=%2Fentries%2Fnew`, state `entry-create`, readiness selector `main`, and the
+environment recorded in `docs/handoff.md`: 412 by 839 CSS pixels, DPR 2, text scale 1, `ja-JP`,
+UTC, light theme, and reduced motion. Use port 4173, a 180-second startup timeout, and this
+shell-free server argv:
+
+```text
+./node_modules/.bin/wrangler dev
+--local
+--ip 127.0.0.1
+--port {port}
+--inspector-port 0
+--var APP_ENV:test
+--var TEST_AUTH:1
+--var RESEND_FROM_EMAIL:noreply@mail.tabisaifu.madebytaro.com
+--show-interactive-dev-session false
+--log-level error
+```
+
+Resolve tabisaifu as the sibling of the primary SightLint checkout rather than assuming it is next
+to an isolated worktree. If that checkout, its existing Wrangler executable, or the expected test
+route is unavailable, skip the dogfood and report why. Do not install or update target dependencies
+to make an opportunistic run work.
+
+Every run must follow these boundaries:
+
+- invoke the public `sightlint-web-check` path with `--allow-server-command`; do not bypass the
+  managed lifecycle or browser-network controls;
+- before and immediately after the invocation, record `git status --short` and a SHA-256 digest of
+  the bytes from `git diff --binary HEAD --`; the two observations must match before claiming that
+  the target was unchanged;
+- never switch, pull, clean, reset, restore, create, edit, format, install into, or commit in the
+  target repository, including `.dev.vars`; preserve all existing dirty and untracked work;
+- place the request, response, Artifact IR, screenshot, human/JSON report, and captured server
+  output in a fresh temporary directory and remove it after review; never commit or upload those
+  artifacts;
+- always verify that the managed process tree stopped and port 4173 is free, including after a
+  capture error, kernel error, or interruption;
+- treat child-process outbound networking as uncontrolled, as ADR 0048 specifies, and do not add
+  credentials or claim that the server command was sandboxed;
+- report acquisition, deterministic check results, and cleanup as separate outcomes. A check exit
+  of 1 with findings is not a capture or lifecycle failure;
+- do not infer that a finding is a design defect, edit tabisaifu, tune a rule, change maturity or
+  enforcement, or update a reviewed oracle without the normal evidence and issue/PR process;
+- if concurrent work changes tabisaifu during the run, do not revert it and do not make a
+  no-change claim. Report that the paired guard was inconclusive.
+
+Dogfood is exploratory product evidence, not conformance or a protected holdout. Preserve a new
+reproducible signal in a focused SightLint issue or PR only when it helps evaluate a named
+acquisition or rule claim; otherwise a concise run report is sufficient.
+
 ## Before editing
 
 From the repository root:
