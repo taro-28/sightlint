@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:protected-holdout-bundle:1.0.0",
+  "title": "SightLint protected Web holdout bundle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "manifestDigest",
+    "dataClassification",
+    "bundle",
+    "limits",
+    "families",
+    "cases"
+  ],
+  "properties": {
+    "$schema": { "const": "urn:sightlint:schema:protected-holdout-bundle:1.0.0" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "protectedHoldoutBundleManifest" },
+    "manifestDigest": { "$ref": "#/$defs/sha256" },
+    "dataClassification": { "enum": ["protectedHoldout", "publicConformanceOnly"] },
+    "bundle": { "$ref": "#/$defs/bundle" },
+    "limits": { "$ref": "#/$defs/limits" },
+    "families": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/family" }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "dataClassification": { "const": "protectedHoldout" } },
+        "required": ["dataClassification"]
+      },
+      "then": {
+        "properties": {
+          "bundle": {
+            "type": "object",
+            "properties": { "tuningVisible": { "const": false } },
+            "required": ["tuningVisible"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "dataClassification": { "const": "publicConformanceOnly" } },
+        "required": ["dataClassification"]
+      },
+      "then": {
+        "properties": {
+          "bundle": {
+            "type": "object",
+            "properties": { "tuningVisible": { "const": true } },
+            "required": ["tuningVisible"]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "ascii": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[ -~]+$" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "semver": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9._/-]+$",
+      "not": { "pattern": "(^/|(^|/)\\.\\.?(/|$)|//|\\\\|:)" }
+    },
+    "bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "frozenAt",
+        "storageAuthorityId",
+        "tuningVisible",
+        "implementationOutputUsedAsOracle"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" },
+        "frozenAt": { "$ref": "#/$defs/timestamp" },
+        "storageAuthorityId": { "$ref": "#/$defs/id" },
+        "tuningVisible": { "type": "boolean" },
+        "implementationOutputUsedAsOracle": { "const": false }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximumFamilies", "maximumCases", "maximumFilesPerCase", "maximumManifestBytes"],
+      "properties": {
+        "maximumFamilies": { "type": "integer", "minimum": 1, "maximum": 128 },
+        "maximumCases": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "maximumFilesPerCase": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "maximumManifestBytes": { "type": "integer", "minimum": 1, "maximum": 1048576 }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "caseIds"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "caseIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path", "sha256", "byteLength", "mediaType"],
+      "properties": {
+        "role": { "enum": ["source", "request", "supportingAsset"] },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
+        "mediaType": { "$ref": "#/$defs/ascii" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "familyId", "classification", "files"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "familyId": { "$ref": "#/$defs/id" },
+        "classification": {
+          "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous", "malformed", "resourceBoundary"]
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/file" }
+        }
+      }
+    }
+  }
+}

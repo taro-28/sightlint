@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:private-web-holdout-result:1.0.0",
+  "title": "SightLint private Web holdout result manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "manifestDigest",
+    "dataClassification",
+    "bundleBinding",
+    "oracleBinding",
+    "invocationBinding",
+    "execution",
+    "caseResults",
+    "metricCells"
+  ],
+  "properties": {
+    "$schema": { "const": "urn:sightlint:schema:private-web-holdout-result:1.0.0" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "privateHoldoutResultManifest" },
+    "manifestDigest": { "$ref": "#/$defs/sha256" },
+    "dataClassification": { "enum": ["protectedHoldout", "publicConformanceOnly"] },
+    "bundleBinding": { "$ref": "#/$defs/versionedBinding" },
+    "oracleBinding": { "$ref": "#/$defs/versionedBinding" },
+    "invocationBinding": { "$ref": "#/$defs/digestBinding" },
+    "execution": { "$ref": "#/$defs/execution" },
+    "caseResults": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": { "$ref": "#/$defs/caseResult" }
+    },
+    "metricCells": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": { "$ref": "#/$defs/metricCell" }
+    }
+  },
+  "$defs": {
+    "ascii": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[ -~]+$" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "semver": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "versionedBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "manifestDigest"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" },
+        "manifestDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "digestBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestDigest"],
+      "properties": { "manifestDigest": { "$ref": "#/$defs/sha256" } }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "startedAt",
+        "completedAt",
+        "evaluatorId",
+        "attemptedCases",
+        "completedCases",
+        "executionErrors"
+      ],
+      "properties": {
+        "status": { "enum": ["succeeded", "failed"] },
+        "startedAt": { "$ref": "#/$defs/timestamp" },
+        "completedAt": { "$ref": "#/$defs/timestamp" },
+        "evaluatorId": { "$ref": "#/$defs/id" },
+        "attemptedCases": { "type": "integer", "minimum": 0, "maximum": 4096 },
+        "completedCases": { "type": "integer", "minimum": 0, "maximum": 4096 },
+        "executionErrors": { "type": "integer", "minimum": 0, "maximum": 4096 }
+      }
+    },
+    "caseResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caseId",
+        "captureResponseDigest",
+        "artifactIrDigest",
+        "screenshotDigest",
+        "checkReportDigest",
+        "diagnosticsDigest",
+        "exitCode"
+      ],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/id" },
+        "captureResponseDigest": { "$ref": "#/$defs/sha256" },
+        "artifactIrDigest": { "$ref": "#/$defs/sha256" },
+        "screenshotDigest": { "$ref": "#/$defs/sha256" },
+        "checkReportDigest": { "$ref": "#/$defs/sha256" },
+        "diagnosticsDigest": { "$ref": "#/$defs/sha256" },
+        "exitCode": { "type": "integer", "minimum": 0, "maximum": 2 }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["opaqueCohortId", "split", "ruleId", "ruleVersion", "evidenceClass"],
+      "properties": {
+        "opaqueCohortId": { "$ref": "#/$defs/id" },
+        "split": { "enum": ["holdout"] },
+        "ruleId": { "$ref": "#/$defs/id" },
+        "ruleVersion": { "$ref": "#/$defs/semver" },
+        "evidenceClass": { "$ref": "#/$defs/id" }
+      }
+    },
+    "metricCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "measure", "scope", "numerator", "denominator"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "measure": {
+          "enum": [
+            "caseCoverage",
+            "acquisitionExpectationCoverage",
+            "ruleResultCoverage",
+            "failurePrecision",
+            "falsePositiveFailures",
+            "reviewedAbstentionAgreement",
+            "mutationKillRate",
+            "executionErrors",
+            "nativePixelConflictRetention"
+          ]
+        },
+        "scope": { "$ref": "#/$defs/scope" },
+        "numerator": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "denominator": { "type": "integer", "minimum": 0, "maximum": 1000000 }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "urn:sightlint:schema:private-web-holdout-result:1.0.0",
+  "schemaVersion": "1.0.0",
+  "documentType": "privateHoldoutResultManifest",
+  "manifestDigest": "sha256:d0737d7ec28a7c415042e13458c1f5db2283d2500a51959af8fcc2f7f98cd26a",
+  "dataClassification": "publicConformanceOnly",
+  "bundleBinding": {
+    "id": "conformance-web-holdout",
+    "version": "1.0.0",
+    "manifestDigest": "sha256:f829b82ff4ea1646b0e7c96227f1daf466ca8ac5385e698219737cc73a43f63f"
+  },
+  "oracleBinding": {
+    "id": "conformance-web-oracle",
+    "version": "1.0.0",
+    "manifestDigest": "sha256:117901b69db2412c93d6ec45da11c9878bcda87be9f6a4e73726dd32690808b2"
+  },
+  "invocationBinding": {
+    "manifestDigest": "sha256:24967ade1c05481ed13bb50fcce8264b39e58b1de3ea977bd8b37ad29c811d70"
+  },
+  "execution": {
+    "status": "succeeded",
+    "startedAt": "2026-09-06T00:15:00Z",
+    "completedAt": "2026-09-06T00:16:00Z",
+    "evaluatorId": "conformance-evaluator",
+    "attemptedCases": 6,
+    "completedCases": 6,
+    "executionErrors": 0
+  },
+  "caseResults": [
+    { "caseId": "opaque-case-001", "captureResponseDigest": "sha256:1010101010101010101010101010101010101010101010101010101010101010", "artifactIrDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111", "screenshotDigest": "sha256:1212121212121212121212121212121212121212121212121212121212121212", "checkReportDigest": "sha256:1313131313131313131313131313131313131313131313131313131313131313", "diagnosticsDigest": "sha256:1414141414141414141414141414141414141414141414141414141414141414", "exitCode": 0 },
+    { "caseId": "opaque-case-002", "captureResponseDigest": "sha256:2020202020202020202020202020202020202020202020202020202020202020", "artifactIrDigest": "sha256:2121212121212121212121212121212121212121212121212121212121212121", "screenshotDigest": "sha256:2222222222222222222222222222222222222222222222222222222222222222", "checkReportDigest": "sha256:2323232323232323232323232323232323232323232323232323232323232323", "diagnosticsDigest": "sha256:2424242424242424242424242424242424242424242424242424242424242424", "exitCode": 1 },
+    { "caseId": "opaque-case-003", "captureResponseDigest": "sha256:3030303030303030303030303030303030303030303030303030303030303030", "artifactIrDigest": "sha256:3131313131313131313131313131313131313131313131313131313131313131", "screenshotDigest": "sha256:3232323232323232323232323232323232323232323232323232323232323232", "checkReportDigest": "sha256:3333333333333333333333333333333333333333333333333333333333333333", "diagnosticsDigest": "sha256:3434343434343434343434343434343434343434343434343434343434343434", "exitCode": 0 },
+    { "caseId": "opaque-case-004", "captureResponseDigest": "sha256:4040404040404040404040404040404040404040404040404040404040404040", "artifactIrDigest": "sha256:4141414141414141414141414141414141414141414141414141414141414141", "screenshotDigest": "sha256:4242424242424242424242424242424242424242424242424242424242424242", "checkReportDigest": "sha256:4343434343434343434343434343434343434343434343434343434343434343", "diagnosticsDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444", "exitCode": 0 },
+    { "caseId": "opaque-case-005", "captureResponseDigest": "sha256:5050505050505050505050505050505050505050505050505050505050505050", "artifactIrDigest": "sha256:5151515151515151515151515151515151515151515151515151515151515151", "screenshotDigest": "sha256:5252525252525252525252525252525252525252525252525252525252525252", "checkReportDigest": "sha256:5353535353535353535353535353535353535353535353535353535353535353", "diagnosticsDigest": "sha256:5454545454545454545454545454545454545454545454545454545454545454", "exitCode": 2 },
+    { "caseId": "opaque-case-006", "captureResponseDigest": "sha256:6060606060606060606060606060606060606060606060606060606060606060", "artifactIrDigest": "sha256:6161616161616161616161616161616161616161616161616161616161616161", "screenshotDigest": "sha256:6262626262626262626262626262626262626262626262626262626262626262", "checkReportDigest": "sha256:6363636363636363636363636363636363636363636363636363636363636363", "diagnosticsDigest": "sha256:6464646464646464646464646464646464646464646464646464646464646464", "exitCode": 0 }
+  ],
+  "metricCells": [
+    { "id": "acquisition-coverage", "measure": "acquisitionExpectationCoverage", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-structure" }, "numerator": 12, "denominator": 12 },
+    { "id": "case-coverage", "measure": "caseCoverage", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-structure" }, "numerator": 6, "denominator": 6 },
+    { "id": "execution-errors", "measure": "executionErrors", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-structure" }, "numerator": 0, "denominator": 6 },
+    { "id": "failure-precision", "measure": "failurePrecision", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "numerator": 2, "denominator": 2 },
+    { "id": "false-positive-failures", "measure": "falsePositiveFailures", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "numerator": 0, "denominator": 5 },
+    { "id": "mutation-kill", "measure": "mutationKillRate", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "numerator": 2, "denominator": 2 },
+    { "id": "native-pixel-conflicts", "measure": "nativePixelConflictRetention", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-pixel-conflict" }, "numerator": 0, "denominator": 0 },
+    { "id": "reviewed-abstention", "measure": "reviewedAbstentionAgreement", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "numerator": 3, "denominator": 3 },
+    { "id": "rule-result-coverage", "measure": "ruleResultCoverage", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "numerator": 10, "denominator": 10 }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "urn:sightlint:schema:web-holdout-run:1.0.0",
+  "schemaVersion": "1.0.0",
+  "documentType": "sanitizedHoldoutRunAttestation",
+  "manifestDigest": "sha256:5d5c420af0da32bbbafe29aa980f8279b44e441f2b5bfffad0390344575c5ebf",
+  "recordPurpose": "conformanceExample",
+  "lifecycle": "valid",
+  "dataClassification": "publicConformanceOnly",
+  "evidenceEligible": false,
+  "admission": {
+    "schemaVersion": "1.0.0",
+    "status": "notOperational",
+    "recordDigest": "sha256:dcc0fd8e6524e22472214a7d3b68edef2036a03e30c896999d747bf67c20dc72"
+  },
+  "bindings": {
+    "bundle": {
+      "id": "conformance-web-holdout",
+      "version": "1.0.0",
+      "manifestDigest": "sha256:f829b82ff4ea1646b0e7c96227f1daf466ca8ac5385e698219737cc73a43f63f"
+    },
+    "oracle": {
+      "id": "conformance-web-oracle",
+      "version": "1.0.0",
+      "manifestDigest": "sha256:117901b69db2412c93d6ec45da11c9878bcda87be9f6a4e73726dd32690808b2"
+    },
+    "invocationManifestDigest": "sha256:24967ade1c05481ed13bb50fcce8264b39e58b1de3ea977bd8b37ad29c811d70",
+    "privateResultManifestDigest": "sha256:d0737d7ec28a7c415042e13458c1f5db2283d2500a51959af8fcc2f7f98cd26a"
+  },
+  "execution": {
+    "status": "succeeded",
+    "startedAt": "2026-09-06T00:15:00Z",
+    "completedAt": "2026-09-06T00:16:00Z",
+    "attemptedCases": 6,
+    "completedCases": 6,
+    "executionErrors": 0
+  },
+  "assurance": {
+    "evaluator": {
+      "id": "conformance-evaluator",
+      "qualification": "Fictional conformance identity; not an independent human evaluator.",
+      "independentFromTuning": true,
+      "conflictOfInterestReviewed": true,
+      "declarationDigest": "sha256:7070707070707070707070707070707070707070707070707070707070707070"
+    },
+    "secondVerifier": {
+      "id": "conformance-second-verifier",
+      "qualification": "Fictional conformance identity; not an external verifier.",
+      "independentFromTuning": true,
+      "conflictOfInterestReviewed": true,
+      "declarationDigest": "sha256:7171717171717171717171717171717171717171717171717171717171717171"
+    },
+    "detachedSignaturesVerifiedBy": "conformance-authority",
+    "cryptographicVerificationPerformedBySightLint": false,
+    "exposureLogVersion": "1.0.0",
+    "exposureLogDigest": "sha256:7272727272727272727272727272727272727272727272727272727272727272"
+  },
+  "disclosure": {
+    "authorityId": "conformance-authority",
+    "minimumPublishedDenominator": 5,
+    "containsArtifactPathsOrUrls": false,
+    "containsCaseMembership": false,
+    "containsLabelsOrSelectors": false,
+    "containsPerCaseResults": false,
+    "containsCredentialsOrPersonalData": false,
+    "universalScore": false
+  },
+  "metrics": [
+    { "id": "acquisition-coverage", "measure": "acquisitionExpectationCoverage", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-structure" }, "publication": "reported", "numerator": 12, "denominator": 12 },
+    { "id": "case-coverage", "measure": "caseCoverage", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-structure" }, "publication": "reported", "numerator": 6, "denominator": 6 },
+    { "id": "execution-errors", "measure": "executionErrors", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-structure" }, "publication": "reported", "numerator": 0, "denominator": 6 },
+    { "id": "failure-precision", "measure": "failurePrecision", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "publication": "suppressed", "suppressionReason": "smallCell", "privateCellDigest": "sha256:18e9a8e9ca27d951b8531467858e2ef9b61ef69275d0b6bce12685988b77adfa" },
+    { "id": "false-positive-failures", "measure": "falsePositiveFailures", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "publication": "reported", "numerator": 0, "denominator": 5 },
+    { "id": "mutation-kill", "measure": "mutationKillRate", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "publication": "suppressed", "suppressionReason": "smallCell", "privateCellDigest": "sha256:d78dbae9a03e3e26b6b192217a2ba973d26c4265dec4a5bf57a1966ad8dc7988" },
+    { "id": "native-pixel-conflicts", "measure": "nativePixelConflictRetention", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "all-evaluated-rules", "ruleVersion": "1.0.0", "evidenceClass": "native-pixel-conflict" }, "publication": "zeroDenominator", "numerator": 0, "denominator": 0 },
+    { "id": "reviewed-abstention", "measure": "reviewedAbstentionAgreement", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "publication": "suppressed", "suppressionReason": "smallCell", "privateCellDigest": "sha256:04a96df1918558a2b4ca39c626f85dbeaae5c60ffb03d827ab7f199b00124530" },
+    { "id": "rule-result-coverage", "measure": "ruleResultCoverage", "scope": { "opaqueCohortId": "opaque-all-families", "split": "holdout", "ruleId": "web.accessibility.interactive-name", "ruleVersion": "0.1.0", "evidenceClass": "native-structure" }, "publication": "reported", "numerator": 10, "denominator": 10 }
+  ],
+  "nonClaims": [
+    "Fictional public conformance data is not protected holdout evidence.",
+    "Fictional identities do not establish independent human review or evaluation.",
+    "No representative accuracy, WCAG conformance, or blocking maturity is claimed."
+  ]
+}

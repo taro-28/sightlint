@@ -40,7 +40,7 @@ function indexBy(items: JsonObject[], field: string, context: string): Map<strin
 }
 
 function validator(schema: JsonObject): ValidateFunction {
-  const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, validateFormats: false });
   return ajv.compile(schema);
 }
 
@@ -172,4 +172,66 @@ test("multi-family registry preserves oracle, review, exposure, and holdout boun
   assertValid(validateHoldout, operational, "complete future operational holdout record");
   delete object(operational["operationalRecord"], "operational record")["evaluator"];
   assertInvalid(validateHoldout, operational, "operational holdout without evaluator");
+});
+
+test("holdout foundation schemas separate private evidence from sanitized public status", async () => {
+  const bundle = await loadJson("evaluation/web/conformance/holdout/bundle-manifest.json");
+  const oracle = await loadJson("evaluation/web/conformance/holdout/oracle-manifest.json");
+  const invocation = await loadJson("evaluation/web/conformance/holdout/invocation-manifest.json");
+  const privateResult = await loadJson("evaluation/web/conformance/holdout/private-result-manifest.json");
+  const publicConformance = await loadJson("evaluation/web/conformance/holdout/public-attestation.json");
+  const currentStatus = await loadJson("evaluation/web/holdout-run.json");
+
+  const validateBundle = validator(await loadJson("evaluation/web/protected-holdout-bundle.schema.json"));
+  const validateOracle = validator(await loadJson("evaluation/web/protected-holdout-oracle.schema.json"));
+  const validateInvocation = validator(await loadJson("evaluation/web/holdout-invocation.schema.json"));
+  const validatePrivateResult = validator(await loadJson("evaluation/web/private-holdout-result.schema.json"));
+  const validateAttestation = validator(await loadJson("evaluation/web/holdout-run.schema.json"));
+
+  assertValid(validateBundle, bundle, "conformance bundle manifest");
+  assertValid(validateOracle, oracle, "conformance oracle manifest");
+  assertValid(validateInvocation, invocation, "conformance invocation manifest");
+  assertValid(validatePrivateResult, privateResult, "conformance private result manifest");
+  assertValid(validateAttestation, publicConformance, "conformance public attestation");
+  assertValid(validateAttestation, currentStatus, "current not-run status");
+
+  const exposedProtectedBundle = clone(bundle);
+  exposedProtectedBundle["dataClassification"] = "protectedHoldout";
+  assertInvalid(validateBundle, exposedProtectedBundle, "protected bundle visible to tuning");
+
+  const mixedOracle = clone(oracle);
+  mixedOracle["implementationOutput"] = { acceptedAsTruth: true };
+  assertInvalid(validateOracle, mixedOracle, "oracle containing implementation output");
+
+  const shellInvocation = clone(invocation);
+  object(shellInvocation["commands"], "invocation commands")["shellInterpolation"] = true;
+  assertInvalid(validateInvocation, shellInvocation, "holdout invocation using a shell");
+
+  const privateResultWithPublicClaim = clone(privateResult);
+  privateResultWithPublicClaim["evidenceEligible"] = true;
+  assertInvalid(validatePrivateResult, privateResultWithPublicClaim, "private result containing a public evidence claim");
+
+  const disclosedSmallCell = clone(publicConformance);
+  const suppressed = array(disclosedSmallCell["metrics"], "public metrics")
+    .find((metric) => metric["publication"] === "suppressed");
+  assert.ok(suppressed);
+  suppressed["numerator"] = 2;
+  assertInvalid(validateAttestation, disclosedSmallCell, "suppressed metric disclosing a numerator");
+
+  const notRunWithResultBinding = clone(currentStatus);
+  notRunWithResultBinding["bindings"] = object(publicConformance["bindings"], "conformance bindings");
+  assertInvalid(validateAttestation, notRunWithResultBinding, "not-run status containing result bindings");
+
+  const futureEvidenceShape = clone(publicConformance);
+  futureEvidenceShape["recordPurpose"] = "holdoutEvidence";
+  futureEvidenceShape["dataClassification"] = "sanitizedProtectedResult";
+  futureEvidenceShape["evidenceEligible"] = true;
+  object(futureEvidenceShape["admission"], "future evidence admission")["status"] = "operational";
+  assertValid(validateAttestation, futureEvidenceShape, "future operational evidence shape");
+  object(futureEvidenceShape["admission"], "future evidence admission")["status"] = "notOperational";
+  assertInvalid(validateAttestation, futureEvidenceShape, "evidence claim without operational admission");
+
+  const incompleteInvalidation = clone(publicConformance);
+  incompleteInvalidation["lifecycle"] = "invalidated";
+  assertInvalid(validateAttestation, incompleteInvalidation, "invalidated evidence without an invalidation record");
 });

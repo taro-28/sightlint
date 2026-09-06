@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:protected-holdout-oracle:1.0.0",
+  "title": "SightLint protected Web holdout oracle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "manifestDigest",
+    "dataClassification",
+    "bundleBinding",
+    "oracle",
+    "caseIds",
+    "acquisitionDocuments",
+    "ruleDocuments",
+    "classificationCounts",
+    "acquisitionExpectationCounts",
+    "ruleOutcomeCounts"
+  ],
+  "properties": {
+    "$schema": { "const": "urn:sightlint:schema:protected-holdout-oracle:1.0.0" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "protectedHoldoutOracleManifest" },
+    "manifestDigest": { "$ref": "#/$defs/sha256" },
+    "dataClassification": { "enum": ["protectedHoldout", "publicConformanceOnly"] },
+    "bundleBinding": { "$ref": "#/$defs/bundleBinding" },
+    "oracle": { "$ref": "#/$defs/oracle" },
+    "caseIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "acquisitionDocuments": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/oracleDocument" }
+    },
+    "ruleDocuments": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": { "$ref": "#/$defs/oracleDocument" }
+    },
+    "classificationCounts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/classificationCount" }
+    },
+    "acquisitionExpectationCounts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": { "$ref": "#/$defs/acquisitionCount" }
+    },
+    "ruleOutcomeCounts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/outcomeCount" }
+    }
+  },
+  "$defs": {
+    "ascii": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[ -~]+$" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "semver": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9._/-]+$",
+      "not": { "pattern": "(^/|(^|/)\\.\\.?(/|$)|//|\\\\|:)" }
+    },
+    "bundleBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "manifestDigest"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" },
+        "manifestDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "qualification", "independentFromAnnotationAuthors"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "role": { "enum": ["annotationAuthor", "independentReviewer", "adjudicator"] },
+        "qualification": { "$ref": "#/$defs/ascii" },
+        "independentFromAnnotationAuthors": { "type": "boolean" }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "frozenAt",
+        "authoringBasis",
+        "implementationOutputUsedAsOracle",
+        "reviewStatus",
+        "reviewers",
+        "unresolvedDisagreements"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" },
+        "frozenAt": { "$ref": "#/$defs/timestamp" },
+        "authoringBasis": { "enum": ["humanReviewedSourceContract", "publicConformanceContract"] },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "reviewStatus": { "enum": ["independentlyReviewed", "adjudicated", "conformanceOnly"] },
+        "reviewers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/reviewer" }
+        },
+        "unresolvedDisagreements": { "type": "integer", "minimum": 0, "maximum": 1000000 }
+      }
+    },
+    "oracleDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "sha256", "byteLength", "caseCount"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
+        "caseCount": { "type": "integer", "minimum": 1, "maximum": 4096 }
+      }
+    },
+    "classificationCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "count"],
+      "properties": {
+        "classification": {
+          "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous", "malformed", "resourceBoundary"]
+        },
+        "count": { "type": "integer", "minimum": 0, "maximum": 4096 }
+      }
+    },
+    "acquisitionCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "count"],
+      "properties": {
+        "state": { "enum": ["exact", "cantTell", "untested", "conflict"] },
+        "count": { "type": "integer", "minimum": 0, "maximum": 1000000 }
+      }
+    },
+    "outcomeCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "count"],
+      "properties": {
+        "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] },
+        "count": { "type": "integer", "minimum": 0, "maximum": 1000000 }
+      }
+    }
+  }
+}
