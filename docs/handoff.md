@@ -11,13 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #65, an evaluation-contract follow-up to #62, started from this verified
-green `main` baseline:
+The branch for issue #67, the final focused M7 integration slice, started from this verified green
+`main` baseline:
 
-- commit: `31b9518e5d8675bf6681cbc5f3a27bab213d500e`
-- tree: `da83a61c28988c64e52afcdb834f8921d047886b`
-- merged PR: #64
-- main CI: run 34026961741, all six jobs successful
+- commit: `85ac8882201a25b2faae246de4b63e2379e9cf4f`
+- tree: `834bc8182238fd5c5f01a5556ed9f5fe103eae10`
+- merged PR: #66
+- main CI: run 34029573773, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -521,6 +521,7 @@ sightlint version
 sightlint adapt-image INPUT
 sightlint check-image INPUT [--format human|json] [--deny-cant-tell] [--profile recommended|base]
 sightlint inspect-image INPUT [--format human|json]
+sightlint github-check INPUT [--source-map FILE] [--repository-root PATH] [--format json|github-actions] [--write-step-summary] [--deny-cant-tell] [--profile recommended|base]
 ```
 
 For a checkout, use `cargo run --locked -p sightlint-cli -- ...`. The source alpha documents how to
@@ -548,6 +549,24 @@ node adapters/playwright/dist/src/check-cli.js \
 
 Omit `--format json` for human output. It performs capture plus the Rust check without persisting
 temporary artifacts or moving verdict policy into Node.
+
+The GitHub Actions surface is a separate deterministic projection of the same Rust report:
+
+```bash
+target/debug/sightlint github-check \
+  evaluation/web/inputs/dashboard-peer-spacing-mutant.json \
+  --source-map evaluation/github-actions/source-maps/dashboard-peer-spacing-mutant.json \
+  --repository-root . \
+  --format github-actions \
+  --write-step-summary
+```
+
+The runner turns escaped `error`/`warning`/`notice` workflow commands into annotations on its
+existing job check. Exact paths and lines require a separately authored, anchored `0.1.0` source
+map; missing mappings stay summary-only. The command never infers source from selectors or bundle
+paths and performs no network request, token use, artifact upload, source edit, or independent REST
+check creation. `--write-step-summary` is explicit and requires the runner-provided
+`GITHUB_STEP_SUMMARY` path.
 
 The perception wrapper is a separate local public process:
 
@@ -683,6 +702,27 @@ SightLint treats tests as part of the product specification.
   join, temporary fix/rerun, no-new-failure postcondition, JSON/human byte stability, and
   ambiguity/intentional-overlay controls;
 - no representative screenshot corpus, private holdout, or general accuracy claim.
+
+### GitHub Actions integration fixtures
+
+- accepted ADR 0050 plus strict `github-source-map@0.1.0` and
+  `github-actions-report@0.1.0` generated schemas;
+- a separate Rust projector outside the kernel and a public `sightlint github-check` file/stdin
+  path using the existing `check_with_options` entry point;
+- independently authored rule, exact-source, and projection authorities across eight public Atlas
+  dashboard/settings cases: two clean, two targeted mutations, two hard negatives, two abstention
+  states, and no protected holdout;
+- exact blocking/error and advisory/warning annotations, exact-source `cantTell`/notice
+  conformance, summary-only abstentions, strict `cantTell` gating without outcome coercion, and
+  passed/inapplicable suppression;
+- repository containment, symlink resolution, stable anchors, declaration ordering/uniqueness,
+  artifact/finding joins, provenance, UTF-8, range, 50-annotation, command-injection, input, and
+  1 MiB summary bounds tested through the public binary;
+- byte-stable file/stdin/rerun output and paired clean reruns after both reviewed mutations;
+- zero unexpected or false-positive failures/annotations in the public corpus, reported only as
+  integer regression evidence rather than real-world precision or a universal score;
+- no network, GitHub App/token, REST publisher, artifact/screenshot upload, telemetry, source
+  excerpt, source edit, or oracle generation from implementation output.
 
 ### Perception protocol fixtures
 
@@ -834,7 +874,8 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
 - broad interaction support beyond the controlled Atlas slice, including offline, permission,
   stale-data, partial success, destructive safeguards, undo, focus/navigation, and mobile traces;
-- MCP, GitHub Checks annotations, editor extension, browser extension, or local GUI;
+- MCP, an independent REST-published GitHub App check, editor extension, browser extension, or
+  local GUI;
 - broad automatic fixes;
 - prebuilt binaries, Cargo/npm publication, package-manager installers, signed artifacts, or
   attestations.
@@ -885,6 +926,10 @@ Issue #34's bounded execution sequence is complete:
 7. **#65 — managed-loopback evaluation authority split (complete in this change).** Strict,
    independently versioned acquisition and rule oracles replace the combined current annotation;
    metrics are derived from reviewed expectations and preserve explicit abstention and non-claims.
+8. **#67 — deterministic GitHub Actions job check (complete in this change).** The public Rust
+   command projects the same authoritative report into escaped job annotations and an explicit
+   bounded summary, using independently reviewed exact-source declarations and preserving
+   unavailable source, abstention, evidence, enforcement, and exit semantics.
 
 Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by placing browser/model
 logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete product.
@@ -903,12 +948,14 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
   source/capture adapters and separate regression corpora.
 - **#30 (complete for the bounded first slice):** medium-neutral actions/effects/states,
   deterministic controlled traces, async feedback, and declared recovery alternatives.
-- **#31:** managed-loopback child #62 and evaluation follow-up #65 are complete; Codex/MCP/GitHub/
-  editor/local-UI ecosystem and later package surfaces remain open.
+- **#31 (complete for its exit criteria):** children #62, #65, and #67 provide managed local
+  capture, independent evaluation authority, and a same-kernel GitHub job-check surface. MCP,
+  editor/browser/local UI, and later package channels remain demand-led non-goals.
 
-The bounded first slices inside #29 and #30 are implemented. The next preserved product issue is
-#31 for ecosystem surfaces. Later expansion remains demand- and evidence-gated; the completed
-alpha, benchmark, and bounded adapter slices do not make stale branches authoritative.
+The bounded first slices inside #29 and #30 are implemented. No further product issue is implied by
+these completed slices; later expansion requires a newly scoped, evidence-gated issue. The
+completed alpha, benchmark, adapter, and integration slices do not make stale branches
+authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -986,6 +1033,8 @@ At minimum, from repository root:
 
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
+python3 tools/generate_github_actions_schemas.py --check
+python3 tools/check_github_actions_evaluation.py
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
@@ -1025,12 +1074,14 @@ cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
+cargo test --locked -p sightlint-cli --test github_actions_e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
+cargo test --locked -p sightlint-cli --test github_actions_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture

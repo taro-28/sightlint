@@ -503,7 +503,7 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - representative/broader PPTX, PDF, Android, and iOS coverage after the bounded issue #29 slices;
 - broader interaction scenarios beyond the bounded issue #30 slice;
 - MCP/editor/local UI, REST check publishing, and later package channels beyond the local GitHub
-  Actions projection: issue #31;
+  Actions projection require a new focused, demand-led issue after #31;
 - signing/attestation identity and any future registry or prebuilt-binary channel after the
   source-only ADR 0037 alpha.
 

@@ -33,11 +33,15 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation, exact PNG
 source-alpha geometry, the PNG format-demand decision, the local perception protocol foundation,
 the first bounded PPTX, PDF, Android, and iOS source/capture-adapter slices, deterministic
-interaction contracts, and managed loopback Web capture. They are not part
+interaction contracts, managed loopback Web capture, and a local GitHub Actions report
+projection. They are not part
 of the published alpha.2 archive and therefore do not retroactively change that release.
 
 | Surface | Version or contract | Compatibility rule |
 |---|---|---|
+| GitHub exact-source map | `0.1.0` | Strict artifact-specific declaration with exact rule/target identity and anchored repository-relative lines. Unknown versions/fields, stale anchors, unsafe paths, and invalid provenance fail before output. |
+| GitHub Actions projection report | `0.1.0` | Embeds the complete authoritative `CheckReport`; preserves outcome, enforcement, policy, evidence, and explicit annotation disposition. Incompatible fields or semantics require a new projection version. |
+| `github-check` | local integration command | JSON or GitHub workflow-command output uses the same kernel and `0`/`1`/`2` exit contract. Optional summary writing is explicit; no network, GitHub token, artifact upload, source inference, or separate REST check run is implied. |
 | Managed Playwright capture protocol | `0.2.0` | Adds only `managedLoopbackHttp`; strict `0.1.0` repository-contained `file:` requests retain their behavior and canonical `0.1.0` response. Unknown fields and versions are rejected. |
 | Managed Web extension | `org.sightlint.web@0.4.0` | Adds loopback response identity, source-kind, route-path, and blocked-transport facts. Rust explicitly dispatches both admitted `0.3.0` and `0.4.0`; older historical schemas are not admitted runtime versions. |
 | Playwright adapter implementation | `0.4.0` | Emitted only for managed protocol `0.2.0`; legacy protocol continues to record implementation `0.3.0`. |

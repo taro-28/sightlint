@@ -43,6 +43,11 @@ jobs:
       - name: Verify committed E2E fixtures
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_e2e_fixtures.py --check
+      - name: Verify GitHub Actions schemas and evaluation governance
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 tools/generate_github_actions_schemas.py --check
+          python3 tools/check_github_actions_evaluation.py
       - name: Verify committed PNG pixel corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_raster_corpus.py --check
@@ -108,6 +113,18 @@ jobs:
       - name: Run fixture-driven CLI E2E explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test e2e
+      - name: Run GitHub Actions projection E2E explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test github_actions_e2e
+      - name: Run GitHub Actions product evaluation explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test github_actions_evaluation_e2e -- --nocapture
+      - name: Exercise the read-only GitHub job-check integration
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: >-
+          cargo run --quiet --locked -p sightlint-cli -- github-check
+          evaluation/web/inputs/dashboard-peer-spacing-clean.json
+          --format github-actions --write-step-summary
       - name: Run PNG filter CLI E2E explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test png_filter_e2e
@@ -268,6 +285,10 @@ jobs:
           ${{ matrix.python }} tools/generate_ios_fixtures.py --check
           ${{ matrix.python }} tools/check_ios_evaluation.py
           ${{ matrix.python }} -m py_compile adapters/ios/sightlint_ios.py
+      - name: Verify GitHub Actions schemas and evaluation governance
+        run: |
+          ${{ matrix.python }} tools/generate_github_actions_schemas.py --check
+          ${{ matrix.python }} tools/check_github_actions_evaluation.py
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E

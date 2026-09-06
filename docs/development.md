@@ -55,9 +55,10 @@ Issue #25 is complete as an evaluation-only benchmark and did not admit a broade
 not establish a format gap. Issue #28 is complete for protocol v0 through ADR 0042; real OCR/model
 quality remains `untested`. Issue #29's focused PPTX, PDF, Android, and iOS slices are implemented
 through ADRs 0043–0046. Issue #62 is the explicitly selected focused #31 slice for managed
-loopback Web capture through ADR 0048; it does not broaden the remaining ecosystem backlog. Other
-work remains available in #30–#31, but historical branch code does not change priority. Explain any
-deviation in the issue and PR.
+loopback Web capture through ADR 0048, and #65 separates its evaluation authorities through ADR
+0049. Issue #67 and ADR 0050 complete #31's remaining integration exit criterion through the
+same-kernel GitHub Actions job-check projection. Optional MCP/editor/local-UI and package work is
+demand-led and requires a new focused issue; historical branch code does not change priority.
 
 ## Planning before implementation
 
@@ -123,6 +124,8 @@ The complete current gate is:
 
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
+python3 tools/generate_github_actions_schemas.py --check
+python3 tools/check_github_actions_evaluation.py
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
@@ -162,12 +165,14 @@ cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
+cargo test --locked -p sightlint-cli --test github_actions_e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
+cargo test --locked -p sightlint-cli --test github_actions_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
@@ -299,7 +304,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0049 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0051 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

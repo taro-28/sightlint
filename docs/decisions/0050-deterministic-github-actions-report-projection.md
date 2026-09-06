@@ -85,6 +85,11 @@ itself to remain unchanged. Empty, duplicate, unsorted, dangling, mismatched-art
 and unknown-field declarations fail closed. A result without an exact entry remains summary-only
 with `sourceMapNotProvided` or `sourceLocationNotDeclared`; the projector never guesses.
 
+The command accepts at most 1 MiB of source-map JSON and 512 entries. Each range spans at most 200
+lines, each anchor is at most 4 KiB, each unique UTF-8 source file is at most 16 MiB, and no more
+than 64 MiB of unique source text is inspected. Repeated locations share one validated in-memory
+source copy rather than multiplying I/O by finding count.
+
 ### Outcome mapping, ordering, and limits
 
 Annotation level is a deterministic projection of two existing fields, not a new verdict:
@@ -111,7 +116,8 @@ only and does not invent columns.
 
 The command never discovers or writes `GITHUB_STEP_SUMMARY` implicitly. The caller must select an
 explicit flag, the GitHub runner must supply the path, and the command refuses to exceed the
-platform's 1 MiB per-step summary limit. The summary lists outcome, enforcement, rule/policy,
+platform's 1 MiB per-step summary limit. The path must already be a regular non-symlink file and
+the integration does not create it. The summary lists outcome, enforcement, rule/policy,
 evidence, source disposition, and gate exit independently. Screenshot, overlay, raw artifact,
 source excerpt, token, and credential data are not written.
 

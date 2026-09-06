@@ -71,7 +71,7 @@ The kernel must not:
 
 ## Current Rust workspace
 
-The current workspace contains four crates:
+The current workspace contains five crates:
 
 - `sightlint-ir`
   - versioned medium-neutral contracts;
@@ -85,6 +85,12 @@ The current workspace contains four crates:
   - bounded untrusted PNG source parsing;
   - complete chunk/CRC validation, inflation, filter reconstruction, supported raster expansion;
   - advisory image-region inspection outside the trusted rule verdict path.
+- `sightlint-github-actions`
+  - deterministic projection of an authoritative `CheckReport` into GitHub job annotations and
+    an optional summary;
+  - strict independently declared exact-source mappings, bounded output, and workflow-command
+    escaping;
+  - no acquisition, rule execution, verdict changes, network access, or artifact upload.
 - `sightlint-cli`
   - local command entry point;
   - input limits, human/canonical JSON output, and stable exit semantics;
@@ -92,7 +98,8 @@ The current workspace contains four crates:
 
 The dependency direction remains intentionally narrow. The adapter may depend on IR to emit
 observations, and the CLI composes adapter and engine. The engine must not depend on a medium-
-specific adapter.
+specific adapter. The GitHub Actions projector may depend on the engine's report contract, while
+the engine has no dependency on the integration.
 
 Future crates require actual ownership/code pressure. Likely boundaries include adapter protocol,
 process runner, rule packs, or reporting, but do not create empty architectural crates in advance.
@@ -404,8 +411,8 @@ semantic reason, not snapshot blessing.
 - Accepted ADR 0007, ADR 0037, and ADR 0038 define dual licensing, surface-specific alpha
   compatibility, source-only packaging, read-only prepublication verification, immutable tags,
   and the first release boundary from issues #33/#47.
-- MCP, GitHub Checks, editor/browser UI, and other surfaces wrap the same kernel and are issue #31;
-  they must not duplicate rule semantics.
+- The GitHub Actions job-check projector wraps the same kernel under ADR 0050. Any future MCP,
+  REST publisher, or editor/browser UI needs a focused issue and must not duplicate rule semantics.
 
 ## Compatibility
 
