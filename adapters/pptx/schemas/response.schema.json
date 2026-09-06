@@ -38,7 +38,7 @@
       "properties": {
         "sourceGeometry": { "enum": ["complete", "partial"] },
         "sourceText": { "const": "digestOnly" },
-        "renderedExtent": { "enum": ["observed", "untested"] },
+        "renderedExtent": { "enum": ["observed", "partial", "untested"] },
         "renderedNodeIdentity": { "const": "cantTell" }
       }
     },

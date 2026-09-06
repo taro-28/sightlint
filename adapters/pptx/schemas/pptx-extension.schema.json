@@ -139,7 +139,7 @@
               "properties": {
                 "status": { "const": "digestOnly" },
                 "sha256": { "$ref": "#/$defs/digest" },
-                "utf8Bytes": { "type": "integer", "minimum": 0, "maximum": 1048576 }
+                "utf8Bytes": { "type": "integer", "minimum": 0, "maximum": 8388608 }
               }
             }
           ]

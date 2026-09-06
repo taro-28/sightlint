@@ -104,6 +104,9 @@ rescaling changes source observations. Pixel-to-node identity, shape ink bounds,
 substitution, text wrapping, clipping, and z-order appearance are `cantTell` in version `0.1.0`.
 A render conflict is evidence, not an automatic rule result.
 
+Response coverage distinguishes `untested` (no slide renders), `partial` (some slides rendered),
+and `observed` (every slide rendered). Node identity remains `cantTell` in all three states.
+
 Repository evaluation renders are reviewed artifacts produced from the matching PPTX with a named
 LibreOffice build and conversion command. CI verifies their bytes and the adapter path; it does not
 regenerate them under an unpinned host renderer or treat adapter output as ground truth.

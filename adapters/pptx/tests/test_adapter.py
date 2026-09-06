@@ -110,6 +110,11 @@ class GeometryTests(unittest.TestCase):
             {"x": 100, "y": 200, "width": 200, "height": 100},
         )
 
+    def test_render_coverage_distinguishes_absent_partial_and_complete(self) -> None:
+        self.assertEqual(ADAPTER.rendered_extent_coverage(0, 2), "untested")
+        self.assertEqual(ADAPTER.rendered_extent_coverage(1, 2), "partial")
+        self.assertEqual(ADAPTER.rendered_extent_coverage(2, 2), "observed")
+
 
 if __name__ == "__main__":
     unittest.main()

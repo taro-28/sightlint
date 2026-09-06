@@ -142,8 +142,17 @@ def parse_request(path: Path) -> dict[str, Any]:
         fail("request-io", f"cannot read request: {error.strerror or 'I/O error'}")
     if len(raw) > MAX_REQUEST_BYTES:
         fail("request-budget", "request exceeds 1048576 bytes")
+
+    def no_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                fail("request-json", f"request contains duplicate field {key}")
+            result[key] = value
+        return result
+
     try:
-        value = json.loads(raw)
+        value = json.loads(raw, object_pairs_hook=no_duplicate_keys)
     except (UnicodeDecodeError, json.JSONDecodeError):
         fail("request-json", "request must be one valid UTF-8 JSON object")
     root = record(value, "request")
@@ -416,7 +425,10 @@ def placeholder_record(shape: ElementTree.Element) -> dict[str, object] | None:
         return None
     result: dict[str, object] = {}
     if "type" in placeholder.attrib:
-        result["type"] = placeholder.attrib["type"]
+        placeholder_type = placeholder.attrib["type"]
+        if not placeholder_type or len(placeholder_type) > 64:
+            fail("source-invalid", "placeholder.type must contain 1 through 64 characters")
+        result["type"] = placeholder_type
     if "idx" in placeholder.attrib:
         result["index"] = attribute_integer(placeholder, "idx", "placeholder", maximum=4_294_967_295)
     return result
@@ -577,6 +589,14 @@ def png_canvas(binary: Path, render_path: Path) -> tuple[int, int, str]:
     return int(width_value), int(height_value), str(adapter_version)
 
 
+def rendered_extent_coverage(render_count: int, slide_count: int) -> str:
+    if render_count == 0:
+        return "untested"
+    if render_count == slide_count:
+        return "observed"
+    return "partial"
+
+
 def adapt(request: dict[str, Any], repository_root: Path, binary: Path) -> tuple[bytes, bytes]:
     source_path = local_file(repository_root, request["input"]["reference"], "input reference")
     execution = request["execution"]
@@ -599,15 +619,15 @@ def adapt(request: dict[str, Any], repository_root: Path, binary: Path) -> tuple
     with archive:
         members = inventory(archive, execution)
         content_types = xml_part(archive, members, "[Content_Types].xml", execution["maxXmlBytes"])
-        presentation_override = next(
-            (
-                item
-                for item in content_types.findall(f"{{{CT}}}Override")
-                if item.attrib.get("PartName") == "/ppt/presentation.xml"
-            ),
-            None,
-        )
-        if presentation_override is None or presentation_override.attrib.get("ContentType") != PRESENTATION_CONTENT_TYPE:
+        presentation_overrides = [
+            item
+            for item in content_types.findall(f"{{{CT}}}Override")
+            if item.attrib.get("PartName") == "/ppt/presentation.xml"
+        ]
+        if (
+            len(presentation_overrides) != 1
+            or presentation_overrides[0].attrib.get("ContentType") != PRESENTATION_CONTENT_TYPE
+        ):
             fail("package-type", "package is not a macro-free PPTX presentation")
         root_relations = relationships(xml_part(archive, members, "_rels/.rels", execution["maxXmlBytes"]), "package relationships")
         office_relations = [item for item in root_relations.values() if item["type"] == REL_OFFICE_DOCUMENT]
@@ -645,6 +665,7 @@ def adapt(request: dict[str, Any], repository_root: Path, binary: Path) -> tuple
         extension_slides: list[dict[str, object]] = []
         unsupported_features: set[str] = {"masterAndLayoutObjects", "themeResolvedStyles"}
         seen_slide_ids: set[int] = set()
+        seen_slide_parts: set[str] = set()
 
         for slide_index, slide_item in enumerate(slide_items, start=1):
             slide_native_id = attribute_integer(
@@ -666,6 +687,9 @@ def adapt(request: dict[str, Any], repository_root: Path, binary: Path) -> tuple
             slide_part = resolve_part("ppt/presentation.xml", relation["target"], f"slide {slide_index} relationship")
             if SLIDE_PART.fullmatch(slide_part) is None:
                 fail("slide-relationship", f"slide {slide_index} target is outside the supported slide part pattern")
+            if slide_part in seen_slide_parts:
+                fail("duplicate-slide-part", "presentation references the same slide part more than once")
+            seen_slide_parts.add(slide_part)
             slide = xml_part(archive, members, slide_part, execution["maxXmlBytes"])
             if slide.tag != f"{{{P}}}sld":
                 fail("source-invalid", f"slide part has an unsupported root element: {slide_part}")
@@ -806,7 +830,9 @@ def adapt(request: dict[str, Any], repository_root: Path, binary: Path) -> tuple
         "coverage": {
             "sourceGeometry": "partial",
             "sourceText": "digestOnly",
-            "renderedExtent": "observed" if renders_by_slide else "untested",
+            "renderedExtent": rendered_extent_coverage(
+                len(renders_by_slide), len(extension_slides)
+            ),
             "renderedNodeIdentity": "cantTell",
         },
         "externalProcessing": False,

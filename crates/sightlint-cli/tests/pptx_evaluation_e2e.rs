@@ -515,6 +515,25 @@ fn public_process_rejects_digest_limits_unknown_fields_and_output_collisions() {
         "sightlint-pptx: request-invalid: request has unknown fields unexpected\n",
     );
 
+    let duplicate = temporary.0.join("duplicate-key.json");
+    let clean_request =
+        fs::read_to_string(repository_root().join("evaluation/pptx/requests/atlas-clean.json"))
+            .unwrap();
+    fs::write(
+        &duplicate,
+        clean_request.replacen(
+            "\"protocolVersion\": \"0.1.0\"",
+            "\"protocolVersion\": \"0.1.0\",\n  \"protocolVersion\": \"0.1.0\"",
+            1,
+        ),
+    )
+    .unwrap();
+    assert_stable_error(
+        &duplicate,
+        &temporary.0.join("duplicate-key.ir.json"),
+        "sightlint-pptx: request-json: request contains duplicate field protocolVersion\n",
+    );
+
     let collision = temporary.0.join("already-exists.ir.json");
     fs::write(&collision, b"preserve me").unwrap();
     let request = repository_root().join("evaluation/pptx/requests/atlas-clean.json");
@@ -526,7 +545,11 @@ fn public_process_rejects_digest_limits_unknown_fields_and_output_collisions() {
         "sightlint-pptx: output-collision: artifact IR output already exists\n"
     );
     assert_eq!(fs::read(&collision).unwrap(), b"preserve me");
+}
 
+#[test]
+fn public_process_rejects_a_malformed_archive_without_output() {
+    let temporary = TempDirectory::new();
     let malformed_root = temporary.0.join("malformed-root");
     fs::create_dir(&malformed_root).unwrap();
     fs::write(malformed_root.join("malformed.pptx"), b"").unwrap();
