@@ -146,7 +146,7 @@ contract; they do not silently modify `encodedRgba8Raster@0.1.0` or `alphaGeomet
 ## Verification
 
 - strict schema validation of the format-demand assessment;
-- drift check over all eight committed `.png` files, their digests, dimensions, depth, color type,
+- drift check over all eleven committed `.png` files, their digests, dimensions, depth, color type,
   and interlace method;
 - explicit linkage to the five unsupported conformance cases and their stable reason codes;
 - nine-case Playwright segmentation E2E assertion that generated screenshots are eight-bit RGB

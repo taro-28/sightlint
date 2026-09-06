@@ -47,8 +47,8 @@ The #25 benchmark is complete without changing the strict image-inspection defau
 exact source-alpha geometry without introducing a padding rule. Issue #27 is complete through ADR
 0041 without broadening PNG coverage because current product evidence did not establish a format
 gap. Issue #28 adds the first local perception protocol foundation without OCR/model accuracy or
-blocking claims. [Issue #29](https://github.com/taro-28/sightlint/issues/29) now includes a first
-bounded PPTX source-geometry slice; PDF/document is the next candidate in that umbrella.
+blocking claims. [Issue #29](https://github.com/taro-28/sightlint/issues/29) now includes bounded
+PPTX and PDF source-geometry slices; Android is the next candidate in that umbrella.
 
 ## Why
 
@@ -180,8 +180,8 @@ Palette/indexed, sub-byte, 16-bit, `tRNS`, animation, and over-budget cases are 
 unavailable instead of guessed.
 
 ADR 0041 keeps that boundary after a versioned format-demand assessment found that all five
-source-alpha assets, all three later PPTX differential renders, and the nine pinned-browser
-product captures use the supported subset.
+source-alpha assets, all three PPTX differential renders, all three PDF page renders, and the nine
+pinned-browser product captures use the supported subset.
 Unsupported formats remain conformance controls rather than product-demand evidence; no decoder
 dependency, automatic conversion, compatibility change, prevalence claim, or protected holdout is
 introduced. A future observed gap requires a new issue and ADR.
@@ -263,6 +263,19 @@ objects are not guessed. All successful v0 responses therefore report partial co
 three-case public synthetic corpus is regression evidence only, with no protected holdout or
 general slide-quality claim; see [`adapters/pptx/README.md`](adapters/pptx/README.md).
 
+### Bounded PDF source acquisition
+
+ADR 0044 adds a separate Python 3.9+ process using exactly hash-locked `pypdf==6.17.0`. It maps
+only explicit integral unrotated page boxes and rectangular internal Link activation regions to
+`pdfPoint` canvases and exact-source `hitBox` nodes. Candidate IR passes public normalization, and
+the existing deterministic containment rule runs without a PDF-specific kernel branch.
+
+Optional digest-pinned page PNGs remain separate device-pixel canvases with extent-only
+agreement/conflict. `QuadPoints`, paths, unsupported actions, uncertain page geometry, text, tags,
+paint, reading order, viewer hit testing, and rendered node identity are not guessed. The
+three-case public corpus is maintainer-authored regression evidence with no protected holdout or
+general PDF/document-quality claim; see [`adapters/pdf/README.md`](adapters/pdf/README.md).
+
 ## Install and current commands
 
 The first alpha is a source-only GitHub prerelease with a deterministic archive and SHA-256
@@ -308,6 +321,17 @@ python3 adapters/pptx/sightlint_pptx.py \
   --sightlint-binary target/debug/sightlint \
   --artifact-ir-out /tmp/atlas-clean.ir.json
 target/debug/sightlint check /tmp/atlas-clean.ir.json --profile base --format json
+
+# Install the exact PDF parser, acquire bounded PDF geometry, and run the public rule engine.
+python3 -m venv .venv-sightlint-pdf
+.venv-sightlint-pdf/bin/python -m pip install --require-hashes -r adapters/pdf/requirements.txt
+export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
+python3 adapters/pdf/sightlint_pdf.py \
+  --request evaluation/pdf/requests/atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-clean-pdf.ir.json
+target/debug/sightlint check /tmp/atlas-clean-pdf.ir.json --profile base --format json
 
 # Binary stdin is supported.
 cat screenshot.png | cargo run --locked -p sightlint-cli -- adapt-image -
@@ -368,7 +392,7 @@ Current committed assets include:
 
 - generated `fixtures/e2e/` Artifact IR conformance data;
 - a versioned synthetic rule smoke oracle under `evaluation/`;
-- **38 PNG raster cases** with exact independent pixel, unavailable, or malformed outcomes;
+- **43 PNG raster cases** with exact independent pixel, unavailable, or malformed outcomes;
 - **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
 - a nine-case realistic image-segmentation benchmark with separate acquisition/rule oracles,
   hard negatives, abstention, targeted mutation, metamorphic relations, and bounded refusal;
@@ -383,6 +407,9 @@ Current committed assets include:
 - a versioned one-command agent report and one reviewed temporary source-edit/fix/rerun case with
   byte-stable JSON/human output, native source navigation, and retained ambiguity/hard-negative
   controls;
+- three deterministic PDF pages/renders with separate acquisition/rule oracles, one source-only
+  off-page mutation, one `QuadPoints` abstention hard negative, explicit provenance/license/
+  privacy/non-holdout records, and public-process byte-stability/fail-closed checks;
 - targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
   byte-identical results.
 
@@ -439,14 +466,14 @@ Read:
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand/decoder strategy decision; broader coverage not admitted |
 | #28 | completed local OCR/CV/VLM protocol foundation; real model evaluation remains untested |
-| #29 | PPTX first slice implemented; PDF/document and Android/iOS adapters remain |
+| #29 | PPTX and PDF first slices implemented; Android/iOS adapters remain |
 | #30 | interaction states, effects, traces, and recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0044 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0045 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

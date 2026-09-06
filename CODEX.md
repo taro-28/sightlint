@@ -53,9 +53,9 @@ policy. Issue #26 adds exact source-alpha geometry without admitting an alpha-pa
 establish a format gap, unsupported formats remain explicit, and no decoder dependency was added.
 #28 is complete for protocol v0 through ADR 0042: the local bounded worker boundary and typed
 perception records are implemented, while real OCR/model quality remains `untested`. Issue #29's
-first focused slice is implemented through ADR 0043: a bounded local PPTX source adapter, separate
-native/render evidence, and public regression corpus exist. PDF/document is the next candidate
-inside #29; mobile remains later in the same umbrella, followed by #30–#31. Existing stale code
+PPTX and PDF focused slices are implemented through ADRs 0043–0044: both use bounded local process
+adapters, separate native/render evidence, and public regression corpora. Android is the next
+candidate inside #29, with iOS later in the same umbrella, followed by #30–#31. Existing stale code
 does not change priority.
 
 ## Non-negotiable workflow

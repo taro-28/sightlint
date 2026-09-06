@@ -1,0 +1,59 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "pdf-atlas-clean",
+      "caseRole": "clean",
+      "expectations": [
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:7-0" },
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:8-0" },
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:9-0" }
+      ],
+      "falsePositiveRisk": "A source activation rectangle may not match a particular viewer, but all three exact rectangular source regions are contained by the declared CropBox.",
+      "forbidUnexpectedFailures": true,
+      "id": "pdf-atlas-clean-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "The existing mechanical bounds obligation applies to each exact source hit rectangle without asserting document usability or visible link styling."
+    },
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "pdf-atlas-off-page-mutant",
+      "caseRole": "targetedMutation",
+      "expectations": [
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:7-0" },
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:8-0" },
+        { "aspect": "hitBox", "expectedOutcome": "failed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:9-0" }
+      ],
+      "falsePositiveRisk": "The exact source rectangle extends beyond CropBox, but viewer clipping, destination behavior, or author intent could mean this is not a user-visible defect; this corpus proves only the named source obligation.",
+      "forbidUnexpectedFailures": true,
+      "id": "pdf-atlas-off-page-mutant-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "Only annotation 9 0 R moves, and its right edge 674 exceeds the 612-point CropBox while the other links and rendered pixels remain unchanged."
+    },
+    {
+      "applicabilityGroundTruth": "cantTell",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "pdf-atlas-quadpoints-hard-negative",
+      "caseRole": "hardNegative",
+      "expectations": [
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:7-0" },
+        { "aspect": "hitBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pdf:annotation:8-0" }
+      ],
+      "falsePositiveRisk": "Using Link object 9 0 R Rect as its hit area would fill the intentional gap between two QuadPoints regions and manufacture exact applicability.",
+      "forbidUnexpectedFailures": true,
+      "id": "pdf-atlas-quadpoints-hard-negative-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "The two supported rectangular links remain in bounds; the QuadPoints link has no core hitBox or rule result, and asymmetric paint geometry creates no peer relation."
+    }
+  ],
+  "kind": "ruleGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureIntentAndRuleContract",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

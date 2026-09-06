@@ -1,0 +1,37 @@
+{
+  "artifact": {
+    "id": "pdf-atlas-off-page-mutant",
+    "title": "Atlas operating review off-page link mutation"
+  },
+  "execution": {
+    "maxAnnotations": 16,
+    "maxAnnotationsPerPage": 8,
+    "maxInputBytes": 1048576,
+    "maxObjects": 100,
+    "maxOutputBytes": 1048576,
+    "maxPages": 4,
+    "maxRenderBytes": 4194304
+  },
+  "input": {
+    "reference": "fixtures/pdf/atlas-off-page-mutant.pdf",
+    "sha256": "sha256:370b77e231e403a96b6cb80652fe57a45ded6d1aabde59e25b3c9f77fd7ac06d"
+  },
+  "privacy": {
+    "contentPolicy": "geometryAndTypeOnly",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "renders": [
+    {
+      "pageIndex": 1,
+      "pdfPointsPerPixel": {
+        "denominator": 1,
+        "numerator": 1
+      },
+      "reference": "evaluation/pdf/renders/atlas-off-page-mutant.png",
+      "sha256": "sha256:343ed41c651202cc50243c44fa0cbe3535e95e52d4d671e27fabca3df1e151f3"
+    }
+  ],
+  "requestId": "pdf-atlas-off-page-mutant"
+}

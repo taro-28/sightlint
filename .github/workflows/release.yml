@@ -85,12 +85,15 @@ jobs:
           - name: Linux x64
             os: ubuntu-latest
             python: python3
+            pdf_python: .venv-sightlint-pdf/bin/python
           - name: macOS arm64
             os: macos-latest
             python: python3
+            pdf_python: .venv-sightlint-pdf/bin/python
           - name: Windows x64
             os: windows-latest
             python: python
+            pdf_python: .venv-sightlint-pdf/Scripts/python.exe
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -116,6 +119,14 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal
           rustup default stable
+      - name: Install locked PDF parser dependency
+        shell: bash
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}
+        run: |
+          "${{ matrix.python }}" -m venv .venv-sightlint-pdf
+          "${{ matrix.pdf_python }}" -m pip install --disable-pip-version-check --require-hashes \
+            -r adapters/pdf/requirements.txt
+          "${{ matrix.pdf_python }}" -c 'import os,sys; print(os.path.dirname(sys.executable))' >> "$GITHUB_PATH"
       - name: Test extracted Rust workspace
         shell: bash
         run: cargo test --manifest-path "release-unpacked/sightlint-$RELEASE_TAG/Cargo.toml" --locked --workspace --all-features
@@ -126,6 +137,13 @@ jobs:
           "${{ matrix.python }}" tools/generate_pptx_fixtures.py --check
           "${{ matrix.python }}" tools/check_pptx_evaluation.py
           "${{ matrix.python }}" -m unittest adapters/pptx/tests/test_adapter.py
+      - name: Verify extracted PDF evaluation contracts
+        shell: bash
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}
+        run: |
+          "${{ matrix.pdf_python }}" tools/generate_pdf_fixtures.py --check
+          "${{ matrix.pdf_python }}" tools/check_pdf_evaluation.py
+          "${{ matrix.pdf_python }}" -m unittest adapters/pdf/tests/test_adapter.py
       - name: Verify hosted Node compatibility
         shell: bash
         run: node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 20 || major > 24) process.exit(1)'
@@ -166,6 +184,9 @@ jobs:
       - name: Verify extracted corpus and package contracts
         working-directory: release-unpacked/sightlint-${{ github.ref_name }}
         run: |
+          python3 -m venv .venv-sightlint-pdf
+          .venv-sightlint-pdf/bin/python -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+          .venv-sightlint-pdf/bin/python -c 'import os,sys; print(os.path.dirname(sys.executable))' >> "$GITHUB_PATH"
           python3 tools/generate_e2e_fixtures.py --check
           python3 tools/generate_raster_corpus.py --check
           python3 tools/generate_alpha_assets.py --check
@@ -177,6 +198,9 @@ jobs:
           python3 tools/generate_pptx_fixtures.py --check
           python3 tools/check_pptx_evaluation.py
           python3 -m unittest adapters/pptx/tests/test_adapter.py
+          .venv-sightlint-pdf/bin/python tools/generate_pdf_fixtures.py --check
+          .venv-sightlint-pdf/bin/python tools/check_pdf_evaluation.py
+          .venv-sightlint-pdf/bin/python -m unittest adapters/pdf/tests/test_adapter.py
           python3 tools/check_dependency_licenses.py
           python3 -m unittest tools/test_release.py
       - name: Install the locked perception wrapper
@@ -195,6 +219,7 @@ jobs:
         run: |
           cargo build --locked -p sightlint-cli --bin sightlint
           cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
+          cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
           npm run test:e2e --prefix adapters/perception
           npm run test:e2e --prefix adapters/playwright
 

@@ -70,9 +70,24 @@ and Python runtime remain in the adapter trust zone. Digest-only text metadata a
 limit: unsalted hashes of low-entropy strings may be guessed offline, while caller-supplied title
 and relative path metadata remains visible. Treat output as source-derived sensitive data.
 
+## Current PDF parser boundary
+
+ADR 0044 treats pypdf and PDF object traversal as another untrusted local process. The exact
+universal `pypdf==6.17.0` wheel is SHA-256 locked, its version is checked at runtime, strict mode is
+enabled, and the adapter rejects encryption. Repository-contained source/render paths and digests,
+source/render bytes, cross-reference objects, page-tree traversal with cycle detection, pages,
+annotations, and output are bounded. The adapter does not read content streams, extract text or
+images, interpret tags, follow destinations/actions, or serialize URI/action/text/metadata values.
+Candidate IR still passes public Rust normalization before it is written.
+
+Those controls do not provide a CPU, memory, syscall, recursion, or filesystem sandbox. A hostile
+PDF still reaches pypdf under the caller's process privileges, and parser version locking does not
+prove safety. Object IDs, rectangles, relative paths, titles, and digests are source-derived
+sensitive metadata even though document text and pixels are omitted from serialized output.
+
 ## Future work
 
-Before broadening PPTX or accepting other real artifact formats, add format-specific fuzzing,
+Before broadening PPTX/PDF or accepting other real artifact formats, add format-specific fuzzing,
 parser/runtime compatibility characterization, and stronger sandbox guidance; every new parser
 still needs its own resource and archive policy.
 Before browser support, define origin isolation, credential handling, request interception,

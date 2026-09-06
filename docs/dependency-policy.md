@@ -5,9 +5,10 @@ external tools retain their own terms.
 
 ## Current locked review
 
-The current source tree contains 36 external Cargo packages and 30 external npm lockfile package
-entries across two private Node package roots. `tools/check_dependency_licenses.py` reads the
-complete locked graphs and rejects
+The current source tree contains 36 external Cargo packages, 30 external npm lockfile package
+entries across two private Node package roots, and one hash-locked Python wheel record for the
+untrusted PDF adapter. `tools/check_dependency_licenses.py` reads the complete locked graphs and
+records and rejects
 missing declarations or identifiers outside this reviewed permissive set:
 
 - `0BSD`;
@@ -28,6 +29,10 @@ lockfiles rather than inferred from this summary.
 The private perception package has no npm dependencies, model weights, native modules, or bundled
 runtime. Its lockfile still participates in the root-license check so future additions cannot
 bypass review.
+
+The PDF process adapter pins the universal `pypdf==6.17.0` wheel by SHA-256. Its
+`BSD-3-Clause` license is allowed, but the package remains an untrusted parser outside the Rust
+kernel; the lock does not make hostile PDF parsing safe or sandboxed.
 
 Adding a package with an allowed license still requires ordinary ownership, maintenance,
 security, MSRV/runtime, determinism, privacy, and resource review. Updating the allowed set is a

@@ -336,8 +336,10 @@ The sequence is:
 
 ADR 0042 completes the protocol-v0 perception boundary. ADR 0043 then selects PPTX as the first
 post-Web structured medium and proves a bounded direct-shape/source-geometry slice without moving
-OOXML into the kernel. The remaining PDF/document and mobile work stays sequenced inside #29;
-issues #30 and #31 preserve the later stages.
+OOXML into the kernel. ADR 0044 follows with a hash-locked untrusted PDF parser process and maps
+only exact page and rectangular internal-Link activation geometry; a `QuadPoints` case proves that
+uncertain activation regions are not promoted. Android and iOS stay sequenced inside #29; issues
+#30 and #31 preserve the later stages.
 
 ## Local-first and privacy
 
@@ -456,7 +458,9 @@ Important historical detail:
   non-promotion boundary;
 - ADR 0043 defines the bounded PPTX source-geometry process, separate rendered extent evidence,
   and public acquisition-versus-rule evaluation boundary;
-- new ADRs should continue at 0044 or later rather than silently reusing historical numbers.
+- ADR 0044 defines the bounded PDF page/Link-annotation process, exact hash-locked parser,
+  conservative non-rectangular abstention, and separate acquisition/rule evaluation boundary;
+- new ADRs should continue at 0045 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.

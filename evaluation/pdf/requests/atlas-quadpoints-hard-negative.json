@@ -1,0 +1,37 @@
+{
+  "artifact": {
+    "id": "pdf-atlas-quadpoints-hard-negative",
+    "title": "Atlas operating review QuadPoints hard negative"
+  },
+  "execution": {
+    "maxAnnotations": 16,
+    "maxAnnotationsPerPage": 8,
+    "maxInputBytes": 1048576,
+    "maxObjects": 100,
+    "maxOutputBytes": 1048576,
+    "maxPages": 4,
+    "maxRenderBytes": 4194304
+  },
+  "input": {
+    "reference": "fixtures/pdf/atlas-quadpoints-hard-negative.pdf",
+    "sha256": "sha256:bc450a410dc3b561576770edaeb62ea21410830fb66fde15fc9fbdd725bdf163"
+  },
+  "privacy": {
+    "contentPolicy": "geometryAndTypeOnly",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "renders": [
+    {
+      "pageIndex": 1,
+      "pdfPointsPerPixel": {
+        "denominator": 1,
+        "numerator": 1
+      },
+      "reference": "evaluation/pdf/renders/atlas-quadpoints-hard-negative.png",
+      "sha256": "sha256:e6801eb7437bd75989159c009a2e405dd89cca8c24088e2a2e4b599a0b28ae29"
+    }
+  ],
+  "requestId": "pdf-atlas-quadpoints-hard-negative"
+}

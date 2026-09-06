@@ -1,0 +1,17 @@
+{
+  "lockVersion": "0.1.0",
+  "packages": [
+    {
+      "filename": "pypdf-6.17.0-py3-none-any.whl",
+      "license": "BSD-3-Clause",
+      "name": "pypdf",
+      "publishedAt": "2026-09-04T11:30:42.681909Z",
+      "requiresPython": ">=3.9",
+      "reviewedAt": "2026-09-06",
+      "sha256": "sha256:5bd827266a21553b74d910e350131a6227b72f2ab4209bf372814b8195fa11c5",
+      "sizeBytes": 388051,
+      "url": "https://files.pythonhosted.org/packages/c1/08/1e9731038124a9127e1d27848952b86fb32b2f45f8f1b94adc7f0817a6ac/pypdf-6.17.0-py3-none-any.whl",
+      "version": "6.17.0"
+    }
+  ]
+}

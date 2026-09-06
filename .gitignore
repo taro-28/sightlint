@@ -14,5 +14,6 @@ artifacts/
 /adapters/playwright/node_modules/
 /playwright-report/
 /test-results/
+/.venv-sightlint-pdf/
 __pycache__/
 *.pyc

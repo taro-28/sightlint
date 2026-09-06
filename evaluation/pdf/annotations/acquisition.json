@@ -1,0 +1,237 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "abstentions": [
+        "taggedStructureInterpretation",
+        "sourceTextAndReadingOrder",
+        "paintAndInkGeometry",
+        "renderedAnnotationIdentity",
+        "viewerHitTesting"
+      ],
+      "annotations": [
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:7-0",
+          "normalizedHitBoxPdfPoints": { "height": 30, "width": 68, "x": 40, "y": 86 },
+          "objectReference": "7 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 676, "left": 40, "right": 108, "top": 706 },
+          "subtype": "/Link"
+        },
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:8-0",
+          "normalizedHitBoxPdfPoints": { "height": 30, "width": 84, "x": 116, "y": 86 },
+          "objectReference": "8 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 676, "left": 116, "right": 200, "top": 706 },
+          "subtype": "/Link"
+        },
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:9-0",
+          "normalizedHitBoxPdfPoints": { "height": 36, "width": 134, "x": 430, "y": 702 },
+          "objectReference": "9 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 54, "left": 430, "right": 564, "top": 90 },
+          "subtype": "/Link"
+        }
+      ],
+      "caseId": "pdf-atlas-clean",
+      "id": "pdf-atlas-clean-acquisition",
+      "page": {
+        "cropBoxPdfPoints": { "bottom": 0, "left": 0, "right": 612, "top": 792 },
+        "evidenceClass": "exactSource",
+        "geometryStatus": "exact",
+        "id": "pdf:page:3-0",
+        "index": 1,
+        "mediaBoxPdfPoints": { "bottom": 0, "left": 0, "right": 612, "top": 792 },
+        "objectReference": "3 0 R",
+        "rotationDegrees": 0
+      },
+      "pdfHeader": "%PDF-1.7",
+      "render": {
+        "evidenceClass": "exactRender",
+        "extentReconciliation": "agreement",
+        "heightPixels": 792,
+        "nodeIdentity": "cantTell",
+        "pdfPointsPerPixel": { "denominator": 1, "numerator": 1 },
+        "widthPixels": 612
+      },
+      "taggedStructure": {
+        "catalogDeclaresStructTreeRoot": true,
+        "interpretation": "untested"
+      }
+    },
+    {
+      "abstentions": [
+        "taggedStructureInterpretation",
+        "sourceTextAndReadingOrder",
+        "paintAndInkGeometry",
+        "renderedAnnotationIdentity",
+        "viewerHitTesting"
+      ],
+      "annotations": [
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:7-0",
+          "normalizedHitBoxPdfPoints": { "height": 30, "width": 68, "x": 40, "y": 86 },
+          "objectReference": "7 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 676, "left": 40, "right": 108, "top": 706 },
+          "subtype": "/Link"
+        },
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:8-0",
+          "normalizedHitBoxPdfPoints": { "height": 30, "width": 84, "x": 116, "y": 86 },
+          "objectReference": "8 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 676, "left": 116, "right": 200, "top": 706 },
+          "subtype": "/Link"
+        },
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:9-0",
+          "normalizedHitBoxPdfPoints": { "height": 36, "width": 134, "x": 540, "y": 702 },
+          "objectReference": "9 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 54, "left": 540, "right": 674, "top": 90 },
+          "subtype": "/Link"
+        }
+      ],
+      "caseId": "pdf-atlas-off-page-mutant",
+      "id": "pdf-atlas-off-page-mutant-acquisition",
+      "page": {
+        "cropBoxPdfPoints": { "bottom": 0, "left": 0, "right": 612, "top": 792 },
+        "evidenceClass": "exactSource",
+        "geometryStatus": "exact",
+        "id": "pdf:page:3-0",
+        "index": 1,
+        "mediaBoxPdfPoints": { "bottom": 0, "left": 0, "right": 612, "top": 792 },
+        "objectReference": "3 0 R",
+        "rotationDegrees": 0
+      },
+      "pdfHeader": "%PDF-1.7",
+      "render": {
+        "evidenceClass": "exactRender",
+        "extentReconciliation": "agreement",
+        "heightPixels": 792,
+        "nodeIdentity": "cantTell",
+        "pdfPointsPerPixel": { "denominator": 1, "numerator": 1 },
+        "widthPixels": 612
+      },
+      "taggedStructure": {
+        "catalogDeclaresStructTreeRoot": true,
+        "interpretation": "untested"
+      }
+    },
+    {
+      "abstentions": [
+        "taggedStructureInterpretation",
+        "sourceTextAndReadingOrder",
+        "paintAndInkGeometry",
+        "quadPointsActivationGeometry",
+        "renderedAnnotationIdentity",
+        "viewerHitTesting"
+      ],
+      "annotations": [
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:7-0",
+          "normalizedHitBoxPdfPoints": { "height": 30, "width": 68, "x": 40, "y": 86 },
+          "objectReference": "7 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 676, "left": 40, "right": 108, "top": 706 },
+          "subtype": "/Link"
+        },
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "exact",
+          "hasPath": false,
+          "hasQuadPoints": false,
+          "id": "pdf:annotation:8-0",
+          "normalizedHitBoxPdfPoints": { "height": 30, "width": 84, "x": 116, "y": 86 },
+          "objectReference": "8 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 676, "left": 116, "right": 200, "top": 706 },
+          "subtype": "/Link"
+        },
+        {
+          "actionKind": "internalDestination",
+          "flags": 0,
+          "geometryStatus": "unsupportedQuadPoints",
+          "hasPath": false,
+          "hasQuadPoints": true,
+          "id": "pdf:annotation:9-0",
+          "objectReference": "9 0 R",
+          "sourceEvidenceClass": "exactSource",
+          "sourceRectPdfPoints": { "bottom": 54, "left": 430, "right": 564, "top": 90 },
+          "subtype": "/Link"
+        }
+      ],
+      "caseId": "pdf-atlas-quadpoints-hard-negative",
+      "id": "pdf-atlas-quadpoints-hard-negative-acquisition",
+      "page": {
+        "cropBoxPdfPoints": { "bottom": 0, "left": 0, "right": 612, "top": 792 },
+        "evidenceClass": "exactSource",
+        "geometryStatus": "exact",
+        "id": "pdf:page:3-0",
+        "index": 1,
+        "mediaBoxPdfPoints": { "bottom": 0, "left": 0, "right": 612, "top": 792 },
+        "objectReference": "3 0 R",
+        "rotationDegrees": 0
+      },
+      "pdfHeader": "%PDF-1.7",
+      "render": {
+        "evidenceClass": "exactRender",
+        "extentReconciliation": "agreement",
+        "heightPixels": 792,
+        "nodeIdentity": "cantTell",
+        "pdfPointsPerPixel": { "denominator": 1, "numerator": 1 },
+        "widthPixels": 612
+      },
+      "taggedStructure": {
+        "catalogDeclaresStructTreeRoot": true,
+        "interpretation": "untested"
+      }
+    }
+  ],
+  "kind": "acquisitionGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureSpecification",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

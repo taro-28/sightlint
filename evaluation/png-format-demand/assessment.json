@@ -23,9 +23,43 @@
   "committedAssets": {
     "sourceManifest": "evaluation/image-alpha/corpus.json",
     "additionalSourceManifests": [
-      "evaluation/pptx/corpus.json"
+      "evaluation/pptx/corpus.json",
+      "evaluation/pdf/corpus.json"
     ],
     "cases": [
+      {
+        "caseId": "atlas-pdf-clean",
+        "path": "evaluation/pdf/renders/atlas-clean.png",
+        "byteSha256": "343ed41c651202cc50243c44fa0cbe3535e95e52d4d671e27fabca3df1e151f3",
+        "width": 612,
+        "height": 792,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-pdf-off-page-mutant",
+        "path": "evaluation/pdf/renders/atlas-off-page-mutant.png",
+        "byteSha256": "343ed41c651202cc50243c44fa0cbe3535e95e52d4d671e27fabca3df1e151f3",
+        "width": 612,
+        "height": 792,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-pdf-quadpoints-hard-negative",
+        "path": "evaluation/pdf/renders/atlas-quadpoints-hard-negative.png",
+        "byteSha256": "e6801eb7437bd75989159c009a2e405dd89cca8c24088e2a2e4b599a0b28ae29",
+        "width": 612,
+        "height": 792,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
       {
         "caseId": "atlas-pptx-asymmetric-hard-negative",
         "path": "evaluation/pptx/renders/atlas-asymmetric-hard-negative.png",

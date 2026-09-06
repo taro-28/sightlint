@@ -1,0 +1,87 @@
+%PDF-1.7
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /StructTreeRoot 10 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /CropBox [0 0 612 792] /Rotate 0 /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R /Annots [7 0 R 8 0 R 9 0 R] >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+6 0 obj
+<< /Length 1335 >>
+stream
+q
+1 1 1 rg 0 0 612 792 re f
+0.055 0.075 0.125 rg 0 656 612 136 re f
+0.15 0.20 0.31 rg 40 676 68 30 re f
+0.15 0.20 0.31 rg 116 676 84 30 re f
+0.13 0.48 0.88 rg 430 54 134 36 re f
+0.96 0.97 0.99 rg 40 424 246 188 re f
+0.94 0.97 1 rg 318 424 246 188 re f
+0.96 0.97 0.99 rg 40 174 524 208 re f
+0.22 0.76 0.55 rg 58 536 12 12 re f
+0.98 0.67 0.24 rg 336 536 12 12 re f
+0.13 0.48 0.88 rg 58 302 456 10 re f
+0.40 0.47 0.58 rg 58 276 402 10 re f
+0.66 0.71 0.78 rg 58 250 348 10 re f
+1 1 1 rg
+BT /F2 24 Tf 40 744 Td (Atlas Operations Review) Tj ET
+BT /F1 10 Tf 40 726 Td (Fictional repository-owned report - September planning cycle) Tj ET
+BT /F2 10 Tf 56 687 Td (Overview) Tj ET
+BT /F2 10 Tf 128 687 Td (Decisions) Tj ET
+BT /F2 12 Tf 462 67 Td (Open plan) Tj ET
+0.055 0.075 0.125 rg
+BT /F2 14 Tf 58 574 Td (Delivery confidence) Tj ET
+BT /F2 30 Tf 58 520 Td (84 percent) Tj ET
+BT /F1 10 Tf 58 486 Td (Three milestones remain inside the reviewed scope.) Tj ET
+BT /F2 14 Tf 336 574 Td (Review queue) Tj ET
+BT /F2 30 Tf 336 520 Td (7 items) Tj ET
+BT /F1 10 Tf 336 486 Td (Two items require a documented abstention.) Tj ET
+BT /F2 16 Tf 58 344 Td (Evidence notes) Tj ET
+BT /F1 11 Tf 58 326 Td (Native structure and rendered pixels remain separate.) Tj ET
+BT /F1 11 Tf 58 216 Td (SIGHTLINT-PDF-CONTENT-SENTINEL is fictional private test text.) Tj ET
+Q
+endstream
+endobj
+7 0 obj
+<< /Type /Annot /Subtype /Link /Rect [40 676 108 706] /Border [0 0 0] /Dest [3 0 R /Fit] >>
+endobj
+8 0 obj
+<< /Type /Annot /Subtype /Link /Rect [116 676 200 706] /Border [0 0 0] /Dest [3 0 R /Fit] >>
+endobj
+9 0 obj
+<< /Type /Annot /Subtype /Link /Rect [430 54 564 90] /Border [0 0 0] /Dest [3 0 R /Fit] >>
+endobj
+10 0 obj
+<< /Type /StructTreeRoot /K [] >>
+endobj
+11 0 obj
+<< /Title (Atlas Internal Review) /Subject (SIGHTLINT-PDF-METADATA-SENTINEL) /Creator (SightLint fixture generator) >>
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000015 00000 n 
+0000000087 00000 n 
+0000000144 00000 n 
+0000000341 00000 n 
+0000000411 00000 n 
+0000000486 00000 n 
+0000001873 00000 n 
+0000001980 00000 n 
+0000002088 00000 n 
+0000002194 00000 n 
+0000002244 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R /Info 11 0 R >>
+startxref
+2379
+%%EOF

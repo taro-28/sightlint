@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:protocol:pdf-request:0.1.0",
+  "title": "SightLint PDF adapter request 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "requestId", "artifact", "input", "renders", "privacy", "execution"],
+  "properties": {
+    "protocolVersion": { "const": "0.1.0" },
+    "requestId": { "$ref": "#/$defs/token" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 256 }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "sha256"],
+      "properties": {
+        "reference": { "$ref": "#/$defs/reference" },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "renders": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pageIndex", "reference", "sha256", "pdfPointsPerPixel"],
+        "properties": {
+          "pageIndex": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "reference": { "$ref": "#/$defs/reference" },
+          "sha256": { "$ref": "#/$defs/digest" },
+          "pdfPointsPerPixel": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["numerator", "denominator"],
+            "properties": {
+              "numerator": { "type": "integer", "minimum": 1, "maximum": 14400 },
+              "denominator": { "type": "integer", "minimum": 1, "maximum": 14400 }
+            }
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "contentPolicy"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "contentPolicy": { "const": "geometryAndTypeOnly" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxInputBytes", "maxRenderBytes", "maxObjects", "maxPages", "maxAnnotations", "maxAnnotationsPerPage", "maxOutputBytes"],
+      "properties": {
+        "maxInputBytes": { "type": "integer", "minimum": 1, "maximum": 33554432 },
+        "maxRenderBytes": { "type": "integer", "minimum": 1, "maximum": 67108864 },
+        "maxObjects": { "type": "integer", "minimum": 1, "maximum": 50000 },
+        "maxPages": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "maxAnnotations": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "maxAnnotationsPerPage": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "maxOutputBytes": { "type": "integer", "minimum": 1024, "maximum": 16777216 }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "reference": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\\\/].*" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

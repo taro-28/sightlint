@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:pdf-corpus:0.1.0",
+  "title": "SightLint PDF evaluation corpus 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["corpusVersion", "source", "splitPolicy", "holdout", "cases"],
+  "properties": {
+    "corpusVersion": { "const": "0.1.0" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "ownership", "license", "redistribution", "privacy", "review", "fixtureGenerator", "renderer", "rendererVersion", "renderPipeline"],
+      "properties": {
+        "origin": { "const": "repositoryOwnedFixture" },
+        "ownership": { "const": "SightLint project" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "const": "permitted" },
+        "privacy": { "const": "fictionalNoPersonalOrCustomerData" },
+        "review": { "const": "maintainerAuthoredNotIndependent" },
+        "fixtureGenerator": { "const": "tools/generate_pdf_fixtures.py" },
+        "renderer": { "const": "pdftoppm" },
+        "rendererVersion": { "const": "26.05.0" },
+        "renderPipeline": { "const": "pdftoppm-cropbox-singlefile-png-r72" }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge"],
+      "properties": {
+        "smoke": { "type": "string", "minLength": 1 },
+        "development": { "type": "string", "minLength": 1 },
+        "challenge": { "type": "string", "minLength": 1 }
+      }
+    },
+    "holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": { "const": "notEstablished" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "split", "request", "input", "render", "relation", "acquisitionAnnotationId", "ruleAnnotationId"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "split": { "enum": ["smoke", "development", "challenge"] },
+          "request": { "$ref": "#/$defs/artifact" },
+          "input": { "$ref": "#/$defs/artifact" },
+          "render": { "$ref": "#/$defs/artifact" },
+          "relation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind"],
+            "properties": {
+              "kind": { "enum": ["baseline", "targetedMutation", "hardNegative"] },
+              "baselineId": { "$ref": "#/$defs/id" },
+              "changedProperty": { "type": "string", "minLength": 1 }
+            }
+          },
+          "acquisitionAnnotationId": { "$ref": "#/$defs/id" },
+          "ruleAnnotationId": { "$ref": "#/$defs/id" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

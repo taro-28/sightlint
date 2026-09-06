@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:dependency-lock:pdf-adapter:0.1.0",
+  "title": "SightLint PDF adapter dependency lock 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lockVersion", "packages"],
+  "properties": {
+    "lockVersion": { "const": "0.1.0" },
+    "packages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version", "filename", "sha256", "sizeBytes", "license", "requiresPython", "url", "publishedAt", "reviewedAt"],
+        "properties": {
+          "name": { "const": "pypdf" },
+          "version": { "const": "6.17.0" },
+          "filename": { "const": "pypdf-6.17.0-py3-none-any.whl" },
+          "sha256": { "const": "sha256:5bd827266a21553b74d910e350131a6227b72f2ab4209bf372814b8195fa11c5" },
+          "sizeBytes": { "const": 388051 },
+          "license": { "const": "BSD-3-Clause" },
+          "requiresPython": { "const": ">=3.9" },
+          "url": { "type": "string", "pattern": "^https://files\\.pythonhosted\\.org/.+/pypdf-6\\.17\\.0-py3-none-any\\.whl$" },
+          "publishedAt": { "const": "2026-09-04T11:30:42.681909Z" },
+          "reviewedAt": { "const": "2026-09-06" }
+        }
+      }
+    }
+  }
+}
