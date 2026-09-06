@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { canonicalJson } from "./canonical.mjs";
+import { canonicalJson, compareUtf16 } from "./canonical.mjs";
 import { PerceptionError } from "./errors.mjs";
 import { MAX_REQUEST_BYTES, parseRequest } from "./validate.mjs";
 
@@ -77,7 +77,7 @@ function responseFor(request) {
           semanticApplicability: "cantTell",
         },
       };
-    }).sort((left, right) => left.id.localeCompare(right.id))
+    }).sort((left, right) => compareUtf16(left.id, right.id))
     : [];
   const regionStatus = observed ? "observed" : "unsupported";
   const reason = observed

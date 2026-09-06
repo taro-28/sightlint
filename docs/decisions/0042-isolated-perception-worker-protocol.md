@@ -101,7 +101,8 @@ Repeated-run agreement is a separate field and never substitutes for model confi
 - Reference region identifiers derive from the complete measured tuple rather than collection
   iteration order.
 - Observations, alternatives, family statuses, evidence, nodes, and extension objects are sorted
-  before canonical serialization.
+  before canonical serialization. String ordering uses ECMAScript UTF-16 code-unit comparison;
+  locale-sensitive comparison is forbidden.
 - Runtime/backend/model/preprocessing versions are part of the declared compatibility
   environment. Byte stability is required for repeated identical runs in that environment, not
   across different model/runtime/platform versions.

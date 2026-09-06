@@ -1,4 +1,4 @@
-import { canonicalJson, sha256 } from "./canonical.mjs";
+import { canonicalJson, compareUtf16, sha256 } from "./canonical.mjs";
 
 const WRAPPER_NAME = "sightlint-perception-wrapper";
 const WRAPPER_VERSION = "0.1.0";
@@ -61,8 +61,8 @@ export function mapResponseToArtifactIr(request, response) {
       },
     };
   });
-  evidence.sort((left, right) => left.id.localeCompare(right.id));
-  nodes.sort((left, right) => left.id.localeCompare(right.id));
+  evidence.sort((left, right) => compareUtf16(left.id, right.id));
+  nodes.sort((left, right) => compareUtf16(left.id, right.id));
   const extension = {
     version: "0.1.0",
     protocolVersion: response.protocolVersion,
@@ -70,7 +70,7 @@ export function mapResponseToArtifactIr(request, response) {
     responseSha256: sha256(responseBytes),
     worker: response.worker,
     familyStatus: response.familyStatus,
-    observationIds: response.observations.map((observation) => observation.id).sort(),
+    observationIds: response.observations.map((observation) => observation.id).sort(compareUtf16),
     mapping: {
       mappedRegionCount: nodes.length,
       unmappedObservationCount: response.observations.length - nodes.length,

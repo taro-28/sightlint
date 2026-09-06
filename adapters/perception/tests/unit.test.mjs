@@ -4,7 +4,7 @@ import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { canonicalJson, sha256 } from "../src/canonical.mjs";
+import { canonicalJson, compareUtf16, sha256 } from "../src/canonical.mjs";
 import { mapResponseToArtifactIr } from "../src/map.mjs";
 import { parseRequest, parseWorkerResponse } from "../src/validate.mjs";
 import { requestFor } from "./helpers.mjs";
@@ -57,6 +57,7 @@ test("canonical JSON is stable and SHA-256 covers exact bytes", () => {
   const second = canonicalJson({ a: [{ x: 1, y: 2 }], z: 0 });
   assert.equal(first, second);
   assert.match(sha256(Buffer.from(first)), /^sha256:[0-9a-f]{64}$/);
+  assert.deepEqual(["region:2", "region:10", "region:_"].sort(compareUtf16), ["region:10", "region:2", "region:_"]);
 });
 
 test("request validation binds canonical content, local privacy, preprocessing, and budgets", async () => {
