@@ -1,0 +1,98 @@
+{
+  "cases": [
+    {
+      "acquisitionAnnotationId": "ios-atlas-clean-acquisition",
+      "capture": {
+        "path": "evaluation/ios/captures/clean.capture.json",
+        "sha256": "sha256:78d6567b0359f83b1e67717498c1a793312cfa742784447092633e2d96e29e37"
+      },
+      "id": "ios-atlas-clean",
+      "relation": {
+        "kind": "baseline"
+      },
+      "request": {
+        "path": "evaluation/ios/requests/ios-atlas-clean.json",
+        "sha256": "sha256:abf59fb767751bc7295bf5f94be2d31c9da62b7157f70a765e424bb62ec9d940"
+      },
+      "ruleAnnotationId": "ios-atlas-clean-rules",
+      "screenshot": {
+        "path": "evaluation/ios/captures/clean.png",
+        "sha256": "sha256:accaa375f338ead217076ec5242baeec3436e58f8677eeaec4600ae661179d54"
+      },
+      "split": "smoke"
+    },
+    {
+      "acquisitionAnnotationId": "ios-atlas-off-canvas-control-mutant-acquisition",
+      "capture": {
+        "path": "evaluation/ios/captures/off-canvas-control-mutant.capture.json",
+        "sha256": "sha256:e5b040e303bac15354f79aa3e3466b25529962869d2e836a8b574796b4d3449c"
+      },
+      "id": "ios-atlas-off-canvas-control-mutant",
+      "relation": {
+        "baselineId": "ios-atlas-clean",
+        "changedProperty": "Only the Save button source leading position changes from x 24 to x 300 points; its 354-point allocation crosses the 402-point screen while the window intersection clips to 102 points.",
+        "kind": "targetedMutation"
+      },
+      "request": {
+        "path": "evaluation/ios/requests/ios-atlas-off-canvas-control-mutant.json",
+        "sha256": "sha256:705c5ce51d0813eaf204b84c0bb483e206f0b6503ca62a09d4b8562019299a0d"
+      },
+      "ruleAnnotationId": "ios-atlas-off-canvas-control-mutant-rules",
+      "screenshot": {
+        "path": "evaluation/ios/captures/off-canvas-control-mutant.png",
+        "sha256": "sha256:9d6115b9458f92daa925a0961df6c7ea3fb3c32958f1f93b1a8831d8ce707e9a"
+      },
+      "split": "development"
+    },
+    {
+      "acquisitionAnnotationId": "ios-atlas-scroll-offscreen-hard-negative-acquisition",
+      "capture": {
+        "path": "evaluation/ios/captures/scroll-offscreen-hard-negative.capture.json",
+        "sha256": "sha256:d118afcd3fa3e5b2f2ad555e2513e207a6c87010e44091ff09a5cc83e1d7340a"
+      },
+      "id": "ios-atlas-scroll-offscreen-hard-negative",
+      "relation": {
+        "baselineId": "ios-atlas-clean",
+        "changedProperty": "A valid scroll container adds three source views below the current window; XCUITest exposes two exact but non-hittable platform frames, and the pre-query screenshot remains byte-identical to clean.",
+        "kind": "hardNegative"
+      },
+      "request": {
+        "path": "evaluation/ios/requests/ios-atlas-scroll-offscreen-hard-negative.json",
+        "sha256": "sha256:6f66cf700709c159ab5ca3bbf82d298af3ca1fd9db4ce1ca94466f1dcd4b6815"
+      },
+      "ruleAnnotationId": "ios-atlas-scroll-offscreen-hard-negative-rules",
+      "screenshot": {
+        "path": "evaluation/ios/captures/scroll-offscreen-hard-negative.png",
+        "sha256": "sha256:accaa375f338ead217076ec5242baeec3436e58f8677eeaec4600ae661179d54"
+      },
+      "split": "challenge"
+    }
+  ],
+  "corpusVersion": "0.1.0",
+  "fixtureSourceSha256": "sha256:b058a0ee74be9eb66371f6bebfe5d8c2f1d293af2f4ed1c86534e539640bccba",
+  "holdout": {
+    "reason": "All fixture source, captures, annotations, and splits are public to implementers and maintainer-authored; no frozen inaccessible application/device sample or leakage-control process exists.",
+    "status": "notEstablished"
+  },
+  "source": {
+    "application": "fixtures/ios/atlas-app",
+    "capturePipeline": "instrumented-uikit-then-screenshot-then-xcui",
+    "deviceType": "iPhone 17 Pro",
+    "license": "MIT OR Apache-2.0",
+    "modelIdentifier": "iPhone18,1",
+    "origin": "repositoryOwnedFixtureApplication",
+    "ownership": "SightLint project",
+    "privacy": "fictionalNoPersonalOrCustomerData",
+    "redistribution": "permitted",
+    "review": "maintainerAuthoredAndVisuallyReviewedNotIndependent",
+    "runtimeBuild": "23D8133",
+    "runtimeVersion": "26.3.1",
+    "xcodeBuild": "17C529",
+    "xcodeVersion": "26.3"
+  },
+  "splitPolicy": {
+    "challenge": "Public scroll hard negative used to verify exclusion, native conflict retention, abstention, and false-positive behavior.",
+    "development": "Visible targeted source-layout mutation used for implementation and regression tuning.",
+    "smoke": "Required clean iOS source/XCUI/screenshot adapter and binary path on every change."
+  }
+}

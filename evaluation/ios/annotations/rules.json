@@ -1,0 +1,61 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "ios-atlas-clean",
+      "expectedAbsentTargets": [],
+      "expectedFailedTargets": [],
+      "expectedResultCount": 22,
+      "falsePositiveRisk": "A UIKit layout allocation does not prove visible ink or usability; this oracle only asks whether admitted exact source allocations fit the point canvas.",
+      "forbidUnexpectedFailures": true,
+      "id": "ios-atlas-clean-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "All 22 admitted clean UIKit source allocations are contained by the exact 402 by 874 point screen canvas.",
+      "ruleId": "visual.bounds.within-canvas",
+      "ruleVersion": "0.1.0"
+    },
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "ios-atlas-off-canvas-control-mutant",
+      "expectedAbsentTargets": [],
+      "expectedFailedTargets": ["ios:view:save_button"],
+      "expectedResultCount": 22,
+      "falsePositiveRisk": "The failure is justified only by fixture-authored exact source allocation; the visible clipped pixels and XCUI hittability are supporting observations, not the blocking predicate.",
+      "forbidUnexpectedFailures": true,
+      "id": "ios-atlas-off-canvas-control-mutant-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "Only save_button moves to x 300 while retaining width 354, so its exact UIKit source allocation crosses the 402 point screen boundary.",
+      "ruleId": "visual.bounds.within-canvas",
+      "ruleVersion": "0.1.0"
+    },
+    {
+      "applicabilityGroundTruth": "applicableWithExcludedHardNegative",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "ios-atlas-scroll-offscreen-hard-negative",
+      "expectedAbsentTargets": [
+        "ios:view:archived_card",
+        "ios:view:archived_detail",
+        "ios:view:archived_title"
+      ],
+      "expectedFailedTargets": [],
+      "expectedResultCount": 22,
+      "falsePositiveRisk": "Valid scroll content below the current viewport must not be reported as an off-canvas defect merely because XCUI exposes its platform frame.",
+      "forbidUnexpectedFailures": true,
+      "id": "ios-atlas-scroll-offscreen-hard-negative-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "The three archived source views are outside the current window and remain extension-only; the other 22 admitted source allocations match the clean state and stay contained.",
+      "ruleId": "visual.bounds.within-canvas",
+      "ruleVersion": "0.1.0"
+    }
+  ],
+  "kind": "ruleGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureIntentAndExistingRuleContract",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

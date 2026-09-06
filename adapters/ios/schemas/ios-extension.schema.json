@@ -25,8 +25,8 @@
           "prefixItems": [
             { "const": "waitForQuiescence" },
             { "const": "sourceHierarchy" },
-            { "const": "xcuiHierarchy" },
-            { "const": "screenshot" }
+            { "const": "screenshot" },
+            { "const": "xcuiHierarchy" }
           ],
           "minItems": 4,
           "maxItems": 4
@@ -200,7 +200,7 @@
         "xcodeVersion": { "const": "26.3" },
         "xcodeBuild": { "const": "17C529" },
         "swiftVersion": { "const": "6.2.4" },
-        "sdkVersion": { "const": "26.3" },
+        "sdkVersion": { "const": "26.2" },
         "deploymentTarget": { "const": "26.0" }
       }
     },
@@ -226,7 +226,7 @@
         "layoutDirection": { "const": "ltr" },
         "contentSizeCategory": { "const": "large" },
         "interfaceStyle": { "const": "light" },
-        "reduceMotion": { "const": true }
+        "reduceMotion": { "const": false }
       }
     },
     "device": {

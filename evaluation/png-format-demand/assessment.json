@@ -24,6 +24,7 @@
     "sourceManifest": "evaluation/image-alpha/corpus.json",
     "additionalSourceManifests": [
       "evaluation/android/corpus.json",
+      "evaluation/ios/corpus.json",
       "evaluation/pptx/corpus.json",
       "evaluation/pdf/corpus.json"
     ],
@@ -56,6 +57,39 @@
         "byteSha256": "afe150689f40cbd2e7fdd5cd5e32e7d1bd61a29943228b3fb9a5b744e529d332",
         "width": 1080,
         "height": 2400,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-ios-clean",
+        "path": "evaluation/ios/captures/clean.png",
+        "byteSha256": "accaa375f338ead217076ec5242baeec3436e58f8677eeaec4600ae661179d54",
+        "width": 1206,
+        "height": 2622,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-ios-off-canvas-control-mutant",
+        "path": "evaluation/ios/captures/off-canvas-control-mutant.png",
+        "byteSha256": "9d6115b9458f92daa925a0961df6c7ea3fb3c32958f1f93b1a8831d8ce707e9a",
+        "width": 1206,
+        "height": 2622,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-ios-scroll-offscreen-hard-negative",
+        "path": "evaluation/ios/captures/scroll-offscreen-hard-negative.png",
+        "byteSha256": "accaa375f338ead217076ec5242baeec3436e58f8677eeaec4600ae661179d54",
+        "width": 1206,
+        "height": 2622,
         "bitDepth": 8,
         "colorType": 2,
         "interlaceMethod": 0,

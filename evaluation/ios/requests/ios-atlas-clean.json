@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "id": "ios-atlas-clean",
+    "title": "Atlas iOS clean settings"
+  },
+  "capture": {
+    "reference": "evaluation/ios/captures/clean.capture.json",
+    "sha256": "sha256:78d6567b0359f83b1e67717498c1a793312cfa742784447092633e2d96e29e37"
+  },
+  "execution": {
+    "maxAttributesPerNode": 32,
+    "maxCaptureBytes": 2097152,
+    "maxDepth": 16,
+    "maxNodes": 64,
+    "maxOutputBytes": 4194304,
+    "maxScreenshotBytes": 8388608,
+    "maxStringBytes": 1024
+  },
+  "privacy": {
+    "contentPolicy": "digestsAndGeometry",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "requestId": "ios-atlas-clean",
+  "screenshot": {
+    "reference": "evaluation/ios/captures/clean.png",
+    "sha256": "sha256:accaa375f338ead217076ec5242baeec3436e58f8677eeaec4600ae661179d54"
+  }
+}

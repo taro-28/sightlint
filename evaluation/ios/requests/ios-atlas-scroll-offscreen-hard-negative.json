@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "id": "ios-atlas-scroll-offscreen-hard-negative",
+    "title": "Atlas iOS offscreen scroll hard negative"
+  },
+  "capture": {
+    "reference": "evaluation/ios/captures/scroll-offscreen-hard-negative.capture.json",
+    "sha256": "sha256:d118afcd3fa3e5b2f2ad555e2513e207a6c87010e44091ff09a5cc83e1d7340a"
+  },
+  "execution": {
+    "maxAttributesPerNode": 32,
+    "maxCaptureBytes": 2097152,
+    "maxDepth": 16,
+    "maxNodes": 64,
+    "maxOutputBytes": 4194304,
+    "maxScreenshotBytes": 8388608,
+    "maxStringBytes": 1024
+  },
+  "privacy": {
+    "contentPolicy": "digestsAndGeometry",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "requestId": "ios-atlas-scroll-offscreen-hard-negative",
+  "screenshot": {
+    "reference": "evaluation/ios/captures/scroll-offscreen-hard-negative.png",
+    "sha256": "sha256:accaa375f338ead217076ec5242baeec3436e58f8677eeaec4600ae661179d54"
+  }
+}

@@ -45,8 +45,8 @@ under `fixtures/ios/atlas-app/`. The explicit maintainer capture path:
 
 1. builds and launches one pinned simulator/test configuration;
 2. makes the app write source-view facts after layout stabilization;
-3. has XCUITest query named accessibility elements and attach its independent observation plus a
-   screenshot;
+3. has XCUITest attach a screenshot, then query named accessibility elements and attach its
+   independent observation;
 4. exports the attachments and source observation on the host;
 5. canonicalizes one combined capture manifest and paired PNG per scenario;
 6. verifies source and capture digests before committed artifacts are reviewed.
@@ -99,6 +99,14 @@ For the same named identifiers, XCUITest independently records:
 The XCUITest list is not forced to match the UIKit list. Missing, merged, split, duplicated, or
 conflicting projections remain explicit extension coverage/conflict facts. Traversal index never
 becomes stable identity.
+
+The screenshot is taken after the source hierarchy is published but before individual XCUI element
+queries. Querying an accessibility element outside a scroll viewport can change that viewport as a
+platform side effect. Preserving that side effect in the screenshot would make the acquisition
+fixture depend on observer behavior rather than the ready source state. The capture remains
+non-atomic, and later XCUI facts may describe platform state after such a side effect; the extension
+therefore preserves capture order and never treats source, screenshot, and XCUI observations as one
+simultaneous exact fact.
 
 Only a UIKit source View with a unique identifier, finite nonnegative size, identity transform,
 window attachment, non-hidden state, positive alpha, and nonempty window intersection may become a

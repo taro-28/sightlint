@@ -20,7 +20,7 @@
         "privacy": { "const": "fictionalNoPersonalOrCustomerData" },
         "redistribution": { "const": "permitted" },
         "review": { "const": "maintainerAuthoredAndVisuallyReviewedNotIndependent" },
-        "capturePipeline": { "const": "instrumented-uikit-then-xcui-and-screenshot" },
+        "capturePipeline": { "const": "instrumented-uikit-then-screenshot-then-xcui" },
         "xcodeVersion": { "const": "26.3" },
         "xcodeBuild": { "const": "17C529" },
         "runtimeVersion": { "const": "26.3.1" },

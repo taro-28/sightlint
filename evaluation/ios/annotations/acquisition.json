@@ -1,0 +1,241 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "abstentions": [
+        "touchHitRegions",
+        "renderedNodeIdentity",
+        "occlusionAndInkGeometry",
+        "swiftUISemantics",
+        "focusNavigation",
+        "dynamicBehavior"
+      ],
+      "caseId": "ios-atlas-clean",
+      "counts": {
+        "mappedCoreNodes": 22,
+        "sourceNodes": 22,
+        "unidentifiedSourceNodes": 15,
+        "unmatchedXcuiQueries": 0,
+        "xcuiNodes": 15
+      },
+      "display": {
+        "heightPixels": 2622,
+        "heightPoints": 874,
+        "orientation": "portrait",
+        "scale": 3,
+        "widthPixels": 1206,
+        "widthPoints": 402
+      },
+      "id": "ios-atlas-clean-acquisition",
+      "nodes": [
+        {
+          "className": "UISwitch",
+          "coreKind": "control",
+          "identifier": "notifications_switch",
+          "label": {
+            "sha256": "sha256:ce57845e252776bed2990cdc67e7257a05c1c41835bdf6f55e7a237ce877dc59",
+            "utf8ByteLength": 21
+          },
+          "layoutBoundsPoints": { "height": 28, "width": 63, "x": 299, "y": 353.333 },
+          "mappingStatus": "mappedExactLayout",
+          "value": {
+            "sha256": "sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+            "utf8ByteLength": 1
+          },
+          "windowVisible": true,
+          "xcuiFramePoints": { "height": 28, "width": 63, "x": 299, "y": 353.333 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": true,
+          "xcuiReconciliation": "frameAgreement"
+        },
+        {
+          "className": "UIButton",
+          "coreKind": "control",
+          "identifier": "save_button",
+          "label": {
+            "sha256": "sha256:dd0ae7a5cbcf233968657563dce34639e681861e2df6d3f845c08d49981c0999",
+            "utf8ByteLength": 12
+          },
+          "layoutBoundsPoints": { "height": 52, "width": 354, "x": 24, "y": 521.667 },
+          "mappingStatus": "mappedExactLayout",
+          "windowVisible": true,
+          "xcuiFramePoints": { "height": 52, "width": 354, "x": 24, "y": 521.667 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": true,
+          "xcuiReconciliation": "frameAgreement"
+        }
+      ],
+      "safeAreaInsetsPoints": { "bottom": 34, "left": 0, "right": 0, "top": 62 },
+      "screenshot": {
+        "extentReconciliation": "extentAndScaleAgree",
+        "heightPixels": 2622,
+        "nodeIdentity": "cantTell",
+        "widthPixels": 1206
+      }
+    },
+    {
+      "abstentions": [
+        "touchHitRegions",
+        "renderedNodeIdentity",
+        "occlusionAndInkGeometry",
+        "swiftUISemantics",
+        "focusNavigation",
+        "dynamicBehavior"
+      ],
+      "caseId": "ios-atlas-off-canvas-control-mutant",
+      "counts": {
+        "mappedCoreNodes": 22,
+        "sourceNodes": 22,
+        "unidentifiedSourceNodes": 15,
+        "unmatchedXcuiQueries": 0,
+        "xcuiNodes": 15
+      },
+      "display": {
+        "heightPixels": 2622,
+        "heightPoints": 874,
+        "orientation": "portrait",
+        "scale": 3,
+        "widthPixels": 1206,
+        "widthPoints": 402
+      },
+      "id": "ios-atlas-off-canvas-control-mutant-acquisition",
+      "nodes": [
+        {
+          "className": "UISwitch",
+          "coreKind": "control",
+          "identifier": "notifications_switch",
+          "label": {
+            "sha256": "sha256:ce57845e252776bed2990cdc67e7257a05c1c41835bdf6f55e7a237ce877dc59",
+            "utf8ByteLength": 21
+          },
+          "layoutBoundsPoints": { "height": 28, "width": 63, "x": 299, "y": 353.333 },
+          "mappingStatus": "mappedExactLayout",
+          "value": {
+            "sha256": "sha256:6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+            "utf8ByteLength": 1
+          },
+          "windowVisible": true,
+          "xcuiFramePoints": { "height": 28, "width": 63, "x": 299, "y": 353.333 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": true,
+          "xcuiReconciliation": "frameAgreement"
+        },
+        {
+          "className": "UIButton",
+          "coreKind": "control",
+          "identifier": "save_button",
+          "label": {
+            "sha256": "sha256:dd0ae7a5cbcf233968657563dce34639e681861e2df6d3f845c08d49981c0999",
+            "utf8ByteLength": 12
+          },
+          "layoutBoundsPoints": { "height": 52, "width": 354, "x": 300, "y": 521.667 },
+          "mappingStatus": "mappedExactLayout",
+          "windowVisible": true,
+          "xcuiFramePoints": { "height": 52, "width": 354, "x": 300, "y": 521.667 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": true,
+          "xcuiReconciliation": "frameAgreement"
+        }
+      ],
+      "safeAreaInsetsPoints": { "bottom": 34, "left": 0, "right": 0, "top": 62 },
+      "screenshot": {
+        "extentReconciliation": "extentAndScaleAgree",
+        "heightPixels": 2622,
+        "nodeIdentity": "cantTell",
+        "widthPixels": 1206
+      }
+    },
+    {
+      "abstentions": [
+        "touchHitRegions",
+        "renderedNodeIdentity",
+        "occlusionAndInkGeometry",
+        "swiftUISemantics",
+        "focusNavigation",
+        "dynamicBehavior"
+      ],
+      "caseId": "ios-atlas-scroll-offscreen-hard-negative",
+      "counts": {
+        "mappedCoreNodes": 22,
+        "sourceNodes": 25,
+        "unidentifiedSourceNodes": 15,
+        "unmatchedXcuiQueries": 0,
+        "xcuiNodes": 17
+      },
+      "display": {
+        "heightPixels": 2622,
+        "heightPoints": 874,
+        "orientation": "portrait",
+        "scale": 3,
+        "widthPixels": 1206,
+        "widthPoints": 402
+      },
+      "id": "ios-atlas-scroll-offscreen-hard-negative-acquisition",
+      "nodes": [
+        {
+          "className": "UILabel",
+          "coreKind": null,
+          "identifier": "archived_detail",
+          "label": {
+            "sha256": "sha256:b17c7b7a4b124bf7c70031999815b47f52c532c172ed342a5370beac8001d01d",
+            "utf8ByteLength": 24
+          },
+          "layoutBoundsPoints": { "height": 15.667, "width": 155, "x": 42, "y": 974.333 },
+          "mappingStatus": "notMappedNotWindowVisible",
+          "windowVisible": false,
+          "xcuiFramePoints": { "height": 15.667, "width": 155, "x": 42, "y": 974.333 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": false,
+          "xcuiReconciliation": "frameAgreement"
+        },
+        {
+          "className": "UILabel",
+          "coreKind": null,
+          "identifier": "archived_title",
+          "label": {
+            "sha256": "sha256:02642b5089160de030d7625b12ff34c6efb2fd69f5dd827691b3398c18945f76",
+            "utf8ByteLength": 20
+          },
+          "layoutBoundsPoints": { "height": 20.333, "width": 170.667, "x": 42, "y": 948 },
+          "mappingStatus": "notMappedNotWindowVisible",
+          "windowVisible": false,
+          "xcuiFramePoints": { "height": 20.333, "width": 170.667, "x": 42, "y": 948 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": false,
+          "xcuiReconciliation": "frameAgreement"
+        },
+        {
+          "className": "UIButton",
+          "coreKind": "control",
+          "identifier": "save_button",
+          "label": {
+            "sha256": "sha256:dd0ae7a5cbcf233968657563dce34639e681861e2df6d3f845c08d49981c0999",
+            "utf8ByteLength": 12
+          },
+          "layoutBoundsPoints": { "height": 52, "width": 354, "x": 24, "y": 521.667 },
+          "mappingStatus": "mappedExactLayout",
+          "windowVisible": true,
+          "xcuiFramePoints": { "height": 52, "width": 354, "x": 24, "y": 521.667 },
+          "xcuiFrameStatus": "exact",
+          "xcuiHittable": true,
+          "xcuiReconciliation": "frameAgreement"
+        }
+      ],
+      "safeAreaInsetsPoints": { "bottom": 34, "left": 0, "right": 0, "top": 62 },
+      "screenshot": {
+        "extentReconciliation": "extentAndScaleAgree",
+        "heightPixels": 2622,
+        "nodeIdentity": "cantTell",
+        "widthPixels": 1206
+      }
+    }
+  ],
+  "kind": "acquisitionGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureSourcePlatformCaptureAndHumanVisualReview",
+    "captureIsAdapterOutput": false,
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}
