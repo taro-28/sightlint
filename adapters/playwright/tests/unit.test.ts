@@ -113,6 +113,14 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ["adapters/pptx/schemas/request.schema.json", "evaluation/pptx/requests/atlas-clean.json"],
     ["adapters/pptx/schemas/request.schema.json", "evaluation/pptx/requests/atlas-off-slide-mutant.json"],
     ["adapters/pptx/schemas/request.schema.json", "evaluation/pptx/requests/atlas-asymmetric-hard-negative.json"],
+    ["evaluation/pdf/corpus.schema.json", "evaluation/pdf/corpus.json"],
+    ["evaluation/pdf/acquisition-annotation.schema.json", "evaluation/pdf/annotations/acquisition.json"],
+    ["evaluation/pdf/rule-annotation.schema.json", "evaluation/pdf/annotations/rules.json"],
+    ["evaluation/pdf/metric-contract.schema.json", "evaluation/pdf/metric-contract.json"],
+    ["adapters/pdf/dependency-lock.schema.json", "adapters/pdf/dependency-lock.json"],
+    ["adapters/pdf/schemas/request.schema.json", "evaluation/pdf/requests/atlas-clean.json"],
+    ["adapters/pdf/schemas/request.schema.json", "evaluation/pdf/requests/atlas-off-page-mutant.json"],
+    ["adapters/pdf/schemas/request.schema.json", "evaluation/pdf/requests/atlas-quadpoints-hard-negative.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {
@@ -128,6 +136,8 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     "adapters/perception/schemas/perception-extension.schema.json",
     "adapters/pptx/schemas/response.schema.json",
     "adapters/pptx/schemas/pptx-extension.schema.json",
+    "adapters/pdf/schemas/response.schema.json",
+    "adapters/pdf/schemas/pdf-extension.schema.json",
   ]) {
     const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
     ajv.compile(await json(schemaPath) as AnySchema);
