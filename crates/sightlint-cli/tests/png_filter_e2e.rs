@@ -238,7 +238,14 @@ fn all_five_filters_flow_through_the_public_adapter_and_metadata() {
     assert_eq!(metadata["inflatedScanlineBytes"], 50);
     assert_eq!(metadata["reconstructedPackedSampleBytes"], 45);
     assert_eq!(metadata["nonEmptyPassCount"], 1);
-    assert!(ir["nodes"][0]["geometry"].get("inkBox").is_none());
+    assert_eq!(
+        ir["nodes"][0]["geometry"]["inkBox"]["rect"],
+        serde_json::json!({"x": 0.0, "y": 0.0, "width": 3.0, "height": 5.0})
+    );
+    assert_eq!(
+        ir["nodes"][0]["geometry"]["inkBox"]["evidenceId"],
+        "evidence:png-alpha"
+    );
     assert!(ir["nodes"][0].get("role").is_none());
 
     for _ in 0..10 {

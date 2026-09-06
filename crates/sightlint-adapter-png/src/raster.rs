@@ -6,7 +6,8 @@ use serde_json::{Value, json};
 use sightlint_ir::{ArtifactIr, Identifier, Selector};
 
 use crate::{
-    PNG_EXTENSION_KEY, PngAdapterError, PngHeader, PngPass, PngStructure, ReconstructedPng, crc32,
+    AlphaBounds, AlphaEdgeCount, AlphaGeometry, PNG_EXTENSION_KEY, PngAdapterError, PngHeader,
+    PngPass, PngStructure, ReconstructedPng, TransparentInsets, crc32, observe_alpha_geometry,
     reconstruct_png_scanlines,
 };
 
@@ -324,7 +325,91 @@ pub(crate) fn attach_raster(
             PngAdapterError::InvalidArtifactIr("missing PNG metadata object".to_owned())
         })?
         .insert("encodedRgba8Raster".to_owned(), raster_metadata(&status));
+    attach_alpha_geometry(document, &status)?;
     Ok(())
+}
+
+fn attach_alpha_geometry(
+    document: &mut ArtifactIr,
+    status: &PngRasterStatus,
+) -> Result<(), PngAdapterError> {
+    let metadata = match status {
+        PngRasterStatus::Available(raster) => {
+            let observed =
+                observe_alpha_geometry(raster).map_err(PngAdapterError::InvalidRasterData)?;
+            let mut evidence = document.evidence[0].clone();
+            evidence.id = Identifier::from("evidence:png-alpha");
+            evidence.selector = Some(Selector::NativeId {
+                native_id: "IDAT/encoded-rgba8-v1/alpha8".to_owned(),
+            });
+            document.evidence.push(evidence);
+            document.nodes[0].geometry.ink_box =
+                observed.visible_bounds.map(AlphaBounds::as_observed_rect);
+            alpha_available_metadata(observed)
+        }
+        PngRasterStatus::Unavailable(reason) => json!({
+            "version": "0.1.0",
+            "status": "unavailable",
+            "reason": reason.code()
+        }),
+    };
+    document
+        .extensions
+        .get_mut(PNG_EXTENSION_KEY)
+        .and_then(Value::as_object_mut)
+        .ok_or_else(|| {
+            PngAdapterError::InvalidArtifactIr("missing PNG metadata object".to_owned())
+        })?
+        .insert("alphaGeometry".to_owned(), metadata);
+    Ok(())
+}
+
+fn alpha_available_metadata(observed: AlphaGeometry) -> Value {
+    json!({
+        "version": "0.1.0",
+        "status": "available",
+        "sourceAlphaEncoding": "unassociatedPngEncodedAlpha8",
+        "visiblePredicate": "alphaGreaterThanZero",
+        "opaquePredicate": "alphaEquals255",
+        "coordinateSpaceId": "canvas",
+        "unit": "devicePixel",
+        "boundsFormat": "xywh-half-open",
+        "evidenceId": "evidence:png-alpha",
+        "visibleBounds": observed.visible_bounds.map(AlphaBounds::as_array),
+        "opaqueBounds": observed.opaque_bounds.map(AlphaBounds::as_array),
+        "transparentInsets": observed.transparent_insets.map(insets_metadata),
+        "pixelCounts": {
+            "total": observed.pixel_counts.total,
+            "visible": observed.pixel_counts.visible,
+            "opaque": observed.pixel_counts.opaque,
+            "translucent": observed.pixel_counts.translucent,
+            "transparent": observed.pixel_counts.transparent
+        },
+        "visibleEdgePixels": {
+            "top": edge_metadata(observed.visible_edge_pixels.top),
+            "right": edge_metadata(observed.visible_edge_pixels.right),
+            "bottom": edge_metadata(observed.visible_edge_pixels.bottom),
+            "left": edge_metadata(observed.visible_edge_pixels.left)
+        },
+        "entirelyTransparent": observed.entirely_transparent,
+        "allPixelsVisible": observed.all_pixels_visible
+    })
+}
+
+fn insets_metadata(insets: TransparentInsets) -> Value {
+    json!({
+        "top": insets.top,
+        "right": insets.right,
+        "bottom": insets.bottom,
+        "left": insets.left
+    })
+}
+
+fn edge_metadata(edge: AlphaEdgeCount) -> Value {
+    json!({
+        "count": edge.count,
+        "denominator": edge.denominator
+    })
 }
 
 fn raster_metadata(status: &PngRasterStatus) -> Value {

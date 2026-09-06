@@ -1,11 +1,13 @@
 //! Deterministic PNG source adapter for `SightLint`.
 //!
 //! Validates source structure, inflates bounded data, reconstructs filters, and expands supported
-//! eight-bit samples to encoded RGBA. No color management, visible ink, text, or semantics are
-//! inferred. Unsupported raster interpretations are explicitly unavailable.
+//! eight-bit samples to encoded RGBA. Supported samples also expose exact source-alpha geometry;
+//! no color management, composited visibility, text, or semantics are inferred. Unsupported
+//! raster interpretations are explicitly unavailable.
 
 #![forbid(unsafe_code)]
 
+pub mod alpha;
 mod filter;
 mod inflate;
 pub mod inspection;
@@ -13,6 +15,10 @@ mod raster;
 pub mod segmentation;
 mod structure;
 
+pub use alpha::{
+    AlphaBounds, AlphaEdgeCount, AlphaEdgePixels, AlphaGeometry, AlphaPixelCounts,
+    TransparentInsets, observe_alpha_geometry,
+};
 pub use filter::{PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines};
 use inflate::expected_scanline_bytes;
 pub use inflate::{InflatedPng, PngInflateError, inflate_png_scanlines};
@@ -228,8 +234,9 @@ pub fn inspect_png_header(input: &[u8]) -> Result<PngHeader, PngAdapterError> {
 /// Validates PNG source stages and emits source facts plus staged raster availability.
 ///
 /// `source_name` identifies a local source when available. The adapter never transmits input.
-/// Raw samples remain in the adapter; colors are not display-corrected and no ink or semantics
-/// are inferred. Unsupported raster interpretation is explicit, not a full PNG conformance claim.
+/// Raw samples remain in the adapter; colors are not display-corrected. Exact source-alpha ink is
+/// distinct from composited visibility and semantics. Unsupported raster interpretation is
+/// explicit, not a full PNG conformance claim.
 ///
 /// # Errors
 ///
@@ -326,7 +333,7 @@ fn png_metadata(reconstructed: &ReconstructedPng) -> serde_json::Value {
     let structure = &reconstructed.structure;
     let header = structure.header;
     json!({
-        "version": "0.1.0",
+        "version": "0.2.0",
         "bitDepth": header.bit_depth,
         "colorType": header.color_type,
         "compressionMethod": header.compression_method,
