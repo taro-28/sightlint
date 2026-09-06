@@ -11,13 +11,15 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #72, the first focused child of the post-alpha evidence epic #71, started from
+The branch for issue #75, the technical foundation required before issue #74 can operate a
+protected holdout, started from
 this verified green `main` baseline:
 
-- commit: `b4d9a2e4af06ddb080337617395903aba8e25ef5`
-- tree: `fcfa85984b843025db2f6d317bde81e3df87dd57`
-- merged PR: #70
-- main CI: run 34036003552, all six jobs successful
+- commit: `6a7dfea4845f3bac49d56c1d71090218b0a13d14`
+- tree: `82e76bc1687555508df11a830237d14d8e9c6ba6`
+- merged PR: #73
+- main CI: run 34043097106, all six jobs successful
+- main CodeQL: run 34043096788, all four language jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -403,6 +405,22 @@ log, tuning exclusion, pinned execution, correction procedure, and reporting pla
 status is `notOperational`; both families remain public maintainer-authored tuning data. No
 independent-review agreement, representative accuracy, holdout performance, WCAG conformance, or
 blocking maturity is claimed.
+
+ADR 0052 and issue #75 add strict `1.0.0` contracts for a protected external bundle, separately
+authored acquisition/rule oracle, pinned invocation/environment, private result, and sanitized
+public attestation. `holdout-run.json` truthfully remains `currentStatus`/`notRun`, bound to the
+current non-operational admission record. The committed six-case `conformance/holdout/` chain is
+fictional, tuning-visible, dual-purpose protocol test data: it covers clean, targeted mutation,
+hard negative, ambiguity, malformed input, and resource boundary, but is always
+`evidenceEligible: false`.
+
+`tools/check_web_holdout_foundation.py` is a read-only, standard-library checker. It enforces
+canonical SHA-256 projections, contained relative paths, byte limits, manifest joins, pinned
+public argv, acquisition/rule oracle separation, integer metric arithmetic, explicit 0/0,
+small-cell suppression at denominator 5, distinct evaluator/verifier declarations, leakage
+redaction, and byte-stable exit-2 diagnostics. It does not run SightLint, contact a protected
+store, validate a person's identity or qualification, verify detached signatures, or establish
+real holdout performance. Those operational facts remain issue #74.
 
 ### Playwright Web acquisition and evidence matrix
 
@@ -940,13 +958,18 @@ fixture-family diversity, independent review, and protected-holdout operation be
 broader recommended rules, Web acquisition breadth, interaction breadth, perception models,
 additional-medium breadth, or more distribution surfaces.
 
-1. **#72 — second Web family and holdout admission (implemented in this change).** ADR 0051 adds
+1. **#72 — second Web family and holdout admission (complete).** ADR 0051 adds
    the additive registry, Harbor support-inbox clean/mutation/hard-negative/ambiguity slice,
    separate acquisition/rule truth, split/family metrics, and strict admission metadata. The
    protected holdout remains honestly `notOperational` and independent review remains absent.
-2. **Next #71 child — independent review and protected holdout operation.** Use a separately
-   controlled, digest-bound bundle and evaluator; do not relabel public fixtures as holdout.
-3. **Later focused children — rule and adapter expansion.** Select one evidence-backed candidate
+2. **#75 — external manifest and public attestation foundation (implemented in this change).**
+   ADR 0052 defines the private/public boundary, frozen digest chain, disclosure threshold,
+   lifecycle, current `notRun` record, conformance fixtures, and read-only verifier. It does not
+   claim an operational holdout.
+3. **#74 — independent review and protected holdout operation (next, externally gated).** Use a
+   separately controlled bundle, qualified independent evaluator, second verifier, exposure log,
+   and detached signatures; do not relabel public fixtures or fictional identities as evidence.
+4. **Later focused children — rule and adapter expansion.** Select one evidence-backed candidate
    at a time only after the earlier evaluation gate supplies its applicability and false-positive
    evidence.
 
@@ -1086,6 +1109,9 @@ python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
+python3 tools/check_web_evaluation_v1.py
+python3 tools/check_web_holdout_foundation.py
+python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
 python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py

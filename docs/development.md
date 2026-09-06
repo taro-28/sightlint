@@ -133,6 +133,8 @@ python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 python3 tools/check_web_evaluation_v1.py
+python3 tools/check_web_holdout_foundation.py
+python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
 python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py
@@ -305,7 +307,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0052 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0053 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

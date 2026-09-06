@@ -1,0 +1,101 @@
+{
+  "$schema": "urn:sightlint:schema:protected-holdout-bundle:1.0.0",
+  "schemaVersion": "1.0.0",
+  "documentType": "protectedHoldoutBundleManifest",
+  "manifestDigest": "sha256:f1c0bb8843a26e80000b407e2ca0aede983e3b7f5a184c0de6de1f14cde4f342",
+  "dataClassification": "publicConformanceOnly",
+  "bundle": {
+    "id": "conformance-web-holdout",
+    "version": "1.0.0",
+    "frozenAt": "2026-09-06T00:00:00Z",
+    "storageAuthorityId": "conformance-authority",
+    "tuningVisible": true,
+    "implementationOutputUsedAsOracle": false
+  },
+  "provenance": {
+    "sourceAuthorityId": "sightlint-maintainers",
+    "ownershipBasis": "Repository-authored fictional protocol conformance data.",
+    "licenseId": "MIT OR Apache-2.0",
+    "redistribution": "permitted"
+  },
+  "privacy": {
+    "reviewed": true,
+    "containsPersonalData": false,
+    "containsCustomerData": false,
+    "containsCredentials": false,
+    "externalProcessing": false,
+    "retentionPolicyVersion": "1.0.0"
+  },
+  "limits": {
+    "maximumFamilies": 2,
+    "maximumCases": 6,
+    "maximumFilesPerCase": 2,
+    "maximumManifestBytes": 1048576
+  },
+  "families": [
+    {
+      "id": "opaque-family-a",
+      "caseIds": ["opaque-case-001", "opaque-case-002", "opaque-case-003"]
+    },
+    {
+      "id": "opaque-family-b",
+      "caseIds": ["opaque-case-004", "opaque-case-005", "opaque-case-006"]
+    }
+  ],
+  "cases": [
+    {
+      "id": "opaque-case-001",
+      "familyId": "opaque-family-a",
+      "classification": "clean",
+      "files": [
+        { "role": "request", "path": "payloads/request-001.json", "sha256": "sha256:d81897767a8f044ab677ea303437e634811c4ebd15969d5a59ea96d0765e9efc", "byteLength": 45, "mediaType": "application/json" },
+        { "role": "source", "path": "payloads/family-a.html", "sha256": "sha256:31bf28459dd4ac544a88a005813343904d6e99df4cf42c3d200be0a35bdf8461", "byteLength": 90, "mediaType": "text/html" }
+      ]
+    },
+    {
+      "id": "opaque-case-002",
+      "familyId": "opaque-family-a",
+      "classification": "targetedMutation",
+      "files": [
+        { "role": "request", "path": "payloads/request-002.json", "sha256": "sha256:6604b5d7181ebe9093a4086378a6d11792462662aa382e49261b2d08b03fe90e", "byteLength": 57, "mediaType": "application/json" },
+        { "role": "source", "path": "payloads/family-a.html", "sha256": "sha256:31bf28459dd4ac544a88a005813343904d6e99df4cf42c3d200be0a35bdf8461", "byteLength": 90, "mediaType": "text/html" }
+      ]
+    },
+    {
+      "id": "opaque-case-003",
+      "familyId": "opaque-family-a",
+      "classification": "hardNegative",
+      "files": [
+        { "role": "request", "path": "payloads/request-003.json", "sha256": "sha256:839ffbced7d7cadd990eff56c4f2afc3139c64f5f4fb38213375998df017418f", "byteLength": 53, "mediaType": "application/json" },
+        { "role": "source", "path": "payloads/family-a.html", "sha256": "sha256:31bf28459dd4ac544a88a005813343904d6e99df4cf42c3d200be0a35bdf8461", "byteLength": 90, "mediaType": "text/html" }
+      ]
+    },
+    {
+      "id": "opaque-case-004",
+      "familyId": "opaque-family-b",
+      "classification": "ambiguous",
+      "files": [
+        { "role": "request", "path": "payloads/request-004.json", "sha256": "sha256:fc3ac894648c9ec9a34edb71083f2a6bf35be13de66dbeb0ef4b26e0b738d244", "byteLength": 49, "mediaType": "application/json" },
+        { "role": "source", "path": "payloads/family-b.html", "sha256": "sha256:3a1e85d9b8cca5cf9cbe5ce683ee8f20841250b50f48e987fec0899203e4ca3e", "byteLength": 122, "mediaType": "text/html" }
+      ]
+    },
+    {
+      "id": "opaque-case-005",
+      "familyId": "opaque-family-b",
+      "classification": "malformed",
+      "files": [
+        { "role": "request", "path": "payloads/request-005.json", "sha256": "sha256:2d36439781cc83403279294c683cc017c81a0b60943906bd22d8d1e169ae3b94", "byteLength": 57, "mediaType": "application/json" },
+        { "role": "source", "path": "payloads/family-b.html", "sha256": "sha256:3a1e85d9b8cca5cf9cbe5ce683ee8f20841250b50f48e987fec0899203e4ca3e", "byteLength": 122, "mediaType": "text/html" }
+      ]
+    },
+    {
+      "id": "opaque-case-006",
+      "familyId": "opaque-family-b",
+      "classification": "resourceBoundary",
+      "files": [
+        { "role": "request", "path": "payloads/request-006.json", "sha256": "sha256:026f4e6d1a798d16ab9c72da0a76ec39761d60347344497ed93d25b6721f5816", "byteLength": 57, "mediaType": "application/json" },
+        { "role": "source", "path": "payloads/family-b.html", "sha256": "sha256:3a1e85d9b8cca5cf9cbe5ce683ee8f20841250b50f48e987fec0899203e4ca3e", "byteLength": 122, "mediaType": "text/html" }
+      ]
+    }
+  ]
+}

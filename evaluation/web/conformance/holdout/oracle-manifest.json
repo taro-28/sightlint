@@ -1,0 +1,76 @@
+{
+  "$schema": "urn:sightlint:schema:protected-holdout-oracle:1.0.0",
+  "schemaVersion": "1.0.0",
+  "documentType": "protectedHoldoutOracleManifest",
+  "manifestDigest": "sha256:29ca6f55050cd7381c9ae0d3596581da3d8eec9d4185119851980d905de9494c",
+  "dataClassification": "publicConformanceOnly",
+  "bundleBinding": {
+    "id": "conformance-web-holdout",
+    "version": "1.0.0",
+    "manifestDigest": "sha256:f1c0bb8843a26e80000b407e2ca0aede983e3b7f5a184c0de6de1f14cde4f342"
+  },
+  "oracle": {
+    "id": "conformance-web-oracle",
+    "version": "1.0.0",
+    "frozenAt": "2026-09-06T00:05:00Z",
+    "authoringBasis": "publicConformanceContract",
+    "implementationOutputUsedAsOracle": false,
+    "reviewStatus": "conformanceOnly",
+    "reviewers": [
+      {
+        "id": "conformance-author",
+        "role": "annotationAuthor",
+        "qualification": "Fictional protocol conformance author; not an independent reviewer.",
+        "independentFromAnnotationAuthors": false
+      }
+    ],
+    "unresolvedDisagreements": 0
+  },
+  "caseIds": [
+    "opaque-case-001",
+    "opaque-case-002",
+    "opaque-case-003",
+    "opaque-case-004",
+    "opaque-case-005",
+    "opaque-case-006"
+  ],
+  "acquisitionDocuments": [
+    {
+      "id": "conformance-acquisition-oracle",
+      "path": "payloads/acquisition-oracle.json",
+      "sha256": "sha256:4f8408efbc244ed60a68b0d49f207286670a11e174d28b065df2159fd76c25df",
+      "byteLength": 102,
+      "caseCount": 6
+    }
+  ],
+  "ruleDocuments": [
+    {
+      "id": "conformance-rule-oracle",
+      "path": "payloads/rule-oracle.json",
+      "sha256": "sha256:c30ea503d9eae89a842dbab23422676f25212f6e47eca82ffdfe192b02d45756",
+      "byteLength": 113,
+      "caseCount": 6
+    }
+  ],
+  "classificationCounts": [
+    { "classification": "ambiguous", "count": 1 },
+    { "classification": "clean", "count": 1 },
+    { "classification": "hardNegative", "count": 1 },
+    { "classification": "malformed", "count": 1 },
+    { "classification": "resourceBoundary", "count": 1 },
+    { "classification": "targetedMutation", "count": 1 }
+  ],
+  "acquisitionExpectationCounts": [
+    { "state": "cantTell", "count": 2 },
+    { "state": "conflict", "count": 0 },
+    { "state": "exact", "count": 9 },
+    { "state": "untested", "count": 1 }
+  ],
+  "ruleOutcomeCounts": [
+    { "outcome": "cantTell", "count": 2 },
+    { "outcome": "failed", "count": 2 },
+    { "outcome": "inapplicable", "count": 1 },
+    { "outcome": "passed", "count": 4 },
+    { "outcome": "untested", "count": 1 }
+  ]
+}

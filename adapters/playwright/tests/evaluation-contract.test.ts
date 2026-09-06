@@ -40,7 +40,7 @@ function indexBy(items: JsonObject[], field: string, context: string): Map<strin
 }
 
 function validator(schema: JsonObject): ValidateFunction {
-  const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, validateFormats: false });
   return ajv.compile(schema);
 }
 
@@ -54,6 +54,21 @@ function assertInvalid(validate: ValidateFunction, value: unknown, context: stri
 
 function clone<T>(value: T): T {
   return structuredClone(value);
+}
+
+function assertMaximum(
+  validate: ValidateFunction,
+  base: JsonObject,
+  maximum: number,
+  mutate: (value: JsonObject, boundary: number) => void,
+  context: string,
+): void {
+  const exactBoundary = clone(base);
+  mutate(exactBoundary, maximum);
+  assertValid(validate, exactBoundary, `${context} exact boundary`);
+  const oneOver = clone(base);
+  mutate(oneOver, maximum + 1);
+  assertInvalid(validate, oneOver, `${context} one over`);
 }
 
 test("multi-family registry preserves oracle, review, exposure, and holdout boundaries", async () => {
@@ -172,4 +187,223 @@ test("multi-family registry preserves oracle, review, exposure, and holdout boun
   assertValid(validateHoldout, operational, "complete future operational holdout record");
   delete object(operational["operationalRecord"], "operational record")["evaluator"];
   assertInvalid(validateHoldout, operational, "operational holdout without evaluator");
+});
+
+test("holdout foundation schemas separate private evidence from sanitized public status", async () => {
+  const bundle = await loadJson("evaluation/web/conformance/holdout/bundle-manifest.json");
+  const oracle = await loadJson("evaluation/web/conformance/holdout/oracle-manifest.json");
+  const invocation = await loadJson("evaluation/web/conformance/holdout/invocation-manifest.json");
+  const privateResult = await loadJson("evaluation/web/conformance/holdout/private-result-manifest.json");
+  const publicConformance = await loadJson("evaluation/web/conformance/holdout/public-attestation.json");
+  const currentStatus = await loadJson("evaluation/web/holdout-run.json");
+
+  const validateBundle = validator(await loadJson("evaluation/web/protected-holdout-bundle.schema.json"));
+  const validateOracle = validator(await loadJson("evaluation/web/protected-holdout-oracle.schema.json"));
+  const validateInvocation = validator(await loadJson("evaluation/web/holdout-invocation.schema.json"));
+  const validatePrivateResult = validator(await loadJson("evaluation/web/private-holdout-result.schema.json"));
+  const validateAttestation = validator(await loadJson("evaluation/web/holdout-run.schema.json"));
+
+  assertValid(validateBundle, bundle, "conformance bundle manifest");
+  assertValid(validateOracle, oracle, "conformance oracle manifest");
+  assertValid(validateInvocation, invocation, "conformance invocation manifest");
+  assertValid(validatePrivateResult, privateResult, "conformance private result manifest");
+  assertValid(validateAttestation, publicConformance, "conformance public attestation");
+  assertValid(validateAttestation, currentStatus, "current not-run status");
+
+  const exposedProtectedBundle = clone(bundle);
+  exposedProtectedBundle["dataClassification"] = "protectedHoldout";
+  assertInvalid(validateBundle, exposedProtectedBundle, "protected bundle visible to tuning");
+
+  const privatePublicFixture = clone(bundle);
+  object(privatePublicFixture["privacy"], "bundle privacy")["containsPersonalData"] = true;
+  assertInvalid(validateBundle, privatePublicFixture, "public conformance bundle containing personal data");
+
+  const mixedOracle = clone(oracle);
+  mixedOracle["implementationOutput"] = { acceptedAsTruth: true };
+  assertInvalid(validateOracle, mixedOracle, "oracle containing implementation output");
+
+  const unreviewedProtectedOracle = clone(oracle);
+  unreviewedProtectedOracle["dataClassification"] = "protectedHoldout";
+  assertInvalid(validateOracle, unreviewedProtectedOracle, "protected oracle without independent review");
+
+  const shellInvocation = clone(invocation);
+  object(shellInvocation["commands"], "invocation commands")["shellInterpolation"] = true;
+  assertInvalid(validateInvocation, shellInvocation, "holdout invocation using a shell");
+
+  const privateResultWithPublicClaim = clone(privateResult);
+  privateResultWithPublicClaim["evidenceEligible"] = true;
+  assertInvalid(validatePrivateResult, privateResultWithPublicClaim, "private result containing a public evidence claim");
+
+  const disclosedSmallCell = clone(publicConformance);
+  const suppressed = array(disclosedSmallCell["metrics"], "public metrics")
+    .find((metric) => metric["publication"] === "suppressed");
+  assert.ok(suppressed);
+  suppressed["numerator"] = 2;
+  assertInvalid(validateAttestation, disclosedSmallCell, "suppressed metric disclosing a numerator");
+
+  const notRunWithResultBinding = clone(currentStatus);
+  notRunWithResultBinding["bindings"] = object(publicConformance["bindings"], "conformance bindings");
+  assertInvalid(validateAttestation, notRunWithResultBinding, "not-run status containing result bindings");
+
+  const futureEvidenceShape = clone(publicConformance);
+  futureEvidenceShape["recordPurpose"] = "holdoutEvidence";
+  futureEvidenceShape["dataClassification"] = "sanitizedProtectedResult";
+  futureEvidenceShape["evidenceEligible"] = true;
+  object(futureEvidenceShape["admission"], "future evidence admission")["status"] = "operational";
+  assertValid(validateAttestation, futureEvidenceShape, "future operational evidence shape");
+  object(futureEvidenceShape["admission"], "future evidence admission")["status"] = "notOperational";
+  assertInvalid(validateAttestation, futureEvidenceShape, "evidence claim without operational admission");
+
+  const invalidatedEvidenceShape = clone(futureEvidenceShape);
+  object(invalidatedEvidenceShape["admission"], "invalidated evidence admission")["status"] = "operational";
+  invalidatedEvidenceShape["lifecycle"] = "invalidated";
+  invalidatedEvidenceShape["evidenceEligible"] = false;
+  invalidatedEvidenceShape["invalidation"] = {
+    invalidatedAt: "2026-09-06T00:20:00Z",
+    reason: "Conformance-only lifecycle shape test.",
+    authorityId: "conformance-authority",
+  };
+  assertValid(validateAttestation, invalidatedEvidenceShape, "future invalidated evidence shape");
+
+  const incompleteInvalidation = clone(publicConformance);
+  incompleteInvalidation["lifecycle"] = "invalidated";
+  assertInvalid(validateAttestation, incompleteInvalidation, "invalidated evidence without an invalidation record");
+});
+
+test("holdout foundation schemas enforce every declared collection and byte boundary", async () => {
+  const bundle = await loadJson("evaluation/web/conformance/holdout/bundle-manifest.json");
+  const oracle = await loadJson("evaluation/web/conformance/holdout/oracle-manifest.json");
+  const invocation = await loadJson("evaluation/web/conformance/holdout/invocation-manifest.json");
+  const privateResult = await loadJson("evaluation/web/conformance/holdout/private-result-manifest.json");
+  const publicAttestation = await loadJson("evaluation/web/conformance/holdout/public-attestation.json");
+  const currentStatus = await loadJson("evaluation/web/holdout-run.json");
+  const validateBundle = validator(await loadJson("evaluation/web/protected-holdout-bundle.schema.json"));
+  const validateOracle = validator(await loadJson("evaluation/web/protected-holdout-oracle.schema.json"));
+  const validateInvocation = validator(await loadJson("evaluation/web/holdout-invocation.schema.json"));
+  const validatePrivateResult = validator(await loadJson("evaluation/web/private-holdout-result.schema.json"));
+  const validateAttestation = validator(await loadJson("evaluation/web/holdout-run.schema.json"));
+
+  assertMaximum(validateBundle, bundle, 128, (value, boundary) => {
+    object(value["limits"], "bundle limits")["maximumFamilies"] = boundary;
+  }, "declared family limit");
+  assertMaximum(validateBundle, bundle, 4096, (value, boundary) => {
+    object(value["limits"], "bundle limits")["maximumCases"] = boundary;
+  }, "declared case limit");
+  assertMaximum(validateBundle, bundle, 64, (value, boundary) => {
+    object(value["limits"], "bundle limits")["maximumFilesPerCase"] = boundary;
+  }, "declared files-per-case limit");
+  assertMaximum(validateBundle, bundle, 1_048_576, (value, boundary) => {
+    object(value["limits"], "bundle limits")["maximumManifestBytes"] = boundary;
+  }, "declared manifest-byte limit");
+  assertMaximum(validateBundle, bundle, 128, (value, boundary) => {
+    const family = array(value["families"], "families")[0]!;
+    value["families"] = Array.from({ length: boundary }, () => clone(family));
+  }, "family collection");
+  assertMaximum(validateBundle, bundle, 4096, (value, boundary) => {
+    const sample = clone(array(value["cases"], "cases")[0]!);
+    sample["files"] = [clone(array(sample["files"], "sample files")[0]!)];
+    value["cases"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "case collection");
+  assertMaximum(validateBundle, bundle, 64, (value, boundary) => {
+    const firstCase = array(value["cases"], "cases")[0]!;
+    const sample = array(firstCase["files"], "case files")[0]!;
+    firstCase["files"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "files-per-case collection");
+  assertMaximum(validateBundle, bundle, 1_048_576, (value, boundary) => {
+    array(array(value["cases"], "cases")[0]!["files"], "case files")[0]!["byteLength"] = boundary;
+  }, "raw file byte length");
+  assertMaximum(validateBundle, bundle, 512, (value, boundary) => {
+    object(value["provenance"], "provenance")["ownershipBasis"] = "a".repeat(boundary);
+  }, "printable string length");
+  assertMaximum(validateBundle, bundle, 128, (value, boundary) => {
+    object(value["bundle"], "bundle")["id"] = `a${"b".repeat(boundary - 1)}`;
+  }, "stable identifier length");
+  assertMaximum(validateBundle, bundle, 512, (value, boundary) => {
+    array(array(value["cases"], "cases")[0]!["files"], "case files")[0]!["path"] = "a".repeat(boundary);
+  }, "relative path length");
+
+  assertMaximum(validateOracle, oracle, 4096, (value, boundary) => {
+    value["caseIds"] = Array.from({ length: boundary }, (_, index) => `case-${index.toString().padStart(4, "0")}`);
+  }, "oracle case ID collection");
+  for (const field of ["acquisitionDocuments", "ruleDocuments"] as const) {
+    assertMaximum(validateOracle, oracle, 128, (value, boundary) => {
+      const sample = array(value[field], field)[0]!;
+      value[field] = Array.from({ length: boundary }, () => clone(sample));
+    }, `${field} collection`);
+  }
+  assertMaximum(validateOracle, oracle, 64, (value, boundary) => {
+    const oracleMetadata = object(value["oracle"], "oracle");
+    const sample = array(oracleMetadata["reviewers"], "reviewers")[0]!;
+    oracleMetadata["reviewers"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "reviewer collection");
+  for (const [field, maximum] of [["classificationCounts", 6], ["acquisitionExpectationCounts", 4], ["ruleOutcomeCounts", 5]] as const) {
+    assertMaximum(validateOracle, oracle, maximum, (value, boundary) => {
+      const sample = array(value[field], field)[0]!;
+      value[field] = Array.from({ length: boundary }, () => clone(sample));
+    }, `${field} collection`);
+  }
+  assertMaximum(validateOracle, oracle, 1_000_000, (value, boundary) => {
+    object(value["oracle"], "oracle")["unresolvedDisagreements"] = boundary;
+  }, "oracle disagreement count");
+  assertMaximum(validateOracle, oracle, 1_048_576, (value, boundary) => {
+    array(value["acquisitionDocuments"], "acquisition documents")[0]!["byteLength"] = boundary;
+  }, "oracle document byte length");
+
+  assertMaximum(validateInvocation, invocation, 128, (value, boundary) => {
+    object(value["commands"], "commands")["captureArgv"] = Array.from({ length: boundary }, () => "argument");
+  }, "command argument collection");
+  assertMaximum(validateInvocation, invocation, 128, (value, boundary) => {
+    const evaluation = object(value["evaluationContract"], "evaluation contract");
+    const sample = array(evaluation["rules"], "rules")[0]!;
+    evaluation["rules"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "rule binding collection");
+  const invocationLimits: Array<[string, number]> = [
+    ["maximumCases", 4096],
+    ["maximumCaseSeconds", 3600],
+    ["maximumOutputBytes", 1_073_741_824],
+    ["maximumManifestBytes", 1_048_576],
+  ];
+  for (const [field, maximum] of invocationLimits) {
+    assertMaximum(validateInvocation, invocation, maximum, (value, boundary) => {
+      object(value["resourceLimits"], "resource limits")[field] = boundary;
+    }, `invocation ${field}`);
+  }
+  for (const [field, maximum] of [["viewportWidthCssPixels", 32768], ["viewportHeightCssPixels", 32768], ["deviceScaleFactor", 8], ["textScale", 4]] as const) {
+    assertMaximum(validateInvocation, invocation, maximum, (value, boundary) => {
+      object(value["environment"], "environment")[field] = boundary;
+    }, `environment ${field}`);
+  }
+
+  assertMaximum(validatePrivateResult, privateResult, 4096, (value, boundary) => {
+    const sample = array(value["caseResults"], "case results")[0]!;
+    value["caseResults"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "private case result collection");
+  assertMaximum(validatePrivateResult, privateResult, 512, (value, boundary) => {
+    const sample = array(value["metricCells"], "metric cells")[0]!;
+    value["metricCells"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "private metric collection");
+  for (const field of ["attemptedCases", "completedCases", "executionErrors"] as const) {
+    assertMaximum(validatePrivateResult, privateResult, 4096, (value, boundary) => {
+      object(value["execution"], "execution")[field] = boundary;
+    }, `private execution ${field}`);
+  }
+  for (const field of ["numerator", "denominator"] as const) {
+    assertMaximum(validatePrivateResult, privateResult, 1_000_000, (value, boundary) => {
+      array(value["metricCells"], "metric cells")[0]![field] = boundary;
+    }, `private metric ${field}`);
+  }
+
+  assertMaximum(validateAttestation, publicAttestation, 512, (value, boundary) => {
+    const sample = array(value["metrics"], "public metrics")[0]!;
+    value["metrics"] = Array.from({ length: boundary }, () => clone(sample));
+  }, "public metric collection");
+  assertMaximum(validateAttestation, publicAttestation, 32, (value, boundary) => {
+    value["nonClaims"] = Array.from({ length: boundary }, (_, index) => `claim-${index}`);
+  }, "public non-claim collection");
+  assertMaximum(validateAttestation, currentStatus, 32, (value, boundary) => {
+    value["blockers"] = Array.from({ length: boundary }, (_, index) => `blocker-${index}`);
+  }, "current blocker collection");
+  assertMaximum(validateAttestation, publicAttestation, 1_000_000, (value, boundary) => {
+    object(value["disclosure"], "disclosure")["minimumPublishedDenominator"] = boundary;
+  }, "publication denominator threshold");
 });

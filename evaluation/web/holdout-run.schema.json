@@ -1,0 +1,408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-holdout-run:1.0.0",
+  "title": "SightLint sanitized Web holdout run attestation",
+  "oneOf": [
+    { "$ref": "#/$defs/notRun" },
+    { "$ref": "#/$defs/runRecord" }
+  ],
+  "$defs": {
+    "ascii": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[ -~]+$" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "semver": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "status", "recordDigest"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "status": { "enum": ["notOperational", "operational"] },
+        "recordDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorityId",
+        "minimumPublishedDenominator",
+        "containsArtifactPathsOrUrls",
+        "containsCaseMembership",
+        "containsLabelsOrSelectors",
+        "containsPerCaseResults",
+        "containsCredentialsOrPersonalData",
+        "universalScore"
+      ],
+      "properties": {
+        "authorityId": { "$ref": "#/$defs/id" },
+        "minimumPublishedDenominator": { "type": "integer", "minimum": 5, "maximum": 1000000 },
+        "containsArtifactPathsOrUrls": { "const": false },
+        "containsCaseMembership": { "const": false },
+        "containsLabelsOrSelectors": { "const": false },
+        "containsPerCaseResults": { "const": false },
+        "containsCredentialsOrPersonalData": { "const": false },
+        "universalScore": { "const": false }
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "$schema",
+        "schemaVersion",
+        "documentType",
+        "manifestDigest",
+        "recordPurpose",
+        "lifecycle",
+        "dataClassification",
+        "evidenceEligible",
+        "admission",
+        "disclosure",
+        "nonClaims"
+      ],
+      "properties": {
+        "$schema": { "const": "urn:sightlint:schema:web-holdout-run:1.0.0" },
+        "schemaVersion": { "const": "1.0.0" },
+        "documentType": { "const": "sanitizedHoldoutRunAttestation" },
+        "manifestDigest": { "$ref": "#/$defs/sha256" },
+        "recordPurpose": { "enum": ["currentStatus", "holdoutEvidence", "conformanceExample"] },
+        "lifecycle": { "enum": ["notRun", "valid", "invalidated", "superseded"] },
+        "dataClassification": {
+          "enum": ["publicMetadataOnly", "sanitizedProtectedResult", "publicConformanceOnly"]
+        },
+        "evidenceEligible": { "type": "boolean" },
+        "admission": { "$ref": "#/$defs/admission" },
+        "disclosure": { "$ref": "#/$defs/disclosure" },
+        "nonClaims": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/ascii" }
+        },
+        "blockers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/ascii" }
+        },
+        "bindings": { "$ref": "#/$defs/bindings" },
+        "execution": { "$ref": "#/$defs/execution" },
+        "assurance": { "$ref": "#/$defs/assurance" },
+        "metrics": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 512,
+          "items": { "$ref": "#/$defs/publicMetric" }
+        },
+        "invalidation": { "$ref": "#/$defs/invalidation" },
+        "supersession": { "$ref": "#/$defs/supersession" }
+      }
+    },
+    "notRun": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "required": ["blockers"],
+          "properties": {
+            "recordPurpose": { "const": "currentStatus" },
+            "lifecycle": { "const": "notRun" },
+            "dataClassification": { "const": "publicMetadataOnly" },
+            "evidenceEligible": { "const": false },
+            "admission": {
+              "type": "object",
+              "properties": { "status": { "const": "notOperational" } },
+              "required": ["status"]
+            }
+          },
+          "not": {
+            "anyOf": [
+              { "required": ["bindings"] },
+              { "required": ["execution"] },
+              { "required": ["assurance"] },
+              { "required": ["metrics"] },
+              { "required": ["invalidation"] },
+              { "required": ["supersession"] }
+            ]
+          }
+        }
+      ]
+    },
+    "versionedBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "manifestDigest"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/semver" },
+        "manifestDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle", "oracle", "invocationManifestDigest", "privateResultManifestDigest"],
+      "properties": {
+        "bundle": { "$ref": "#/$defs/versionedBinding" },
+        "oracle": { "$ref": "#/$defs/versionedBinding" },
+        "invocationManifestDigest": { "$ref": "#/$defs/sha256" },
+        "privateResultManifestDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "startedAt", "completedAt", "attemptedCases", "completedCases", "executionErrors"],
+      "properties": {
+        "status": { "enum": ["succeeded", "failed"] },
+        "startedAt": { "$ref": "#/$defs/timestamp" },
+        "completedAt": { "$ref": "#/$defs/timestamp" },
+        "attemptedCases": { "type": "integer", "minimum": 0, "maximum": 4096 },
+        "completedCases": { "type": "integer", "minimum": 0, "maximum": 4096 },
+        "executionErrors": { "type": "integer", "minimum": 0, "maximum": 4096 }
+      }
+    },
+    "declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "qualification", "independentFromTuning", "conflictOfInterestReviewed", "declarationDigest"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "qualification": { "$ref": "#/$defs/ascii" },
+        "independentFromTuning": { "const": true },
+        "conflictOfInterestReviewed": { "const": true },
+        "declarationDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "assurance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluator",
+        "secondVerifier",
+        "detachedSignaturesVerifiedBy",
+        "cryptographicVerificationPerformedBySightLint",
+        "exposureLogVersion",
+        "exposureLogDigest"
+      ],
+      "properties": {
+        "evaluator": { "$ref": "#/$defs/declaration" },
+        "secondVerifier": { "$ref": "#/$defs/declaration" },
+        "detachedSignaturesVerifiedBy": { "$ref": "#/$defs/id" },
+        "cryptographicVerificationPerformedBySightLint": { "const": false },
+        "exposureLogVersion": { "$ref": "#/$defs/semver" },
+        "exposureLogDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["opaqueCohortId", "split", "ruleId", "ruleVersion", "evidenceClass"],
+      "properties": {
+        "opaqueCohortId": { "$ref": "#/$defs/id" },
+        "split": { "const": "holdout" },
+        "ruleId": { "$ref": "#/$defs/id" },
+        "ruleVersion": { "$ref": "#/$defs/semver" },
+        "evidenceClass": { "$ref": "#/$defs/id" }
+      }
+    },
+    "metricBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "measure", "scope", "publication"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "measure": {
+          "enum": [
+            "caseCoverage",
+            "acquisitionExpectationCoverage",
+            "ruleResultCoverage",
+            "failurePrecision",
+            "falsePositiveFailures",
+            "reviewedAbstentionAgreement",
+            "mutationKillRate",
+            "executionErrors",
+            "nativePixelConflictRetention"
+          ]
+        },
+        "scope": { "$ref": "#/$defs/scope" },
+        "publication": { "enum": ["reported", "suppressed", "zeroDenominator"] },
+        "numerator": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "denominator": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "suppressionReason": { "enum": ["smallCell", "disclosureAuthorityDecision"] },
+        "privateCellDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "publicMetric": {
+      "oneOf": [
+        {
+          "allOf": [
+            { "$ref": "#/$defs/metricBase" },
+            {
+              "type": "object",
+              "required": ["numerator", "denominator"],
+              "properties": { "publication": { "const": "reported" } },
+              "not": {
+                "anyOf": [
+                  { "required": ["suppressionReason"] },
+                  { "required": ["privateCellDigest"] }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/metricBase" },
+            {
+              "type": "object",
+              "required": ["suppressionReason", "privateCellDigest"],
+              "properties": { "publication": { "const": "suppressed" } },
+              "not": {
+                "anyOf": [
+                  { "required": ["numerator"] },
+                  { "required": ["denominator"] }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/metricBase" },
+            {
+              "type": "object",
+              "required": ["numerator", "denominator"],
+              "properties": {
+                "publication": { "const": "zeroDenominator" },
+                "numerator": { "const": 0 },
+                "denominator": { "const": 0 }
+              },
+              "not": {
+                "anyOf": [
+                  { "required": ["suppressionReason"] },
+                  { "required": ["privateCellDigest"] }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "invalidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invalidatedAt", "reason", "authorityId"],
+      "properties": {
+        "invalidatedAt": { "$ref": "#/$defs/timestamp" },
+        "reason": { "$ref": "#/$defs/ascii" },
+        "authorityId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "supersession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supersededAt", "replacementAttestationDigest", "authorityId"],
+      "properties": {
+        "supersededAt": { "$ref": "#/$defs/timestamp" },
+        "replacementAttestationDigest": { "$ref": "#/$defs/sha256" },
+        "authorityId": { "$ref": "#/$defs/id" }
+      }
+    },
+    "runRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "required": ["bindings", "execution", "assurance", "metrics"],
+          "properties": {
+            "recordPurpose": { "enum": ["holdoutEvidence", "conformanceExample"] }
+          },
+          "not": { "required": ["blockers"] },
+          "allOf": [
+            {
+              "if": {
+                "properties": { "recordPurpose": { "const": "holdoutEvidence" } },
+                "required": ["recordPurpose"]
+              },
+              "then": {
+                "properties": {
+                  "dataClassification": { "const": "sanitizedProtectedResult" },
+                  "admission": {
+                    "type": "object",
+                    "properties": { "status": { "const": "operational" } },
+                    "required": ["status"]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "recordPurpose": { "const": "holdoutEvidence" },
+                  "lifecycle": { "const": "valid" }
+                },
+                "required": ["recordPurpose", "lifecycle"]
+              },
+              "then": {
+                "properties": { "evidenceEligible": { "const": true } }
+              }
+            },
+            {
+              "if": {
+                "properties": { "recordPurpose": { "const": "conformanceExample" } },
+                "required": ["recordPurpose"]
+              },
+              "then": {
+                "properties": {
+                  "dataClassification": { "const": "publicConformanceOnly" },
+                  "evidenceEligible": { "const": false }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": { "lifecycle": { "const": "valid" } },
+                "required": ["lifecycle"]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    { "required": ["invalidation"] },
+                    { "required": ["supersession"] }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": { "lifecycle": { "const": "invalidated" } },
+                "required": ["lifecycle"]
+              },
+              "then": {
+                "required": ["invalidation"],
+                "properties": { "evidenceEligible": { "const": false } },
+                "not": { "required": ["supersession"] }
+              }
+            },
+            {
+              "if": {
+                "properties": { "lifecycle": { "const": "superseded" } },
+                "required": ["lifecycle"]
+              },
+              "then": {
+                "required": ["supersession"],
+                "properties": { "evidenceEligible": { "const": false } },
+                "not": { "required": ["invalidation"] }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

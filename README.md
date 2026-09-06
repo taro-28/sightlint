@@ -523,6 +523,12 @@ a machine-checkable holdout-admission contract. The two public families remain m
 tuning data; representative sampling, independent review, semantic peer inference, complete hit
 regions, pixel-content identity, and an operational protected holdout remain future work.
 
+ADR 0052/#75 add strict external bundle/oracle/invocation/private-result schemas, a sanitized
+public attestation schema, an honest `notRun` record, and a fictional public conformance chain.
+The read-only checker verifies digests, joins, bounded inputs, small-cell suppression, and stable
+fail-closed behavior. It neither operates a protected holdout nor verifies human identity, external
+storage, detached signatures, or real-world accuracy; those remain issue #74.
+
 ## Architecture
 
 ```text
@@ -574,11 +580,13 @@ Read:
 | #62 | completed managed loopback Web capture and `/entries/new` dogfood slice of #31 |
 | #71 | post-alpha evidence-first product maturity epic |
 | #72 | second realistic Web fixture family and protected-holdout admission contract |
+| #75 | external holdout manifest and sanitized run-attestation foundation |
+| #74 | independent human review and externally operated protected holdout |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0052 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0053 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

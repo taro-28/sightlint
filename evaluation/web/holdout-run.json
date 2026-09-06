@@ -1,0 +1,36 @@
+{
+  "$schema": "urn:sightlint:schema:web-holdout-run:1.0.0",
+  "schemaVersion": "1.0.0",
+  "documentType": "sanitizedHoldoutRunAttestation",
+  "manifestDigest": "sha256:80a94b7a35c7ce73fc887a0de6740dd9787355b7d8759bd036d4ec7562069ebc",
+  "recordPurpose": "currentStatus",
+  "lifecycle": "notRun",
+  "dataClassification": "publicMetadataOnly",
+  "evidenceEligible": false,
+  "admission": {
+    "schemaVersion": "1.0.0",
+    "status": "notOperational",
+    "recordDigest": "sha256:dcc0fd8e6524e22472214a7d3b68edef2036a03e30c896999d747bf67c20dc72"
+  },
+  "disclosure": {
+    "authorityId": "repository-maintainer",
+    "minimumPublishedDenominator": 5,
+    "containsArtifactPathsOrUrls": false,
+    "containsCaseMembership": false,
+    "containsLabelsOrSelectors": false,
+    "containsPerCaseResults": false,
+    "containsCredentialsOrPersonalData": false,
+    "universalScore": false
+  },
+  "nonClaims": [
+    "No independent human review agreement has been measured.",
+    "No protected holdout bundle has been admitted or executed.",
+    "No representative accuracy, WCAG conformance, or blocking maturity is claimed."
+  ],
+  "blockers": [
+    "An external storage and access authority has not been appointed.",
+    "An independent evaluator and second verifier have not been appointed.",
+    "No frozen protected bundle, oracle, invocation, environment, or result exists.",
+    "The public Atlas and Harbor fixture families are tuning-visible and ineligible."
+  ]
+}

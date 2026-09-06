@@ -487,15 +487,19 @@ Important historical detail:
   boundary, outcome-to-annotation mapping, and no-token/no-upload job-check integration;
 - ADR 0051 defines the additive multi-family Web evaluation registry, honest maintainer-only
   review status, and the machine-checkable admission boundary for an external protected holdout;
-- new ADRs should continue at 0052 or later rather than silently reusing historical numbers.
+- ADR 0052 defines versioned external holdout manifests, canonical digest bindings, private
+  integer result cells, sanitized public attestations, small-cell suppression, and an explicit
+  non-claim boundary for fictional conformance data;
+- new ADRs should continue at 0053 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
 
 ## Decisions still open
 
-- independent review, representative corpus expansion beyond the two public families, and actual
-  protected-holdout operation after the ADR 0051 admission-contract slice;
+- independent review, representative corpus expansion beyond the two public families, external
+  custody/signature authority, and actual protected-holdout operation after the ADR 0052 technical
+  foundation;
 - broader arbitrary-project and cross-platform Playwright compatibility beyond the bounded
   managed-loopback #62 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;

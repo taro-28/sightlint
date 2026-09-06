@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0052 or later. -->
+0053 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -66,6 +66,8 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/check_png_format_demand.py`
 - [ ] `python3 tools/check_web_evaluation.py`
 - [ ] `python3 tools/check_web_evaluation_v1.py`
+- [ ] `python3 tools/check_web_holdout_foundation.py`
+- [ ] `python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout`
 - [ ] `python3 tools/check_perception_evaluation.py`
 - [ ] `python3 tools/generate_pptx_fixtures.py --check`
 - [ ] `python3 tools/check_pptx_evaluation.py`
