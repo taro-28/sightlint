@@ -1,6 +1,53 @@
 {
   "cases": [
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "83d61254",
       "colorType": 0,
       "exitCode": 0,
@@ -14,6 +61,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "83d61254",
       "colorType": 0,
       "exitCode": 0,
@@ -27,6 +121,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "83d61254",
       "colorType": 0,
       "exitCode": 0,
@@ -40,6 +181,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "83d61254",
       "colorType": 0,
       "exitCode": 0,
@@ -53,6 +241,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "83d61254",
       "colorType": 0,
       "exitCode": 0,
@@ -66,6 +301,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "c2af7ac5",
       "colorType": 2,
       "exitCode": 0,
@@ -79,6 +361,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "c2af7ac5",
       "colorType": 2,
       "exitCode": 0,
@@ -92,6 +421,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "c2af7ac5",
       "colorType": 2,
       "exitCode": 0,
@@ -105,6 +481,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "c2af7ac5",
       "colorType": 2,
       "exitCode": 0,
@@ -118,6 +541,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "pixelCounts": {
+          "opaque": 6,
+          "total": 6,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 6
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "c2af7ac5",
       "colorType": 2,
       "exitCode": 0,
@@ -131,6 +601,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "721e3a0a",
       "colorType": 4,
       "exitCode": 0,
@@ -144,6 +656,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "721e3a0a",
       "colorType": 4,
       "exitCode": 0,
@@ -157,6 +711,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "721e3a0a",
       "colorType": 4,
       "exitCode": 0,
@@ -170,6 +766,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "721e3a0a",
       "colorType": 4,
       "exitCode": 0,
@@ -183,6 +821,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "721e3a0a",
       "colorType": 4,
       "exitCode": 0,
@@ -196,6 +876,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "3367529b",
       "colorType": 6,
       "exitCode": 0,
@@ -209,6 +931,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "3367529b",
       "colorType": 6,
       "exitCode": 0,
@@ -222,6 +986,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "3367529b",
       "colorType": 6,
       "exitCode": 0,
@@ -235,6 +1041,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "3367529b",
       "colorType": 6,
       "exitCode": 0,
@@ -248,6 +1096,48 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "3367529b",
       "colorType": 6,
       "exitCode": 0,
@@ -261,6 +1151,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          3
+        ],
+        "pixelCounts": {
+          "opaque": 9,
+          "total": 9,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 9
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          3
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 3,
+            "denominator": 3
+          },
+          "right": {
+            "count": 3,
+            "denominator": 3
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "bf5b1705",
       "colorType": 0,
       "exitCode": 0,
@@ -274,6 +1211,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          3,
+          3
+        ],
+        "pixelCounts": {
+          "opaque": 9,
+          "total": 9,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 9
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          3
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 3,
+            "denominator": 3
+          },
+          "right": {
+            "count": 3,
+            "denominator": 3
+          },
+          "top": {
+            "count": 3,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "d04f6bd1",
       "colorType": 2,
       "exitCode": 0,
@@ -287,6 +1271,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          2,
+          2,
+          1,
+          1
+        ],
+        "pixelCounts": {
+          "opaque": 1,
+          "total": 9,
+          "translucent": 7,
+          "transparent": 1,
+          "visible": 8
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          3
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 3
+          },
+          "right": {
+            "count": 3,
+            "denominator": 3
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "e79e40f6",
       "colorType": 4,
       "exitCode": 0,
@@ -300,6 +1331,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          2,
+          2,
+          1,
+          1
+        ],
+        "pixelCounts": {
+          "opaque": 1,
+          "total": 9,
+          "translucent": 7,
+          "transparent": 1,
+          "visible": 8
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          3
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 2,
+            "denominator": 3
+          },
+          "right": {
+            "count": 3,
+            "denominator": 3
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "888a3c22",
       "colorType": 6,
       "exitCode": 0,
@@ -313,6 +1391,38 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": true,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 1,
+          "translucent": 0,
+          "transparent": 1,
+          "visible": 0
+        },
+        "transparentInsets": null,
+        "visibleBounds": null,
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 0,
+            "denominator": 1
+          },
+          "left": {
+            "count": 0,
+            "denominator": 1
+          },
+          "right": {
+            "count": 0,
+            "denominator": 1
+          },
+          "top": {
+            "count": 0,
+            "denominator": 1
+          }
+        }
+      },
       "byteCrc32": "63707ebd",
       "colorType": 6,
       "exitCode": 0,
@@ -326,6 +1436,53 @@
       "width": 1
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          4,
+          1,
+          1
+        ],
+        "pixelCounts": {
+          "opaque": 1,
+          "total": 5,
+          "translucent": 3,
+          "transparent": 1,
+          "visible": 4
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 1
+        },
+        "visibleBounds": [
+          0,
+          1,
+          1,
+          4
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 1,
+            "denominator": 1
+          },
+          "left": {
+            "count": 4,
+            "denominator": 5
+          },
+          "right": {
+            "count": 4,
+            "denominator": 5
+          },
+          "top": {
+            "count": 0,
+            "denominator": 1
+          }
+        }
+      },
       "byteCrc32": "063c3342",
       "colorType": 6,
       "exitCode": 0,
@@ -339,6 +1496,53 @@
       "width": 1
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          4,
+          0,
+          1,
+          1
+        ],
+        "pixelCounts": {
+          "opaque": 1,
+          "total": 5,
+          "translucent": 3,
+          "transparent": 1,
+          "visible": 4
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 1,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          1,
+          0,
+          4,
+          1
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 4,
+            "denominator": 5
+          },
+          "left": {
+            "count": 0,
+            "denominator": 1
+          },
+          "right": {
+            "count": 1,
+            "denominator": 1
+          },
+          "top": {
+            "count": 4,
+            "denominator": 5
+          }
+        }
+      },
       "byteCrc32": "a8a95cda",
       "colorType": 6,
       "exitCode": 0,
@@ -352,6 +1556,53 @@
       "width": 5
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          8,
+          8
+        ],
+        "pixelCounts": {
+          "opaque": 12,
+          "total": 64,
+          "translucent": 40,
+          "transparent": 12,
+          "visible": 52
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          8,
+          8
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 7,
+            "denominator": 8
+          },
+          "left": {
+            "count": 6,
+            "denominator": 8
+          },
+          "right": {
+            "count": 7,
+            "denominator": 8
+          },
+          "top": {
+            "count": 6,
+            "denominator": 8
+          }
+        }
+      },
       "byteCrc32": "ef5ed0c4",
       "colorType": 6,
       "exitCode": 0,
@@ -365,6 +1616,313 @@
       "width": 8
     },
     {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          1,
+          1,
+          3,
+          3
+        ],
+        "pixelCounts": {
+          "opaque": 9,
+          "total": 25,
+          "translucent": 0,
+          "transparent": 16,
+          "visible": 9
+        },
+        "transparentInsets": {
+          "bottom": 1,
+          "left": 1,
+          "right": 1,
+          "top": 1
+        },
+        "visibleBounds": [
+          1,
+          1,
+          3,
+          3
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 0,
+            "denominator": 5
+          },
+          "left": {
+            "count": 0,
+            "denominator": 5
+          },
+          "right": {
+            "count": 0,
+            "denominator": 5
+          },
+          "top": {
+            "count": 0,
+            "denominator": 5
+          }
+        }
+      },
+      "byteCrc32": "7a766bee",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 5,
+      "id": "alpha-transparent-border",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000050000000508060000008d6f26e500000001494441547876e684e600000071494441540101690096ff020000c1001f0dc1003e1ac1005d27c1007c34c1000207290000fe4612ffdf3912ffc02c12ff0729000002072900000000000000000000000000000729000002072900000000000000000000000000000729000002072900001e5eee013d6bee015c78ee01072900005160c73c0626000000024944415412487c0804cb000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "0000c1001f0dc1003e1ac1005d27c1007c34c1000729c1001d53d3ff1d53d3ff1d53d3ff835dc1000e52c1001d53d3ff1d53d3ff1d53d3ff8a86c100157bc1001d53d3ff1d53d3ff1d53d3ff91afc1001ca4c1003bb1c1005abec10079cbc10098d8c100",
+      "status": "available",
+      "width": 5
+    },
+    {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 12,
+          "translucent": 3,
+          "transparent": 9,
+          "visible": 3
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          4,
+          3
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 1,
+            "denominator": 4
+          },
+          "left": {
+            "count": 1,
+            "denominator": 3
+          },
+          "right": {
+            "count": 1,
+            "denominator": 3
+          },
+          "top": {
+            "count": 1,
+            "denominator": 4
+          }
+        }
+      },
+      "byteCrc32": "f9132a54",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 3,
+      "id": "alpha-translucent-only",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000004000000030806000000b4f4aec600000001494441547876e684e60000003b4944415401013300ccff021d53d3011f0dc1003e1ac1005d27c10002ead6eefffe46127f07290000072900000207290000100cee8107290000b90312fe88f0771f789100000002494441540e2f49a9ad6d000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "1d53d3011f0dc1003e1ac1005d27c1000729c1001d53d37f4543c1006450c1000e52c1002d5fc1004c6cc1001d53d3fe",
+      "status": "available",
+      "width": 4
+    },
+    {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          1,
+          1,
+          3,
+          3
+        ],
+        "pixelCounts": {
+          "opaque": 8,
+          "total": 25,
+          "translucent": 1,
+          "transparent": 16,
+          "visible": 9
+        },
+        "transparentInsets": {
+          "bottom": 1,
+          "left": 1,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          1,
+          0,
+          4,
+          4
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 0,
+            "denominator": 5
+          },
+          "left": {
+            "count": 0,
+            "denominator": 5
+          },
+          "right": {
+            "count": 1,
+            "denominator": 5
+          },
+          "top": {
+            "count": 1,
+            "denominator": 5
+          }
+        }
+      },
+      "byteCrc32": "da058a8d",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 5,
+      "id": "alpha-ring-hole-edge",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d49484452000000050000000508060000008d6f26e500000001494441547876e684e600000071494441540101690096ff020000c1001f0dc1003e1ac1005d27c1001d53d3400207290000fe4612ffdf3912ffc02c12ff660aeec00207290000000000002f19ee010000000007290000020729000000000000d1e712ff000000000729000002072900001e5eee013d6bee015c78ee01072900006b6c09bf9f3d0000000249444154184886e7ec41000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "0000c1001f0dc1003e1ac1005d27c1001d53d3400729c1001d53d3ff1d53d3ff1d53d3ff835dc1000e52c1001d53d3ff4c6cc1001d53d3ff8a86c100157bc1001d53d3ff1d53d3ff1d53d3ff91afc1001ca4c1003bb1c1005abec10079cbc10098d8c100",
+      "status": "available",
+      "width": 5
+    },
+    {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": true,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 12,
+          "translucent": 0,
+          "transparent": 12,
+          "visible": 0
+        },
+        "transparentInsets": null,
+        "visibleBounds": null,
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 0,
+            "denominator": 4
+          },
+          "left": {
+            "count": 0,
+            "denominator": 3
+          },
+          "right": {
+            "count": 0,
+            "denominator": 3
+          },
+          "top": {
+            "count": 0,
+            "denominator": 4
+          }
+        }
+      },
+      "byteCrc32": "de397552",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 3,
+      "id": "alpha-hidden-rgb-a",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000004000000030806000000b4f4aec600000001494441547876e684e60000003b4944415401013300ccff020000c1001f0dc1003e1ac1005d27c10002072900000729000007290000072900000207290000072900000729000007290000c3c1fd6ab32e00000002494441540593688a8b01000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "0000c1001f0dc1003e1ac1005d27c1000729c1002636c1004543c1006450c1000e52c1002d5fc1004c6cc1006b79c100",
+      "status": "available",
+      "width": 4
+    },
+    {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": true,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 12,
+          "translucent": 0,
+          "transparent": 12,
+          "visible": 0
+        },
+        "transparentInsets": null,
+        "visibleBounds": null,
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 0,
+            "denominator": 4
+          },
+          "left": {
+            "count": 0,
+            "denominator": 3
+          },
+          "right": {
+            "count": 0,
+            "denominator": 3
+          },
+          "top": {
+            "count": 0,
+            "denominator": 4
+          }
+        }
+      },
+      "byteCrc32": "f861c090",
+      "colorType": 6,
+      "exitCode": 0,
+      "filter": 2,
+      "height": 3,
+      "id": "alpha-hidden-rgb-b",
+      "interlace": 0,
+      "pngHex": "89504e470d0a1a0a0000000d4948445200000004000000030806000000b4f4aec600000001494441547876e684e60000003b4944415401013300ccff02000011002f1711005e2e11008d45110002131f0000131f0000131f0000131f000002131f0000131f0000131f0000131f00006a454da51fe50000000249444154037f976c82d4000000004944415435af061e0000000049454e44ae426082",
+      "rgbaHex": "000011002f1711005e2e11008d451100131f110042361100714d1100a0641100263e110055551100846c1100b3831100",
+      "status": "available",
+      "width": 4
+    },
+    {
+      "alpha": {
+        "allPixelsVisible": false,
+        "entirelyTransparent": false,
+        "opaqueBounds": null,
+        "pixelCounts": {
+          "opaque": 0,
+          "total": 6,
+          "translucent": 5,
+          "transparent": 1,
+          "visible": 5
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          3,
+          2
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 3,
+            "denominator": 3
+          },
+          "left": {
+            "count": 1,
+            "denominator": 2
+          },
+          "right": {
+            "count": 2,
+            "denominator": 2
+          },
+          "top": {
+            "count": 2,
+            "denominator": 3
+          }
+        }
+      },
       "byteCrc32": "3367529b",
       "colorType": 6,
       "exitCode": 0,
@@ -378,6 +1936,53 @@
       "width": 3
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          12,
+          5
+        ],
+        "pixelCounts": {
+          "opaque": 60,
+          "total": 60,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 60
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          12,
+          5
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 12,
+            "denominator": 12
+          },
+          "left": {
+            "count": 5,
+            "denominator": 5
+          },
+          "right": {
+            "count": 5,
+            "denominator": 5
+          },
+          "top": {
+            "count": 12,
+            "denominator": 12
+          }
+        }
+      },
       "byteCrc32": "b994d785",
       "colorType": 6,
       "exitCode": 0,
@@ -420,6 +2025,53 @@
       "width": 12
     },
     {
+      "alpha": {
+        "allPixelsVisible": true,
+        "entirelyTransparent": false,
+        "opaqueBounds": [
+          0,
+          0,
+          12,
+          5
+        ],
+        "pixelCounts": {
+          "opaque": 60,
+          "total": 60,
+          "translucent": 0,
+          "transparent": 0,
+          "visible": 60
+        },
+        "transparentInsets": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        },
+        "visibleBounds": [
+          0,
+          0,
+          12,
+          5
+        ],
+        "visibleEdgePixels": {
+          "bottom": {
+            "count": 12,
+            "denominator": 12
+          },
+          "left": {
+            "count": 5,
+            "denominator": 5
+          },
+          "right": {
+            "count": 5,
+            "denominator": 5
+          },
+          "top": {
+            "count": 12,
+            "denominator": 12
+          }
+        }
+      },
       "byteCrc32": "75c5d989",
       "colorType": 6,
       "exitCode": 0,
@@ -513,5 +2165,5 @@
   "origin": "procedural-no-external-assets",
   "reviewStatus": "synthetic-not-human-validated",
   "scope": "source-raster-conformance",
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

@@ -82,6 +82,63 @@ def expected_rgba(source, color):
     return bytes(result)
 
 
+def alpha_geometry(rgba, width, height):
+    visible = []
+    opaque = []
+    counts = {"total": width * height, "visible": 0, "opaque": 0,
+              "translucent": 0, "transparent": 0}
+    edges = {"top": 0, "right": 0, "bottom": 0, "left": 0}
+    for y in range(height):
+        for x in range(width):
+            alpha = rgba[(y * width + x) * 4 + 3]
+            if alpha == 0:
+                counts["transparent"] += 1
+                continue
+            visible.append((x, y))
+            counts["visible"] += 1
+            if alpha == 255:
+                opaque.append((x, y))
+                counts["opaque"] += 1
+            else:
+                counts["translucent"] += 1
+            if y == 0:
+                edges["top"] += 1
+            if x + 1 == width:
+                edges["right"] += 1
+            if y + 1 == height:
+                edges["bottom"] += 1
+            if x == 0:
+                edges["left"] += 1
+
+    def bounds(points):
+        if not points:
+            return None
+        xs = [point[0] for point in points]
+        ys = [point[1] for point in points]
+        return [min(xs), min(ys), max(xs) - min(xs) + 1, max(ys) - min(ys) + 1]
+
+    visible_bounds = bounds(visible)
+    insets = None
+    if visible_bounds is not None:
+        x, y, box_width, box_height = visible_bounds
+        insets = {"top": y, "right": width - x - box_width,
+                  "bottom": height - y - box_height, "left": x}
+    return {
+        "visibleBounds": visible_bounds,
+        "opaqueBounds": bounds(opaque),
+        "transparentInsets": insets,
+        "pixelCounts": counts,
+        "visibleEdgePixels": {
+            "top": {"count": edges["top"], "denominator": width},
+            "right": {"count": edges["right"], "denominator": height},
+            "bottom": {"count": edges["bottom"], "denominator": width},
+            "left": {"count": edges["left"], "denominator": height},
+        },
+        "entirelyTransparent": not visible,
+        "allPixelsVisible": len(visible) == width * height,
+    }
+
+
 def scanlines(source, width, height, channels, selector, interlace):
     result = bytearray()
     for sx, sy, dx, dy in PASSES if interlace else [(0, 0, 1, 1)]:
@@ -104,7 +161,19 @@ def available(identifier, width, height, color, selector, interlace=0, *, source
     return {"id": identifier, "pngHex": input_bytes.hex(), "width": width, "height": height,
             "colorType": color, "filter": selector, "interlace": interlace, "exitCode": 0,
             "status": "available", "rgbaHex": rgba.hex(),
-            "byteCrc32": f"{binascii.crc32(rgba):08x}"}
+            "byteCrc32": f"{binascii.crc32(rgba):08x}",
+            "alpha": alpha_geometry(rgba, width, height)}
+
+
+def alpha_case(identifier, width, height, assignments):
+    source = bytearray()
+    for y in range(height):
+        for x in range(width):
+            source.extend(((31 * x + 7 * y) % 256, (13 * x + 41 * y) % 256, 193, 0))
+    for x, y, alpha in assignments:
+        start = (y * width + x) * 4
+        source[start:start + 4] = bytes((29, 83, 211, alpha))
+    return available(identifier, width, height, 6, 2, source=bytes(source))
 
 
 def dashboard(mutated):
@@ -130,6 +199,20 @@ def generate():
              for color in (0, 2, 4, 6) for f in range(5)]
     cases += [available(f"adam7-color-{color}", 3, 3, color, 4, 1) for color in (0, 2, 4, 6)]
     cases += [available(f"adam7-{w}x{h}", w, h, 6, 3, 1) for w, h in ((1, 1), (1, 5), (5, 1), (8, 8))]
+    cases += [
+        alpha_case("alpha-transparent-border", 5, 5,
+                   [(x, y, 255) for y in range(1, 4) for x in range(1, 4)]),
+        alpha_case("alpha-translucent-only", 4, 3,
+                   [(0, 0, 1), (1, 1, 127), (3, 2, 254)]),
+        alpha_case("alpha-ring-hole-edge", 5, 5,
+                   [(x, y, 255) for y in range(1, 4) for x in range(1, 4)
+                    if (x, y) != (2, 2)] + [(4, 0, 64)]),
+        alpha_case("alpha-hidden-rgb-a", 4, 3, []),
+        available("alpha-hidden-rgb-b", 4, 3, 6, 2,
+                  source=bytes([value for y in range(3) for x in range(4)
+                                for value in ((47 * x + 19 * y) % 256,
+                                              (23 * x + 31 * y) % 256, 17, 0)])),
+    ]
     cases += [available("unmanaged-gamma", 3, 2, 6, 0, extra=[(b"gAMA", struct.pack(">I", 100000))])]
     cases += [dashboard(False), dashboard(True)]
     unsupported = [
@@ -147,7 +230,7 @@ def generate():
     cases += [{"id": "invalid-filter", "pngHex": invalid.hex(), "exitCode": 2, "errorContains": "invalid filter type 5"},
               {"id": "invalid-crc", "pngHex": bad_crc.hex(), "exitCode": 2, "errorContains": "CRC"}]
     assert len({case["id"] for case in cases}) == len(cases)
-    return {"version": "0.1.0", "origin": "procedural-no-external-assets",
+    return {"version": "0.2.0", "origin": "procedural-no-external-assets",
             "reviewStatus": "synthetic-not-human-validated", "scope": "source-raster-conformance",
             "cases": cases}
 
