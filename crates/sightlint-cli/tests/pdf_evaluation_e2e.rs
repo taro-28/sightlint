@@ -279,6 +279,92 @@ struct Metrics {
     killed_mutations: u32,
 }
 
+fn observe_case(
+    root: &Path,
+    temporary: &Path,
+    case: &Value,
+    acquisitions: &Value,
+    rules: &Value,
+    metrics: &mut Metrics,
+) {
+    let case_id = case["id"].as_str().unwrap();
+    let request = root.join(case["request"]["path"].as_str().unwrap());
+    let first_ir = temporary.join(format!("{case_id}-first.json"));
+    let second_ir = temporary.join(format!("{case_id}-second.json"));
+    let first = adapter(&request, &first_ir);
+    let second = adapter(&request, &second_ir);
+    assert_exit(&first, EXIT_SUCCESS);
+    assert_exit(&second, EXIT_SUCCESS);
+    assert!(first.stderr.is_empty() && second.stderr.is_empty());
+    assert_eq!(first.stdout, second.stdout, "{case_id} response drift");
+    let first_bytes = fs::read(&first_ir).unwrap();
+    assert_eq!(
+        first_bytes,
+        fs::read(&second_ir).unwrap(),
+        "{case_id} Artifact IR drift"
+    );
+    assert_no_source_content(&first.stdout);
+    assert_no_source_content(&first_bytes);
+
+    let response: Value = serde_json::from_slice(&first.stdout).unwrap();
+    assert_eq!(response["status"], "partial");
+    assert_eq!(response["coverage"]["pageGeometry"], "partial");
+    assert_eq!(response["coverage"]["linkAnnotations"], "partial");
+    assert_eq!(response["coverage"]["renderedNodeIdentity"], "cantTell");
+    assert_eq!(response["externalProcessing"], false);
+
+    let document: Value = serde_json::from_slice(&first_bytes).unwrap();
+    assert_eq!(document["artifact"]["kind"], "pdf");
+    let extension = &document["extensions"]["org.sightlint.pdf"];
+    assert_eq!(extension["privacy"]["actionsFollowed"], false);
+    assert_eq!(extension["privacy"]["contentPolicy"], "geometryAndTypeOnly");
+    let acquisition = item_by(
+        &acquisitions["annotations"],
+        "id",
+        &case["acquisitionAnnotationId"],
+    );
+    metrics.facts += acquisition_facts(&document, acquisition);
+    let oracle = item_by(&rules["annotations"], "id", &case["ruleAnnotationId"]);
+    let checked = check(&first_ir);
+    let expected_to_fail = oracle["expectations"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|expectation| expectation["expectedOutcome"] == "failed");
+    assert_exit(
+        &checked,
+        if expected_to_fail {
+            EXIT_FINDINGS
+        } else {
+            EXIT_SUCCESS
+        },
+    );
+    assert!(checked.stderr.is_empty());
+    let report: Value = serde_json::from_slice(&checked.stdout).unwrap();
+    let (expected, actual) = rule_observation(&report, oracle);
+    metrics.expected_failures += expected;
+    metrics.actual_failures += actual;
+    metrics.abstentions += u32::from(
+        acquisition["annotations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["geometryStatus"] == "unsupportedQuadPoints"),
+    );
+    match oracle["caseRole"].as_str().unwrap() {
+        "targetedMutation" => {
+            metrics.mutations += 1;
+            metrics.killed_mutations += u32::from(actual == expected && actual > 0);
+        }
+        "clean" | "hardNegative" => {
+            metrics.negative_cases += 1;
+            metrics.false_positive_cases += u32::from(actual > 0);
+        }
+        role => panic!("unexpected case role {role}"),
+    }
+    metrics.cases += 1;
+}
+
 #[test]
 fn public_pdf_corpus_separates_acquisition_and_rule_ground_truth() {
     let root = repository_root();
@@ -288,86 +374,16 @@ fn public_pdf_corpus_separates_acquisition_and_rule_ground_truth() {
     let contract = load_json(root.join("evaluation/pdf/metric-contract.json"));
     let temporary = TempDirectory::new();
     let mut metrics = Metrics::default();
-    let mut response_by_case = BTreeMap::new();
 
     for case in corpus["cases"].as_array().unwrap() {
-        let case_id = case["id"].as_str().unwrap();
-        let request = root.join(case["request"]["path"].as_str().unwrap());
-        let first_ir = temporary.0.join(format!("{case_id}-first.json"));
-        let second_ir = temporary.0.join(format!("{case_id}-second.json"));
-        let first = adapter(&request, &first_ir);
-        let second = adapter(&request, &second_ir);
-        assert_exit(&first, EXIT_SUCCESS);
-        assert_exit(&second, EXIT_SUCCESS);
-        assert!(first.stderr.is_empty() && second.stderr.is_empty());
-        assert_eq!(first.stdout, second.stdout, "{case_id} response drift");
-        let first_bytes = fs::read(&first_ir).unwrap();
-        assert_eq!(
-            first_bytes,
-            fs::read(&second_ir).unwrap(),
-            "{case_id} Artifact IR drift"
+        observe_case(
+            &root,
+            &temporary.0,
+            case,
+            &acquisitions,
+            &rules,
+            &mut metrics,
         );
-        assert_no_source_content(&first.stdout);
-        assert_no_source_content(&first_bytes);
-
-        let response: Value = serde_json::from_slice(&first.stdout).unwrap();
-        assert_eq!(response["status"], "partial");
-        assert_eq!(response["coverage"]["pageGeometry"], "partial");
-        assert_eq!(response["coverage"]["linkAnnotations"], "partial");
-        assert_eq!(response["coverage"]["renderedNodeIdentity"], "cantTell");
-        assert_eq!(response["externalProcessing"], false);
-        response_by_case.insert(case_id, response);
-
-        let document: Value = serde_json::from_slice(&first_bytes).unwrap();
-        assert_eq!(document["artifact"]["kind"], "pdf");
-        let extension = &document["extensions"]["org.sightlint.pdf"];
-        assert_eq!(extension["privacy"]["actionsFollowed"], false);
-        assert_eq!(extension["privacy"]["contentPolicy"], "geometryAndTypeOnly");
-        let acquisition = item_by(
-            &acquisitions["annotations"],
-            "id",
-            &case["acquisitionAnnotationId"],
-        );
-        metrics.facts += acquisition_facts(&document, acquisition);
-        let oracle = item_by(&rules["annotations"], "id", &case["ruleAnnotationId"]);
-        let checked = check(&first_ir);
-        let expected_to_fail = oracle["expectations"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|expectation| expectation["expectedOutcome"] == "failed");
-        assert_exit(
-            &checked,
-            if expected_to_fail {
-                EXIT_FINDINGS
-            } else {
-                EXIT_SUCCESS
-            },
-        );
-        assert!(checked.stderr.is_empty());
-        let report: Value = serde_json::from_slice(&checked.stdout).unwrap();
-        let (expected, actual) = rule_observation(&report, oracle);
-        metrics.expected_failures += expected;
-        metrics.actual_failures += actual;
-        metrics.abstentions += u32::from(
-            acquisition["annotations"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .any(|item| item["geometryStatus"] == "unsupportedQuadPoints"),
-        );
-        match oracle["caseRole"].as_str().unwrap() {
-            "targetedMutation" => {
-                metrics.mutations += 1;
-                metrics.killed_mutations += u32::from(actual == expected && actual > 0);
-            }
-            "clean" | "hardNegative" => {
-                metrics.negative_cases += 1;
-                metrics.false_positive_cases += u32::from(actual > 0);
-            }
-            role => panic!("unexpected case role {role}"),
-        }
-        metrics.cases += 1;
     }
 
     assert_eq!(metrics.cases, 3);
@@ -375,7 +391,6 @@ fn public_pdf_corpus_separates_acquisition_and_rule_ground_truth() {
     assert_eq!(metrics.abstentions, 1);
     assert_eq!(metrics.false_positive_cases, 0);
     assert_eq!(metrics.killed_mutations, metrics.mutations);
-    assert_eq!(response_by_case.len(), 3);
     let observed = BTreeMap::from([
         ("abstentionRetention", f64::from(metrics.abstentions)),
         ("acquisitionFactCoverage", 1.0),
@@ -399,7 +414,7 @@ fn public_pdf_corpus_separates_acquisition_and_rule_ground_truth() {
     }
 }
 
-fn write_request(path: &Path, source: &str, digest: &str, limits: Value) {
+fn write_request(path: &Path, source: &str, digest: &str, limits: &Value) {
     let request = json!({
         "protocolVersion": "0.1.0",
         "requestId": "pdf-error-case",
@@ -418,13 +433,13 @@ fn write_request(path: &Path, source: &str, digest: &str, limits: Value) {
 
 fn default_limits() -> Value {
     json!({
-        "maxInputBytes": 1048576,
-        "maxRenderBytes": 4194304,
+        "maxInputBytes": 1_048_576,
+        "maxRenderBytes": 4_194_304,
         "maxObjects": 100,
         "maxPages": 4,
         "maxAnnotations": 16,
         "maxAnnotationsPerPage": 8,
-        "maxOutputBytes": 1048576
+        "maxOutputBytes": 1_048_576
     })
 }
 
@@ -513,7 +528,7 @@ fn public_pdf_adapter_has_stable_fail_closed_boundaries() {
         &malformed_request,
         "malformed.pdf",
         &python_sha256(&malformed_pdf),
-        default_limits(),
+        &default_limits(),
     );
     let malformed_ir = temporary.0.join("malformed-ir.json");
     assert_error(
@@ -536,7 +551,7 @@ fn public_pdf_adapter_has_stable_fail_closed_boundaries() {
         &encrypted_request,
         "encrypted.pdf",
         &python_sha256(&encrypted_pdf),
-        default_limits(),
+        &default_limits(),
     );
     let encrypted_ir = temporary.0.join("encrypted-ir.json");
     assert_error(
