@@ -78,6 +78,12 @@ jobs:
           .venv-sightlint-pdf/bin/python tools/generate_pdf_fixtures.py --check
           .venv-sightlint-pdf/bin/python tools/check_pdf_evaluation.py
           .venv-sightlint-pdf/bin/python -m unittest adapters/pdf/tests/test_adapter.py
+      - name: Verify Android capture fixtures and evaluation governance
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 tools/generate_android_fixtures.py --check
+          python3 tools/check_android_evaluation.py
+          python3 -m py_compile adapters/android/sightlint_android.py
       - name: Verify release and dependency-license contracts
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
@@ -123,6 +129,9 @@ jobs:
       - name: Run PDF source-adapter evaluation explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
+      - name: Run Android capture-adapter evaluation explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
       - name: Build documentation
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         env:
@@ -235,6 +244,11 @@ jobs:
           "${{ matrix.pdf_python }}" tools/generate_pdf_fixtures.py --check
           "${{ matrix.pdf_python }}" tools/check_pdf_evaluation.py
           "${{ matrix.pdf_python }}" -m unittest adapters/pdf/tests/test_adapter.py
+      - name: Verify Android fixture and evaluation contracts
+        run: |
+          ${{ matrix.python }} tools/generate_android_fixtures.py --check
+          ${{ matrix.python }} tools/check_android_evaluation.py
+          ${{ matrix.python }} -m py_compile adapters/android/sightlint_android.py
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E

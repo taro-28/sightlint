@@ -85,10 +85,28 @@ PDF still reaches pypdf under the caller's process privileges, and parser versio
 prove safety. Object IDs, rectangles, relative paths, titles, and digests are source-derived
 sensitive metadata even though document text and pixels are omitted from serialized output.
 
+## Current Android capture boundary
+
+ADR 0045 treats both the Android instrumentation output and its local Python converter as
+untrusted sensors. The converter accepts only repository-contained digest-pinned capture/PNG
+paths, rejects duplicate/unknown fields and hierarchy identity errors, bounds request/capture/
+screenshot/node/depth/attribute/string/output resources, validates the PNG through public
+`adapt-image`, requires display/PNG extent agreement, and passes candidate IR through public Rust
+normalization before exclusive output creation. It does not invoke `adb`, boot or mutate a device,
+install an APK, perform an accessibility action, or use the network.
+
+These controls are not a CPU, memory, syscall, or filesystem sandbox. Capture acquisition runs
+under explicit maintainer-controlled Android/Gradle tooling outside CI, and the committed
+manifests remain untrusted input. Resource IDs, class/package names, device/build identifiers,
+geometry, relative paths, screenshots, and unsalted text/content-description digests are
+source-derived sensitive data; low-entropy values can be guessed offline. Treat captures and
+adapter output like source artifacts even though plaintext View strings and pixels are not copied
+into Artifact IR.
+
 ## Future work
 
-Before broadening PPTX/PDF or accepting other real artifact formats, add format-specific fuzzing,
-parser/runtime compatibility characterization, and stronger sandbox guidance; every new parser
-still needs its own resource and archive policy.
+Before broadening PPTX/PDF/Android or accepting other real artifact formats, add format-specific
+fuzzing, parser/runtime compatibility characterization, and stronger sandbox guidance; every new
+parser still needs its own resource and archive policy.
 Before browser support, define origin isolation, credential handling, request interception,
 and trace redaction.

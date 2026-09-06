@@ -15,7 +15,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
-| M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX and PDF source-geometry processes | portability characterization, broader representative evaluation, then Android/iOS by demand |
+| M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX, PDF, and Android processes | portability characterization, broader representative evaluation, then iOS by demand |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
 | M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
@@ -114,8 +114,8 @@ default. ADR 0040 and issue #26 add exact source-alpha geometry without admittin
 ADR 0041 and issue #27 retain explicit unavailability for broader PNG formats because current
 product evidence does not establish a coverage gap. ADR 0042 and issue #28 add the local
 perception protocol foundation without semantic promotion or model-accuracy claims. ADRs
-0043–0044 add bounded PPTX and PDF source-geometry slices under #29; the remaining
-structured-medium sequence starts with Android.
+0043–0045 add bounded PPTX, PDF, and instrumented Android slices under #29; the remaining
+structured-medium sequence starts with iOS.
 
 ## Scope-selection rules
 
@@ -329,8 +329,9 @@ Add one at a time according to demand and fixture quality:
 
 1. PPTX/slides — first bounded source-geometry slice implemented through ADR 0043;
 2. structured PDF/document — bounded page/Link-annotation slice implemented through ADR 0044;
-3. Android semantics/accessibility plus screenshot — next candidate;
-4. iOS XCUI/accessibility plus screenshot.
+3. Android semantics/accessibility plus screenshot — first bounded instrumented-capture slice
+   implemented through ADR 0045;
+4. iOS XCUI/accessibility plus screenshot — next candidate.
 
 This order is provisional. Every adapter needs an ADR, native fixture corpus, unit/coordinate plan,
 trust/privacy/resource model, compatibility strategy, rendered differential tests, and public E2E.
@@ -349,6 +350,15 @@ device-pixel canvases with extent-only reconciliation. Its clean/source-only-mut
 hard-negative corpus proves the shared containment rule and conservative abstention. Text, tags,
 paint, actions, viewer hit testing, node-to-pixel identity, broader documents, a protected holdout,
 and PDF-specific recommended rules remain unimplemented or untested.
+
+The Android `0.1.0` process consumes a strict digest-pinned instrumentation capture and paired PNG
+without operating a device. It maps only supported shown/globally-visible classic View allocations
+to exact-source device-pixel `layoutBox` nodes. Accessibility rectangles remain separate platform
+semantics, and the PNG remains a separate exact-render canvas with extent-only reconciliation. Its
+clean/off-canvas-mutation/offscreen-hard-negative corpus proves the shared containment rule,
+conflict retention, and conservative exclusion. Live capture, Compose, arbitrary applications,
+touch regions, dynamic behavior, node-to-pixel identity, representative devices, a protected
+holdout, and Android-specific recommended rules remain unimplemented or untested.
 
 ### M4 exit criteria
 
@@ -510,7 +520,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0045 or later.
+- New architecture decision numbers continue at 0046 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -533,7 +543,8 @@ Every public behavior must satisfy the applicable matrix:
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand and decoder strategy decision; broader coverage not admitted |
 | #28 | completed local OCR/CV/VLM perception protocol foundation; model quality remains untested |
-| #29 | PPTX and PDF first slices implemented; Android/iOS remain |
+| #29 | PPTX, PDF, and Android first slices implemented; iOS remains |
+| #56 | bounded Android instrumented-capture adapter slice |
 | #30 | interaction states/effects/traces/recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #32 | completed legacy branch and repository-setting cleanup |

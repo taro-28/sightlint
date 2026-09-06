@@ -118,6 +118,10 @@ ADR 0044 uses an exact hash-locked pypdf wheel in a second local Python process 
 page/Link-annotation slice. The parser and object graph remain untrusted; only normalized exact
 source facts cross into the medium-neutral kernel.
 
+ADR 0045 uses a dependency-free Python 3.9+ file adapter over output from a repository-owned
+Android instrumentation runner. Device capture stays outside the adapter and kernel. Exact View
+allocation, accessibility semantics, and PNG render evidence remain separately typed.
+
 Early development prefers versioned process protocols to a shared in-process plugin ABI. Process
 isolation limits crashes, memory, dependency conflicts, runtime choice, and untrusted content.
 
@@ -167,6 +171,27 @@ Optional repository-contained PNG page renders pass public `adapt-image` and rem
 and viewer hit testing remain `cantTell`. Text, tag interpretation, paint/ink, reading order,
 forms, actions, attachments, and metadata are not mapped. The pypdf/Python process is an untrusted
 sensor with request budgets, not an operating-system sandbox.
+
+## Current Android adapter boundary
+
+The `sightlint-android` process reads one strict digest-pinned capture manifest and paired PNG
+below an explicit repository root. It does not run `adb`, boot a device, install an APK, perform
+accessibility actions, or access the network. The repository-owned API-35 fixture runner records
+classic View hierarchy/allocation facts and `AccessibilityNodeInfo` facts separately before a
+sequential `UiAutomation` screenshot.
+
+Only shown, globally visible, identity-transform Views with unique resource IDs and nonempty
+allocations become exact-source device-pixel `layoutBox` nodes. Accessibility bounds remain
+`PlatformSemantics` in `org.sightlint.android@0.1.0`; they never become `hitBox`, `renderBox`, or
+`inkBox`. Fully offscreen scroll content and invalid platform rectangles remain extension evidence
+without manufactured core verdicts. The PNG passes public `adapt-image`, stays on a separate
+canvas, and is reconciled only at display extent. Candidate IR passes public `normalize` before
+exclusive output creation.
+
+The current boundary covers one repository-owned classic-View application and one pinned emulator
+profile. Compose, arbitrary applications, live capture, touch delegates, multiple windows,
+dynamic behavior, occlusion, and native-to-pixel identity remain unsupported, `untested`, or
+`cantTell`. Python and Android tooling are untrusted sensors, not an operating-system sandbox.
 
 ## Current PNG adapter boundary
 

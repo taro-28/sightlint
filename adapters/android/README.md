@@ -25,3 +25,10 @@ Exact View screen allocations may become `layoutBox` observations. Accessibility
 separate platform-semantic facts and never become `hitBox` or rendered geometry. The paired PNG is
 validated through public `adapt-image`, uses a separate canvas, and is reconciled only at screen
 extent. See `evaluation/android/README.md` for evaluation governance and explicit non-claims.
+
+The v0.1 process accepts only the pinned Atlas API/tool/device profile and reports all coverage as
+partial. It serializes digest/byte-length facts instead of plaintext View text or content
+descriptions, but resource IDs, class/package names, device/build metadata, paths, geometry,
+screenshots, and unsalted low-entropy digests remain sensitive source data. The process has no
+external processing or retention and adds no package dependency; request limits do not constitute
+an operating-system sandbox.

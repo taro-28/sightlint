@@ -251,6 +251,23 @@ rotation, unsupported actions, and uncertain page geometry do not create approxi
 boxes. Rendered annotation identity and viewer behavior remain `cantTell`, while text, tags, paint,
 and reading order remain `untested`.
 
+## Current Android use
+
+ADR 0045 leaves core Artifact IR at `0.1.0`. One platform display becomes an exact-source
+`devicePixel` canvas. A supported shown and globally visible classic View becomes an ordinary
+`control`, `container`, `text`, or `other` node carrying only an exact-source `layoutBox`.
+Resource IDs, Java classes, hierarchy depth/parentage, View state, text/content-description
+digests, accessibility actions and rectangles, device/build/capture provenance, coverage, and
+unsupported features stay in `org.sightlint.android@0.1.0`.
+
+The paired PNG is a second `devicePixel` canvas with exact-render evidence. Display extent
+agreement is recorded without manufacturing node-to-pixel identity. Accessibility rectangles use
+separate `platformSemantics` evidence and do not become touch or render geometry. A clipped
+accessibility rectangle cannot repair a source allocation, and invalid or offscreen platform
+geometry remains conflict/abstention evidence rather than an exact fact. The shared
+canvas-containment rule may consume admitted View `layoutBox` facts without learning Android
+concepts.
+
 ## Interaction extension
 
 Interaction data is optional for static artifacts and remains future work under issue #30. A
@@ -323,5 +340,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0045 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0046 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

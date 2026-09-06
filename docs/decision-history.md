@@ -338,8 +338,10 @@ ADR 0042 completes the protocol-v0 perception boundary. ADR 0043 then selects PP
 post-Web structured medium and proves a bounded direct-shape/source-geometry slice without moving
 OOXML into the kernel. ADR 0044 follows with a hash-locked untrusted PDF parser process and maps
 only exact page and rectangular internal-Link activation geometry; a `QuadPoints` case proves that
-uncertain activation regions are not promoted. Android and iOS stay sequenced inside #29; issues
-#30 and #31 preserve the later stages.
+uncertain activation regions are not promoted. ADR 0045 then selects a bounded file adapter over a
+repository-owned Android instrumentation capture: exact View allocations, accessibility
+semantics, and PNG pixels stay distinct, and offscreen/invalid platform geometry is not promoted.
+iOS remains sequenced inside #29; issues #30 and #31 preserve the later stages.
 
 ## Local-first and privacy
 
@@ -460,7 +462,9 @@ Important historical detail:
   and public acquisition-versus-rule evaluation boundary;
 - ADR 0044 defines the bounded PDF page/Link-annotation process, exact hash-locked parser,
   conservative non-rectangular abstention, and separate acquisition/rule evaluation boundary;
-- new ADRs should continue at 0045 or later rather than silently reusing historical numbers.
+- ADR 0045 defines the bounded Android instrumented-capture file adapter, separate View/platform/
+  render evidence, offscreen abstention, and public acquisition/rule evaluation boundary;
+- new ADRs should continue at 0046 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -474,8 +478,7 @@ inside an unmerged branch and does not make them accepted repository decisions.
   gap after ADR 0041;
 - real OCR/CV/VLM model selection, calibration, and representative perception evaluation after
   the issue #28 protocol foundation;
-- adapter ordering after the bounded PPTX slice: PDF/document next within issue #29, with mobile
-  still evidence- and demand-gated;
+- iOS adapter evidence and trust boundary after the bounded Android slice inside issue #29;
 - interaction trace/effect schema: issue #30;
 - MCP/GitHub/editor/local UI and later package channels: issue #31;
 - signing/attestation identity and any future registry or prebuilt-binary channel after the

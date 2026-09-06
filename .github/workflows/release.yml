@@ -144,6 +144,13 @@ jobs:
           "${{ matrix.pdf_python }}" tools/generate_pdf_fixtures.py --check
           "${{ matrix.pdf_python }}" tools/check_pdf_evaluation.py
           "${{ matrix.pdf_python }}" -m unittest adapters/pdf/tests/test_adapter.py
+      - name: Verify extracted Android evaluation contracts
+        shell: bash
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}
+        run: |
+          "${{ matrix.python }}" tools/generate_android_fixtures.py --check
+          "${{ matrix.python }}" tools/check_android_evaluation.py
+          "${{ matrix.python }}" -m py_compile adapters/android/sightlint_android.py
       - name: Verify hosted Node compatibility
         shell: bash
         run: node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 20 || major > 24) process.exit(1)'
@@ -201,6 +208,9 @@ jobs:
           .venv-sightlint-pdf/bin/python tools/generate_pdf_fixtures.py --check
           .venv-sightlint-pdf/bin/python tools/check_pdf_evaluation.py
           .venv-sightlint-pdf/bin/python -m unittest adapters/pdf/tests/test_adapter.py
+          python3 tools/generate_android_fixtures.py --check
+          python3 tools/check_android_evaluation.py
+          python3 -m py_compile adapters/android/sightlint_android.py
           python3 tools/check_dependency_licenses.py
           python3 -m unittest tools/test_release.py
       - name: Install the locked perception wrapper
@@ -220,6 +230,7 @@ jobs:
           cargo build --locked -p sightlint-cli --bin sightlint
           cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
           cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
+          cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
           npm run test:e2e --prefix adapters/perception
           npm run test:e2e --prefix adapters/playwright
 

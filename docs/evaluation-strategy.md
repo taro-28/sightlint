@@ -70,6 +70,12 @@ exact rectangular hit boxes consumed by `visual.bounds.within-canvas`. The sourc
 mutation leaves rendered pixels unchanged, so source and render disagreement is preserved rather
 than using one as truth for the other.
 
+ADR 0045 applies the same separation to Android. Its acquisition oracle labels platform display,
+View allocation/state, accessibility geometry, screenshot extent, mapping exclusions, and
+abstentions independently from adapter output. Its rule oracle covers only the admitted exact
+View `layoutBox` facts consumed by `visual.bounds.within-canvas`. Clipped or invalid accessibility
+bounds remain separate evidence and cannot repair source geometry or create touch/render facts.
+
 ### 3. Rule/product evaluation
 
 **Question:** Given sufficient observations, applicability, and policy, did SightLint return the
@@ -178,6 +184,26 @@ privacy, public smoke/development/challenge exposure, and missing holdout are ex
 three maintainer-authored regression cases, not representative PDF, accessibility, interaction,
 or document-quality accuracy. Text, tags, paint, viewer hit testing, and node-to-pixel identity
 remain `untested` or `cantTell`.
+
+### Android capture-adapter evaluation
+
+`evaluation/android/` implements ADR 0045 with three API-35 captures produced from the
+repository-owned Atlas account/settings application. The clean case supplies a realistic static
+screen, the targeted mutation moves only the Save View allocation beyond the display, and the
+asymmetric hard negative adds ordinary offscreen scroll content whose platform accessibility
+bounds are invalid after clipping.
+
+The public adapter and built binary match 114 reviewed acquisition facts, emit the one expected
+source-bounds failure, retain the hard-negative exclusion, kill the one declared mutation, and
+emit no clean/hard-negative failure. View, accessibility, and screenshot evidence retain separate
+classes and coordinate meaning. Capture/request/PNG digests, tool/device/build provenance,
+fictional ownership, dual license, privacy, public smoke/development/challenge exposure, and
+missing holdout are explicit.
+
+These are three public maintainer-authored regression cases, not representative Android,
+accessibility, device, or UI/UX accuracy. Compose, arbitrary applications, live capture, touch
+regions, dynamic behavior, occlusion/ink, and rendered node identity remain unimplemented,
+`untested`, or `cantTell`.
 
 ### PNG raster acquisition corpus
 
