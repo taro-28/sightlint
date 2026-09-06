@@ -13,10 +13,10 @@ The authoritative development line is the latest green commit on `main`.
 
 The branch for issue #56, a focused child of #29, started from this verified green `main` baseline:
 
-- commit: `868f61388de326951a0716aed959cc8693dc8232`
-- tree: `7d4795aedc8ed066ced50327d63011b850db36a2`
-- merged PR: #55
-- main CI: run 34013913755, all six jobs successful
+- commit: `29fd63177ba465f2f90baf5693d03415ec02354c`
+- tree: `e6ac14006ac1a915791d5e11c41064121884848e`
+- merged PR: #58
+- main CI: run 34016009257, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
