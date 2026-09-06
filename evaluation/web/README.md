@@ -61,8 +61,10 @@ ADR 0053 and issue #78 add a source-only review packet for the real human task i
 `review-packet.json` embeds only the six Atlas/Harbor fixture source files and 27 capture requests;
 `reviewer-submission.blank.json` contains no answers. Strict submission records separate
 acquisition observations from rule verdicts and lock reviewer-authored bytes before a read-only
-comparison may open the existing oracles. The committed conformance reviewer/submission is wholly
-fictional, fully exposed, and permanently ineligible as independent-review or product evidence.
+comparison may open the existing oracles. Comparison metrics keep category-specific integer
+numerators and denominators, including explicit zero denominators. The committed conformance
+reviewer/submission is wholly fictional, fully exposed, and permanently ineligible as
+independent-review or product evidence.
 
 ## Files and authority
 

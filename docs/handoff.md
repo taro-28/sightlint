@@ -436,8 +436,9 @@ Acquisition judgments and rule judgments remain separate; unavailable measuremen
 native and pixel evidence/conflict, confidence, rationale, hard negatives, and all five rule
 outcomes remain explicit. `tools/compare_web_review.py` verifies finalization before opening the
 current public oracles and writes only canonical comparison JSON to stdout. It reports separate
-integer acquisition agreement, rule agreement, disagreement, unresolved, adjudicated, and
-abstention-agreement counts and never writes or adjudicates either side.
+integer numerator/denominator cells for acquisition agreement, rule agreement, disagreement,
+unresolved, adjudicated, and abstention agreement, keeps zero denominators explicit, and never
+writes or adjudicates either side.
 
 The committed `conformance/review/fictional-submission.json` is wholly fictional, declares full
 public-label exposure and no independence, and is permanently `ineligibleConformance`. Its

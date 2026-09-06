@@ -178,7 +178,11 @@ test("review schemas keep packet, acquisition, rule, outcome, and evidence autho
 
   const processResult = await pythonRun(compare, ["--submission", submissionPath]);
   assert.equal(processResult.code, 0, processResult.stderr.toString("utf8"));
-  assertValid(validateComparison, JSON.parse(processResult.stdout.toString("utf8")), "comparison output");
+  const comparisonOutput = JSON.parse(processResult.stdout.toString("utf8")) as JsonObject;
+  assertValid(validateComparison, comparisonOutput, "comparison output");
+  const flattenedCount = clone(comparisonOutput);
+  object(flattenedCount["counts"], "comparison counts")["acquisitionAgreement"] = 3;
+  assertInvalid(validateComparison, flattenedCount, "comparison with an implicit denominator");
 
   const unknownPacket = clone(packet);
   unknownPacket["expectedVerdict"] = "passed";
@@ -241,12 +245,12 @@ test("generation, finalization, and comparison are byte-stable and comparison is
     assert.equal(firstComparison.stdout.at(-1), 0x7d, "canonical comparison stdout has no trailing newline");
     const report = JSON.parse(firstComparison.stdout.toString("utf8")) as JsonObject;
     assert.deepEqual(report["counts"], {
-      abstentionAgreement: 4,
-      acquisitionAgreement: 3,
-      adjudicated: 0,
-      disagreement: 1,
-      ruleAgreement: 5,
-      unresolved: 3,
+      abstentionAgreement: { numerator: 4, denominator: 4 },
+      acquisitionAgreement: { numerator: 3, denominator: 5 },
+      adjudicated: { numerator: 0, denominator: 3 },
+      disagreement: { numerator: 1, denominator: 9 },
+      ruleAgreement: { numerator: 5, denominator: 6 },
+      unresolved: { numerator: 3, denominator: 11 },
     });
     assert.equal(report["evidenceStatus"], "ineligibleConformance");
     const rows = array(report["comparisons"], "comparisons");
@@ -254,6 +258,31 @@ test("generation, finalization, and comparison are byte-stable and comparison is
     assert.ok(rows.some((row) => row["status"] === "disagreement" && row["unresolved"] === true));
     assert.ok(rows.some((row) => row["status"] === "unresolved"));
     assert.ok(rows.every((row) => object(row["adjudication"], "adjudication")["status"] === "notPerformed"));
+
+    const singleAuthority = draft(finalized);
+    object(singleAuthority["reviewScope"], "single-authority scope")["familyIds"] = ["harbor-support-inbox-v1"];
+    object(singleAuthority["reviewScope"], "single-authority scope")["caseIds"] = ["support-inbox-clean"];
+    const cleanCase = clone(array(singleAuthority["cases"], "single-authority cases")
+      .find((item) => item["caseId"] === "support-inbox-clean")!);
+    cleanCase["ruleJudgments"] = [];
+    singleAuthority["cases"] = [cleanCase];
+    const singleDraftPath = join(directory, "single-authority-draft.json");
+    const singleFinalPath = join(directory, "single-authority-final.json");
+    await writeJson(singleDraftPath, singleAuthority);
+    const singleFinalization = await pythonRun(prepare, ["--finalize-submission", singleDraftPath]);
+    assert.equal(singleFinalization.code, 0, singleFinalization.stderr.toString("utf8"));
+    await writeFile(singleFinalPath, singleFinalization.stdout);
+    const singleComparison = await pythonRun(compare, ["--submission", singleFinalPath]);
+    assert.equal(singleComparison.code, 0, singleComparison.stderr.toString("utf8"));
+    const singleReport = JSON.parse(singleComparison.stdout.toString("utf8")) as JsonObject;
+    assert.deepEqual(singleReport["counts"], {
+      abstentionAgreement: { numerator: 0, denominator: 0 },
+      acquisitionAgreement: { numerator: 0, denominator: 1 },
+      adjudicated: { numerator: 0, denominator: 1 },
+      disagreement: { numerator: 1, denominator: 1 },
+      ruleAgreement: { numerator: 0, denominator: 0 },
+      unresolved: { numerator: 1, denominator: 1 },
+    });
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

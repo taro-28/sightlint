@@ -79,12 +79,12 @@
         "abstentionAgreement"
       ],
       "properties": {
-        "acquisitionAgreement": { "$ref": "#/$defs/count" },
-        "ruleAgreement": { "$ref": "#/$defs/count" },
-        "disagreement": { "$ref": "#/$defs/count" },
-        "unresolved": { "$ref": "#/$defs/count" },
-        "adjudicated": { "$ref": "#/$defs/count" },
-        "abstentionAgreement": { "$ref": "#/$defs/count" }
+        "acquisitionAgreement": { "$ref": "#/$defs/countCell" },
+        "ruleAgreement": { "$ref": "#/$defs/countCell" },
+        "disagreement": { "$ref": "#/$defs/countCell" },
+        "unresolved": { "$ref": "#/$defs/countCell" },
+        "adjudicated": { "$ref": "#/$defs/countCell" },
+        "abstentionAgreement": { "$ref": "#/$defs/countCell" }
       }
     },
     "comparisons": {
@@ -133,6 +133,15 @@
       "items": { "$ref": "#/$defs/text" }
     },
     "count": { "type": "integer", "minimum": 0, "maximum": 512 },
+    "countCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numerator", "denominator"],
+      "properties": {
+        "numerator": { "$ref": "#/$defs/count" },
+        "denominator": { "$ref": "#/$defs/count" }
+      }
+    },
     "fileBinding": {
       "type": "object",
       "additionalProperties": false,

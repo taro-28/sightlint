@@ -176,7 +176,7 @@ def comparison_row(
     judgment: dict[str, Any],
     oracle_case: dict[str, Any],
     oracle_path: str,
-) -> tuple[dict[str, Any], bool, bool, bool]:
+) -> tuple[dict[str, Any], bool, bool, bool, bool, bool]:
     reviewer_value: Any
     if authority == "acquisition":
         reviewer_value = judgment["value"] if judgment["status"] == "observed" else judgment["status"]
@@ -203,7 +203,12 @@ def comparison_row(
         else:
             row_status = "agreement" if reviewer_value == oracle_value else "disagreement"
     unresolved = row_status in {"disagreement", "unresolved"}
-    abstention_agreement = row_status == "agreement" and reviewer_value in {"cantTell", "untested"}
+    comparable = row_status != "unresolved"
+    abstention_eligible = comparable and (
+        reviewer_value in {"cantTell", "untested"}
+        or oracle_value in {"cantTell", "untested"}
+    )
+    abstention_agreement = row_status == "agreement" and abstention_eligible
     row = {
         "authority": authority,
         "caseId": case_id,
@@ -226,7 +231,14 @@ def comparison_row(
             "rationale": "Version 1.0.0 preserves the comparison for separate human adjudication and never resolves it automatically.",
         },
     }
-    return row, row_status == "agreement", row_status == "disagreement", abstention_agreement
+    return (
+        row,
+        row_status == "agreement",
+        row_status == "disagreement",
+        comparable,
+        abstention_eligible,
+        abstention_agreement,
+    )
 
 
 def compare(packet: dict[str, Any], submission: dict[str, Any], registry_path: Path) -> dict[str, Any]:
@@ -236,12 +248,12 @@ def compare(packet: dict[str, Any], submission: dict[str, Any], registry_path: P
     _, registry_digest, oracles, oracle_bindings = load_oracles(registry_path)
     rows: list[dict[str, Any]] = []
     counts = {
-        "acquisitionAgreement": 0,
-        "ruleAgreement": 0,
-        "disagreement": 0,
-        "unresolved": 0,
-        "adjudicated": 0,
-        "abstentionAgreement": 0,
+        "acquisitionAgreement": {"numerator": 0, "denominator": 0},
+        "ruleAgreement": {"numerator": 0, "denominator": 0},
+        "disagreement": {"numerator": 0, "denominator": 0},
+        "unresolved": {"numerator": 0, "denominator": 0},
+        "adjudicated": {"numerator": 0, "denominator": 0},
+        "abstentionAgreement": {"numerator": 0, "denominator": 0},
     }
     for case in submission["cases"]:
         case_id = case["caseId"]
@@ -251,23 +263,33 @@ def compare(packet: dict[str, Any], submission: dict[str, Any], registry_path: P
         if oracle["familyId"] != next(item["familyId"] for item in packet["cases"] if item["caseId"] == case_id):
             raise ContractError("binding", f"current registry family differs for {case_id!r}")
         for judgment in case["acquisitionJudgments"]:
-            row, agreed, disagreed, abstention = comparison_row(
+            row, agreed, disagreed, comparable, abstention_eligible, abstention = comparison_row(
                 "acquisition", case_id, judgment, oracle["acquisition"], oracle["acquisitionPath"]
             )
             rows.append(row)
-            counts["acquisitionAgreement"] += int(agreed)
-            counts["disagreement"] += int(disagreed)
-            counts["unresolved"] += int(row["unresolved"])
-            counts["abstentionAgreement"] += int(abstention)
+            counts["acquisitionAgreement"]["numerator"] += int(agreed)
+            counts["acquisitionAgreement"]["denominator"] += 1
+            counts["disagreement"]["numerator"] += int(disagreed)
+            counts["disagreement"]["denominator"] += int(comparable)
+            counts["unresolved"]["numerator"] += int(row["unresolved"])
+            counts["unresolved"]["denominator"] += 1
+            counts["adjudicated"]["denominator"] += int(row["unresolved"])
+            counts["abstentionAgreement"]["numerator"] += int(abstention)
+            counts["abstentionAgreement"]["denominator"] += int(abstention_eligible)
         for judgment in case["ruleJudgments"]:
-            row, agreed, disagreed, abstention = comparison_row(
+            row, agreed, disagreed, comparable, abstention_eligible, abstention = comparison_row(
                 "rule", case_id, judgment, oracle["rule"], oracle["rulePath"]
             )
             rows.append(row)
-            counts["ruleAgreement"] += int(agreed)
-            counts["disagreement"] += int(disagreed)
-            counts["unresolved"] += int(row["unresolved"])
-            counts["abstentionAgreement"] += int(abstention)
+            counts["ruleAgreement"]["numerator"] += int(agreed)
+            counts["ruleAgreement"]["denominator"] += 1
+            counts["disagreement"]["numerator"] += int(disagreed)
+            counts["disagreement"]["denominator"] += int(comparable)
+            counts["unresolved"]["numerator"] += int(row["unresolved"])
+            counts["unresolved"]["denominator"] += 1
+            counts["adjudicated"]["denominator"] += int(row["unresolved"])
+            counts["abstentionAgreement"]["numerator"] += int(abstention)
+            counts["abstentionAgreement"]["denominator"] += int(abstention_eligible)
     rows.sort(key=lambda row: (row["caseId"], row["authority"], row["judgmentId"]))
     if len(rows) > MAX_JUDGMENTS:
         raise ContractError("limit", f"comparison exceeds the {MAX_JUDGMENTS}-row limit")

@@ -186,7 +186,8 @@ submission contains no expected observations or verdicts. Reviewer-authored acqu
 rule verdicts are separate, explicitly preserve unavailable evidence and all outcome states, and
 are digest-locked before the read-only comparison process may open current public oracles.
 Comparison reports separate acquisition agreement, rule agreement, disagreement, unresolved,
-adjudicated, and abstention-agreement integer counts while retaining both values and rationales.
+adjudicated, and abstention-agreement integer numerator/denominator cells while retaining both
+values and rationales. Category-specific denominators and zero denominators remain explicit.
 The committed reviewer and answers are fictional conformance data with full label exposure, so
 they measure protocol behavior rather than human agreement. Actual review remains issue #77;
 protected execution and external governance remain issue #74.

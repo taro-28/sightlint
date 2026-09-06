@@ -303,8 +303,9 @@ submission, and comparison schemas; generator drift; canonical finalization; pre
 oracle exclusion; read-only comparison; distinct acquisition/rule judgments; all five rule
 outcomes; clean, mutation, hard-negative, ambiguity, disagreement, unresolved, and abstention
 paths; duplicate IDs/keys, unknown fields, malformed digests, privacy/leakage declarations; exact
-file/string/packet/judgment limits and exact one-over refusal; repeated stdout/stderr/exit bytes;
-and before/after hashes of every comparison input. The reviewer identity and answers are wholly
+file/string/packet/judgment limits and exact one-over refusal; explicit category-specific and zero
+denominators; repeated stdout/stderr/exit bytes; and before/after hashes of every comparison input.
+The reviewer identity and answers are wholly
 fictional conformance data and never count as independent-review or product-quality evidence.
 
 ADR 0048 adds a separate managed-loopback suite rather than rewriting that 23-case oracle. ADR

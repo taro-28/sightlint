@@ -117,11 +117,16 @@ does not modify or adjudicate either side.
 
 ## Interpreting comparison output
 
-The report keeps acquisition agreement and rule agreement separate. `disagreement` counts
-comparable unequal values. `unresolved` includes every disagreement and every key that cannot be
-uniquely compared. `adjudicated` is zero in version `1.0.0` because the tool never decides which
-side is right. `abstentionAgreement` counts matching `cantTell` and `untested` values; rule
-`inapplicable` remains a rule agreement rather than being collapsed into abstention.
+The report keeps acquisition agreement and rule agreement separate as integer numerator and
+denominator cells. Their denominators are all submitted acquisition and rule comparisons,
+respectively. `disagreement` uses uniquely comparable rows as its denominator and counts unequal
+values. `unresolved` uses every comparison as its denominator and includes every disagreement plus
+every key that cannot be uniquely compared. `adjudicated` uses unresolved rows as its denominator
+and has a zero numerator in version `1.0.0` because the tool never decides which side is right.
+`abstentionAgreement` uses uniquely comparable rows where either side is `cantTell` or `untested`
+as its denominator and counts matching abstentions. Rule `inapplicable` remains a rule agreement
+rather than being collapsed into abstention. A zero denominator is reported as zero, not divided
+or omitted.
 
 Each row retains reviewer value, confidence, rationale, current oracle value, public source, and
 oracle rationale. A separately responsible human must investigate disagreements. Do not edit an
