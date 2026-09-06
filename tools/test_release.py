@@ -23,7 +23,7 @@ class ReleaseTests(unittest.TestCase):
         files = {
             "Cargo.toml": (
                 '[workspace]\nmembers = ["crates/example"]\n\n'
-                '[workspace.package]\nversion = "0.1.0-alpha.1"\n'
+                '[workspace.package]\nversion = "0.1.0-alpha.2"\n'
                 'license = "MIT OR Apache-2.0"\n'
             ),
             "LICENSE-APACHE": "Apache test license\n",
@@ -37,7 +37,7 @@ class ReleaseTests(unittest.TestCase):
                 'publish = false\nlicense.workspace = true\n'
             ),
             "crates/example/src/lib.rs": "pub fn value() -> u8 { 1 }\n",
-            "docs/releases/v0.1.0-alpha.1.md": "# Test alpha\n",
+            "docs/releases/v0.1.0-alpha.2.md": "# Test alpha\n",
         }
         for name, content in files.items():
             path = root / name
@@ -63,17 +63,17 @@ class ReleaseTests(unittest.TestCase):
             directory = Path(raw_directory)
             root = self.repository(directory)
             first, first_checksum = release.create_source_archive(
-                "v0.1.0-alpha.1", directory / "first", root
+                "v0.1.0-alpha.2", directory / "first", root
             )
             second, second_checksum = release.create_source_archive(
-                "v0.1.0-alpha.1", directory / "second", root
+                "v0.1.0-alpha.2", directory / "second", root
             )
             self.assertEqual(first.read_bytes(), second.read_bytes())
             self.assertEqual(first_checksum.read_text(), second_checksum.read_text())
 
-            members = release.verify_archive(first, first_checksum, "v0.1.0-alpha.1")
+            members = release.verify_archive(first, first_checksum, "v0.1.0-alpha.2")
             extracted = release.extract_archive(
-                first, directory / "unpacked", members, "v0.1.0-alpha.1"
+                first, directory / "unpacked", members, "v0.1.0-alpha.2"
             )
             self.assertEqual((extracted / "README.md").read_text(), "# Test release\n")
 
@@ -82,18 +82,18 @@ class ReleaseTests(unittest.TestCase):
             directory = Path(raw_directory)
             root = self.repository(directory)
             with self.assertRaisesRegex(release.ReleaseError, "release tag must be"):
-                release.validate_tag("v0.1.0-alpha.2", root)
+                release.validate_tag("v0.1.0-alpha.3", root)
             archive, checksum = release.create_source_archive(
-                "v0.1.0-alpha.1", directory / "dist", root
+                "v0.1.0-alpha.2", directory / "dist", root
             )
             archive.write_bytes(archive.read_bytes() + b"corrupt")
             with self.assertRaisesRegex(release.ReleaseError, "checksum does not match"):
-                release.verify_archive(archive, checksum, "v0.1.0-alpha.1")
+                release.verify_archive(archive, checksum, "v0.1.0-alpha.2")
 
     def test_unsafe_archive_member_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as raw_directory:
             directory = Path(raw_directory)
-            archive = directory / "sightlint-v0.1.0-alpha.1-source.tar.gz"
+            archive = directory / "sightlint-v0.1.0-alpha.2-source.tar.gz"
             raw_tar = io.BytesIO()
             with tarfile.open(fileobj=raw_tar, mode="w") as bundle:
                 member = tarfile.TarInfo("../escape")
@@ -108,7 +108,7 @@ class ReleaseTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(release.ReleaseError, "unsafe archive member"):
-                release.verify_archive(archive, checksum, "v0.1.0-alpha.1")
+                release.verify_archive(archive, checksum, "v0.1.0-alpha.2")
 
 
 if __name__ == "__main__":

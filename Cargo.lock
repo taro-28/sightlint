@@ -268,7 +268,7 @@ dependencies = [
 
 [[package]]
 name = "sightlint-adapter-png"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 dependencies = [
  "miniz_oxide",
  "serde_json",
@@ -277,7 +277,7 @@ dependencies = [
 
 [[package]]
 name = "sightlint-cli"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 dependencies = [
  "clap",
  "serde_json",
@@ -288,7 +288,7 @@ dependencies = [
 
 [[package]]
 name = "sightlint-engine"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 dependencies = [
  "schemars",
  "serde",
@@ -298,7 +298,7 @@ dependencies = [
 
 [[package]]
 name = "sightlint-ir"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 dependencies = [
  "schemars",
  "serde",

@@ -46,9 +46,18 @@ jobs:
           python3 -m unittest tools/test_release.py
       - name: Create deterministic source archive and checksum
         run: python3 tools/release.py source-archive --tag "$RELEASE_TAG" --output-dir release-dist
+      - name: Upload exact prepublication source assets
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sightlint-${{ github.ref_name }}-source
+          path: release-dist/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
       - name: Create or refresh the draft prerelease
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           release_draft="$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft 2>/dev/null || true)"
           if [ -z "$release_draft" ]; then
@@ -89,14 +98,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Download draft source assets
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download "$RELEASE_TAG" \
-            --pattern "sightlint-$RELEASE_TAG-source.tar.gz*" \
-            --dir release-download
+      - name: Download exact prepublication source assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sightlint-${{ github.ref_name }}-source
+          path: release-download
       - name: Verify and extract source assets
         shell: bash
         run: |
@@ -132,13 +138,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Download, verify, and extract source assets
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Download exact prepublication source assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sightlint-${{ github.ref_name }}-source
+          path: release-download
+      - name: Verify and extract source assets
         run: |
-          gh release download "$RELEASE_TAG" \
-            --pattern "sightlint-$RELEASE_TAG-source.tar.gz*" \
-            --dir release-download
           python3 tools/release.py verify-archive \
             --tag "$RELEASE_TAG" \
             --archive "release-download/sightlint-$RELEASE_TAG-source.tar.gz" \
@@ -179,7 +185,28 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Download verified workflow assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sightlint-${{ github.ref_name }}-source
+          path: verified-assets
+      - name: Compare the draft release with verified assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir draft-assets
+          gh release download "$RELEASE_TAG" \
+            --pattern "sightlint-$RELEASE_TAG-source.tar.gz*" \
+            --dir draft-assets
+          cmp "verified-assets/sightlint-$RELEASE_TAG-source.tar.gz" \
+            "draft-assets/sightlint-$RELEASE_TAG-source.tar.gz"
+          cmp "verified-assets/sightlint-$RELEASE_TAG-source.tar.gz.sha256" \
+            "draft-assets/sightlint-$RELEASE_TAG-source.tar.gz.sha256"
+          cd draft-assets
+          sha256sum -c "sightlint-$RELEASE_TAG-source.tar.gz.sha256"
       - name: Publish the completed draft
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: gh release edit "$RELEASE_TAG" --draft=false --prerelease
