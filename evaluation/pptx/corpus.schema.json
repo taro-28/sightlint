@@ -10,14 +10,18 @@
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["origin", "ownership", "license", "redistribution", "privacy", "review"],
+      "required": ["origin", "ownership", "license", "redistribution", "privacy", "review", "fixtureGenerator", "renderer", "rendererVersion", "renderPipeline"],
       "properties": {
         "origin": { "const": "repositoryOwnedFixture" },
         "ownership": { "const": "SightLint project" },
         "license": { "const": "MIT OR Apache-2.0" },
         "redistribution": { "const": "permitted" },
         "privacy": { "const": "fictionalNoPersonalOrCustomerData" },
-        "review": { "const": "maintainerAuthoredNotIndependent" }
+        "review": { "const": "maintainerAuthoredNotIndependent" },
+        "fixtureGenerator": { "const": "tools/generate_pptx_fixtures.py" },
+        "renderer": { "const": "LibreOfficeDev" },
+        "rendererVersion": { "const": "26.8.0.0.alpha0+2c87e51eeaa2b413ff4ae097b2705eea1995d8e5" },
+        "renderPipeline": { "const": "soffice-headless-to-pdf+pdftoppm-960x540" }
       }
     },
     "splitPolicy": {
@@ -45,10 +49,11 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "split", "input", "render", "relation", "acquisitionAnnotationId", "ruleAnnotationId"],
+        "required": ["id", "split", "request", "input", "render", "relation", "acquisitionAnnotationId", "ruleAnnotationId"],
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
           "split": { "enum": ["smoke", "development", "challenge"] },
+          "request": { "$ref": "#/$defs/artifact" },
           "input": { "$ref": "#/$defs/artifact" },
           "render": { "$ref": "#/$defs/artifact" },
           "relation": {

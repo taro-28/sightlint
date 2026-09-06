@@ -42,7 +42,7 @@
                 "ruleId": { "const": "visual.bounds.within-canvas" },
                 "ruleVersion": { "const": "0.1.0" },
                 "targetId": { "type": "string", "minLength": 1 },
-                "aspect": { "const": "layout" },
+                "aspect": { "const": "layoutBox" },
                 "expectedOutcome": { "enum": ["passed", "failed", "inapplicable", "cantTell", "untested"] }
               }
             }

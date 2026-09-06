@@ -22,10 +22,15 @@
           "slide": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["widthEmu", "heightEmu"],
+            "required": ["id", "index", "part", "nativeId", "widthEmu", "heightEmu", "evidenceClass"],
             "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "index": { "const": 1 },
+              "part": { "const": "ppt/slides/slide1.xml" },
+              "nativeId": { "const": 256 },
               "widthEmu": { "type": "integer", "minimum": 1 },
-              "heightEmu": { "type": "integer", "minimum": 1 }
+              "heightEmu": { "type": "integer", "minimum": 1 },
+              "evidenceClass": { "const": "exactSource" }
             }
           },
           "nodes": {
@@ -33,7 +38,7 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["id", "nativeId", "nativeType", "zOrder", "geometryStatus", "text"],
+              "required": ["id", "nativeId", "nativeType", "zOrder", "geometryStatus", "sourceEvidenceClass", "text"],
               "properties": {
                 "id": { "type": "string", "minLength": 1 },
                 "nativeId": { "type": "integer", "minimum": 1 },
@@ -41,6 +46,7 @@
                 "zOrder": { "type": "integer", "minimum": 0 },
                 "parentId": { "type": "string", "minLength": 1 },
                 "geometryStatus": { "enum": ["exact", "unsupportedTransform", "missing"] },
+                "sourceEvidenceClass": { "const": "exactSource" },
                 "rectEmu": { "$ref": "#/$defs/rect" },
                 "text": {
                   "type": "object",
@@ -58,12 +64,13 @@
           "render": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["widthPixels", "heightPixels", "emuPerPixel", "extentReconciliation", "nodeIdentity"],
+            "required": ["widthPixels", "heightPixels", "emuPerPixel", "extentReconciliation", "evidenceClass", "nodeIdentity"],
             "properties": {
               "widthPixels": { "type": "integer", "minimum": 1 },
               "heightPixels": { "type": "integer", "minimum": 1 },
               "emuPerPixel": { "type": "integer", "minimum": 1 },
               "extentReconciliation": { "enum": ["agreement", "conflict"] },
+              "evidenceClass": { "const": "exactRender" },
               "nodeIdentity": { "const": "cantTell" }
             }
           },

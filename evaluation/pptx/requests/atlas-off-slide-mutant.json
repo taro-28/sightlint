@@ -1,0 +1,36 @@
+{
+  "artifact": {
+    "id": "pptx-off-slide-mutant",
+    "title": "Atlas presentation off-slide-mutant"
+  },
+  "execution": {
+    "maxArchiveBytes": 1048576,
+    "maxCompressionRatio": 20,
+    "maxEntries": 64,
+    "maxExpandedBytes": 2097152,
+    "maxGroupDepth": 8,
+    "maxNodes": 64,
+    "maxOutputBytes": 1048576,
+    "maxSlides": 4,
+    "maxXmlBytes": 262144
+  },
+  "input": {
+    "reference": "fixtures/pptx/atlas-off-slide-mutant.pptx",
+    "sha256": "sha256:1a342da99d0e7a4b6fbbb530cccf31f46292ce2beac22156953f7fd526de5925"
+  },
+  "privacy": {
+    "externalProcessing": false,
+    "retention": "none",
+    "textPolicy": "digestOnly"
+  },
+  "protocolVersion": "0.1.0",
+  "renders": [
+    {
+      "emuPerPixel": 9525,
+      "reference": "evaluation/pptx/renders/atlas-off-slide-mutant.png",
+      "sha256": "sha256:3a9d9c5ce782cf5133f704beebb12dc4eb6193d37fd2713ebded97f4900309b4",
+      "slideIndex": 1
+    }
+  ],
+  "requestId": "pptx-off-slide-mutant"
+}
