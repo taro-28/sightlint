@@ -3,6 +3,8 @@
 - Status: Accepted
 - Date: 2026-09-06
 - Owners: @taro-28
+- Amendment: ADR 0038 preserves this contract but changes prepublication transport and makes
+  `v0.1.0-alpha.2` the first publishable tag after the immutable alpha.1 attempt failed.
 
 ## Context
 
