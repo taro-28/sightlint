@@ -298,6 +298,15 @@ or an operational holdout missing its freeze, access, leakage, evaluator, execut
 and reporting controls. Both families remain public, maintainer-authored development evidence;
 the committed holdout record is deliberately `notOperational`.
 
+ADR 0053 adds a separate source-only review-operation process E2E. It validates strict packet,
+submission, and comparison schemas; generator drift; canonical finalization; pre-finalization
+oracle exclusion; read-only comparison; distinct acquisition/rule judgments; all five rule
+outcomes; clean, mutation, hard-negative, ambiguity, disagreement, unresolved, and abstention
+paths; duplicate IDs/keys, unknown fields, malformed digests, privacy/leakage declarations; exact
+file/string/packet/judgment limits and exact one-over refusal; repeated stdout/stderr/exit bytes;
+and before/after hashes of every comparison input. The reviewer identity and answers are wholly
+fictional conformance data and never count as independent-review or product-quality evidence.
+
 ADR 0048 adds a separate managed-loopback suite rather than rewriting that 23-case oracle. ADR
 0049 gives its three clean/mutation/hard-negative cases independent strict acquisition and rule
 oracles. They execute a repository-owned Node server, redirect and same-origin API through
@@ -449,6 +458,9 @@ python3 tools/check_web_evaluation.py
 python3 tools/check_web_evaluation_v1.py
 python3 tools/check_web_holdout_foundation.py
 python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
+python3 tools/prepare_web_review.py --check
+python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
+python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
 python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py

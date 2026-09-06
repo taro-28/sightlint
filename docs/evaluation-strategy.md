@@ -180,6 +180,17 @@ It is deliberately fictional and tuning-visible, so its valid shape is not valid
 The current public record remains `notRun`/`notOperational`; independent human review, external
 custody, signature verification, and a protected run remain unmeasured work in issue #74.
 
+ADR 0053 adds a public-review operations layer without changing those facts. A deterministic
+Atlas/Harbor packet is assembled only from fixture source and capture requests, and its blank
+submission contains no expected observations or verdicts. Reviewer-authored acquisition facts and
+rule verdicts are separate, explicitly preserve unavailable evidence and all outcome states, and
+are digest-locked before the read-only comparison process may open current public oracles.
+Comparison reports separate acquisition agreement, rule agreement, disagreement, unresolved,
+adjudicated, and abstention-agreement integer counts while retaining both values and rationales.
+The committed reviewer and answers are fictional conformance data with full label exposure, so
+they measure protocol behavior rather than human agreement. Actual review remains issue #77;
+protected execution and external governance remain issue #74.
+
 ADR 0036 adds a separate public agent-workflow oracle and E2E. The test runs one combined local
 capture/check command, joins the reviewed finding to a native selector and source bundle, applies
 one human-authored edit only in a temporary fixture copy, and requires the named finding to
