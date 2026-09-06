@@ -32,8 +32,8 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 
 The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation, exact PNG
 source-alpha geometry, the PNG format-demand decision, the local perception protocol foundation,
-and the first bounded PPTX, PDF, and Android source/capture-adapter slices. They are not part of the
-published alpha.2 archive and therefore do not retroactively change that release.
+and the first bounded PPTX, PDF, Android, and iOS source/capture-adapter slices. They are not part
+of the published alpha.2 archive and therefore do not retroactively change that release.
 
 | Surface | Version or contract | Compatibility rule |
 |---|---|---|
@@ -64,6 +64,11 @@ published alpha.2 archive and therefore do not retroactively change that release
 | Android adapter implementation | `0.1.0` | Unreleased dependency-free Python 3.9+ source-tree file process; runtime version is provenance, and device orchestration is not part of this surface. |
 | Android evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth, explicit public splits, and no protected holdout; implementation output cannot rewrite an oracle. |
 | Android metric contract | `0.1.0` | Defines public-corpus acquisition coverage, verdict precision, abstention, false-positive, and mutation expectations without storing observed implementation output as truth. |
+| iOS request/response and capture protocol | `0.1.0` | Strict local digest-pinned capture/PNG fields, bounded resources, pinned tool/device profile, and explicitly partial coverage; incompatible fields or semantics require a new version. |
+| iOS extension | `org.sightlint.ios@0.1.0` | UIKit hierarchy/allocation, XCUITest facts, capture/tool/device provenance and order, coverage, privacy, unsupported features, and screenshot extent/scale reconciliation remain versioned outside core IR. |
+| iOS adapter implementation | `0.1.0` | Unreleased dependency-free Python 3.9+ source-tree file process; runtime version is provenance, and Xcode/simulator orchestration is not part of this surface. |
+| iOS evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth, explicit public splits, and no protected holdout; implementation output cannot rewrite an oracle. |
+| iOS metric contract | `0.1.0` | Defines public-corpus acquisition coverage, verdict precision, abstention, false-positive, and mutation expectations without storing observed implementation output as truth. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.
@@ -85,10 +90,10 @@ from package version alone. Ordering and repeated output are byte-stable only wi
 normalized inputs and compatibility environment documented by the applicable adapter/report.
 
 `sightlint-web`, `sightlint-web-check`, and `sightlint-perception` require Node `>=20 <25`.
-`sightlint-pptx` and `sightlint-android` require Python 3.9+. `sightlint-pdf` requires Python 3.9+
-and exactly pypdf 6.17.0. All report the exact runtime patch version; repeated canonical bytes are
-guaranteed for the same declared input and compatibility environment, not across different
-Python/runtime versions. The evaluated browser path uses
+`sightlint-pptx`, `sightlint-android`, and `sightlint-ios` require Python 3.9+.
+`sightlint-pdf` requires Python 3.9+ and exactly pypdf 6.17.0. All report the exact runtime patch
+version; repeated canonical bytes are guaranteed for the same declared input and compatibility
+environment, not across different Python/runtime versions. The evaluated browser path uses
 the lockfile's Playwright/Chromium build on Linux. The private Node package can build on the hosted
 macOS arm64 and Windows x64 runners, but cross-platform screenshot byte identity and browser E2E
 support are not claimed.

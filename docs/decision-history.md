@@ -341,7 +341,9 @@ only exact page and rectangular internal-Link activation geometry; a `QuadPoints
 uncertain activation regions are not promoted. ADR 0045 then selects a bounded file adapter over a
 repository-owned Android instrumentation capture: exact View allocations, accessibility
 semantics, and PNG pixels stay distinct, and offscreen/invalid platform geometry is not promoted.
-iOS remains sequenced inside #29; issues #30 and #31 preserve the later stages.
+ADR 0046 completes the bounded first-slice sequence with paired UIKit source, XCUITest platform,
+and PNG evidence; clipped scroll content, offscreen source facts, and source/platform conflicts are
+preserved without geometry promotion. Issues #30 and #31 preserve the later stages.
 
 ## Local-first and privacy
 
@@ -464,7 +466,10 @@ Important historical detail:
   conservative non-rectangular abstention, and separate acquisition/rule evaluation boundary;
 - ADR 0045 defines the bounded Android instrumented-capture file adapter, separate View/platform/
   render evidence, offscreen abstention, and public acquisition/rule evaluation boundary;
-- new ADRs should continue at 0046 or later rather than silently reusing historical numbers.
+- ADR 0046 defines the bounded iOS paired UIKit/XCUITest capture adapter, separate source/platform/
+  render evidence, clipped-scroll/offscreen abstention, and public acquisition/rule evaluation
+  boundary;
+- new ADRs should continue at 0047 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -478,7 +483,7 @@ inside an unmerged branch and does not make them accepted repository decisions.
   gap after ADR 0041;
 - real OCR/CV/VLM model selection, calibration, and representative perception evaluation after
   the issue #28 protocol foundation;
-- iOS adapter evidence and trust boundary after the bounded Android slice inside issue #29;
+- representative/broader PPTX, PDF, Android, and iOS coverage after the bounded issue #29 slices;
 - interaction trace/effect schema: issue #30;
 - MCP/GitHub/editor/local UI and later package channels: issue #31;
 - signing/attestation identity and any future registry or prebuilt-binary channel after the

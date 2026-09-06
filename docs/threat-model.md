@@ -103,9 +103,28 @@ source-derived sensitive data; low-entropy values can be guessed offline. Treat 
 adapter output like source artifacts even though plaintext View strings and pixels are not copied
 into Artifact IR.
 
+## Current iOS capture boundary
+
+ADR 0046 treats UIKit instrumentation output, XCUITest observations, screenshots, and their local
+Python converter as untrusted sensors. The converter accepts only repository-contained
+digest-pinned capture/PNG paths, rejects duplicate/unknown fields and hierarchy identity errors,
+bounds request/capture/screenshot/node/depth/attribute/string/output resources, validates the PNG
+through public `adapt-image`, requires screen/PNG extent-and-scale agreement, and passes candidate
+IR through public Rust normalization before exclusive output creation. It does not invoke Xcode or
+`simctl`, boot or mutate a simulator, install/launch an app, execute an XCUI action, parse an
+`.xcresult`, or use the network.
+
+These controls are not a CPU, memory, syscall, or filesystem sandbox. Authentic capture runs
+under explicit maintainer-controlled Xcode/simulator tooling outside CI, and the committed
+manifests remain untrusted input. Accessibility identifiers, selectors, class/bundle names,
+device/build identifiers, geometry, relative paths, screenshots, and unsalted label/value digests
+are source-derived sensitive data; low-entropy values can be guessed offline. Treat captures and
+adapter output like source artifacts even though plaintext labels/values and pixels are not copied
+into Artifact IR.
+
 ## Future work
 
-Before broadening PPTX/PDF/Android or accepting other real artifact formats, add format-specific
+Before broadening PPTX/PDF/Android/iOS or accepting other real artifact formats, add format-specific
 fuzzing, parser/runtime compatibility characterization, and stronger sandbox guidance; every new
 parser still needs its own resource and archive policy.
 Before browser support, define origin isolation, credential handling, request interception,

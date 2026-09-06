@@ -53,8 +53,8 @@ Issue #34's bounded execution sequence is complete:
 Issue #25 is complete as an evaluation-only benchmark and did not admit a broader default. Issue
 #27 is complete through ADR 0041 without decoder expansion because current product evidence did
 not establish a format gap. Issue #28 is complete for protocol v0 through ADR 0042; real OCR/model
-quality remains `untested`. Issue #29's focused PPTX, PDF, and Android slices are implemented
-through ADRs 0043–0045; iOS is next within #29. Other work
+quality remains `untested`. Issue #29's focused PPTX, PDF, Android, and iOS slices are implemented
+through ADRs 0043–0046. Other work
 remains available in #30–#31, but historical branch code does not change priority. Explain any
 deviation in the issue and PR.
 
@@ -141,6 +141,9 @@ python3 -m unittest adapters/pdf/tests/test_adapter.py
 python3 tools/generate_android_fixtures.py --check
 python3 tools/check_android_evaluation.py
 python3 -m py_compile adapters/android/sightlint_android.py
+python3 tools/generate_ios_fixtures.py --check
+python3 tools/check_ios_evaluation.py
+python3 -m py_compile adapters/ios/sightlint_ios.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
@@ -166,6 +169,7 @@ cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test ios_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```
@@ -292,7 +296,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0046 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0047 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

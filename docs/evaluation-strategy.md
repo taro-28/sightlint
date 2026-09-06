@@ -205,6 +205,28 @@ accessibility, device, or UI/UX accuracy. Compose, arbitrary applications, live 
 regions, dynamic behavior, occlusion/ink, and rendered node identity remain unimplemented,
 `untested`, or `cantTell`.
 
+### iOS capture-adapter evaluation
+
+`evaluation/ios/` implements ADR 0046 with three captures produced from the repository-owned
+UIKit Atlas account/settings application on one pinned iPhone 17 Pro simulator profile. The clean
+case supplies a realistic static screen, the targeted mutation moves only the Save button's UIKit
+source allocation beyond the point canvas, and the asymmetric hard negative adds ordinary
+offscreen scroll content whose UIKit allocation and XCUITest projection must not manufacture a
+containment defect.
+
+The public adapter and built binary match 122 reviewed acquisition facts, emit the one expected
+source-bounds failure, retain four reviewed hard-negative exclusions, kill the one declared
+mutation, and emit no clean/hard-negative failure. UIKit, XCUITest, and screenshot evidence retain
+separate classes and coordinate meaning; a source/XCUI frame disagreement remains conflict
+evidence. Capture/request/PNG/source digests, capture order, Xcode/runtime/device provenance,
+fictional ownership, dual license, privacy, public smoke/development/challenge exposure, and
+missing holdout are explicit.
+
+These are three public maintainer-authored regression cases, not representative iOS,
+accessibility, device, or UI/UX accuracy. SwiftUI, arbitrary applications, live capture,
+activation geometry, dynamic behavior, occlusion/ink, focus navigation, and rendered node
+identity remain unimplemented, `untested`, or `cantTell`.
+
 ### PNG raster acquisition corpus
 
 `fixtures/png-raster/` contains 43 committed PNG byte cases:
