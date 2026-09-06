@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0039 or later. -->
+0040 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -75,6 +75,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `cargo test --locked -p sightlint-cli --test png_filter_e2e`
 - [ ] `cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture`
+- [ ] `cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test evaluation_corpus`
 - [ ] `cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture`
 - [ ] `RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps`

@@ -97,9 +97,10 @@ Its bounded sequence is complete:
 4. #42 — the local agent edit/check/fix/rerun loop defined by #34 (complete);
 5. #33 — licensing, compatibility, packaging, and first alpha release (complete).
 
-The earliest remaining research gate is #25. Other work is preserved in #26–#31; later milestones
-do not automatically outrank it because historical code once existed on a stale branch. Explain
-any deviation from the remaining sequence in the issue and PR.
+Issue #25 is complete as an evaluation-only benchmark; it did not replace the strict image
+inspection policy. The earliest remaining implementation gate is #26. Other work is preserved in
+#27–#31; later milestones do not automatically outrank it because historical code once existed on
+a stale branch. Explain any deviation from the remaining sequence in the issue and PR.
 
 ## Before editing
 
@@ -132,7 +133,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0039 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0040 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -174,6 +175,7 @@ cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps

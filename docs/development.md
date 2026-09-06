@@ -50,7 +50,8 @@ Issue #34's bounded execution sequence is complete:
 4. the local agent edit/check/fix/rerun demo in #34 (complete);
 5. #33 — license, packaging, compatibility, and alpha release (complete).
 
-The earliest remaining research gate is #25. Other work remains available in #26–#31, but
+Issue #25 is complete as an evaluation-only benchmark and did not admit a broader default. The
+earliest remaining implementation gate is #26. Other work remains available in #27–#31, but
 historical branch code does not change priority. Explain any deviation in the issue and PR.
 
 ## Planning before implementation
@@ -135,6 +136,7 @@ cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
@@ -262,7 +264,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0039 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0040 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

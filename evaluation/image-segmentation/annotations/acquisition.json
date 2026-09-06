@@ -1,0 +1,152 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "acquisitionOracle",
+  "annotationMethod": "Targets and background usability were authored from fixture HTML/CSS and human visual review before running candidate algorithms; implementation output is not ground truth.",
+  "cases": [
+    {
+      "caseId": "checkerboard-stress",
+      "policyExpectations": [
+        {
+          "policy": "qualified-corner-95-row-runs-v1",
+          "expectedStatus": "unavailable",
+          "expectedReason": "runBudgetExceeded",
+          "backgroundUsability": "usable",
+          "rationale": "The exact white perimeter is usable, but one-pixel checker cells intentionally exceed the bounded run budget."
+        },
+        {
+          "policy": "ranked-exact-border-flood-v1",
+          "expectedStatus": "unavailable",
+          "expectedReason": "regionBudgetExceeded",
+          "backgroundUsability": "usable",
+          "rationale": "White ranks first, but four-connected dark cells exceed the retained output region budget."
+        },
+        {
+          "policy": "strict-uniform-perimeter-flood-v1",
+          "expectedStatus": "unavailable",
+          "expectedReason": "regionBudgetExceeded",
+          "backgroundUsability": "usable",
+          "rationale": "The perimeter is uniformly white while the interior exceeds the bounded flood-fill region budget."
+        }
+      ],
+      "regionTargets": [],
+      "abstentions": [
+        "The stress artwork has no semantic UI-object oracle.",
+        "A resource refusal is unavailable acquisition, not a failed or passed UX result."
+      ]
+    },
+    {
+      "caseId": "device-scale-canvas",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "All exact perimeter samples are the source-authored canvas color." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The uniform canvas color is the unambiguous leading exact candidate in this controlled case." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The screenshot perimeter remains one opaque exact color at the declared CSS screenshot scale." }
+      ],
+      "regionTargets": [
+        { "id": "masthead", "sourceSelector": "[data-testid='masthead']", "bounds": [32, 32, 896, 78], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-builds", "sourceSelector": "[data-testid='metric-builds']", "bounds": [32, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-findings", "sourceSelector": "[data-testid='metric-findings']", "bounds": [337, 130, 286, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-coverage", "sourceSelector": "[data-testid='metric-coverage']", "bounds": [643, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "activity-panel", "sourceSelector": "[data-testid='activity-panel']", "bounds": [32, 314, 896, 294], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+      ],
+      "abstentions": ["Device scale does not establish cross-platform screenshot byte identity or display-color equivalence."]
+    },
+    {
+      "caseId": "edge-noise",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The source-authored canvas color occupies more than 95% of the unique perimeter and all corners." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The canvas color remains the dominant corner, edge, and whole-image candidate." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "unavailable", "expectedReason": "nonUniformBorder", "backgroundUsability": "notSelected", "rationale": "The targeted 20 by 1 status indicator makes the exact perimeter non-uniform." }
+      ],
+      "regionTargets": [
+        { "id": "edge-mark", "sourceSelector": "[data-testid='edge-mark']", "bounds": [470, 0, 20, 1], "edgeTolerance": 1, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "masthead", "sourceSelector": "[data-testid='masthead']", "bounds": [32, 32, 896, 78], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-builds", "sourceSelector": "[data-testid='metric-builds']", "bounds": [32, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-findings", "sourceSelector": "[data-testid='metric-findings']", "bounds": [337, 130, 286, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-coverage", "sourceSelector": "[data-testid='metric-coverage']", "bounds": [643, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "activity-panel", "sourceSelector": "[data-testid='activity-panel']", "bounds": [32, 314, 896, 294], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+      ],
+      "abstentions": ["Recovering geometry does not determine whether the edge indicator is intentional or a defect."]
+    },
+    {
+      "caseId": "gradient-edge-hard-negative",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "unavailable", "expectedReason": "noQualifiedBackgroundCandidate", "backgroundUsability": "notSelected", "rationale": "No exact corner color occupies 95% of the continuously varying perimeter." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "unsafe", "rationale": "Ranking must still expose a candidate, but no individual exact gradient sample is a valid global background." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "unavailable", "expectedReason": "nonUniformBorder", "backgroundUsability": "notSelected", "rationale": "The gradient produces a varying exact perimeter." }
+      ],
+      "regionTargets": [],
+      "abstentions": ["No exact-color component is annotated as a semantic card, illustration, or background layer."]
+    },
+    {
+      "caseId": "modal-surface",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The opaque source-authored backdrop is exact on every perimeter pixel." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The backdrop is the leading exact candidate in this controlled visible-layer case." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The visible modal screenshot has one exact opaque perimeter color." }
+      ],
+      "regionTargets": [
+        { "id": "review-dialog", "sourceSelector": "[data-testid='review-dialog']", "bounds": [240, 206, 480, 308], "edgeTolerance": 28, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+      ],
+      "abstentions": ["The screenshot alone cannot establish whether obscured underlying content remains interactive or semantically relevant."]
+    },
+    {
+      "caseId": "recolored-canvas",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "Recoloring preserves one exact opaque perimeter candidate." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The recolored canvas remains the leading candidate." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "Recoloring preserves strict perimeter equality." }
+      ],
+      "regionTargets": [
+        { "id": "masthead", "sourceSelector": "[data-testid='masthead']", "bounds": [32, 32, 896, 78], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-builds", "sourceSelector": "[data-testid='metric-builds']", "bounds": [32, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-findings", "sourceSelector": "[data-testid='metric-findings']", "bounds": [337, 130, 286, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-coverage", "sourceSelector": "[data-testid='metric-coverage']", "bounds": [643, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "activity-panel", "sourceSelector": "[data-testid='activity-panel']", "bounds": [32, 314, 896, 294], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+      ],
+      "abstentions": ["Exact recoloring does not evaluate compression, color management, or perceptual similarity."]
+    },
+    {
+      "caseId": "split-pane-hard-negative",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "unavailable", "expectedReason": "noQualifiedBackgroundCandidate", "backgroundUsability": "notSelected", "rationale": "Neither pane color reaches 95% perimeter support." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "unsafe", "rationale": "The larger pane may rank first, but treating the other pane as foreground invents a global layer model." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "unavailable", "expectedReason": "nonUniformBorder", "backgroundUsability": "notSelected", "rationale": "Two full-height surfaces produce a non-uniform perimeter." }
+      ],
+      "regionTargets": [],
+      "abstentions": ["No single exact background can express the source-authored two-pane hierarchy."]
+    },
+    {
+      "caseId": "translated-canvas",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "Translation preserves the exact opaque perimeter." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The canvas remains the leading candidate after translation." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The perimeter remains uniform after the padding change." }
+      ],
+      "regionTargets": [
+        { "id": "masthead", "sourceSelector": "[data-testid='masthead']", "bounds": [48, 44, 864, 78], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-builds", "sourceSelector": "[data-testid='metric-builds']", "bounds": [48, 142, 275, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-findings", "sourceSelector": "[data-testid='metric-findings']", "bounds": [343, 142, 274, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-coverage", "sourceSelector": "[data-testid='metric-coverage']", "bounds": [637, 142, 275, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "activity-panel", "sourceSelector": "[data-testid='activity-panel']", "bounds": [48, 326, 864, 294], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+      ],
+      "abstentions": ["Translation stability is geometric acquisition evidence, not proof that the layout is desirable."]
+    },
+    {
+      "caseId": "uniform-canvas",
+      "policyExpectations": [
+        { "policy": "qualified-corner-95-row-runs-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "All corners and perimeter pixels use the source-authored canvas color." },
+        { "policy": "ranked-exact-border-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The canvas color is the leading exact border and whole-image candidate." },
+        { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The entire opaque perimeter uses one exact source-authored canvas color." }
+      ],
+      "regionTargets": [
+        { "id": "masthead", "sourceSelector": "[data-testid='masthead']", "bounds": [32, 32, 896, 78], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-builds", "sourceSelector": "[data-testid='metric-builds']", "bounds": [32, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-findings", "sourceSelector": "[data-testid='metric-findings']", "bounds": [337, 130, 286, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "metric-coverage", "sourceSelector": "[data-testid='metric-coverage']", "bounds": [643, 130, 285, 164], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" },
+        { "id": "activity-panel", "sourceSelector": "[data-testid='activity-panel']", "bounds": [32, 314, 896, 294], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+      ],
+      "abstentions": ["Visible-surface bounds do not establish card semantics, peer relations, hierarchy, or a UI/UX verdict."]
+    }
+  ]
+}

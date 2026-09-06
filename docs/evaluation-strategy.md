@@ -179,10 +179,30 @@ It proves the current source-pixel path, not screenshot UI understanding.
 It proves the narrow unanimous-perimeter acquisition policy and nonblocking uncertainty. It is not
 a benchmark for rounded, shadowed, textual, photographic, or complex application screenshots.
 
+### Image-segmentation policy benchmark
+
+`evaluation/image-segmentation/` contains nine temporary-browser-capture cases from one fictional,
+repository-owned Northstar application. Its `0.1.0` corpus and schemas keep source-authored visible
+surface bounds separate from the rule oracle. The latter records no executable rule,
+`applicabilityGroundTruth` as `cantTell` or `inapplicable`, `expectedOutcome: untested`, and no
+blocking authority.
+
+The built public binary compares strict perimeter flood fill, ranked exact-border flood fill, and
+95%-qualified corner row-run/union-find. Reviewed smoke/development/challenge cases cover clean,
+targeted edge contamination, recoloring, translation, device scale, modal, split-pane and gradient
+hard negatives, and checkerboard resource stress. Reports and screenshots are temporary rather
+than expected outputs.
+
+The initial reviewed metrics show that strict/ranked/qualified region recall is respectively
+`1/21`, `2/27`, and `2/27`, with 4, 5, and 5 false groups. Qualified selection correctly abstains
+on both semantic-background hard negatives; ranked selection observes both unsafely. These are
+small public-corpus regression counts, not representative precision or a private holdout. They do
+not justify changing `inspect-image` or creating a downstream rule.
+
 ## Next evaluation expansion gates
 
-The first #22 evaluation foundation, #24 advisory rule slice, and #42 local-agent path are
-complete. Before promoting
+The first #22 evaluation foundation, #24 advisory rule slice, #42 local-agent path, and #25
+segmentation comparison are complete. Before promoting
 broader image inference, more Playwright-derived rules, or any rule to blocking maturity, expand
 the repository-owned Web applications, independent review, and protected-holdout process. The
 following records remain the required shape for those additions.

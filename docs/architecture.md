@@ -150,7 +150,13 @@ and exact-source evidence.
 uniform opaque perimeter color and measure simple regions/gaps, but it does not create trusted
 semantic nodes or blocking rule results. See ADRs 0030 and 0031.
 
-Broader format/segmentation work is evidence-gated by issues #22, #25, #26, and #27. Do not merge
+ADR 0039 adds a second, evaluation-only report that compares the unchanged strict hypothesis with
+ranked exact-border flood fill and a 95%-qualified corner/row-run implementation. Candidate colors
+and connected pixels remain untrusted acquisition hypotheses. The report is not Artifact IR or a
+CheckReport, contains no executable rule result, and cannot block. Its realistic fixture shows
+unsafe ranked selection and shadow-connected false grouping, so no broader policy is admitted.
+
+Further visible-geometry and format work is evidence-gated by issues #26 and #27. Do not merge
 historical branch implementations.
 
 ## Perception workers

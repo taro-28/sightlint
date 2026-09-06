@@ -79,6 +79,9 @@ jobs:
       - name: Run native image inspection E2E explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
+      - name: Run image segmentation benchmark E2E explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
       - name: Run product evaluation smoke corpus explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test evaluation_corpus

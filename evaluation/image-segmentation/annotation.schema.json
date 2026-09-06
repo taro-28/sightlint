@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:image-segmentation-annotation:0.1.0",
+  "title": "SightLint image segmentation acquisition or rule oracle",
+  "oneOf": [
+    { "$ref": "#/$defs/acquisitionDocument" },
+    { "$ref": "#/$defs/ruleDocument" }
+  ],
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+    "policy": {
+      "enum": [
+        "qualified-corner-95-row-runs-v1",
+        "ranked-exact-border-flood-v1",
+        "strict-uniform-perimeter-flood-v1"
+      ]
+    },
+    "bounds": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 1 },
+        { "type": "integer", "minimum": 1 }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "sourceSelector", "bounds", "edgeTolerance", "unit", "annotationBasis"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "sourceSelector": { "$ref": "#/$defs/text" },
+        "bounds": { "$ref": "#/$defs/bounds" },
+        "edgeTolerance": { "type": "integer", "minimum": 0, "maximum": 32 },
+        "unit": { "const": "devicePixel" },
+        "annotationBasis": { "const": "sourceAuthoredCssAndHumanVisualReview" }
+      }
+    },
+    "policyExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "expectedStatus", "expectedReason", "backgroundUsability", "rationale"],
+      "properties": {
+        "policy": { "$ref": "#/$defs/policy" },
+        "expectedStatus": { "enum": ["observed", "unavailable"] },
+        "expectedReason": { "type": ["string", "null"] },
+        "backgroundUsability": { "enum": ["usable", "unsafe", "notSelected"] },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "acquisitionCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "policyExpectations", "regionTargets", "abstentions"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" },
+        "policyExpectations": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/policyExpectation" }
+        },
+        "regionTargets": { "type": "array", "items": { "$ref": "#/$defs/target" } },
+        "abstentions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "ruleCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "executableRule", "semanticQuestion", "applicabilityGroundTruth", "expectedOutcome", "blockingAllowed", "rationale"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" },
+        "executableRule": { "type": "null" },
+        "semanticQuestion": { "$ref": "#/$defs/text" },
+        "applicabilityGroundTruth": { "enum": ["cantTell", "inapplicable"] },
+        "expectedOutcome": { "const": "untested" },
+        "blockingAllowed": { "const": false },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "acquisitionDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schemaVersion", "documentType", "annotationMethod", "cases"],
+      "properties": {
+        "$schema": { "const": "../annotation.schema.json" },
+        "schemaVersion": { "const": "0.1.0" },
+        "documentType": { "const": "acquisitionOracle" },
+        "annotationMethod": { "$ref": "#/$defs/text" },
+        "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/acquisitionCase" } }
+      }
+    },
+    "ruleDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schemaVersion", "documentType", "annotationMethod", "cases"],
+      "properties": {
+        "$schema": { "const": "../annotation.schema.json" },
+        "schemaVersion": { "const": "0.1.0" },
+        "documentType": { "const": "ruleOracle" },
+        "annotationMethod": { "$ref": "#/$defs/text" },
+        "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ruleCase" } }
+      }
+    }
+  }
+}

@@ -263,6 +263,11 @@ The implemented schema and future extensions must preserve:
 Artifact IR, official extensions, adapter protocols, reports, rule semantics, and package versions
 are separate compatibility surfaces. A package bump alone cannot silently redefine all of them.
 
+The ADR 0039 image-segmentation benchmark report is intentionally outside Artifact IR and
+CheckReport. Its exact-color candidates and connected regions remain evaluation-only adapter
+observations with `cantTell` semantic applicability and `untested` rule outcome; they do not create
+nodes, relations, findings, or blocking policy in the medium-neutral core.
+
 For an IR or official-extension change:
 
 - write an ADR when architecture/semantics change;
@@ -274,5 +279,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0039 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0040 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

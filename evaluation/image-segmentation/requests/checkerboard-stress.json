@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../adapters/playwright/schemas/capture-request.schema.json",
+  "protocolVersion": "0.1.0",
+  "artifact": { "id": "image-segmentation-checkerboard-stress", "title": "Northstar — checkerboard stress" },
+  "fixture": {
+    "entrypoint": "evaluation/image-segmentation/fixture-app/index.html",
+    "state": "checkerboard-stress",
+    "readinessSelector": "html[data-fixture-ready=\"true\"]"
+  },
+  "environment": {
+    "viewport": { "width": 960, "height": 720, "unit": "cssPixel" },
+    "deviceScaleFactor": 1,
+    "textScale": 1,
+    "locale": "en-US",
+    "timezoneId": "UTC",
+    "colorScheme": "light",
+    "reducedMotion": "reduce"
+  },
+  "privacy": { "accessibleNameMode": "selectedNodes", "externalProcessing": false },
+  "network": { "mode": "deny" },
+  "screenshot": { "reference": "capture/image-segmentation/checkerboard-stress.png" }
+}

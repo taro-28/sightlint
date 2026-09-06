@@ -47,7 +47,9 @@ Issue #34's bounded execution sequence is complete:
 4. #42 — Codex edit/check/fix/rerun demonstration within #34 (complete);
 5. #33 — license, compatibility, packaging, and first alpha release (complete).
 
-The earliest remaining research gate is #25. Other preserved work is tracked in #26–#31.
+Issue #25 is complete as an evaluation-only benchmark and did not admit a broader segmentation
+policy. The earliest remaining implementation gate is #26. Other preserved work is tracked in
+#27–#31.
 Existing stale code does not change priority.
 
 ## Non-negotiable workflow

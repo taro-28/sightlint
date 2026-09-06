@@ -3,6 +3,18 @@
 All notable release changes are recorded here. SightLint is pre-1.0; each entry also names the
 independent compatibility surfaces changed by the release.
 
+## Unreleased
+
+- Added the evaluation-only `benchmark-image-segmentation` command and report schema `0.1.0` to
+  compare the unchanged strict perimeter policy with ranked exact-border and 95%-qualified
+  row-run policies without producing a rule result or blocking a build.
+- Added a repository-owned nine-case Web UI benchmark with separate human-authored acquisition and
+  rule oracles, provenance/license/privacy declarations, hard negatives, abstention, targeted
+  mutation, metamorphic checks, deterministic bytes, and resource-boundary coverage.
+- Retained `inspect-image` as the strict default: the public corpus exposes unsafe ranked
+  hypotheses and shadow-connected false grouping, so it does not support a production admission or
+  a real-world UI/UX accuracy claim.
+
 ## 0.1.0-alpha.2 — 2026-09-06
 
 First published source-only alpha.

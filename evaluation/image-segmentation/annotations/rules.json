@@ -1,0 +1,17 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "ruleOracle",
+  "annotationMethod": "Rule applicability is reviewed independently from pixel acquisition; no executable rule or generated report supplies these labels.",
+  "cases": [
+    { "caseId": "checkerboard-stress", "executableRule": null, "semanticQuestion": "Does the artwork contain a UI/UX defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "The case exists only to exercise bounded acquisition behavior." },
+    { "caseId": "device-scale-canvas", "executableRule": null, "semanticQuestion": "Do acquired surfaces establish a UI/UX defect at this device scale?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "Pixel regions do not define a normative design obligation." },
+    { "caseId": "edge-noise", "executableRule": null, "semanticQuestion": "Is the edge status indicator a defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "The mutation targets acquisition coverage; the indicator may be intentional." },
+    { "caseId": "gradient-edge-hard-negative", "executableRule": null, "semanticQuestion": "Should gradient layers be treated as repeated foreground UI objects?", "applicabilityGroundTruth": "inapplicable", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "The illustration is an intentional hard negative for one global exact background." },
+    { "caseId": "modal-surface", "executableRule": null, "semanticQuestion": "Does the visible modal geometry prove an interaction or layout defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "Pixels do not reveal modal interaction, focus, or obscured-content semantics." },
+    { "caseId": "recolored-canvas", "executableRule": null, "semanticQuestion": "Does exact recoloring prove a color or contrast defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "No color-management, compositing, or contrast policy is present." },
+    { "caseId": "split-pane-hard-negative", "executableRule": null, "semanticQuestion": "Is either intentional pane a foreground defect?", "applicabilityGroundTruth": "inapplicable", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "Both source-authored panes are valid top-level surfaces; a frequency winner is not a semantic error." },
+    { "caseId": "translated-canvas", "executableRule": null, "semanticQuestion": "Does translating the surface layout establish a defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "The benchmark checks acquisition stability, not preferred placement." },
+    { "caseId": "uniform-canvas", "executableRule": null, "semanticQuestion": "Do the acquired regions prove semantic card grouping or a UI/UX defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "Source-authored visible surfaces are acquisition targets only." }
+  ]
+}
