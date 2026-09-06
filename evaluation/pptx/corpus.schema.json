@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:pptx-corpus:0.1.0",
+  "title": "SightLint PPTX evaluation corpus 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["corpusVersion", "source", "splitPolicy", "holdout", "cases"],
+  "properties": {
+    "corpusVersion": { "const": "0.1.0" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "ownership", "license", "redistribution", "privacy", "review"],
+      "properties": {
+        "origin": { "const": "repositoryOwnedFixture" },
+        "ownership": { "const": "SightLint project" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "const": "permitted" },
+        "privacy": { "const": "fictionalNoPersonalOrCustomerData" },
+        "review": { "const": "maintainerAuthoredNotIndependent" }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge"],
+      "properties": {
+        "smoke": { "type": "string", "minLength": 1 },
+        "development": { "type": "string", "minLength": 1 },
+        "challenge": { "type": "string", "minLength": 1 }
+      }
+    },
+    "holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": { "const": "notEstablished" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "split", "input", "render", "relation", "acquisitionAnnotationId", "ruleAnnotationId"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "split": { "enum": ["smoke", "development", "challenge"] },
+          "input": { "$ref": "#/$defs/artifact" },
+          "render": { "$ref": "#/$defs/artifact" },
+          "relation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind"],
+            "properties": {
+              "kind": { "enum": ["baseline", "targetedMutation", "hardNegative"] },
+              "baselineId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+              "changedProperty": { "type": "string", "minLength": 1 }
+            }
+          },
+          "acquisitionAnnotationId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "ruleAnnotationId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:pptx-extension:0.1.0",
+  "title": "SightLint PPTX Artifact IR extension 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["extensionVersion", "protocolVersion", "inputSha256", "adapter", "privacy", "slides", "nodes", "unsupportedFeatures"],
+  "properties": {
+    "extensionVersion": { "const": "0.1.0" },
+    "protocolVersion": { "const": "0.1.0" },
+    "inputSha256": { "$ref": "#/$defs/digest" },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "runtime"],
+      "properties": {
+        "name": { "const": "sightlint-pptx" },
+        "version": { "const": "0.1.0" },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": {
+            "name": { "const": "python" },
+            "version": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "textPolicy"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "textPolicy": { "const": "digestOnly" }
+      }
+    },
+    "slides": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/slide" }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "unsupportedFeatures": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "type": "string", "minLength": 1, "maxLength": 256 },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#=-]{0,255}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "positiveInteger": { "type": "integer", "minimum": 1, "maximum": 9223372036854775807 },
+    "slide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "index", "part", "widthEmu", "heightEmu", "sourceEvidenceId", "render"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "index": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "part": { "type": "string", "pattern": "^ppt/slides/slide[1-9][0-9]*\\.xml$" },
+        "widthEmu": { "$ref": "#/$defs/positiveInteger" },
+        "heightEmu": { "$ref": "#/$defs/positiveInteger" },
+        "sourceEvidenceId": { "$ref": "#/$defs/token" },
+        "render": { "$ref": "#/$defs/render" }
+      }
+    },
+    "render": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason", "nodeIdentity"],
+          "properties": {
+            "status": { "const": "untested" },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reference", "sha256", "widthPixels", "heightPixels", "emuPerPixel", "extentReconciliation", "evidenceId", "nodeIdentity"],
+          "properties": {
+            "status": { "const": "observed" },
+            "reference": { "type": "string", "minLength": 1, "maxLength": 1024 },
+            "sha256": { "$ref": "#/$defs/digest" },
+            "widthPixels": { "type": "integer", "minimum": 1, "maximum": 4096 },
+            "heightPixels": { "type": "integer", "minimum": 1, "maximum": 4096 },
+            "emuPerPixel": { "type": "integer", "minimum": 1, "maximum": 914400 },
+            "extentReconciliation": { "enum": ["agreement", "conflict"] },
+            "evidenceId": { "$ref": "#/$defs/token" },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        }
+      ]
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "slideId", "nativeId", "nativeType", "zOrder", "geometryStatus", "sourceEvidenceId", "text"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "slideId": { "$ref": "#/$defs/token" },
+        "nativeId": { "type": "integer", "minimum": 1, "maximum": 4294967295 },
+        "nativeType": { "enum": ["shape", "group"] },
+        "zOrder": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "parentId": { "$ref": "#/$defs/token" },
+        "geometryStatus": { "enum": ["exact", "unsupportedTransform", "missing"] },
+        "sourceEvidenceId": { "$ref": "#/$defs/token" },
+        "placeholder": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "index": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+          }
+        },
+        "text": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status"],
+              "properties": { "status": { "const": "absent" } }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status", "sha256", "utf8Bytes"],
+              "properties": {
+                "status": { "const": "digestOnly" },
+                "sha256": { "$ref": "#/$defs/digest" },
+                "utf8Bytes": { "type": "integer", "minimum": 0, "maximum": 1048576 }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
