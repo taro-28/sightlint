@@ -81,6 +81,12 @@ text layout into core geometry. Encountered unsupported native object types and 
 listed explicitly. Unsupported geometry remains absent; it is not approximated with an
 axis-aligned source box.
 
+Because version `0.1.0` does not acquire master/layout objects or theme-resolved styles, every
+successful response is explicitly `partial` and source-geometry coverage remains `partial` even
+when all directly declared slide shapes are supported. The supported package vocabulary is the
+transitional OOXML namespace used by the fixtures; strict OOXML is not silently treated as the
+same format.
+
 ## Rendered evidence and reconciliation
 
 A request may name one repository-contained PNG render per slide, with an exact SHA-256 digest and
@@ -139,6 +145,9 @@ and XML parsers remain untrusted sensor implementation, not trusted kernel code.
 - `externalProcessing` is always false and retention is `none`.
 - Full source text, shape names, XML, embedded binaries, and rendered pixels are not serialized in
   the IR or response; text is digest/count only.
+- Unsalted text digests and caller-supplied artifact titles/relative references remain sensitive
+  metadata: low-entropy strings may be guessed offline, so users must protect adapter output like
+  source-derived data.
 - Repository fixtures, annotations, and renders are fictional project-owned data under
   `MIT OR Apache-2.0`, with no customer, credential, or personal data.
 - The adapter adds no package dependency. Python and any separately used LibreOffice renderer keep

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:pptx-metric-contract:0.1.0",
+  "title": "SightLint PPTX public evaluation metric contract 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "scope", "implementationOutputsStoredAsOracle", "metrics", "nonClaims"],
+  "properties": {
+    "contractVersion": { "const": "0.1.0" },
+    "scope": { "const": "publicMaintainerAuthoredRegressionCorpus" },
+    "implementationOutputsStoredAsOracle": { "const": false },
+    "metrics": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "definition", "target"],
+        "properties": {
+          "id": { "enum": ["acquisitionFactCoverage", "evaluatedCaseCoverage", "verdictPrecision", "abstentionRetention", "falsePositiveRate", "mutationKillRate"] },
+          "definition": { "type": "string", "minLength": 1 },
+          "target": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "nonClaims": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

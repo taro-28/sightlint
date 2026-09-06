@@ -9,6 +9,9 @@ focused PPTX slice of issue #29.
   digests, rendered extent reconciliation, and explicit acquisition abstentions.
 - `rule-annotation.schema.json` separately describes rule applicability, policy, target outcomes,
   false-positive risk, and blocking authority.
+- `metric-contract.json` defines acquisition coverage, evaluated-case coverage, verdict precision,
+  abstention retention, false-positive rate, and mutation kill rate without storing implementation
+  output as oracle data.
 
 Fixture specifications and annotations are authored before adapter output is inspected. Adapter
 or `sightlint check` output is never copied into either oracle. The committed rendered slides are

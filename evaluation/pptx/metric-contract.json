@@ -1,0 +1,42 @@
+{
+  "contractVersion": "0.1.0",
+  "implementationOutputsStoredAsOracle": false,
+  "metrics": [
+    {
+      "definition": "Fraction of independently annotated slide, node, geometry, text-metadata, and render-extent facts matched by acquisition output.",
+      "id": "acquisitionFactCoverage",
+      "target": 1.0
+    },
+    {
+      "definition": "Fraction of public corpus cases executed through the process adapter and public SightLint binary.",
+      "id": "evaluatedCaseCoverage",
+      "target": 1.0
+    },
+    {
+      "definition": "Expected failed bounds verdicts divided by all emitted failed bounds verdicts in this public corpus.",
+      "id": "verdictPrecision",
+      "target": 1.0
+    },
+    {
+      "definition": "Fraction of cases retaining cantTell for rendered node identity.",
+      "id": "abstentionRetention",
+      "target": 1.0
+    },
+    {
+      "definition": "Fraction of clean and hard-negative cases with any unexpected failed verdict.",
+      "id": "falsePositiveRate",
+      "target": 0.0
+    },
+    {
+      "definition": "Fraction of targeted mutations producing their independently declared failed rule target.",
+      "id": "mutationKillRate",
+      "target": 1.0
+    }
+  ],
+  "nonClaims": [
+    "These targets are regression expectations for three public synthetic cases, not estimates of real-world accuracy.",
+    "No protected holdout, independent annotation, rendered node identity, or slide-specific recommended rule is evaluated.",
+    "A source containment failure does not by itself prove a user-facing presentation defect."
+  ],
+  "scope": "publicMaintainerAuthoredRegressionCorpus"
+}
