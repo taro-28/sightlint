@@ -113,6 +113,12 @@ test("public holdout checker rejects digest, path, command, metric, disclosure, 
     },
     {
       file: "bundle-manifest.json",
+      category: "version",
+      detail: "bundle manifest uses an unsupported schema or document type",
+      mutate: (document) => { document["schemaVersion"] = "2.0.0"; },
+    },
+    {
+      file: "bundle-manifest.json",
       category: "path",
       detail: "bundle file must use a contained relative POSIX path",
       mutate: (document) => {

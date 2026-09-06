@@ -29,6 +29,19 @@ MAXIMUM_METRICS = 512
 MINIMUM_PUBLISHED_DENOMINATOR = 5
 SHA256 = re.compile(r"sha256:[0-9a-f]{64}\Z")
 IDENTIFIER = re.compile(r"[a-z0-9][a-z0-9._-]{0,127}\Z")
+SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\Z")
+TIMESTAMP = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\Z")
+MEASURES = {
+    "caseCoverage",
+    "acquisitionExpectationCoverage",
+    "ruleResultCoverage",
+    "failurePrecision",
+    "falsePositiveFailures",
+    "reviewedAbstentionAgreement",
+    "mutationKillRate",
+    "executionErrors",
+    "nativePixelConflictRetention",
+}
 
 
 class ContractError(Exception):
@@ -137,6 +150,20 @@ def boolean(value: Any, label: str) -> bool:
     return value
 
 
+def semver(value: Any, label: str) -> str:
+    result = text(value, label)
+    if not SEMVER.fullmatch(result):
+        fail("shape", f"{label} must be a semantic version")
+    return result
+
+
+def timestamp(value: Any, label: str) -> str:
+    result = text(value, label)
+    if not TIMESTAMP.fullmatch(result):
+        fail("shape", f"{label} must be a UTC second-precision timestamp")
+    return result
+
+
 def exact(value: Any, fields: set[str], label: str) -> dict[str, Any]:
     result = obj(value, label)
     unknown = sorted(set(result) - fields)
@@ -146,6 +173,11 @@ def exact(value: Any, fields: set[str], label: str) -> dict[str, Any]:
     if missing:
         fail("shape", f"{label} is missing required fields: {', '.join(missing)}")
     return result
+
+
+def validate_header(value: dict[str, Any], schema: str, document_type: str, label: str) -> None:
+    if value.get("$schema") != schema or value.get("schemaVersion") != "1.0.0" or value.get("documentType") != document_type:
+        fail("version", f"{label} uses an unsupported schema or document type")
 
 
 def canonical_bytes(value: dict[str, Any], omit: str | None = None) -> bytes:
@@ -189,6 +221,9 @@ def validate_binding(value: Any, expected: dict[str, Any], label: str) -> None:
         "manifestDigest": expected["manifestDigest"],
     }:
         fail("binding", f"{label} does not match the referenced manifest")
+    identifier(binding["id"], f"{label} id")
+    semver(binding["version"], f"{label} version")
+    validate_sha256(binding["manifestDigest"], f"{label} manifestDigest")
 
 
 def validate_relative_file(root: Path, value: Any, expected_digest: Any, expected_length: Any, label: str) -> Path:
@@ -225,6 +260,15 @@ def validate_relative_file(root: Path, value: Any, expected_digest: Any, expecte
 
 def validate_admission(path: Path) -> tuple[dict[str, Any], str]:
     admission = load_json(path, "holdout admission")
+    exact(
+        admission,
+        {"$schema", "schemaVersion", "status", "publicRepositoryRole", "implementationOutputUsedAsOracle", "publicCasesEligible", "requiredControls", "blockers", "forbiddenClaims"},
+        "holdout admission",
+    )
+    if admission.get("$schema") != "./holdout-admission.schema.json" or admission.get("schemaVersion") != "1.0.0":
+        fail("version", "holdout admission uses an unsupported schema version")
+    if admission.get("publicRepositoryRole") != "admissionMetadataOnly":
+        fail("admission", "the public repository may contain admission metadata only")
     if admission.get("status") != "notOperational":
         fail("admission", "this public checker requires a separately verified operational admission")
     if admission.get("publicCasesEligible") is not False:
@@ -234,6 +278,16 @@ def validate_admission(path: Path) -> tuple[dict[str, Any], str]:
     blockers = items(admission.get("blockers"), "admission blockers", 1, 32)
     if not all(isinstance(item, str) and item for item in blockers):
         fail("shape", "admission blockers must be non-empty strings")
+    controls = exact(
+        admission["requiredControls"],
+        {"freeze", "access", "evaluator", "leakage", "execution", "oracleCorrection", "reporting"},
+        "admission required controls",
+    )
+    if not all(isinstance(value, str) and value for value in controls.values()):
+        fail("shape", "admission required controls must be non-empty strings")
+    forbidden = items(admission["forbiddenClaims"], "admission forbiddenClaims", 1, 32)
+    if not all(isinstance(item, str) and item for item in forbidden):
+        fail("shape", "admission forbiddenClaims must be non-empty strings")
     return admission, digest(admission)
 
 
@@ -303,8 +357,10 @@ def validate_current_record(path: Path, admission_digest: str) -> None:
     }:
         fail("binding", "current holdout record does not match holdout admission")
     validate_disclosure(record["disclosure"], "current disclosure")
-    items(record["nonClaims"], "current nonClaims", 1, 32)
-    items(record["blockers"], "current blockers", 1, 32)
+    non_claims = items(record["nonClaims"], "current nonClaims", 1, 32)
+    blockers = items(record["blockers"], "current blockers", 1, 32)
+    if not all(isinstance(item, str) and item for item in [*non_claims, *blockers]):
+        fail("shape", "current nonClaims and blockers must be non-empty strings")
     validate_manifest_digest(record, "current holdout record")
 
 
@@ -315,6 +371,7 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], list[str]]:
         {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "bundle", "provenance", "privacy", "limits", "families", "cases"},
         "bundle manifest",
     )
+    validate_header(bundle, "urn:sightlint:schema:protected-holdout-bundle:1.0.0", "protectedHoldoutBundleManifest", "bundle manifest")
     if bundle.get("dataClassification") != "publicConformanceOnly":
         fail("classification", "the committed conformance bundle must remain publicConformanceOnly")
     metadata = exact(
@@ -324,6 +381,8 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], list[str]]:
     )
     for field in ("id", "storageAuthorityId"):
         identifier(metadata[field], f"bundle {field}")
+    semver(metadata["version"], "bundle version")
+    timestamp(metadata["frozenAt"], "bundle frozenAt")
     if metadata["tuningVisible"] is not True:
         fail("classification", "public conformance data must be tuning-visible")
     if metadata["implementationOutputUsedAsOracle"] is not False:
@@ -334,6 +393,7 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], list[str]]:
         "bundle provenance",
     )
     identifier(provenance["sourceAuthorityId"], "bundle sourceAuthorityId")
+    text(provenance["licenseId"], "bundle licenseId")
     if (
         provenance["licenseId"] != "MIT OR Apache-2.0"
         or provenance["redistribution"] != "permitted"
@@ -396,6 +456,7 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], list[str]]:
             if role not in {"source", "request", "supportingAsset"}:
                 fail("shape", "bundle file role is unsupported")
             roles.append(role)
+            text(file["mediaType"], "bundle file mediaType")
             validate_relative_file(root, file["path"], file["sha256"], file["byteLength"], "bundle file")
         if roles.count("source") != 1 or roles.count("request") != 1 or len(roles) != len(set(roles)):
             fail("shape", "each conformance case must have one source, one request, and unique file roles")
@@ -425,6 +486,7 @@ def validate_oracle(root: Path, bundle: dict[str, Any], case_ids: list[str]) -> 
         {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "bundleBinding", "oracle", "caseIds", "acquisitionDocuments", "ruleDocuments", "classificationCounts", "acquisitionExpectationCounts", "ruleOutcomeCounts"},
         "oracle manifest",
     )
+    validate_header(oracle, "urn:sightlint:schema:protected-holdout-oracle:1.0.0", "protectedHoldoutOracleManifest", "oracle manifest")
     if oracle.get("dataClassification") != "publicConformanceOnly":
         fail("classification", "the committed conformance oracle must remain publicConformanceOnly")
     validate_binding(oracle["bundleBinding"], {**bundle["bundle"], "manifestDigest": bundle["manifestDigest"]}, "oracle bundle binding")
@@ -435,6 +497,9 @@ def validate_oracle(root: Path, bundle: dict[str, Any], case_ids: list[str]) -> 
     )
     if metadata["authoringBasis"] != "publicConformanceContract" or metadata["reviewStatus"] != "conformanceOnly":
         fail("assurance", "public conformance truth must not claim independent review")
+    identifier(metadata["id"], "oracle id")
+    semver(metadata["version"], "oracle version")
+    timestamp(metadata["frozenAt"], "oracle frozenAt")
     if metadata["implementationOutputUsedAsOracle"] is not False:
         fail("oracle", "implementation output must not be used as oracle truth")
     reviewers = items(metadata["reviewers"], "oracle reviewers", 1, 64)
@@ -442,6 +507,9 @@ def validate_oracle(root: Path, bundle: dict[str, Any], case_ids: list[str]) -> 
     for reviewer_value in reviewers:
         reviewer = exact(reviewer_value, {"id", "role", "qualification", "independentFromAnnotationAuthors"}, "oracle reviewer")
         reviewer_ids.append(identifier(reviewer["id"], "oracle reviewer id"))
+        if reviewer["role"] not in {"annotationAuthor", "independentReviewer", "adjudicator"}:
+            fail("shape", "oracle reviewer role is unsupported")
+        text(reviewer["qualification"], "oracle reviewer qualification")
         if reviewer["independentFromAnnotationAuthors"] is not False:
             fail("assurance", "conformance authors must not be represented as independent reviewers")
     if len(reviewer_ids) != len(set(reviewer_ids)):
@@ -469,6 +537,8 @@ def validate_oracle(root: Path, bundle: dict[str, Any], case_ids: list[str]) -> 
 
     acquisition_payload = documents["acquisitionDocuments"]
     rule_payload = documents["ruleDocuments"]
+    exact(acquisition_payload, {"authority", "caseCount", "states"}, "acquisition payload")
+    exact(rule_payload, {"authority", "caseCount", "outcomes"}, "rule payload")
     if acquisition_payload.get("authority") != "acquisition" or "outcomes" in acquisition_payload:
         fail("oracle", "acquisition truth must remain separate from rule verdict truth")
     if rule_payload.get("authority") != "rule" or "states" in rule_payload:
@@ -490,6 +560,7 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
         {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "source", "bundleBinding", "oracleBinding", "commands", "evaluationContract", "environment", "resourceLimits", "createdAt", "createdBy"},
         "invocation manifest",
     )
+    validate_header(invocation, "urn:sightlint:schema:web-holdout-invocation:1.0.0", "protectedHoldoutInvocationManifest", "invocation manifest")
     if invocation.get("dataClassification") != "publicConformanceOnly":
         fail("classification", "the conformance invocation must remain publicConformanceOnly")
     validate_binding(invocation["bundleBinding"], {**bundle["bundle"], "manifestDigest": bundle["manifestDigest"]}, "invocation bundle binding")
@@ -520,6 +591,7 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
     )
     if evaluation["profileId"] != "sightlint:recommended" or evaluation["profileVersion"] != "0.1.0":
         fail("command", "evaluation contract must pin the current recommended profile")
+    semver(evaluation["profileVersion"], "evaluation profileVersion")
     validate_sha256(evaluation["configurationDigest"], "evaluation configurationDigest")
     rules = items(evaluation["rules"], "evaluation rule bindings", 1, 128)
     if sorted_unique_ids(rules, "id", "evaluation rule bindings") != [
@@ -530,6 +602,7 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
         fail("command", "evaluation contract must pin the current recommended rule set")
     for rule_value in rules:
         rule = exact(rule_value, {"id", "version"}, "evaluation rule binding")
+        semver(rule["version"], "evaluation rule version")
         if rule["version"] != "0.1.0":
             fail("command", "evaluation contract must pin current rule versions")
     if evaluation["expectedExitCodes"] != [0, 1, 2]:
@@ -541,6 +614,12 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
     )
     if validate_sha256(environment["manifestDigest"], "environment digest") != digest(environment, "manifestDigest"):
         fail("digest", "environment manifestDigest does not match its canonical projection")
+    if environment["operatingSystem"] not in {"linux", "macos", "windows"}:
+        fail("shape", "environment operatingSystem is unsupported")
+    if environment["theme"] not in {"light", "dark"} or environment["reducedMotion"] not in {"reduce", "no-preference"}:
+        fail("shape", "environment theme or reducedMotion is unsupported")
+    for field in ("architecture", "rustVersion", "nodeVersion", "playwrightVersion", "chromiumRevision", "locale", "timezone"):
+        text(environment[field], f"environment {field}")
     for field in ("viewportWidthCssPixels", "viewportHeightCssPixels", "deviceScaleFactor", "textScale"):
         integer(environment[field], f"environment {field}", 1, 32768)
     limits = exact(invocation["resourceLimits"], {"maximumCases", "maximumCaseSeconds", "maximumOutputBytes", "maximumManifestBytes"}, "invocation resource limits")
@@ -550,6 +629,8 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
     integer(limits["maximumOutputBytes"], "maximumOutputBytes", 1, 1_073_741_824)
     if integer(limits["maximumManifestBytes"], "maximumManifestBytes", 1, MAXIMUM_MANIFEST_BYTES) != MAXIMUM_MANIFEST_BYTES:
         fail("limit", "invocation maximumManifestBytes must pin the checker limit")
+    timestamp(invocation["createdAt"], "invocation createdAt")
+    identifier(invocation["createdBy"], "invocation createdBy")
     validate_manifest_digest(invocation, "invocation manifest")
     return invocation
 
@@ -564,6 +645,7 @@ def validate_scope(value: Any, label: str) -> dict[str, Any]:
         identifier(scope[field], f"{label} {field}")
     if scope["split"] != "holdout":
         fail("shape", f"{label} split must be holdout")
+    semver(scope["ruleVersion"], f"{label} ruleVersion")
     return scope
 
 
@@ -574,6 +656,7 @@ def validate_result(root: Path, bundle: dict[str, Any], oracle: dict[str, Any], 
         {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "bundleBinding", "oracleBinding", "invocationBinding", "execution", "caseResults", "metricCells"},
         "private result manifest",
     )
+    validate_header(result, "urn:sightlint:schema:private-web-holdout-result:1.0.0", "privateHoldoutResultManifest", "private result manifest")
     if result.get("dataClassification") != "publicConformanceOnly":
         fail("classification", "the conformance private result must remain publicConformanceOnly")
     validate_binding(result["bundleBinding"], {**bundle["bundle"], "manifestDigest": bundle["manifestDigest"]}, "result bundle binding")
@@ -581,6 +664,11 @@ def validate_result(root: Path, bundle: dict[str, Any], oracle: dict[str, Any], 
     if exact(result["invocationBinding"], {"manifestDigest"}, "result invocation binding")["manifestDigest"] != invocation["manifestDigest"]:
         fail("binding", "result invocation binding does not match the invocation manifest")
     execution = exact(result["execution"], {"status", "startedAt", "completedAt", "evaluatorId", "attemptedCases", "completedCases", "executionErrors"}, "private execution")
+    if execution["status"] not in {"succeeded", "failed"}:
+        fail("execution", "private execution status is unsupported")
+    timestamp(execution["startedAt"], "private execution startedAt")
+    timestamp(execution["completedAt"], "private execution completedAt")
+    identifier(execution["evaluatorId"], "private execution evaluatorId")
     attempted = integer(execution["attemptedCases"], "attemptedCases", 0, MAXIMUM_CASES)
     completed = integer(execution["completedCases"], "completedCases", 0, MAXIMUM_CASES)
     errors = integer(execution["executionErrors"], "executionErrors", 0, MAXIMUM_CASES)
@@ -602,6 +690,8 @@ def validate_result(root: Path, bundle: dict[str, Any], oracle: dict[str, Any], 
     for metric_value in metric_values:
         metric = exact(metric_value, METRIC_FIELDS, "private metric cell")
         validate_scope(metric["scope"], "private metric scope")
+        if metric["measure"] not in MEASURES:
+            fail("metric", "private metric measure is unsupported")
         numerator = integer(metric["numerator"], "metric numerator")
         denominator = integer(metric["denominator"], "metric denominator")
         if numerator > denominator:
@@ -623,6 +713,7 @@ def validate_attestation(root: Path, admission_digest: str, bundle: dict[str, An
         {"$schema", "schemaVersion", "documentType", "manifestDigest", "recordPurpose", "lifecycle", "dataClassification", "evidenceEligible", "admission", "bindings", "execution", "assurance", "disclosure", "metrics", "nonClaims"},
         "public attestation",
     )
+    validate_header(attestation, "urn:sightlint:schema:web-holdout-run:1.0.0", "sanitizedHoldoutRunAttestation", "public attestation")
     expected = {"recordPurpose": "conformanceExample", "lifecycle": "valid", "dataClassification": "publicConformanceOnly", "evidenceEligible": False}
     for field, wanted in expected.items():
         if attestation.get(field) != wanted:
@@ -636,6 +727,8 @@ def validate_attestation(root: Path, admission_digest: str, bundle: dict[str, An
     if bindings["invocationManifestDigest"] != invocation["manifestDigest"] or bindings["privateResultManifestDigest"] != result["manifestDigest"]:
         fail("binding", "attestation manifest bindings do not match the private chain")
     execution = exact(attestation["execution"], {"status", "startedAt", "completedAt", "attemptedCases", "completedCases", "executionErrors"}, "public execution")
+    timestamp(execution["startedAt"], "public execution startedAt")
+    timestamp(execution["completedAt"], "public execution completedAt")
     private_execution = dict(result["execution"])
     private_execution.pop("evaluatorId")
     if execution != private_execution:
@@ -645,6 +738,7 @@ def validate_attestation(root: Path, admission_digest: str, bundle: dict[str, An
     for role in ("evaluator", "secondVerifier"):
         declaration = exact(assurance[role], {"id", "qualification", "independentFromTuning", "conflictOfInterestReviewed", "declarationDigest"}, f"{role} declaration")
         identifier(declaration["id"], f"{role} id")
+        text(declaration["qualification"], f"{role} qualification")
         if declaration["independentFromTuning"] is not True or declaration["conflictOfInterestReviewed"] is not True:
             fail("assurance", f"{role} declaration must explicitly assert both controls")
         validate_sha256(declaration["declarationDigest"], f"{role} declarationDigest")
@@ -655,6 +749,8 @@ def validate_attestation(root: Path, admission_digest: str, bundle: dict[str, An
         fail("assurance", "public evaluator must match the private execution evaluator")
     if assurance["cryptographicVerificationPerformedBySightLint"] is not False:
         fail("assurance", "SightLint must not claim cryptographic identity verification")
+    identifier(assurance["detachedSignaturesVerifiedBy"], "detached signature authority")
+    semver(assurance["exposureLogVersion"], "exposure log version")
     validate_sha256(assurance["exposureLogDigest"], "exposure log digest")
     threshold = validate_disclosure(attestation["disclosure"], "attestation disclosure")
     if threshold != MINIMUM_PUBLISHED_DENOMINATOR:
@@ -694,7 +790,9 @@ def validate_attestation(root: Path, admission_digest: str, bundle: dict[str, An
     sensitive_fragments = ("atlas", "harbor", "http://", "https://", "/users/", "c:\\")
     if any(fragment in value for value in serialized_strings for fragment in sensitive_fragments):
         fail("leakage", "public attestation contains a prohibited fixture identity, path, or URL")
-    items(attestation["nonClaims"], "attestation nonClaims", 1, 32)
+    non_claims = items(attestation["nonClaims"], "attestation nonClaims", 1, 32)
+    if not all(isinstance(item, str) and item for item in non_claims):
+        fail("shape", "attestation nonClaims must be non-empty strings")
     validate_manifest_digest(attestation, "public attestation")
     return attestation
 
