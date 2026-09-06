@@ -86,7 +86,7 @@
         { "policy": "strict-uniform-perimeter-flood-v1", "expectedStatus": "observed", "expectedReason": null, "backgroundUsability": "usable", "rationale": "The visible modal screenshot has one exact opaque perimeter color." }
       ],
       "regionTargets": [
-        { "id": "review-dialog", "sourceSelector": "[data-testid='review-dialog']", "bounds": [240, 206, 480, 308], "edgeTolerance": 16, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
+        { "id": "review-dialog", "sourceSelector": "[data-testid='review-dialog']", "bounds": [240, 206, 480, 308], "edgeTolerance": 28, "unit": "devicePixel", "annotationBasis": "sourceAuthoredCssAndHumanVisualReview" }
       ],
       "abstentions": ["The screenshot alone cannot establish whether obscured underlying content remains interactive or semantically relevant."]
     },

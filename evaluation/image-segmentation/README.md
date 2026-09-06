@@ -22,3 +22,11 @@ bounds error, unsafe hypotheses, correct abstention, fragmentation/false groupin
 agreement, and mutation/metamorphic observations. They are not representative real-world UI/UX
 accuracy. There is no private holdout or independent reviewer, no semantic grouping, no rule
 verdict, no color management or alpha compositing, and no universal score.
+
+The reviewed baseline measurements and non-admission decision are recorded in
+[`results.md`](results.md). Run the dedicated public-process gate with:
+
+```bash
+cargo build --locked -p sightlint-cli
+npm --prefix adapters/playwright run test:segmentation-evaluation
+```

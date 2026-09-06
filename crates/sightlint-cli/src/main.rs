@@ -54,6 +54,11 @@ enum Command {
         #[arg(long, value_enum, default_value_t = OutputFormat::Human)]
         format: OutputFormat,
     },
+    /// Compare experimental image-segmentation policies; evaluation-only and nonblocking.
+    BenchmarkImageSegmentation {
+        /// PNG file, or `-` for binary standard input.
+        input: PathBuf,
+    },
     /// Adapt a supported image and run the built-in rules.
     CheckImage {
         /// PNG file, or `-` for binary standard input.
@@ -124,6 +129,7 @@ fn run(cli: Cli) -> ExitCode {
         } => run_check(&input, format, deny_cant_tell, profile),
         Command::AdaptImage { input } => run_adapt_image(&input),
         Command::InspectImage { input, format } => run_inspect_image(&input, format),
+        Command::BenchmarkImageSegmentation { input } => run_benchmark_image_segmentation(&input),
         Command::CheckImage {
             input,
             format,
@@ -195,6 +201,23 @@ fn run_inspect_image(input: &Path, format: OutputFormat) -> ExitCode {
             Ok(output) => write_success(&output),
             Err(error) => fail(format!("failed to serialize image inspection: {error}")),
         },
+    }
+}
+
+fn run_benchmark_image_segmentation(input: &Path) -> ExitCode {
+    let bytes = match read_binary_input(input) {
+        Ok(bytes) => bytes,
+        Err(error) => return fail(error),
+    };
+    let benchmark = match sightlint_adapter_png::segmentation::benchmark_png_segmentation(&bytes) {
+        Ok(benchmark) => benchmark,
+        Err(error) => return fail(error.to_string()),
+    };
+    match benchmark.to_canonical_json() {
+        Ok(output) => write_success(&output),
+        Err(error) => fail(format!(
+            "failed to serialize image segmentation benchmark: {error}"
+        )),
     }
 }
 

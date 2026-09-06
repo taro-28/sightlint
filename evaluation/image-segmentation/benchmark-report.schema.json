@@ -76,11 +76,16 @@
       "additionalProperties": false,
       "required": ["id", "class", "selector", "byteCrc32", "interpretation"],
       "properties": {
-        "id": { "const": "raster" },
+        "id": { "enum": ["raster", "source"] },
         "class": { "const": "exactSource" },
-        "selector": { "const": "IDAT/encoded-rgba8-v1" },
+        "selector": { "enum": ["IDAT/encoded-rgba8-v1", "PNG/source"] },
         "byteCrc32": { "type": "string", "pattern": "^[0-9a-f]{8}$" },
-        "interpretation": { "const": "PNG encoded channels; no display-color, compositing, or semantic claim" }
+        "interpretation": {
+          "enum": [
+            "PNG encoded channels; no display-color, compositing, or semantic claim",
+            "Source structure only; encoded RGBA raster unavailable"
+          ]
+        }
       }
     },
     "limits": {

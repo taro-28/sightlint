@@ -9,8 +9,8 @@ use crate::{
     EncodedRgba8Raster, PngAdapterError, PngRasterError, PngRasterStatus, crc32, observe_png_raster,
 };
 
-const MAX_INSPECTION_PIXELS: usize = 4_194_304;
-const MAX_REGIONS: usize = 1_024;
+pub(crate) const MAX_INSPECTION_PIXELS: usize = 4_194_304;
+pub(crate) const MAX_REGIONS: usize = 1_024;
 
 /// A versioned observation report, deliberately separate from a trusted rule report.
 #[derive(Debug, Clone, PartialEq)]
@@ -102,20 +102,20 @@ pub fn inspect_png(input: &[u8]) -> Result<ImageInspection, PngAdapterError> {
 }
 
 #[derive(Debug, Clone)]
-struct Region {
-    seed: usize,
-    bounds: [u32; 4],
-    count: u32,
-    color: [u8; 4],
-    uniform_color: bool,
+pub(crate) struct Region {
+    pub(crate) seed: usize,
+    pub(crate) bounds: [u32; 4],
+    pub(crate) count: u32,
+    pub(crate) color: [u8; 4],
+    pub(crate) uniform_color: bool,
 }
 
 impl Region {
-    fn id(&self) -> String {
+    pub(crate) fn id(&self) -> String {
         format!("region:{}", self.seed)
     }
 
-    fn is_solid_rectangle(&self) -> bool {
+    pub(crate) fn is_solid_rectangle(&self) -> bool {
         self.uniform_color && u64::from(self.count) == self.area()
     }
 
@@ -129,6 +129,15 @@ impl Region {
             "boundsFormat": "xywh-half-open", "unit": "devicePixel",
             "pixelCount": self.count, "singleColorRectangle": self.is_solid_rectangle(),
             "evidenceId": "raster", "hypothesisId": "border-background"
+        })
+    }
+
+    pub(crate) fn as_benchmark_json(&self, hypothesis_id: &str) -> Value {
+        json!({
+            "id": self.id(), "bounds": self.bounds, "coordinateSpaceId": "canvas",
+            "boundsFormat": "xywh-half-open", "unit": "devicePixel",
+            "pixelCount": self.count, "singleColorRectangle": self.is_solid_rectangle(),
+            "evidenceId": "raster", "hypothesisId": hypothesis_id
         })
     }
 }
@@ -186,13 +195,13 @@ fn inspect_raster(raster: &EncodedRgba8Raster, report: &mut Value) -> Result<(),
     Ok(())
 }
 
-fn pixel(raster: &EncodedRgba8Raster, index: usize) -> [u8; 4] {
+pub(crate) fn pixel(raster: &EncodedRgba8Raster, index: usize) -> [u8; 4] {
     raster.pixels[index * 4..index * 4 + 4]
         .try_into()
         .expect("validated raster index")
 }
 
-fn components(
+pub(crate) fn components(
     raster: &EncodedRgba8Raster,
     background: [u8; 4],
     count: usize,

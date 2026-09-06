@@ -10,6 +10,7 @@ mod filter;
 mod inflate;
 pub mod inspection;
 mod raster;
+pub mod segmentation;
 mod structure;
 
 pub use filter::{PngFilterError, PngPass, ReconstructedPng, reconstruct_png_scanlines};
