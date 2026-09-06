@@ -121,12 +121,26 @@ Consequently the `adjudicated` count is present and zero for tool-produced repor
 for signed adjudication input requires a new version and decision rather than editing a finalized
 reviewer submission.
 
-Reports contain separate integer counts for acquisition agreement, rule agreement, all
-disagreements, unresolved comparisons, adjudicated comparisons, and agreement on `cantTell` or
-`untested` abstentions. Counts are not percentages and are not combined into a score. Rule
-`inapplicable` agreement remains a rule agreement, not an abstention. The report binds the exact
-packet, submission, registry, and oracle byte digests and labels fictional input as
-`evidenceEligible: false`.
+Reports contain a separate integer `{ numerator, denominator }` cell for acquisition agreement,
+rule agreement, all disagreements, unresolved comparisons, adjudicated comparisons, and
+agreement on `cantTell` or `untested` abstentions. Denominators are explicit and category-specific:
+
+- acquisition agreement uses every submitted acquisition comparison as its denominator;
+- rule agreement uses every submitted rule comparison as its denominator;
+- disagreement uses only rows with one uniquely resolved oracle value as its denominator;
+- unresolved uses every acquisition and rule comparison as its denominator;
+- adjudicated uses unresolved comparisons as its denominator; and
+- abstention agreement uses uniquely resolved comparisons where either side is `cantTell` or
+  `untested` as its denominator.
+
+A missing or ambiguous oracle key therefore reduces acquisition or rule agreement coverage and
+increases unresolved coverage, but it cannot silently enter the disagreement or abstention
+denominator. A disagreement is included in both the disagreement numerator and the unresolved
+numerator. Version `1.0.0` reports a zero adjudicated numerator while retaining the unresolved
+denominator. Zero denominators remain explicit; the tool does not divide them. These cells are not
+percentages and are not combined into a score. Rule `inapplicable` agreement remains a rule
+agreement, not an abstention. The report binds the exact packet, submission, registry, and oracle
+byte digests and labels fictional input as `evidenceEligible: false`.
 
 The comparison command writes canonical JSON only to stdout. It has no output-path option and does
 not modify packet, submission, registry, oracle, source, or request files. Invalid input produces
