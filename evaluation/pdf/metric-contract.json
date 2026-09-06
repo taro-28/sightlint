@@ -1,0 +1,42 @@
+{
+  "contractVersion": "0.1.0",
+  "implementationOutputsStoredAsOracle": false,
+  "metrics": [
+    {
+      "definition": "Fraction of independently annotated page, annotation, geometry, action-class, tag-presence, and render-extent facts matched by acquisition output.",
+      "id": "acquisitionFactCoverage",
+      "target": 1.0
+    },
+    {
+      "definition": "Fraction of public corpus cases executed through the PDF process adapter and public SightLint binary.",
+      "id": "evaluatedCaseCoverage",
+      "target": 1.0
+    },
+    {
+      "definition": "Expected failed bounds verdicts divided by all emitted failed bounds verdicts in this public corpus.",
+      "id": "verdictPrecision",
+      "target": 1.0
+    },
+    {
+      "definition": "Fraction of declared non-rectangular activation cases retaining cantTell rather than receiving a core hitBox.",
+      "id": "abstentionRetention",
+      "target": 1.0
+    },
+    {
+      "definition": "Fraction of clean and hard-negative cases with any unexpected failed verdict.",
+      "id": "falsePositiveRate",
+      "target": 0.0
+    },
+    {
+      "definition": "Fraction of targeted mutations producing their independently declared failed hitBox target.",
+      "id": "mutationKillRate",
+      "target": 1.0
+    }
+  ],
+  "nonClaims": [
+    "These targets are regression expectations for three public generated cases, not estimates of real-world PDF accuracy.",
+    "No protected holdout, independent annotation, text or tag interpretation, paint geometry, rendered node identity, or PDF-specific rule is evaluated.",
+    "A source annotation rectangle outside a CropBox does not by itself prove a user-facing defect in every PDF viewer."
+  ],
+  "scope": "publicMaintainerAuthoredRegressionCorpus"
+}

@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:pdf-extension:0.1.0",
+  "title": "SightLint PDF Artifact IR extension 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["extensionVersion", "protocolVersion", "inputSha256", "pdfHeader", "adapter", "privacy", "taggedStructure", "pages", "annotations", "unsupportedFeatures"],
+  "properties": {
+    "extensionVersion": { "const": "0.1.0" },
+    "protocolVersion": { "const": "0.1.0" },
+    "inputSha256": { "$ref": "#/$defs/digest" },
+    "pdfHeader": { "type": "string", "pattern": "^%PDF-[0-9]+\\.[0-9]+$" },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "runtime", "parser"],
+      "properties": {
+        "name": { "const": "sightlint-pdf" },
+        "version": { "const": "0.1.0" },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": {
+            "name": { "const": "python" },
+            "version": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        "parser": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "strict"],
+          "properties": {
+            "name": { "const": "pypdf" },
+            "version": { "const": "6.17.0" },
+            "strict": { "const": true }
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "contentPolicy", "actionsFollowed"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "contentPolicy": { "const": "geometryAndTypeOnly" },
+        "actionsFollowed": { "const": false }
+      }
+    },
+    "taggedStructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalogDeclaresStructTreeRoot", "interpretation"],
+      "properties": {
+        "catalogDeclaresStructTreeRoot": { "type": "boolean" },
+        "interpretation": { "const": "untested" }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/page" }
+    },
+    "annotations": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/annotation" }
+    },
+    "unsupportedFeatures": {
+      "type": "array",
+      "maxItems": 128,
+      "items": { "type": "string", "minLength": 1, "maxLength": 256 },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#=-]{0,255}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "objectReference": { "type": "string", "pattern": "^(0|[1-9][0-9]*) (0|[1-9][0-9]*) R$" },
+    "sourceRect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "bottom", "right", "top"],
+      "properties": {
+        "left": { "type": "integer", "minimum": -1000000, "maximum": 1000000 },
+        "bottom": { "type": "integer", "minimum": -1000000, "maximum": 1000000 },
+        "right": { "type": "integer", "minimum": -1000000, "maximum": 1000000 },
+        "top": { "type": "integer", "minimum": -1000000, "maximum": 1000000 }
+      }
+    },
+    "normalizedRect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": -2000000, "maximum": 2000000 },
+        "y": { "type": "integer", "minimum": -2000000, "maximum": 2000000 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 2000000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 2000000 }
+      }
+    },
+    "render": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason", "nodeIdentity"],
+          "properties": {
+            "status": { "const": "untested" },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reference", "sha256", "widthPixels", "heightPixels", "pdfPointsPerPixel", "extentReconciliation", "evidenceId", "nodeIdentity"],
+          "properties": {
+            "status": { "const": "observed" },
+            "reference": { "type": "string", "minLength": 1, "maxLength": 1024 },
+            "sha256": { "$ref": "#/$defs/digest" },
+            "widthPixels": { "type": "integer", "minimum": 1, "maximum": 16384 },
+            "heightPixels": { "type": "integer", "minimum": 1, "maximum": 16384 },
+            "pdfPointsPerPixel": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["numerator", "denominator"],
+              "properties": {
+                "numerator": { "type": "integer", "minimum": 1, "maximum": 14400 },
+                "denominator": { "type": "integer", "minimum": 1, "maximum": 14400 }
+              }
+            },
+            "extentReconciliation": { "enum": ["agreement", "conflict", "cantTell"] },
+            "evidenceId": { "$ref": "#/$defs/token" },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        }
+      ]
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "index", "objectReference", "rotationDegrees", "geometryStatus", "sourceEvidenceId", "render"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "index": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "objectReference": { "$ref": "#/$defs/objectReference" },
+        "rotationDegrees": { "type": "integer", "minimum": -3600, "maximum": 3600 },
+        "geometryStatus": { "enum": ["exact", "unsupportedRotation", "unsupportedPageBox"] },
+        "mediaBoxPdfPoints": { "$ref": "#/$defs/sourceRect" },
+        "cropBoxPdfPoints": { "$ref": "#/$defs/sourceRect" },
+        "sourceEvidenceId": { "$ref": "#/$defs/token" },
+        "render": { "$ref": "#/$defs/render" }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pageId", "objectReference", "subtype", "flags", "hasQuadPoints", "hasPath", "actionKind", "geometryStatus", "sourceEvidenceId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "pageId": { "$ref": "#/$defs/token" },
+        "objectReference": { "$ref": "#/$defs/objectReference" },
+        "subtype": { "type": "string", "pattern": "^/[A-Za-z0-9]+$", "maxLength": 64 },
+        "flags": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "hasQuadPoints": { "type": "boolean" },
+        "hasPath": { "type": "boolean" },
+        "actionKind": { "enum": ["internalDestination", "goTo", "uri", "remoteGoTo", "launch", "javaScript", "named", "submitForm", "importData", "other", "missing"] },
+        "geometryStatus": { "enum": ["exact", "unsupportedPage", "unsupportedSubtype", "unsupportedDirectObject", "unsupportedFlags", "unsupportedAction", "unsupportedQuadPoints", "unsupportedPath", "missingRect", "invalidRect"] },
+        "sourceRectPdfPoints": { "$ref": "#/$defs/sourceRect" },
+        "normalizedHitBoxPdfPoints": { "$ref": "#/$defs/normalizedRect" },
+        "coreNodeId": { "$ref": "#/$defs/token" },
+        "sourceEvidenceId": { "$ref": "#/$defs/token" }
+      }
+    }
+  }
+}

@@ -58,6 +58,7 @@ background, alternatives, and disposition of historical experiments.
 - [0041 — Retain bounded PNG coverage until product evidence shows a format gap](0041-retain-bounded-png-coverage.md)
 - [0042 — Isolate perception workers behind a bounded observation protocol](0042-isolated-perception-worker-protocol.md)
 - [0043 — Bounded PPTX source-geometry process adapter](0043-bounded-pptx-source-adapter.md)
+- [0044 — Bounded PDF link-annotation geometry process adapter](0044-bounded-pdf-link-annotation-adapter.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
@@ -97,4 +98,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0044.
+Use [the template](template.md) and the next unused number at or after 0045.
