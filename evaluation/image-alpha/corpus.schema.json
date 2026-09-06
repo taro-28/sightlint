@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:image-alpha-corpus:0.1.0",
+  "title": "SightLint source-alpha geometry evaluation corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "corpus", "source", "dataGovernance", "splitPolicy", "gates", "annotations", "cases"],
+  "properties": {
+    "$schema": { "const": "./corpus.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "scope", "limitations"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "version": { "const": "0.1.0" },
+        "scope": { "$ref": "#/$defs/text" },
+        "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "origin", "ownership", "license", "redistribution", "privacyReview", "externalAssets", "fictionalData", "generator"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "kind": { "const": "repositoryOwnedTransparentAssetFamily" },
+        "origin": { "$ref": "#/$defs/path" },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "$ref": "#/$defs/text" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "externalAssets": { "const": false },
+        "fictionalData": { "const": true },
+        "generator": { "$ref": "#/$defs/path" }
+      }
+    },
+    "dataGovernance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assetGeneration", "oracleAuthor", "implementationOutputIsOracle", "prohibitedData", "reviewStatus"],
+      "properties": {
+        "assetGeneration": { "const": "deterministicIndependentFixtureGenerator" },
+        "oracleAuthor": { "const": "maintainerSourceReview" },
+        "implementationOutputIsOracle": { "const": false },
+        "prohibitedData": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "reviewStatus": { "const": "publicDevelopmentLabelsNotIndependentReview" }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge", "holdout"],
+      "properties": {
+        "smoke": { "$ref": "#/$defs/text" },
+        "development": { "$ref": "#/$defs/text" },
+        "challenge": { "$ref": "#/$defs/text" },
+        "holdout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason", "requiredBeforeRuleAdmission"],
+          "properties": {
+            "status": { "const": "notEstablished" },
+            "reason": { "$ref": "#/$defs/text" },
+            "requiredBeforeRuleAdmission": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["determinismRuns", "requiredAcquisitionCases", "requiredAcquisitionMutations", "maximumBlockingFindings", "requiredExtensionVersion", "requiredAlphaGeometryVersion"],
+      "properties": {
+        "determinismRuns": { "type": "integer", "minimum": 2, "maximum": 10 },
+        "requiredAcquisitionCases": { "type": "integer", "minimum": 1 },
+        "requiredAcquisitionMutations": { "type": "integer", "minimum": 1 },
+        "maximumBlockingFindings": { "const": 0 },
+        "requiredExtensionVersion": { "const": "0.2.0" },
+        "requiredAlphaGeometryVersion": { "const": "0.1.0" }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "guide", "acquisition", "rules"],
+      "properties": {
+        "schema": { "$ref": "#/$defs/path" },
+        "guide": { "$ref": "#/$defs/path" },
+        "acquisition": { "$ref": "#/$defs/path" },
+        "rules": { "$ref": "#/$defs/path" }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+    "path": { "type": "string", "pattern": "^[A-Za-z0-9._/-]+$" },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "split", "classification", "sourceId", "path", "byteSha256", "features"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "split": { "enum": ["smoke", "development", "challenge"] },
+        "classification": { "enum": ["baseline", "targetedMutation", "metamorphic", "hardNegative"] },
+        "sourceId": { "$ref": "#/$defs/token" },
+        "path": { "$ref": "#/$defs/path" },
+        "byteSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "features": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+        "relation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["baselineCaseId", "changedProperty", "preservedProperties"],
+          "properties": {
+            "baselineCaseId": { "$ref": "#/$defs/token" },
+            "changedProperty": { "$ref": "#/$defs/text" },
+            "preservedProperties": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+          }
+        },
+        "hardNegative": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["category", "rationale"],
+          "properties": {
+            "category": { "$ref": "#/$defs/token" },
+            "rationale": { "$ref": "#/$defs/text" }
+          }
+        }
+      }
+    }
+  }
+}

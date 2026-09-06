@@ -151,9 +151,9 @@ the task, locator, edit, and labels are public and visible to the implementation
 
 ### PNG raster acquisition corpus
 
-`fixtures/png-raster/` contains 38 committed PNG byte cases:
+`fixtures/png-raster/` contains 43 committed PNG byte cases:
 
-- 31 supported exact raster cases;
+- 36 supported exact raster cases;
 - five explicit unavailable interpretations;
 - two malformed inputs;
 - filter and Adam7 variants;
@@ -162,6 +162,20 @@ the task, locator, edit, and labels are public and visible to the implementation
 - a clean/mutated card pair whose semantic spacing verdict remains `untested`.
 
 It proves the current source-pixel path, not screenshot UI understanding.
+
+### Source-alpha acquisition evaluation
+
+`evaluation/image-alpha/` contains five repository-owned Northstar transparent UI assets with
+separate human-authored acquisition and rule annotations. The acquisition oracle covers visible
+and opaque half-open bounds, alpha-class counts, transparent insets, edge occupancy, and expected
+`inkBox`; the rule oracle keeps every semantic padding question `untested` with `cantTell` or
+`inapplicable` applicability.
+
+The public-binary E2E records 5/5 acquisition matches, 1/1 targeted padding mutation observed, and
+2/2 hard negatives without blocking. A hidden-RGB metamorphic pair preserves alpha geometry while
+changing the encoded-raster checksum. All assets and labels are public to implementers, derived
+from one fictional family, and have no protected holdout or independent reviewer; these counts do
+not estimate real-world UI/UX accuracy or justify an alpha-padding rule.
 
 ### Image-inspection acquisition corpus
 

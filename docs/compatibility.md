@@ -30,14 +30,18 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 
 ## Unreleased current-`main` additions after alpha.2
 
-The source tree after `v0.1.0-alpha.2` adds an evaluation-only image-segmentation surface. It is not
-part of the published alpha.2 archive and therefore does not retroactively change that release.
+The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation and exact PNG
+source-alpha geometry. They are not part of the published alpha.2 archive and therefore do not
+retroactively change that release.
 
 | Surface | Version or contract | Compatibility rule |
 |---|---|---|
 | Segmentation benchmark report | `0.1.0` | Strict canonical JSON; incompatible fields or semantics require a new report version. It is not a CheckReport. |
 | Segmentation evaluation corpus | `0.1.0` | Human-authored acquisition and rule oracles remain separate; implementation output cannot rewrite either oracle. |
 | `benchmark-image-segmentation` | evaluation-only command | Exit `0` returns a complete report, including explicit unavailability; usage, I/O, validation, or decoding errors exit `2`; it never exits `1`. |
+| PNG extension | `org.sightlint.adapter.png@0.2.0` | Adds `alphaGeometry`; consumers must inspect the enclosing version. The published alpha.2 emitted `0.1.0`. |
+| PNG alpha geometry | `0.1.0` | Exact encoded source-alpha predicates and device-pixel bounds; incompatible fields or semantics require a new nested version. |
+| Source-alpha evaluation corpus | `0.1.0` | Acquisition and rule annotations remain separate; all labels are public development data and no holdout is claimed. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.

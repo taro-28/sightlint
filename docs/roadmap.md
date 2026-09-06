@@ -14,7 +14,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M0 — Foundation | complete | architecture, ADRs, Rust workspace, local-first trust boundary, CI, hosting protection, license | ongoing governance and security review |
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
-| M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA samples, 38-case pixel corpus, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, transparent-asset geometry, evaluated broader acquisition |
+| M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
 | M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix and first advisory recommended Web pack | portability characterization, broader representative evaluation, then other media by demand |
 | M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
@@ -109,8 +109,9 @@ accuracy. The corpus has one fictional application family, maintainer-only revie
 development labels, no private holdout, no pixel-content identity, no complete hit regions, no
 semantic peer inference, and no representative sampling. The three new rules therefore remain
 advisory. The scripted edit is not a claim about autonomous agent quality or arbitrary
-repositories. Issue #25 now provides the bounded comparison without admitting a broader
-segmentation default. The earliest remaining implementation gate is #26.
+repositories. Issue #25 provides the bounded comparison without admitting a broader segmentation
+default. ADR 0040 and issue #26 add exact source-alpha geometry without admitting a padding rule.
+The earliest remaining implementation gate is #27.
 
 ## Scope-selection rules
 
@@ -228,6 +229,7 @@ signature/IHDR validation
   -> None/Sub/Up/Average/Paeth reconstruction
   -> non-interlaced/Adam7 layout handling
   -> bounded row-major PNG-encoded RGBA8 for supported eight-bit inputs
+  -> exact encoded source-alpha geometry and evidence
 ```
 
 Supported raster inputs are eight-bit grayscale, RGB, grayscale-alpha, and RGBA without `tRNS`.
@@ -236,7 +238,9 @@ unavailability rather than fabricated pixels.
 
 Current evaluation includes:
 
-- 38 committed source-raster cases with independent exact pixel/unavailable/error oracles;
+- 43 committed source-raster cases with independent exact pixel/alpha/unavailable/error oracles;
+- five realistic transparent UI assets with separate acquisition/rule annotations, one targeted
+  mutation, two hard negatives, explicit abstention, and no protected holdout;
 - 30 committed image-inspection cases with independent region/gap/abstention/error oracles;
 - nine realistic image-segmentation benchmark cases with separate acquisition/rule annotations,
   public split declarations, targeted mutation, hard negatives, metamorphic variants, and bounded
@@ -266,7 +270,7 @@ blocking product path.
 
 - #22 — realistic UI acquisition/rule corpus (complete foundation);
 - #25 — broader background and scalable segmentation benchmark (complete; no admission);
-- #26 — exact alpha-visible geometry for transparent assets;
+- #26 — exact source-alpha geometry for transparent assets (complete; no rule admitted);
 - #27 — optional palette/sub-byte/16-bit/`tRNS` support after a custom-vs-library strategy and
   demonstrated product need.
 
@@ -468,7 +472,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0040 or later.
+- New architecture decision numbers continue at 0041 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -488,7 +492,7 @@ Every public behavior must satisfy the applicable matrix:
 | #23 | Playwright native/pixel web adapter |
 | #24 | zero-setup recommended rule packs |
 | #25 | completed background/segmentation benchmark research; strict default retained |
-| #26 | exact alpha-visible transparent-asset geometry |
+| #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | optional broader PNG format coverage and decoder strategy |
 | #28 | OCR/CV/VLM perception-worker protocol |
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |

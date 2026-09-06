@@ -1,0 +1,58 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "ruleOracle",
+  "annotationMethod": "Rule truth was reviewed separately from exact alpha acquisition; no alpha-padding rule is executable in this slice.",
+  "cases": [
+    {
+      "caseId": "northstar-compass",
+      "executableRule": null,
+      "semanticQuestion": "Does asymmetric transparent padding make the compass asset visually misaligned?",
+      "applicabilityGroundTruth": "cantTell",
+      "expectedOutcome": "untested",
+      "blockingAllowed": false,
+      "falsePositiveRisks": ["Optical centering can intentionally differ from rectangular inset equality.", "A consuming layout can compensate for source padding."],
+      "rationale": "The standalone source does not provide its layout role, alignment target, or padding policy."
+    },
+    {
+      "caseId": "northstar-compass-hidden-rgb",
+      "executableRule": null,
+      "semanticQuestion": "Does hidden RGB under zero alpha change the asset's UI quality?",
+      "applicabilityGroundTruth": "cantTell",
+      "expectedOutcome": "untested",
+      "blockingAllowed": false,
+      "falsePositiveRisks": ["Zero-alpha RGB may be preserved intentionally for authoring or later transforms.", "Source alpha geometry is invariant under this mutation."],
+      "rationale": "Hidden RGB is not displayed under the declared alpha predicate and no downstream transformation is known."
+    },
+    {
+      "caseId": "northstar-compass-padded",
+      "executableRule": null,
+      "semanticQuestion": "Are the added transparent margins an alignment or spacing defect?",
+      "applicabilityGroundTruth": "cantTell",
+      "expectedOutcome": "untested",
+      "blockingAllowed": false,
+      "falsePositiveRisks": ["Export canvases can intentionally reserve transparent space.", "Layout constraints may use the source canvas rather than visible ink."],
+      "rationale": "The targeted acquisition mutation does not supply an applicable product policy."
+    },
+    {
+      "caseId": "northstar-edge-badge",
+      "executableRule": null,
+      "semanticQuestion": "Does visible right-edge contact prove clipping or invalid padding?",
+      "applicabilityGroundTruth": "cantTell",
+      "expectedOutcome": "untested",
+      "blockingAllowed": false,
+      "falsePositiveRisks": ["Edge-flush artwork can be intentional.", "The source canvas does not reveal placement or clipping in a consuming UI."],
+      "rationale": "Exact edge occupancy alone cannot distinguish deliberate composition from a defect."
+    },
+    {
+      "caseId": "northstar-invisible-placeholder",
+      "executableRule": null,
+      "semanticQuestion": "Does transparent padding violate an alignment policy when the asset has no visible samples?",
+      "applicabilityGroundTruth": "inapplicable",
+      "expectedOutcome": "untested",
+      "blockingAllowed": false,
+      "falsePositiveRisks": ["Invisible placeholders or empty animation frames may be valid.", "Inventing a zero ink rectangle creates false geometry."],
+      "rationale": "There is no visible content to which an ink-padding obligation can apply."
+    }
+  ]
+}

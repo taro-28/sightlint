@@ -48,8 +48,8 @@ Issue #34's bounded execution sequence is complete:
 5. #33 — license, compatibility, packaging, and first alpha release (complete).
 
 Issue #25 is complete as an evaluation-only benchmark and did not admit a broader segmentation
-policy. The earliest remaining implementation gate is #26. Other preserved work is tracked in
-#27–#31.
+policy. Issue #26 adds exact source-alpha geometry without admitting an alpha-padding rule. The
+earliest remaining implementation gate is #27. Other preserved work is tracked in #28–#31.
 Existing stale code does not change priority.
 
 ## Non-negotiable workflow

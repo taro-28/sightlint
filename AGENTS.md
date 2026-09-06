@@ -98,9 +98,10 @@ Its bounded sequence is complete:
 5. #33 — licensing, compatibility, packaging, and first alpha release (complete).
 
 Issue #25 is complete as an evaluation-only benchmark; it did not replace the strict image
-inspection policy. The earliest remaining implementation gate is #26. Other work is preserved in
-#27–#31; later milestones do not automatically outrank it because historical code once existed on
-a stale branch. Explain any deviation from the remaining sequence in the issue and PR.
+inspection policy. Issue #26 adds exact source-alpha geometry without introducing a rule. The
+earliest remaining implementation gate is #27. Other work is preserved in #28–#31; later milestones
+do not automatically outrank it because historical code once existed on a stale branch. Explain
+any deviation from the remaining sequence in the issue and PR.
 
 ## Before editing
 
@@ -133,7 +134,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0040 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0041 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -158,7 +159,9 @@ baseline is:
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
+python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
+python3 tools/check_alpha_evaluation.py
 python3 tools/check_web_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
@@ -174,6 +177,7 @@ cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus

@@ -54,10 +54,11 @@ background, alternatives, and disposition of historical experiments.
 - [0037 — Source-first alpha release and compatibility contract](0037-first-alpha-release-contract.md)
 - [0038 — Workflow-artifact verification and immutable release-tag recovery](0038-release-artifact-transport-and-tag-recovery.md)
 - [0039 — Evaluate broader background hypotheses without changing the strict default](0039-background-segmentation-benchmark.md)
+- [0040 — Exact source-alpha geometry for supported PNG assets](0040-exact-source-alpha-geometry.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0040** or later.
+continue at **0041** or later.
 
 ## Historical branch decisions 0025–0029
 
@@ -93,4 +94,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0040.
+Use [the template](template.md) and the next unused number at or after 0041.

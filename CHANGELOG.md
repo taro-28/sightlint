@@ -5,6 +5,14 @@ independent compatibility surfaces changed by the release.
 
 ## Unreleased
 
+- Added exact source-alpha geometry for supported PNG rasters under ADR 0040: half-open visible and
+  opaque bounds, alpha-class counts, transparent insets, edge occupancy, dedicated exact-source
+  evidence, and an evidence-linked `inkBox` without compositing or semantic rule claims.
+- Versioned the PNG extension as `0.2.0` with `alphaGeometry@0.1.0`, preserving explicit
+  unavailability for unsupported rasters and absence of `inkBox` for entirely transparent assets.
+- Added a repository-owned five-case transparent UI asset evaluation with independent acquisition
+  and rule annotations, provenance/license/privacy declarations, hard negatives, explicit
+  abstention and non-holdout status, plus public-binary file/stdin determinism and mutation checks.
 - Added the evaluation-only `benchmark-image-segmentation` command and report schema `0.1.0` to
   compare the unchanged strict perimeter policy with ranked exact-border and 95%-qualified
   row-run policies without producing a rule result or blocking a build.

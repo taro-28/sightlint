@@ -257,7 +257,10 @@ Adapter/perception acquisition uses committed inputs and independently specified
 
 Current examples:
 
-- the 38-case PNG raster corpus compares complete decoded pixels and unavailability/errors;
+- the 43-case PNG raster corpus compares complete decoded pixels, source-alpha geometry, and
+  unavailability/errors;
+- the five-case transparent-asset evaluation keeps independent acquisition/rule annotations,
+  targeted mutation, hidden-RGB metamorphism, hard negatives, abstention, and non-holdout status;
 - the 30-case image-inspection corpus compares region bounds, groups, gaps, abstentions, evidence,
   and errors under the strict perimeter hypothesis;
 - the nine-case image-segmentation benchmark captures one realistic repository-owned application,
@@ -379,7 +382,9 @@ At handoff time, normal CI requires:
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
+python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
+python3 tools/check_alpha_evaluation.py
 python3 tools/check_web_evaluation.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
@@ -392,6 +397,7 @@ cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus

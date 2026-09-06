@@ -140,11 +140,14 @@ source bytes
   -> standard scanline-filter reconstruction
   -> non-interlaced/Adam7 pass mapping
   -> row-major PNG-encoded RGBA8 for supported eight-bit formats
+  -> exact source-alpha geometry for supported rasters
 ```
 
 The resulting bytes are source code values, not color-managed display values. Raw pixels stay
 inside the adapter API. The IR receives source/raster availability, bounded metadata, checksum,
-and exact-source evidence.
+and exact-source evidence. ADR 0040 also records bounds for `alpha > 0` and `alpha == 255`, sample
+counts, transparent insets, and edge occupancy. Only nonempty source-visible bounds become an
+evidence-linked device-pixel `inkBox`; this is not composited visibility or semantic whitespace.
 
 `inspect-image` consumes those pixels through a separate advisory contract. It can hypothesize one
 uniform opaque perimeter color and measure simple regions/gaps, but it does not create trusted
@@ -156,8 +159,8 @@ and connected pixels remain untrusted acquisition hypotheses. The report is not 
 CheckReport, contains no executable rule result, and cannot block. Its realistic fixture shows
 unsafe ranked selection and shadow-connected false grouping, so no broader policy is admitted.
 
-Further visible-geometry and format work is evidence-gated by issues #26 and #27. Do not merge
-historical branch implementations.
+Broader format work is evidence-gated by issue #27. Do not merge historical branch
+implementations.
 
 ## Perception workers
 

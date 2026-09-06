@@ -1,0 +1,132 @@
+{
+  "$schema": "./corpus.schema.json",
+  "schemaVersion": "0.1.0",
+  "corpus": {
+    "id": "sightlint-image-alpha-evaluation",
+    "version": "0.1.0",
+    "scope": "Exact source-alpha geometry for repository-owned transparent UI assets.",
+    "limitations": [
+      "One fictional asset family is not representative real-world evaluation.",
+      "Source alpha is not composited display visibility or semantic whitespace.",
+      "No executable alpha-padding rule or protected holdout exists."
+    ]
+  },
+  "source": {
+    "id": "northstar-alpha-assets",
+    "kind": "repositoryOwnedTransparentAssetFamily",
+    "origin": "evaluation/image-alpha/assets",
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "redistribution": "Repository-owned generated fixture bytes may be redistributed under the project license.",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "fictionalData": true,
+    "generator": "tools/generate_alpha_assets.py"
+  },
+  "dataGovernance": {
+    "assetGeneration": "deterministicIndependentFixtureGenerator",
+    "oracleAuthor": "maintainerSourceReview",
+    "implementationOutputIsOracle": false,
+    "prohibitedData": [
+      "customer artifacts",
+      "personal data",
+      "private application content",
+      "third-party trademarks or licensed artwork"
+    ],
+    "reviewStatus": "publicDevelopmentLabelsNotIndependentReview"
+  },
+  "splitPolicy": {
+    "smoke": "Public baseline command coverage.",
+    "development": "Visible targeted mutation and hidden-RGB metamorphic checks.",
+    "challenge": "Visible hard negatives for edge contact and entirely transparent content.",
+    "holdout": {
+      "status": "notEstablished",
+      "reason": "All five assets, annotations, and generator primitives are public to implementers.",
+      "requiredBeforeRuleAdmission": [
+        "multiple independently sourced asset families",
+        "independent qualified annotation and adjudication",
+        "frozen hidden cases not used for implementation tuning",
+        "downstream rule false-positive and abstention thresholds"
+      ]
+    }
+  },
+  "gates": {
+    "determinismRuns": 3,
+    "requiredAcquisitionCases": 5,
+    "requiredAcquisitionMutations": 1,
+    "maximumBlockingFindings": 0,
+    "requiredExtensionVersion": "0.2.0",
+    "requiredAlphaGeometryVersion": "0.1.0"
+  },
+  "annotations": {
+    "schema": "evaluation/image-alpha/annotation.schema.json",
+    "guide": "evaluation/image-alpha/annotation-guide.md",
+    "acquisition": "evaluation/image-alpha/annotations/acquisition.json",
+    "rules": "evaluation/image-alpha/annotations/rules.json"
+  },
+  "cases": [
+    {
+      "id": "northstar-compass",
+      "split": "smoke",
+      "classification": "baseline",
+      "sourceId": "northstar-alpha-assets",
+      "path": "evaluation/image-alpha/assets/northstar-compass.png",
+      "byteSha256": "50b7aafae6c6f893b34768222ce4199a3a3e4e6b61d55ca2eb7a609792499f42",
+      "features": ["disconnected sparkle", "internal transparent cutout", "opaque body", "translucent fringe and shadow", "transparent padding"]
+    },
+    {
+      "id": "northstar-compass-hidden-rgb",
+      "split": "development",
+      "classification": "metamorphic",
+      "sourceId": "northstar-alpha-assets",
+      "path": "evaluation/image-alpha/assets/northstar-compass-hidden-rgb.png",
+      "byteSha256": "1f8615370db9913625289eb0e5e8c1e7579a7ce0c73cb032cbc908b73bba0038",
+      "features": ["changed RGB under zero alpha", "unchanged visible and opaque alpha"],
+      "relation": {
+        "baselineCaseId": "northstar-compass",
+        "changedProperty": "RGB samples whose alpha is zero",
+        "preservedProperties": ["alpha samples", "alpha geometry", "canvas dimensions"]
+      }
+    },
+    {
+      "id": "northstar-compass-padded",
+      "split": "development",
+      "classification": "targetedMutation",
+      "sourceId": "northstar-alpha-assets",
+      "path": "evaluation/image-alpha/assets/northstar-compass-padded.png",
+      "byteSha256": "bdf5a307f14dce173907819fa941eda9b3eba1b4f9fe1d2d684f75a70a1b75a5",
+      "features": ["four-device-pixel transparent-padding mutation", "translated source ink", "unchanged visible sample counts"],
+      "relation": {
+        "baselineCaseId": "northstar-compass",
+        "changedProperty": "four transparent device pixels added on every canvas edge",
+        "preservedProperties": ["visible and opaque dimensions", "visible and opaque pixel counts", "source-alpha artwork"]
+      }
+    },
+    {
+      "id": "northstar-edge-badge",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "sourceId": "northstar-alpha-assets",
+      "path": "evaluation/image-alpha/assets/northstar-edge-badge.png",
+      "byteSha256": "03a0a610b83175c9b69286fb38ebe2594cebc1774bd712cc10c7e02df875926b",
+      "features": ["intentional right-edge contact", "internal transparent counter", "translucent outline"],
+      "hardNegative": {
+        "category": "intentional-edge-contact",
+        "rationale": "A source-visible asset touching one edge is exact geometry, not proof of clipping or defective padding."
+      }
+    },
+    {
+      "id": "northstar-invisible-placeholder",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "sourceId": "northstar-alpha-assets",
+      "path": "evaluation/image-alpha/assets/northstar-invisible-placeholder.png",
+      "byteSha256": "470af63407954c490d07dad8071705328bc7e0a9f7f7c8742098b1a0110e5e3a",
+      "features": ["entirely transparent", "nonzero hidden RGB", "no source-visible ink"],
+      "hardNegative": {
+        "category": "no-visible-content",
+        "rationale": "An entirely transparent asset has no evidence-based ink rectangle; a zero rectangle would invent an origin."
+      }
+    }
+  ]
+}

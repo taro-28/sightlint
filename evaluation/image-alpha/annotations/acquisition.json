@@ -1,0 +1,133 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "acquisitionOracle",
+  "annotationMethod": "Source primitive review under ADR 0040 alpha predicates; no SightLint output was used as an oracle.",
+  "cases": [
+    {
+      "caseId": "northstar-compass",
+      "canvas": { "width": 48, "height": 48, "unit": "devicePixel" },
+      "expectedStatus": "available",
+      "alpha": {
+        "visibleBounds": [9, 6, 33, 31],
+        "opaqueBounds": [10, 8, 31, 27],
+        "transparentInsets": { "top": 6, "right": 6, "bottom": 11, "left": 9 },
+        "pixelCounts": { "total": 2304, "visible": 465, "opaque": 333, "translucent": 132, "transparent": 1839 },
+        "visibleEdgePixels": {
+          "top": { "count": 0, "denominator": 48 },
+          "right": { "count": 0, "denominator": 48 },
+          "bottom": { "count": 0, "denominator": 48 },
+          "left": { "count": 0, "denominator": 48 }
+        },
+        "entirelyTransparent": false,
+        "allPixelsVisible": false,
+        "expectedInkBox": [9, 6, 33, 31],
+        "evidenceId": "evidence:png-alpha",
+        "unit": "devicePixel",
+        "boundsFormat": "xywh-half-open"
+      },
+      "annotationBasis": "independentFixtureSourceAndMaintainerReview",
+      "abstentions": ["Source alpha does not establish final composited appearance or whether the transparent padding is desirable."]
+    },
+    {
+      "caseId": "northstar-compass-hidden-rgb",
+      "canvas": { "width": 48, "height": 48, "unit": "devicePixel" },
+      "expectedStatus": "available",
+      "alpha": {
+        "visibleBounds": [9, 6, 33, 31],
+        "opaqueBounds": [10, 8, 31, 27],
+        "transparentInsets": { "top": 6, "right": 6, "bottom": 11, "left": 9 },
+        "pixelCounts": { "total": 2304, "visible": 465, "opaque": 333, "translucent": 132, "transparent": 1839 },
+        "visibleEdgePixels": {
+          "top": { "count": 0, "denominator": 48 },
+          "right": { "count": 0, "denominator": 48 },
+          "bottom": { "count": 0, "denominator": 48 },
+          "left": { "count": 0, "denominator": 48 }
+        },
+        "entirelyTransparent": false,
+        "allPixelsVisible": false,
+        "expectedInkBox": [9, 6, 33, 31],
+        "evidenceId": "evidence:png-alpha",
+        "unit": "devicePixel",
+        "boundsFormat": "xywh-half-open"
+      },
+      "annotationBasis": "independentFixtureSourceAndMaintainerReview",
+      "abstentions": ["Hidden RGB differences are preserved source facts but cannot change visibility when alpha remains zero."]
+    },
+    {
+      "caseId": "northstar-compass-padded",
+      "canvas": { "width": 56, "height": 56, "unit": "devicePixel" },
+      "expectedStatus": "available",
+      "alpha": {
+        "visibleBounds": [13, 10, 33, 31],
+        "opaqueBounds": [14, 12, 31, 27],
+        "transparentInsets": { "top": 10, "right": 10, "bottom": 15, "left": 13 },
+        "pixelCounts": { "total": 3136, "visible": 465, "opaque": 333, "translucent": 132, "transparent": 2671 },
+        "visibleEdgePixels": {
+          "top": { "count": 0, "denominator": 56 },
+          "right": { "count": 0, "denominator": 56 },
+          "bottom": { "count": 0, "denominator": 56 },
+          "left": { "count": 0, "denominator": 56 }
+        },
+        "entirelyTransparent": false,
+        "allPixelsVisible": false,
+        "expectedInkBox": [13, 10, 33, 31],
+        "evidenceId": "evidence:png-alpha",
+        "unit": "devicePixel",
+        "boundsFormat": "xywh-half-open"
+      },
+      "annotationBasis": "independentFixtureSourceAndMaintainerReview",
+      "abstentions": ["A transparent-padding mutation is an acquisition target, not an asserted product defect."]
+    },
+    {
+      "caseId": "northstar-edge-badge",
+      "canvas": { "width": 40, "height": 24, "unit": "devicePixel" },
+      "expectedStatus": "available",
+      "alpha": {
+        "visibleBounds": [5, 3, 35, 18],
+        "opaqueBounds": [6, 4, 34, 16],
+        "transparentInsets": { "top": 3, "right": 0, "bottom": 3, "left": 5 },
+        "pixelCounts": { "total": 960, "visible": 574, "opaque": 502, "translucent": 72, "transparent": 386 },
+        "visibleEdgePixels": {
+          "top": { "count": 0, "denominator": 40 },
+          "right": { "count": 18, "denominator": 24 },
+          "bottom": { "count": 0, "denominator": 40 },
+          "left": { "count": 0, "denominator": 24 }
+        },
+        "entirelyTransparent": false,
+        "allPixelsVisible": false,
+        "expectedInkBox": [5, 3, 35, 18],
+        "evidenceId": "evidence:png-alpha",
+        "unit": "devicePixel",
+        "boundsFormat": "xywh-half-open"
+      },
+      "annotationBasis": "independentFixtureSourceAndMaintainerReview",
+      "abstentions": ["Right-edge occupancy is intentional in this asset and does not prove clipping or insufficient padding."]
+    },
+    {
+      "caseId": "northstar-invisible-placeholder",
+      "canvas": { "width": 24, "height": 24, "unit": "devicePixel" },
+      "expectedStatus": "available",
+      "alpha": {
+        "visibleBounds": null,
+        "opaqueBounds": null,
+        "transparentInsets": null,
+        "pixelCounts": { "total": 576, "visible": 0, "opaque": 0, "translucent": 0, "transparent": 576 },
+        "visibleEdgePixels": {
+          "top": { "count": 0, "denominator": 24 },
+          "right": { "count": 0, "denominator": 24 },
+          "bottom": { "count": 0, "denominator": 24 },
+          "left": { "count": 0, "denominator": 24 }
+        },
+        "entirelyTransparent": true,
+        "allPixelsVisible": false,
+        "expectedInkBox": null,
+        "evidenceId": "evidence:png-alpha",
+        "unit": "devicePixel",
+        "boundsFormat": "xywh-half-open"
+      },
+      "annotationBasis": "independentFixtureSourceAndMaintainerReview",
+      "abstentions": ["No source-visible sample exists, so an ink rectangle must remain absent rather than choosing an arbitrary origin."]
+    }
+  ]
+}

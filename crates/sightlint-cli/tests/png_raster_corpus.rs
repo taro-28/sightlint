@@ -8,7 +8,7 @@ use std::path::PathBuf;
 use std::process::{Command, Output, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use serde_json::Value;
+use serde_json::{Value, json};
 use sightlint_adapter_png::{PngRasterStatus, observe_png_raster};
 
 const CORPUS: &str = include_str!("../../../fixtures/png-raster/corpus.json");
@@ -17,7 +17,7 @@ static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 fn cases() -> Vec<Value> {
     let corpus: Value = serde_json::from_str(CORPUS).expect("committed corpus JSON");
-    assert_eq!(corpus["version"], "0.1.0");
+    assert_eq!(corpus["version"], "0.2.0");
     assert_eq!(corpus["scope"], "source-raster-conformance");
     assert_eq!(corpus["reviewStatus"], "synthetic-not-human-validated");
     corpus["cases"].as_array().expect("corpus cases").clone()
@@ -146,7 +146,9 @@ fn assert_api(case: &Value, png: &[u8]) {
 
 fn assert_metadata(case: &Value, ir: &Value) {
     let id = text(case, "id");
-    let raster = &ir["extensions"][EXTENSION]["encodedRgba8Raster"];
+    let extension = &ir["extensions"][EXTENSION];
+    assert_eq!(extension["version"], "0.2.0", "{id}");
+    let raster = &extension["encodedRgba8Raster"];
     assert_eq!(raster["version"], "0.1.0", "{id}");
     assert_eq!(raster["status"], case["status"], "{id}");
     assert_eq!(raster["encoding"], "pngEncodedRgba8", "{id}");
@@ -186,7 +188,78 @@ fn assert_metadata(case: &Value, ir: &Value) {
     // ArtifactIr intentionally omits empty relations (model.rs: skip_serializing_if).
     assert!(ir.get("relations").is_none(), "{id}: invented relations");
     assert!(ir["nodes"][0].get("role").is_none());
-    assert!(ir["nodes"][0]["geometry"].get("inkBox").is_none());
+    assert_alpha_metadata(case, ir);
+}
+
+fn assert_alpha_metadata(case: &Value, ir: &Value) {
+    let id = text(case, "id");
+    let alpha = &ir["extensions"][EXTENSION]["alphaGeometry"];
+    if case["status"] == "unavailable" {
+        assert_eq!(
+            alpha,
+            &json!({
+                "version": "0.1.0",
+                "status": "unavailable",
+                "reason": case["reason"]
+            }),
+            "{id}"
+        );
+        assert!(ir["nodes"][0]["geometry"].get("inkBox").is_none());
+        assert!(
+            ir["evidence"]
+                .as_array()
+                .expect("evidence")
+                .iter()
+                .all(|item| item["id"] != "evidence:png-alpha"),
+            "{id}: unsupported alpha invented evidence"
+        );
+        return;
+    }
+
+    let mut expected = case["alpha"].clone();
+    let expected = expected.as_object_mut().expect("alpha oracle object");
+    expected.insert("version".to_owned(), json!("0.1.0"));
+    expected.insert("status".to_owned(), json!("available"));
+    expected.insert(
+        "sourceAlphaEncoding".to_owned(),
+        json!("unassociatedPngEncodedAlpha8"),
+    );
+    expected.insert("visiblePredicate".to_owned(), json!("alphaGreaterThanZero"));
+    expected.insert("opaquePredicate".to_owned(), json!("alphaEquals255"));
+    expected.insert("coordinateSpaceId".to_owned(), json!("canvas"));
+    expected.insert("unit".to_owned(), json!("devicePixel"));
+    expected.insert("boundsFormat".to_owned(), json!("xywh-half-open"));
+    expected.insert("evidenceId".to_owned(), json!("evidence:png-alpha"));
+    assert_eq!(alpha, &Value::Object(expected.clone()), "{id}");
+
+    let ink = ir["nodes"][0]["geometry"].get("inkBox");
+    match case["alpha"]["visibleBounds"].as_array() {
+        Some(bounds) => {
+            let ink = ink.expect("visible alpha must produce inkBox");
+            assert_eq!(ink["coordinateSpaceId"], "canvas", "{id}");
+            assert_eq!(ink["evidenceId"], "evidence:png-alpha", "{id}");
+            for (field, index) in [("x", 0), ("y", 1), ("width", 2), ("height", 3)] {
+                assert_eq!(
+                    ink["rect"][field].as_f64(),
+                    bounds[index].as_f64(),
+                    "{id}: {field}"
+                );
+            }
+        }
+        None => assert!(ink.is_none(), "{id}: transparent image invented inkBox"),
+    }
+    let evidence = ir["evidence"]
+        .as_array()
+        .expect("evidence")
+        .iter()
+        .find(|item| item["id"] == "evidence:png-alpha")
+        .expect("alpha provenance resolves");
+    assert_eq!(evidence["class"], "exactSource", "{id}");
+    assert_eq!(evidence["source"]["externalProcessing"], false, "{id}");
+    assert_eq!(
+        evidence["selector"]["nativeId"], "IDAT/encoded-rgba8-v1/alpha8",
+        "{id}"
+    );
 }
 
 fn without_source_name(mut ir: Value) -> Value {
@@ -287,7 +360,7 @@ fn native_bytes_match_pixel_oracles_through_api_and_public_binary() {
 #[test]
 fn corpus_cannot_silently_drop_the_required_format_and_failure_matrix() {
     let cases = cases();
-    assert_eq!(cases.len(), 38);
+    assert_eq!(cases.len(), 43);
     let ids: BTreeSet<&str> = cases.iter().map(|case| text(case, "id")).collect();
     assert_eq!(ids.len(), cases.len());
     for color in [0, 2, 4, 6] {
@@ -301,6 +374,11 @@ fn corpus_cannot_silently_drop_the_required_format_and_failure_matrix() {
         "adam7-1x5",
         "adam7-5x1",
         "adam7-8x8",
+        "alpha-transparent-border",
+        "alpha-translucent-only",
+        "alpha-ring-hole-edge",
+        "alpha-hidden-rgb-a",
+        "alpha-hidden-rgb-b",
         "unmanaged-gamma",
         "indexed",
         "packed",

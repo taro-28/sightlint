@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0040 or later. -->
+0041 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -58,7 +58,9 @@ observation/advisory report is not a trusted CheckReport failure. -->
 
 - [ ] `python3 tools/generate_e2e_fixtures.py --check`
 - [ ] `python3 tools/generate_raster_corpus.py --check`
+- [ ] `python3 tools/generate_alpha_assets.py --check`
 - [ ] `python3 tools/generate_inspection_corpus.py --check`
+- [ ] `python3 tools/check_alpha_evaluation.py`
 - [ ] `python3 tools/check_web_evaluation.py`
 - [ ] `python3 tools/release.py validate-tag --tag v0.1.0-alpha.2`
 - [ ] `python3 tools/check_dependency_licenses.py`
@@ -74,6 +76,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `cargo test --locked -p sightlint-cli --test e2e`
 - [ ] `cargo test --locked -p sightlint-cli --test png_filter_e2e`
 - [ ] `cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture`
+- [ ] `cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test evaluation_corpus`

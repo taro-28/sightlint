@@ -98,6 +98,9 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ["evaluation/web/browser-acquisition.schema.json", "evaluation/web/annotations/browser-acquisition.json"],
     ["evaluation/web/browser-rule.schema.json", "evaluation/web/annotations/browser-rules.json"],
     ["evaluation/web/agent-workflow.schema.json", "evaluation/web/annotations/agent-workflow.json"],
+    ["evaluation/image-alpha/corpus.schema.json", "evaluation/image-alpha/corpus.json"],
+    ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/acquisition.json"],
+    ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/rules.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {
@@ -105,6 +108,40 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     const validate = ajv.compile(await json(schemaPath) as AnySchema);
     assert.equal(validate(await json(documentPath)), true, `${documentPath}: ${ajv.errorsText(validate.errors)}`);
   }
+});
+
+test("PNG extension 0.2 schema is strict and compiles", async () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  const validate = ajv.compile(await json("crates/sightlint-adapter-png/schemas/png-extension-0.2.0.schema.json") as AnySchema);
+  const annotations = await json("evaluation/image-alpha/annotations/acquisition.json") as {
+    cases: Array<{ alpha: Record<string, unknown> }>;
+  };
+  const alpha = structuredClone(annotations.cases[0]!.alpha);
+  delete alpha["expectedInkBox"];
+  Object.assign(alpha, {
+    version: "0.1.0",
+    status: "available",
+    sourceAlphaEncoding: "unassociatedPngEncodedAlpha8",
+    visiblePredicate: "alphaGreaterThanZero",
+    opaquePredicate: "alphaEquals255",
+    coordinateSpaceId: "canvas",
+  });
+  const extension = {
+    version: "0.2.0", bitDepth: 8, colorType: 6, compressionMethod: 0, filterMethod: 0,
+    interlaceMethod: 0, chunkCount: 3, idatChunkCount: 1, idatBytes: 1,
+    hasPalette: false, inflatedScanlineBytes: 9264, reconstructedPackedSampleBytes: 9216,
+    nonEmptyPassCount: 1,
+    encodedRgba8Raster: {
+      version: "0.1.0", encoding: "pngEncodedRgba8", colorManagementApplied: false,
+      evidenceId: "evidence:png-raster", status: "available", width: 48, height: 48,
+      byteCount: 9216, byteCrc32: "35ac49cb",
+    },
+    alphaGeometry: alpha,
+  };
+  assert.equal(validate(extension), true, ajv.errorsText(validate.errors));
+  Object.assign(extension, { unexpected: true });
+  assert.equal(validate(extension), false);
+  assert.match(ajv.errorsText(validate.errors), /additional properties/u);
 });
 
 test("workflow report schema compiles with the capture response compatibility surface", async () => {

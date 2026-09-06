@@ -19,7 +19,12 @@ fn corpus(directory: &str) -> Vec<Value> {
         .join("corpus.json");
     let value: Value = serde_json::from_slice(&fs::read(path).expect("committed corpus"))
         .expect("valid corpus JSON");
-    assert_eq!(value["version"], "0.1.0");
+    let expected_version = if directory == "png-raster" {
+        "0.2.0"
+    } else {
+        "0.1.0"
+    };
+    assert_eq!(value["version"], expected_version);
     value["cases"].as_array().expect("case array").clone()
 }
 
