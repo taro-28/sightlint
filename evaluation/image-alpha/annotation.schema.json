@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:image-alpha-annotation:0.1.0",
+  "title": "SightLint source-alpha acquisition or rule oracle",
+  "oneOf": [
+    { "$ref": "#/$defs/acquisitionDocument" },
+    { "$ref": "#/$defs/ruleDocument" }
+  ],
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+    "bounds": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 1 },
+        { "type": "integer", "minimum": 1 }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "nullableBounds": { "oneOf": [{ "$ref": "#/$defs/bounds" }, { "type": "null" }] },
+    "edgeCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "denominator"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "alphaExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibleBounds", "opaqueBounds", "transparentInsets", "pixelCounts", "visibleEdgePixels", "entirelyTransparent", "allPixelsVisible", "expectedInkBox", "evidenceId", "unit", "boundsFormat"],
+      "properties": {
+        "visibleBounds": { "$ref": "#/$defs/nullableBounds" },
+        "opaqueBounds": { "$ref": "#/$defs/nullableBounds" },
+        "transparentInsets": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["top", "right", "bottom", "left"],
+              "properties": {
+                "top": { "type": "integer", "minimum": 0 },
+                "right": { "type": "integer", "minimum": 0 },
+                "bottom": { "type": "integer", "minimum": 0 },
+                "left": { "type": "integer", "minimum": 0 }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "pixelCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total", "visible", "opaque", "translucent", "transparent"],
+          "properties": {
+            "total": { "type": "integer", "minimum": 1 },
+            "visible": { "type": "integer", "minimum": 0 },
+            "opaque": { "type": "integer", "minimum": 0 },
+            "translucent": { "type": "integer", "minimum": 0 },
+            "transparent": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "visibleEdgePixels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["top", "right", "bottom", "left"],
+          "properties": {
+            "top": { "$ref": "#/$defs/edgeCount" },
+            "right": { "$ref": "#/$defs/edgeCount" },
+            "bottom": { "$ref": "#/$defs/edgeCount" },
+            "left": { "$ref": "#/$defs/edgeCount" }
+          }
+        },
+        "entirelyTransparent": { "type": "boolean" },
+        "allPixelsVisible": { "type": "boolean" },
+        "expectedInkBox": { "$ref": "#/$defs/nullableBounds" },
+        "evidenceId": { "const": "evidence:png-alpha" },
+        "unit": { "const": "devicePixel" },
+        "boundsFormat": { "const": "xywh-half-open" }
+      }
+    },
+    "acquisitionCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "canvas", "expectedStatus", "alpha", "annotationBasis", "abstentions"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" },
+        "canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["width", "height", "unit"],
+          "properties": {
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "unit": { "const": "devicePixel" }
+          }
+        },
+        "expectedStatus": { "const": "available" },
+        "alpha": { "$ref": "#/$defs/alphaExpectation" },
+        "annotationBasis": { "const": "independentFixtureSourceAndMaintainerReview" },
+        "abstentions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "ruleCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "executableRule", "semanticQuestion", "applicabilityGroundTruth", "expectedOutcome", "blockingAllowed", "falsePositiveRisks", "rationale"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" },
+        "executableRule": { "type": "null" },
+        "semanticQuestion": { "$ref": "#/$defs/text" },
+        "applicabilityGroundTruth": { "enum": ["cantTell", "inapplicable"] },
+        "expectedOutcome": { "const": "untested" },
+        "blockingAllowed": { "const": false },
+        "falsePositiveRisks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "acquisitionDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schemaVersion", "documentType", "annotationMethod", "cases"],
+      "properties": {
+        "$schema": { "const": "../annotation.schema.json" },
+        "schemaVersion": { "const": "0.1.0" },
+        "documentType": { "const": "acquisitionOracle" },
+        "annotationMethod": { "$ref": "#/$defs/text" },
+        "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/acquisitionCase" } }
+      }
+    },
+    "ruleDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["$schema", "schemaVersion", "documentType", "annotationMethod", "cases"],
+      "properties": {
+        "$schema": { "const": "../annotation.schema.json" },
+        "schemaVersion": { "const": "0.1.0" },
+        "documentType": { "const": "ruleOracle" },
+        "annotationMethod": { "$ref": "#/$defs/text" },
+        "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ruleCase" } }
+      }
+    }
+  }
+}

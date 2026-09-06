@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:adapter-png-extension:0.2.0",
+  "title": "SightLint PNG adapter extension 0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "bitDepth",
+    "colorType",
+    "compressionMethod",
+    "filterMethod",
+    "interlaceMethod",
+    "chunkCount",
+    "idatChunkCount",
+    "idatBytes",
+    "hasPalette",
+    "inflatedScanlineBytes",
+    "reconstructedPackedSampleBytes",
+    "nonEmptyPassCount",
+    "encodedRgba8Raster",
+    "alphaGeometry"
+  ],
+  "properties": {
+    "version": { "const": "0.2.0" },
+    "bitDepth": { "type": "integer", "minimum": 1, "maximum": 16 },
+    "colorType": { "enum": [0, 2, 3, 4, 6] },
+    "compressionMethod": { "const": 0 },
+    "filterMethod": { "const": 0 },
+    "interlaceMethod": { "enum": [0, 1] },
+    "chunkCount": { "type": "integer", "minimum": 3 },
+    "idatChunkCount": { "type": "integer", "minimum": 1 },
+    "idatBytes": { "type": "integer", "minimum": 0 },
+    "hasPalette": { "type": "boolean" },
+    "inflatedScanlineBytes": { "type": "integer", "minimum": 0 },
+    "reconstructedPackedSampleBytes": { "type": "integer", "minimum": 0 },
+    "nonEmptyPassCount": { "type": "integer", "minimum": 1, "maximum": 7 },
+    "encodedRgba8Raster": { "$ref": "#/$defs/raster" },
+    "alphaGeometry": { "$ref": "#/$defs/alphaGeometry" }
+  },
+  "$defs": {
+    "reason": {
+      "enum": [
+        "indexedColor",
+        "unsupportedBitDepth",
+        "transparencyChunk",
+        "animationChunks",
+        "bufferTooLarge"
+      ]
+    },
+    "raster": {
+      "oneOf": [
+        { "$ref": "#/$defs/rasterAvailable" },
+        { "$ref": "#/$defs/rasterUnavailable" }
+      ]
+    },
+    "rasterCommon": {
+      "type": "object",
+      "properties": {
+        "version": { "const": "0.1.0" },
+        "encoding": { "const": "pngEncodedRgba8" },
+        "colorManagementApplied": { "const": false },
+        "evidenceId": { "const": "evidence:png-raster" }
+      }
+    },
+    "rasterAvailable": {
+      "allOf": [
+        { "$ref": "#/$defs/rasterCommon" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "encoding", "colorManagementApplied", "evidenceId", "status", "width", "height", "byteCount", "byteCrc32"],
+          "properties": {
+            "version": { "const": "0.1.0" },
+            "encoding": { "const": "pngEncodedRgba8" },
+            "colorManagementApplied": { "const": false },
+            "evidenceId": { "const": "evidence:png-raster" },
+            "status": { "const": "available" },
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "byteCount": { "type": "integer", "minimum": 4 },
+            "byteCrc32": { "type": "string", "pattern": "^[0-9a-f]{8}$" }
+          }
+        }
+      ]
+    },
+    "rasterUnavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "encoding", "colorManagementApplied", "evidenceId", "status", "reason"],
+      "properties": {
+        "version": { "const": "0.1.0" },
+        "encoding": { "const": "pngEncodedRgba8" },
+        "colorManagementApplied": { "const": false },
+        "evidenceId": { "const": "evidence:png-raster" },
+        "status": { "const": "unavailable" },
+        "reason": { "$ref": "#/$defs/reason" },
+        "requiredBytes": { "type": "integer", "minimum": 1 },
+        "limitBytes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "bounds": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 1 },
+        { "type": "integer", "minimum": 1 }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "edgeCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "denominator"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "alphaGeometry": {
+      "oneOf": [
+        { "$ref": "#/$defs/alphaAvailable" },
+        { "$ref": "#/$defs/alphaUnavailable" }
+      ]
+    },
+    "alphaAvailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "status",
+        "sourceAlphaEncoding",
+        "visiblePredicate",
+        "opaquePredicate",
+        "coordinateSpaceId",
+        "unit",
+        "boundsFormat",
+        "evidenceId",
+        "visibleBounds",
+        "opaqueBounds",
+        "transparentInsets",
+        "pixelCounts",
+        "visibleEdgePixels",
+        "entirelyTransparent",
+        "allPixelsVisible"
+      ],
+      "properties": {
+        "version": { "const": "0.1.0" },
+        "status": { "const": "available" },
+        "sourceAlphaEncoding": { "const": "unassociatedPngEncodedAlpha8" },
+        "visiblePredicate": { "const": "alphaGreaterThanZero" },
+        "opaquePredicate": { "const": "alphaEquals255" },
+        "coordinateSpaceId": { "const": "canvas" },
+        "unit": { "const": "devicePixel" },
+        "boundsFormat": { "const": "xywh-half-open" },
+        "evidenceId": { "const": "evidence:png-alpha" },
+        "visibleBounds": { "oneOf": [{ "$ref": "#/$defs/bounds" }, { "type": "null" }] },
+        "opaqueBounds": { "oneOf": [{ "$ref": "#/$defs/bounds" }, { "type": "null" }] },
+        "transparentInsets": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["top", "right", "bottom", "left"],
+              "properties": {
+                "top": { "type": "integer", "minimum": 0 },
+                "right": { "type": "integer", "minimum": 0 },
+                "bottom": { "type": "integer", "minimum": 0 },
+                "left": { "type": "integer", "minimum": 0 }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "pixelCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total", "visible", "opaque", "translucent", "transparent"],
+          "properties": {
+            "total": { "type": "integer", "minimum": 1 },
+            "visible": { "type": "integer", "minimum": 0 },
+            "opaque": { "type": "integer", "minimum": 0 },
+            "translucent": { "type": "integer", "minimum": 0 },
+            "transparent": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "visibleEdgePixels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["top", "right", "bottom", "left"],
+          "properties": {
+            "top": { "$ref": "#/$defs/edgeCount" },
+            "right": { "$ref": "#/$defs/edgeCount" },
+            "bottom": { "$ref": "#/$defs/edgeCount" },
+            "left": { "$ref": "#/$defs/edgeCount" }
+          }
+        },
+        "entirelyTransparent": { "type": "boolean" },
+        "allPixelsVisible": { "type": "boolean" }
+      }
+    },
+    "alphaUnavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "status", "reason"],
+      "properties": {
+        "version": { "const": "0.1.0" },
+        "status": { "const": "unavailable" },
+        "reason": { "$ref": "#/$defs/reason" }
+      }
+    }
+  }
+}
