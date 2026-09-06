@@ -11,12 +11,12 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #60, a focused child of #29, started from this verified green `main` baseline:
+The branch for issue #30 started from this verified green `main` baseline:
 
-- commit: `0896a1742e9283e92aa72d7ef7db93c2b33153d0`
-- tree: `c44da0ef5fe3052b40af6cf3349578f0d2dd54e0`
-- merged PR: #59
-- main CI: run 34017702706, all six jobs successful
+- commit: `bf19b0e7da6bdf50b9e061e747ff49d23477b049`
+- tree: `25d86902cfd65898ea2ff737a07c9b69016469ba`
+- merged PR: #61
+- main CI: run 34021165856, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -718,6 +718,25 @@ SightLint treats tests as part of the product specification.
 
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
+### Interaction contract and controlled-trace slice
+
+ADR 0047 and issue #30 add:
+
+- optional medium-neutral `org.sightlint.interaction@0.1.0` actions, declared effect latency,
+  recovery alternatives, captured/`untested` traces, controlled environment, ordered events,
+  attempt/causal IDs, and retained conflicts;
+- the local `sightlint-interaction` Playwright process over a realistic repository-owned Atlas
+  account-settings app, with fixed controlled steps, denied external network, and bounded output;
+- sequential DOM, accessibility, and screenshot capture for each named step plus separate
+  app-declared effect events; screenshot bytes are ephemeral and pixels never prove invisible
+  effects;
+- advisory `interaction.async-feedback@0.1.0` and
+  `interaction.failure-recovery@0.1.0` base-profile rules;
+- eight public cases with separate acquisition/rule truth, 35 reviewed acquisition facts, two
+  killed mutations, a save-draft hard negative, `cantTell`, inapplicable, and `untested` paths;
+- no protected holdout, independent review, representative product accuracy, blocking policy,
+  real-network timing, or general application support.
+
 ### Required normal CI
 
 The normal workflow is read-only and includes:
@@ -746,7 +765,7 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - automatic peer-role or design-intent inference;
 - trusted spacing failures derived only from image grouping;
 - color management, compositing, or trusted contrast from PNG samples;
-- arbitrary-URL, iframe, shadow-DOM, full accessibility-tree, or interaction capture;
+- arbitrary-URL, iframe, shadow-DOM, full accessibility-tree, or arbitrary interaction capture;
 - automatic semantic peer inference from Playwright output;
 - broad PDF/document parsing beyond explicit page boxes and rectangular internal Link annotations,
   including text/tags/paint/actions/forms/viewer behavior;
@@ -759,7 +778,8 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - broad PPTX coverage beyond direct unrotated shapes/groups, or a PPTX-specific recommended rule;
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
-- dynamic interaction traces, pending/error/recovery/destructive-action rules;
+- broad interaction support beyond the controlled Atlas slice, including offline, permission,
+  stale-data, partial success, destructive safeguards, undo, focus/navigation, and mobile traces;
 - MCP, GitHub Checks annotations, editor extension, browser extension, or local GUI;
 - broad automatic fixes;
 - prebuilt binaries, Cargo/npm publication, package-manager installers, signed artifacts, or
@@ -821,13 +841,13 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
   three-state differential regression. Real model calibration/accuracy remains `untested`.
 - **#29 (PPTX, PDF, Android, and iOS slices implemented):** ADRs 0043–0046 provide bounded local
   source/capture adapters and separate regression corpora.
-- **#30:** interaction actions/effects/states/traces and recovery contracts.
+- **#30 (complete for the bounded first slice):** medium-neutral actions/effects/states,
+  deterministic controlled traces, async feedback, and declared recovery alternatives.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The bounded first slices inside #29 are implemented. The next preserved product issue is #30 for
-interaction actions/effects/states/traces and recovery. Later expansion remains demand- and
-evidence-gated; the completed alpha, benchmark, and bounded structured-adapter slices do not make
-stale branches authoritative.
+The bounded first slices inside #29 and #30 are implemented. The next preserved product issue is
+#31 for ecosystem surfaces. Later expansion remains demand- and evidence-gated; the completed
+alpha, benchmark, and bounded adapter slices do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.

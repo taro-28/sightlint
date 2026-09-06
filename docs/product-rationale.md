@@ -481,7 +481,8 @@ The following remain intentionally unresolved or evidence-gated:
   slices;
 - perception models/runtimes and calibration requirements;
 - exact formats and decoder strategy if new product evidence re-admits unsupported PNG coverage;
-- interaction trace schema;
+- broader interaction contracts beyond ADR 0047, including offline/permission/stale/partial,
+  destructive safeguards, focus/navigation, and mobile adapters;
 - later registry/binary distribution, signing, and attestation policy beyond the source alpha;
 - telemetry/hosted-service policy if ever proposed.
 

@@ -8,7 +8,7 @@ use schemars::{JsonSchema, schema_for};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{ArtifactIr, EvidenceClass, Identifier, serialize_canonical};
+use crate::{ArtifactIr, EvidenceClass, Identifier, Size, Unit, serialize_canonical};
 
 /// Artifact IR extension key for medium-neutral interaction contracts and traces.
 pub const INTERACTION_EXTENSION_KEY: &str = "org.sightlint.interaction";
@@ -135,6 +135,66 @@ pub enum TraceExecution {
     },
 }
 
+/// Deterministic environment facts required to reproduce a normalized trace.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct TraceEnvironment {
+    /// Ordering source used instead of a raw wall clock.
+    pub clock: TraceClock,
+    /// Network mode used by the controlled execution.
+    pub network: TraceNetwork,
+    /// Viewport or screen size observed during state capture.
+    pub viewport_size: Size,
+    /// Explicit unit for the viewport or screen size.
+    pub viewport_unit: Unit,
+    /// Locale selected for the controlled execution.
+    pub locale: String,
+    /// Timezone identifier selected for the controlled execution.
+    pub timezone_id: String,
+    /// Color-scheme preference selected for the controlled execution.
+    pub color_scheme: TraceColorScheme,
+    /// Reduced-motion preference selected for the controlled execution.
+    pub reduced_motion: TraceReducedMotion,
+    /// Whether artifact content left the local execution boundary.
+    pub external_processing: bool,
+}
+
+/// Deterministic ordering source for trace events.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum TraceClock {
+    /// Adapter-assigned controlled step sequence with no wall-clock timestamps.
+    ControlledSteps,
+}
+
+/// Network behavior for a controlled trace.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum TraceNetwork {
+    /// All non-local requests were denied.
+    DenyExternal,
+}
+
+/// Color-scheme preference applied during controlled acquisition.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum TraceColorScheme {
+    /// A light color scheme was requested.
+    Light,
+    /// A dark color scheme was requested.
+    Dark,
+}
+
+/// Motion preference applied during controlled acquisition.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum TraceReducedMotion {
+    /// Reduced motion was requested.
+    Reduce,
+    /// No reduced-motion preference was requested.
+    NoPreference,
+}
+
 /// Reconciliation status across native, accessibility, rendered, and declared observations.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(
@@ -220,12 +280,11 @@ pub struct TraceEvent {
     /// Evidence records supporting this event.
     pub evidence_ids: Vec<Identifier>,
     /// Typed event payload.
-    #[serde(flatten)]
     pub detail: TraceEventDetail,
 }
 
 /// One action trace, including explicit untested and conflict states.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct InteractionTrace {
     /// Stable trace identifier.
@@ -234,6 +293,8 @@ pub struct InteractionTrace {
     pub action_id: Identifier,
     /// Whether the controlled execution ran.
     pub execution: TraceExecution,
+    /// Controlled environment in which acquisition was attempted.
+    pub environment: TraceEnvironment,
     /// Cross-source agreement or retained conflict.
     pub consistency: TraceConsistency,
     /// Canonically ordered events; empty only for an untested trace.
@@ -241,7 +302,7 @@ pub struct InteractionTrace {
 }
 
 /// Typed payload stored under [`INTERACTION_EXTENSION_KEY`].
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct InteractionExtension {
     /// Independent extension contract version.
@@ -553,6 +614,39 @@ fn validate_trace_status(
     path: &str,
     validator: &mut InteractionValidator,
 ) {
+    for (field, value) in [
+        ("width", trace.environment.viewport_size.width),
+        ("height", trace.environment.viewport_size.height),
+    ] {
+        if !value.is_finite() || value <= 0.0 {
+            validator.issue(
+                InteractionValidationCode::InvalidValue,
+                format!("{path}/environment/viewportSize/{field}"),
+                "viewport dimensions must be finite and greater than zero",
+            );
+        }
+    }
+    if trace.environment.viewport_unit == Unit::Normalized {
+        validator.issue(
+            InteractionValidationCode::InvalidValue,
+            format!("{path}/environment/viewportUnit"),
+            "a normalized ratio cannot express an interaction viewport",
+        );
+    }
+    if trace.environment.locale.is_empty() {
+        validator.issue(
+            InteractionValidationCode::InvalidValue,
+            format!("{path}/environment/locale"),
+            "trace locale must not be empty",
+        );
+    }
+    if trace.environment.timezone_id.is_empty() {
+        validator.issue(
+            InteractionValidationCode::InvalidValue,
+            format!("{path}/environment/timezoneId"),
+            "trace timezone identifier must not be empty",
+        );
+    }
     match &trace.execution {
         TraceExecution::Captured if trace.events.is_empty() => validator.issue(
             InteractionValidationCode::InvalidValue,
@@ -794,9 +888,90 @@ impl InteractionValidator {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::{Value, json};
+
+    use crate::ArtifactIr;
+
     use super::{
         INTERACTION_EXTENSION_VERSION, InteractionExtension, RecoveryContract, RecoveryKind,
     };
+
+    fn valid_document() -> Value {
+        json!({
+            "schemaVersion": "0.1.0",
+            "artifact": { "id": "artifact", "kind": "web" },
+            "canvases": [{
+                "id": "viewport",
+                "size": { "width": 1280.0, "height": 800.0 },
+                "unit": "cssPixel",
+                "horizontalDirection": "right",
+                "verticalDirection": "down",
+                "evidenceId": "e-trace"
+            }],
+            "nodes": [{
+                "id": "target",
+                "kind": { "value": "control", "evidenceId": "e-contract" },
+                "coordinateSpaceId": "viewport",
+                "geometry": {}
+            }],
+            "evidence": [
+                {
+                    "id": "e-contract",
+                    "class": "declaredContract",
+                    "source": { "adapter": "test", "adapterVersion": "0.1.0", "externalProcessing": false }
+                },
+                {
+                    "id": "e-trace",
+                    "class": "interactionTrace",
+                    "source": { "adapter": "test", "adapterVersion": "0.1.0", "externalProcessing": false }
+                }
+            ],
+            "extensions": {
+                "org.sightlint.interaction": {
+                    "extensionVersion": "0.1.0",
+                    "actions": [{
+                        "id": "save",
+                        "targetNodeId": "target",
+                        "contractEvidenceId": "e-contract",
+                        "effectLatency": "observable",
+                        "recovery": { "applicability": "required", "acceptedAlternatives": ["retry"] }
+                    }],
+                    "traces": [{
+                        "id": "trace",
+                        "actionId": "save",
+                        "execution": { "status": "captured" },
+                        "environment": {
+                            "clock": "controlledSteps",
+                            "network": "denyExternal",
+                            "viewportSize": { "width": 1280.0, "height": 800.0 },
+                            "viewportUnit": "cssPixel",
+                            "locale": "en-US",
+                            "timezoneId": "UTC",
+                            "colorScheme": "light",
+                            "reducedMotion": "reduce",
+                            "externalProcessing": false
+                        },
+                        "consistency": { "status": "agreement" },
+                        "events": [{
+                            "id": "event-01",
+                            "sequence": 1,
+                            "attemptId": "primary",
+                            "evidenceIds": ["e-trace"],
+                            "detail": { "kind": "actionActivated" }
+                        }]
+                    }]
+                }
+            }
+        })
+    }
+
+    fn interaction_error(value: Value) -> String {
+        let document: ArtifactIr = serde_json::from_value(value).expect("core document decodes");
+        document
+            .interaction_extension()
+            .expect_err("interaction extension must be rejected")
+            .to_string()
+    }
 
     #[test]
     fn canonicalization_sorts_actions_traces_events_and_set_values() {
@@ -816,5 +991,42 @@ mod tests {
             &[RecoveryKind::Retry, RecoveryKind::SaveDraft]
         );
         extension.actions.clear();
+    }
+
+    #[test]
+    fn validation_rejects_wrong_authority_ordering_and_causal_references() {
+        let mut wrong_authority = valid_document();
+        wrong_authority["evidence"][0]["class"] = json!("exactSource");
+        assert!(interaction_error(wrong_authority).contains("InvalidEvidenceClass"));
+
+        let mut wrong_sequence = valid_document();
+        wrong_sequence["extensions"]["org.sightlint.interaction"]["traces"][0]["events"][0]["sequence"] =
+            json!(2);
+        assert!(interaction_error(wrong_sequence).contains("InvalidSequence"));
+
+        let mut wrong_cause = valid_document();
+        wrong_cause["extensions"]["org.sightlint.interaction"]["traces"][0]["events"][0]["causeEventId"] =
+            json!("missing");
+        assert!(interaction_error(wrong_cause).contains("InvalidCausalReference"));
+    }
+
+    #[test]
+    fn validation_keeps_untested_and_conflict_contracts_strict() {
+        let mut untested_with_events = valid_document();
+        untested_with_events["extensions"]["org.sightlint.interaction"]["traces"][0]["execution"] =
+            json!({ "status": "untested", "reason": "not run" });
+        assert!(interaction_error(untested_with_events).contains("must not contain events"));
+
+        let mut weak_conflict = valid_document();
+        weak_conflict["extensions"]["org.sightlint.interaction"]["traces"][0]["consistency"] = json!({
+            "status": "conflict",
+            "evidenceIds": ["e-trace"],
+            "reason": "one source is not a conflict"
+        });
+        assert!(interaction_error(weak_conflict).contains("at least two evidence records"));
+
+        let mut unknown_field = valid_document();
+        unknown_field["extensions"]["org.sightlint.interaction"]["unexpected"] = json!(true);
+        assert!(interaction_error(unknown_field).contains("unknown field"));
     }
 }

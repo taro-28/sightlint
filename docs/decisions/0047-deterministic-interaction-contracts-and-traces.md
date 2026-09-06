@@ -26,7 +26,8 @@ contains:
 - stable actions linked to core target nodes;
 - caller- or application-declared latency and recovery contracts backed by
   `declaredContract` evidence;
-- exactly one captured or explicitly `untested` trace per action;
+- exactly one captured or explicitly `untested` trace per action, with viewport/unit, locale,
+  timezone, color-scheme, reduced-motion, network, clock, and external-processing facts;
 - one-based canonical event order, stable attempt IDs, and optional causal event links;
 - visible pending, optimistic, success, and failure states;
 - success/failure effect resolution and retry/save-draft recovery alternatives;
@@ -135,4 +136,3 @@ may admit other explicit alternatives without pretending all recovery designs ar
   mutation kills, and byte-stable repeated results;
 - existing generator, Rust, CLI, image, Web, structured-adapter, documentation, MSRV, and
   cross-platform gates remain green.
-

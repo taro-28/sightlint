@@ -1,0 +1,118 @@
+{
+  "annotationVersion": "0.1.0",
+  "kind": "acquisitionGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureIntentAndManualBrowserReview",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  },
+  "annotations": [
+    {
+      "id": "failure-no-recovery-mutant-acquisition",
+      "caseId": "failure-no-recovery-mutant",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "pending", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "failure", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "failure", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": [],
+      "abstentions": ["atomicCrossSourceSnapshot", "duplicateActivation", "focusNavigation", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "failure-retry-clean-acquisition",
+      "caseId": "failure-retry-clean",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "pending", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "failure", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "failure", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "recoveryOffered", "attemptId": "attempt-primary", "recovery": "retry", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "recoveryActivated", "attemptId": "attempt-retry", "recovery": "retry", "evidenceSources": ["browserAction"] },
+        { "kind": "stateObserved", "attemptId": "attempt-retry", "state": "pending", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "effectResolved", "attemptId": "attempt-retry", "resolution": "success", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-retry", "state": "success", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": [],
+      "abstentions": ["atomicCrossSourceSnapshot", "duplicateSideEffect", "focusNavigation", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "failure-save-draft-alternative-acquisition",
+      "caseId": "failure-save-draft-alternative",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "pending", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "failure", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "failure", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "recoveryOffered", "attemptId": "attempt-primary", "recovery": "saveDraft", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "recoveryActivated", "attemptId": "attempt-saveDraft", "recovery": "saveDraft", "evidenceSources": ["browserAction"] },
+        { "kind": "stateObserved", "attemptId": "attempt-saveDraft", "state": "pending", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "effectResolved", "attemptId": "attempt-saveDraft", "resolution": "success", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-saveDraft", "state": "success", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": [],
+      "abstentions": ["atomicCrossSourceSnapshot", "draftDurabilityIndependentVerification", "focusNavigation", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "immediate-success-acquisition",
+      "caseId": "immediate-success",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "success", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "success", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": [],
+      "abstentions": ["atomicCrossSourceSnapshot", "duplicateActivation", "focusNavigation", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "missing-pending-mutant-acquisition",
+      "caseId": "missing-pending-mutant",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "success", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "success", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": [],
+      "abstentions": ["atomicCrossSourceSnapshot", "duplicateActivation", "focusNavigation", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "pending-conflict-acquisition",
+      "caseId": "pending-conflict",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "success", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "success", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": ["step 1 app-declared state pending conflicts with DOM state idle"],
+      "abstentions": ["asyncFeedbackVerdict", "atomicCrossSourceSnapshot", "failureRecoveryVerdict", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "slow-success-clean-acquisition",
+      "caseId": "slow-success-clean",
+      "traceExecution": "captured",
+      "orderedFacts": [
+        { "kind": "actionActivated", "attemptId": "attempt-primary", "evidenceSources": ["browserAction"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "pending", "evidenceSources": ["domState", "accessibilityState", "screenshot"] },
+        { "kind": "effectResolved", "attemptId": "attempt-primary", "resolution": "success", "evidenceSources": ["appDeclaredInstrumentation"] },
+        { "kind": "stateObserved", "attemptId": "attempt-primary", "state": "success", "evidenceSources": ["domState", "accessibilityState", "screenshot"] }
+      ],
+      "conflicts": [],
+      "abstentions": ["atomicCrossSourceSnapshot", "duplicateActivation", "focusNavigation", "invisibleEffectIndependentVerification", "rawWallClockDuration"]
+    },
+    {
+      "id": "trace-untested-acquisition",
+      "caseId": "trace-untested",
+      "traceExecution": "untested",
+      "orderedFacts": [],
+      "conflicts": [],
+      "abstentions": ["allDynamicBehavior", "asyncFeedbackVerdict", "failureRecoveryVerdict", "nativeStateSequence", "renderedStateSequence"]
+    }
+  ]
+}

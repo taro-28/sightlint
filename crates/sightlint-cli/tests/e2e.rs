@@ -260,6 +260,74 @@ fn report_bytes_are_deterministic_across_ordering_stdin_and_repeated_runs() {
 }
 
 #[test]
+fn m6_interaction_rules_preserve_pass_fail_and_abstention_outcomes() {
+    for (name, async_outcome, recovery_outcome) in [
+        ("m6-pass-async-feedback.json", "passed", "inapplicable"),
+        ("m6-fail-async-feedback.json", "failed", "inapplicable"),
+        ("m6-pass-failure-retry.json", "passed", "passed"),
+        ("m6-fail-failure-recovery.json", "passed", "failed"),
+        ("m6-pass-save-draft-hard-negative.json", "passed", "passed"),
+        ("m6-cant-tell-conflict.json", "cantTell", "cantTell"),
+        (
+            "m6-inapplicable-immediate.json",
+            "inapplicable",
+            "inapplicable",
+        ),
+        ("m6-untested.json", "untested", "untested"),
+    ] {
+        let output = check_json(name, &["--profile", "base"]);
+        assert_code(&output, EXIT_SUCCESS);
+        let report = parse_stdout(&output);
+        assert_eq!(
+            report["extensionVersions"]["org.sightlint.interaction"],
+            "0.1.0"
+        );
+        assert_rule_has_outcome(&report, "interaction.async-feedback", async_outcome);
+        assert_rule_has_outcome(&report, "interaction.failure-recovery", recovery_outcome);
+        for result in report["results"]
+            .as_array()
+            .expect("report results")
+            .iter()
+            .filter(|result| {
+                result["ruleId"] == "interaction.async-feedback"
+                    || result["ruleId"] == "interaction.failure-recovery"
+            })
+        {
+            assert_eq!(result["enforcement"], "advisory");
+            assert_eq!(result["maturity"], "advisory");
+            assert!(
+                result["target"]["aspect"]
+                    .as_str()
+                    .is_some_and(|aspect| aspect.starts_with("interaction.action:"))
+            );
+        }
+    }
+}
+
+#[test]
+fn m6_interaction_reports_are_byte_stable_and_malformed_versions_exit_two() {
+    let expected = check_json("m6-pass-failure-retry.json", &["--profile", "base"]);
+    assert_code(&expected, EXIT_SUCCESS);
+    for _ in 0..10 {
+        let repeated = check_json("m6-pass-failure-retry.json", &["--profile", "base"]);
+        assert_code(&repeated, EXIT_SUCCESS);
+        assert_eq!(repeated.stdout, expected.stdout);
+    }
+
+    let invalid = check_json(
+        "m6-invalid-interaction-version.json",
+        &["--profile", "base"],
+    );
+    assert_code(&invalid, EXIT_ERROR);
+    assert!(invalid.stdout.is_empty());
+    assert!(
+        String::from_utf8_lossy(&invalid.stderr)
+            .contains("official interaction extension validation failed")
+    );
+    assert!(String::from_utf8_lossy(&invalid.stderr).contains("UnsupportedExtensionVersion"));
+}
+
+#[test]
 fn the_same_core_contract_accepts_every_planned_static_artifact_kind() {
     for kind in [
         "web", "mobile", "slide", "document", "pdf", "image", "other",

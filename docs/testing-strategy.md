@@ -350,7 +350,8 @@ Test bounded behavior at and around declared limits:
 - PNG dimensions, pixels, chunks, compressed and decoded bytes;
 - adapter nodes, frames/pages, text, relations, output bytes, and process duration;
 - perception tiles/objects/hierarchy depth;
-- interaction trace events and duration;
+- interaction trace events and controlled-step counts; raw wall-clock duration is not a rule input
+  in ADR 0047;
 - memory allocations and fallible allocation paths;
 - worst-case component/run/graph shapes;
 - deterministic timeout/error/untested classification.

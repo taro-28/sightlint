@@ -355,5 +355,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0047 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0048 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

@@ -7,6 +7,7 @@
 #![forbid(unsafe_code)]
 
 mod geometry;
+mod interaction_rules;
 mod report;
 mod rules;
 mod visual_rules;
@@ -30,10 +31,12 @@ use std::error::Error;
 use std::fmt;
 
 use sightlint_ir::{
-    ArtifactIr, VISUAL_EXTENSION_KEY, VISUAL_EXTENSION_VERSION, ValidationErrors,
+    ArtifactIr, INTERACTION_EXTENSION_KEY, INTERACTION_EXTENSION_VERSION,
+    InteractionExtensionErrors, VISUAL_EXTENSION_KEY, VISUAL_EXTENSION_VERSION, ValidationErrors,
     VisualExtensionErrors,
 };
 
+use interaction_rules::run_interaction_rules;
 use visual_rules::run_visual_rules;
 use web_extension::{WEB_EXTENSION_KEY, WEB_EXTENSION_VERSION, decode_web_extension};
 use web_rules::run_recommended_web_rules;
@@ -64,6 +67,8 @@ pub enum CheckError {
     VisualExtension(VisualExtensionErrors),
     /// The recognized official Web extension is invalid.
     WebExtension(WebExtensionErrors),
+    /// The recognized official interaction extension is invalid.
+    InteractionExtension(InteractionExtensionErrors),
 }
 
 impl fmt::Display for CheckError {
@@ -72,6 +77,7 @@ impl fmt::Display for CheckError {
             Self::Core(errors) => errors.fmt(formatter),
             Self::VisualExtension(errors) => errors.fmt(formatter),
             Self::WebExtension(errors) => errors.fmt(formatter),
+            Self::InteractionExtension(errors) => errors.fmt(formatter),
         }
     }
 }
@@ -82,6 +88,7 @@ impl Error for CheckError {
             Self::Core(errors) => Some(errors),
             Self::VisualExtension(errors) => Some(errors),
             Self::WebExtension(errors) => Some(errors),
+            Self::InteractionExtension(errors) => Some(errors),
         }
     }
 }
@@ -104,6 +111,12 @@ impl From<WebExtensionErrors> for CheckError {
     }
 }
 
+impl From<InteractionExtensionErrors> for CheckError {
+    fn from(errors: InteractionExtensionErrors) -> Self {
+        Self::InteractionExtension(errors)
+    }
+}
+
 /// Returns the Artifact IR schema version understood by this engine.
 pub const fn supported_schema_version() -> &'static str {
     sightlint_ir::SCHEMA_VERSION
@@ -117,6 +130,11 @@ pub const fn supported_visual_extension_version() -> &'static str {
 /// Returns the official Web-extension version understood by this engine.
 pub const fn supported_web_extension_version() -> &'static str {
     WEB_EXTENSION_VERSION
+}
+
+/// Returns the official interaction-extension version understood by this engine.
+pub const fn supported_interaction_extension_version() -> &'static str {
+    INTERACTION_EXTENSION_VERSION
 }
 
 /// Validates and checks one Artifact IR document with every applicable built-in rule pack.
@@ -142,6 +160,7 @@ pub fn check_with_options(
     document.validate()?;
     let visual_extension = document.visual_extension()?;
     let web_extension = decode_web_extension(document)?;
+    let interaction_extension = document.interaction_extension()?;
     let context = QueryContext::new(document);
     let mut results = run_default_rules(&context);
     let mut extension_versions = BTreeMap::new();
@@ -168,6 +187,14 @@ pub fn check_with_options(
         profiles.push("sightlint:recommended".to_owned());
     }
 
+    if let Some(extension) = interaction_extension {
+        extension_versions.insert(
+            INTERACTION_EXTENSION_KEY.to_owned(),
+            extension.extension_version.clone(),
+        );
+        results.extend(run_interaction_rules(&context, &extension));
+    }
+
     Ok(CheckReport::new(
         document,
         extension_versions,
@@ -179,8 +206,8 @@ pub fn check_with_options(
 #[cfg(test)]
 mod tests {
     use super::{
-        supported_schema_version, supported_visual_extension_version,
-        supported_web_extension_version,
+        supported_interaction_extension_version, supported_schema_version,
+        supported_visual_extension_version, supported_web_extension_version,
     };
 
     #[test]
@@ -188,5 +215,6 @@ mod tests {
         assert_eq!(supported_schema_version(), "0.1.0");
         assert_eq!(supported_visual_extension_version(), "0.1.0");
         assert_eq!(supported_web_extension_version(), "0.3.0");
+        assert_eq!(supported_interaction_extension_version(), "0.1.0");
     }
 }

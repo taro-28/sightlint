@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Atlas account settings</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#main">Atlas</a>
+      <nav aria-label="Workspace"><span>Northstar workspace</span><span class="avatar" aria-hidden="true">NW</span></nav>
+    </header>
+    <main id="main">
+      <aside class="sidebar" aria-label="Settings sections">
+        <p class="eyebrow">Workspace settings</p>
+        <a class="active" href="#profile">Profile</a>
+        <a href="#notifications">Notifications</a>
+        <a href="#security">Security</a>
+      </aside>
+      <section class="content" id="profile">
+        <div class="heading-row">
+          <div><p class="eyebrow">Account</p><h1>Profile settings</h1></div>
+          <span class="plan">Team plan</span>
+        </div>
+        <form class="settings-card" aria-label="Profile settings" onsubmit="return false">
+          <div class="field-row"><label for="display-name">Display name</label><input id="display-name" value="Northstar editor"></div>
+          <div class="field-row"><label for="weekly-summary">Weekly summary</label><input id="weekly-summary" type="checkbox" checked></div>
+          <div class="form-footer">
+            <div>
+              <p data-testid="interaction-state" data-sightlint-state="idle" role="status" aria-live="polite">No unsaved changes</p>
+              <p class="state-detail">Changes are stored only after confirmation.</p>
+            </div>
+            <div class="actions">
+              <button type="button" data-sightlint-recovery="saveDraft" hidden>Save draft</button>
+              <button type="button" data-sightlint-recovery="retry" hidden>Retry save</button>
+              <button class="primary" type="button" data-testid="save-settings">Save settings</button>
+            </div>
+          </div>
+        </form>
+        <section class="activity" aria-labelledby="activity-title"><h2 id="activity-title">Recent changes</h2><p>Workspace profile updated by the settings team.</p></section>
+      </section>
+    </main>
+    <div id="app-ready" hidden></div>
+    <script src="./app.js"></script>
+  </body>
+</html>

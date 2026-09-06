@@ -469,7 +469,7 @@ Important historical detail:
 - ADR 0046 defines the bounded iOS paired UIKit/XCUITest capture adapter, separate source/platform/
   render evidence, clipped-scroll/offscreen abstention, and public acquisition/rule evaluation
   boundary;
-- new ADRs should continue at 0047 or later rather than silently reusing historical numbers.
+- new ADRs should continue at 0048 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -484,7 +484,7 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - real OCR/CV/VLM model selection, calibration, and representative perception evaluation after
   the issue #28 protocol foundation;
 - representative/broader PPTX, PDF, Android, and iOS coverage after the bounded issue #29 slices;
-- interaction trace/effect schema: issue #30;
+- broader interaction scenarios beyond the bounded issue #30 slice;
 - MCP/GitHub/editor/local UI and later package channels: issue #31;
 - signing/attestation identity and any future registry or prebuilt-binary channel after the
   source-only ADR 0037 alpha.

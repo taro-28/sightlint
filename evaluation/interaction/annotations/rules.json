@@ -1,0 +1,116 @@
+{
+  "annotationVersion": "0.1.0",
+  "kind": "ruleGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureIntentAndVersionedRuleContract",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  },
+  "annotations": [
+    {
+      "id": "failure-no-recovery-mutant-rules",
+      "caseId": "failure-no-recovery-mutant",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "passed" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "failed" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The primary attempt exposes pending and visible failure, but the completed controlled trace offers no declared recovery alternative.",
+      "falsePositiveRisk": "A product may intentionally route recovery outside the captured surface; this fixture contract explicitly requires retry, so broader products need their own declared scope."
+    },
+    {
+      "id": "failure-retry-clean-rules",
+      "caseId": "failure-retry-clean",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "passed" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "passed" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The controlled primary attempt exposes pending then visible failure; the offered and activated retry reaches declared and visible success.",
+      "falsePositiveRisk": "The fixture does not independently prove server-side idempotency or absence of duplicated effects, so those properties remain unclaimed."
+    },
+    {
+      "id": "failure-save-draft-alternative-rules",
+      "caseId": "failure-save-draft-alternative",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "passed" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "passed" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "Save draft is an explicitly accepted alternative that is offered, activated, and followed by declared and visible success; retry is not universally required.",
+      "falsePositiveRisk": "A visible saved state does not independently prove durable storage; the rule evaluates only the declared controlled contract."
+    },
+    {
+      "id": "immediate-success-rules",
+      "caseId": "immediate-success",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "inapplicable" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "inapplicable" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The declared action is immediate and has no failure-recovery obligation; neither rule may manufacture an applicable target.",
+      "falsePositiveRisk": "A falsely declared immediate action could hide a real latency problem, so production contracts require review and cannot be inferred from one fast run."
+    },
+    {
+      "id": "missing-pending-mutant-rules",
+      "caseId": "missing-pending-mutant",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "failed" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "inapplicable" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The observably latent action resolves successfully with no pending or optimistic native-state observation between activation and resolution.",
+      "falsePositiveRisk": "Pending feedback outside the declared target state channel would be missed; the controlled contract must name all accepted evidence sources."
+    },
+    {
+      "id": "pending-conflict-rules",
+      "caseId": "pending-conflict",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "cantTell" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "cantTell" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "App-declared pending conflicts with the native DOM state, so the disagreement remains evidence and neither rule guesses pass or failure.",
+      "falsePositiveRisk": "Treating declared instrumentation as authoritative would create a false pass; treating DOM alone as authoritative would erase a diagnostic conflict."
+    },
+    {
+      "id": "slow-success-clean-rules",
+      "caseId": "slow-success-clean",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "passed" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "inapplicable" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "Pending is observed after activation and before declared success resolution; no recovery contract applies to this success-only trace.",
+      "falsePositiveRisk": "The public fixture validates the named state channel only and does not establish whether arbitrary users perceive the feedback."
+    },
+    {
+      "id": "trace-untested-rules",
+      "caseId": "trace-untested",
+      "policyProfile": "sightlint:base",
+      "expectedExit": 0,
+      "expectations": [
+        { "ruleId": "interaction.async-feedback", "ruleVersion": "0.1.0", "outcome": "untested" },
+        { "ruleId": "interaction.failure-recovery", "ruleVersion": "0.1.0", "outcome": "untested" }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The action and policy are declared but no controlled execution was performed, which is distinct from ambiguity and inapplicability.",
+      "falsePositiveRisk": "Coercing absent execution to pass would conceal coverage gaps; coercing it to fail would claim a defect without observation."
+    }
+  ]
+}

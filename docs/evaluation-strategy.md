@@ -169,6 +169,18 @@ overlay as `cantTell`. Repeated JSON and human bytes are checked within the decl
 This is a deterministic product-path regression, not representative agent user-outcome evidence:
 the task, locator, edit, and labels are public and visible to the implementation.
 
+### Interaction trace evaluation
+
+`evaluation/interaction/` implements ADR 0047 over the repository-owned Atlas settings app. Its
+eight public cases record 35 manually reviewed acquisition facts separately from two-rule verdict
+truth, kill missing-pending and missing-recovery mutations, accept save-draft as a valid hard
+negative, and retain `cantTell`, inapplicable, and `untested` outcomes. DOM, accessibility,
+screenshots, and app-declared effects remain separate evidence sources.
+
+All cases and labels are public maintainer-authored development data. There is no protected
+holdout or independent reviewer, so perfect regression results do not establish representative
+interaction, accessibility, or UI/UX accuracy.
+
 ### PDF source-adapter evaluation
 
 `evaluation/pdf/` implements ADR 0044 with three deterministic repository-owned report pages and

@@ -10,6 +10,8 @@
     "metrics": {
       "type": "array",
       "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -22,8 +24,8 @@
           "requiredMaximum": { "type": "number", "minimum": 0, "maximum": 1 }
         },
         "oneOf": [
-          { "required": ["requiredMinimum"], "not": { "required": ["requiredMaximum"] } },
-          { "required": ["requiredMaximum"], "not": { "required": ["requiredMinimum"] } }
+          { "required": ["requiredMinimum"], "properties": { "requiredMinimum": { "type": "number" } } },
+          { "required": ["requiredMaximum"], "properties": { "requiredMaximum": { "type": "number" } } }
         ]
       }
     },

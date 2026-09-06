@@ -16,7 +16,8 @@ pub use interaction::{
     EffectLatency, EffectResolution, INTERACTION_EXTENSION_KEY, INTERACTION_EXTENSION_VERSION,
     InteractionAction, InteractionExtension, InteractionExtensionErrors, InteractionTrace,
     InteractionValidationCode, InteractionValidationIssue, RecoveryContract, RecoveryKind,
-    TraceConsistency, TraceEvent, TraceEventDetail, TraceExecution, VisibleState,
+    TraceClock, TraceColorScheme, TraceConsistency, TraceEnvironment, TraceEvent, TraceEventDetail,
+    TraceExecution, TraceNetwork, TraceReducedMotion, VisibleState,
     interaction_extension_schema_json,
 };
 pub use json::{LoadError, serialize_canonical};

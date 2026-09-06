@@ -23,6 +23,14 @@ M2 coverage:
 - `m2-inapplicable-visual.json` proves every M2 rule explicitly abstains without a target contract.
 - `m2-unknown-extension.json` proves unknown namespaced data survives canonical normalization.
 
+M6 coverage:
+
+- `m6-pass-*` covers observable pending feedback, failure/retry recovery, and the save-draft
+  alternative hard negative.
+- `m6-fail-*` kills pending feedback and failure recovery independently.
+- `m6-cant-tell-*`, `m6-inapplicable-*`, and `m6-untested*` preserve distinct abstention outcomes.
+- `m6-invalid-interaction-*` proves malformed recognized interaction data exits 2.
+
 Do not hand-edit generated JSON. Change the generator, regenerate, inspect the diff, and run the
 binary E2E suite. Every new rule requires pass, targeted mutation, `cantTell`, inapplicable,
 boundary, and malformed-input coverage where applicable.

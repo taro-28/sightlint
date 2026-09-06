@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../adapters/playwright/schemas/interaction-request.schema.json",
+  "protocolVersion": "0.1.0",
+  "artifact": { "id": "interaction-trace-untested", "title": "Atlas unexecuted interaction trace" },
+  "fixture": { "entrypoint": "evaluation/interaction/fixture-app/index.html", "state": "trace-untested", "readinessSelector": "#app-ready" },
+  "action": { "id": "save-settings", "targetTestId": "save-settings", "effectLatency": "observable", "recovery": { "applicability": "required", "acceptedAlternatives": ["retry"] } },
+  "trace": { "id": "trace-save-settings", "execution": "untested", "reason": "controlled trace execution was not requested", "steps": [] },
+  "environment": { "viewport": { "width": 1280, "height": 800, "unit": "cssPixel" }, "locale": "en-US", "timezoneId": "UTC", "colorScheme": "light", "reducedMotion": "reduce" },
+  "privacy": { "textMode": "digestOnly", "externalProcessing": false },
+  "network": { "mode": "deny" }
+}

@@ -17,7 +17,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
 | M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | portability characterization and broader representative evaluation |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
-| M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
+| M6 — Interaction contracts | active | interaction extension `0.1.0`, controlled Playwright/Atlas traces, async-feedback and failure-recovery advisory rules, eight-case evaluation | offline/permission/stale/partial/destructive/focus/mobile traces and broader evidence |
 | M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
 
 The project has a narrowly scoped source-only alpha. The kernel and structured-IR path are much
@@ -453,6 +453,21 @@ states, recovery, safeguards, focus, navigation, and deterministic traces.
 - controlled slow, offline, failure, permission, stale-data, and recovery scenarios;
 - static screenshots never claim invisible dynamic behavior.
 
+### First bounded slice
+
+ADR 0047 implements the medium-neutral `org.sightlint.interaction@0.1.0` contract and a local
+Playwright process over the repository-owned Atlas settings fixture. The adapter assigns canonical
+controlled-step order without raw timestamps, denies external network, captures native state,
+accessibility, screenshot digest/extent, and declared effect events separately, and preserves
+disagreement as conflict evidence.
+
+Two advisory base-profile rules cover observable-latency feedback and declared failure recovery.
+Eight public cases include clean slow success, failure/retry, missing-pending and missing-recovery
+mutations, a save-draft alternative hard negative, `cantTell`, inapplicable, and `untested` paths.
+Acquisition and rule truth remain separately authored with no protected holdout. This slice does
+not complete offline, permission, stale-data, partial-success, destructive safeguard, focus,
+navigation, or mobile interaction coverage.
+
 ## M7 — Ecosystem, agent workflow, and release
 
 **Goal:** expose the same verified kernel through useful local and collaboration surfaces without
@@ -531,7 +546,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0047 or later.
+- New architecture decision numbers continue at 0048 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -557,7 +572,7 @@ Every public behavior must satisfy the applicable matrix:
 | #29 | PPTX, PDF, Android, and iOS first slices implemented |
 | #56 | bounded Android instrumented-capture adapter slice |
 | #60 | bounded iOS UIKit/XCUITest capture adapter slice |
-| #30 | interaction states/effects/traces/recovery |
+| #30 | completed bounded interaction extension/trace/async-feedback/recovery slice; broader M6 scenarios remain evidence-gated |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |

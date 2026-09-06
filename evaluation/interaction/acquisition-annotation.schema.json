@@ -22,17 +22,13 @@
           "orderedFacts": {
             "type": "array",
             "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["kind", "attemptId", "evidenceSources"],
-              "properties": {
-                "kind": { "enum": ["actionActivated", "stateObserved", "effectResolved", "recoveryOffered", "recoveryActivated"] },
-                "attemptId": { "type": "string", "minLength": 1 },
-                "state": { "enum": ["pending", "optimistic", "success", "failure"] },
-                "resolution": { "enum": ["success", "failure"] },
-                "recovery": { "enum": ["retry", "saveDraft"] },
-                "evidenceSources": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["browserAction", "domState", "accessibilityState", "screenshot", "appDeclaredInstrumentation"] } }
-              }
+              "oneOf": [
+                { "$ref": "#/$defs/actionActivated" },
+                { "$ref": "#/$defs/stateObserved" },
+                { "$ref": "#/$defs/effectResolved" },
+                { "$ref": "#/$defs/recoveryOffered" },
+                { "$ref": "#/$defs/recoveryActivated" }
+              ]
             }
           },
           "conflicts": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
@@ -42,6 +38,51 @@
     }
   },
   "$defs": {
+    "factBase": {
+      "type": "object",
+      "required": ["kind", "attemptId", "evidenceSources"],
+      "properties": {
+        "kind": { "type": "string" },
+        "attemptId": { "type": "string", "minLength": 1 },
+        "evidenceSources": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["browserAction", "domState", "accessibilityState", "screenshot", "appDeclaredInstrumentation"] } }
+      }
+    },
+    "actionActivated": {
+      "allOf": [
+        { "$ref": "#/$defs/factBase" },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "attemptId", "evidenceSources"], "properties": { "kind": { "const": "actionActivated" }, "attemptId": { "type": "string", "minLength": 1 }, "evidenceSources": { "$ref": "#/$defs/evidenceSources" } } }
+      ]
+    },
+    "stateObserved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "attemptId", "state", "evidenceSources"],
+      "properties": { "kind": { "const": "stateObserved" }, "attemptId": { "type": "string", "minLength": 1 }, "state": { "enum": ["pending", "optimistic", "success", "failure"] }, "evidenceSources": { "$ref": "#/$defs/evidenceSources" } }
+    },
+    "effectResolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "attemptId", "resolution", "evidenceSources"],
+      "properties": { "kind": { "const": "effectResolved" }, "attemptId": { "type": "string", "minLength": 1 }, "resolution": { "enum": ["success", "failure"] }, "evidenceSources": { "$ref": "#/$defs/evidenceSources" } }
+    },
+    "recoveryOffered": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "attemptId", "recovery", "evidenceSources"],
+      "properties": { "kind": { "const": "recoveryOffered" }, "attemptId": { "type": "string", "minLength": 1 }, "recovery": { "enum": ["retry", "saveDraft"] }, "evidenceSources": { "$ref": "#/$defs/evidenceSources" } }
+    },
+    "recoveryActivated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "attemptId", "recovery", "evidenceSources"],
+      "properties": { "kind": { "const": "recoveryActivated" }, "attemptId": { "type": "string", "minLength": 1 }, "recovery": { "enum": ["retry", "saveDraft"] }, "evidenceSources": { "$ref": "#/$defs/evidenceSources" } }
+    },
+    "evidenceSources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["browserAction", "domState", "accessibilityState", "screenshot", "appDeclaredInstrumentation"] }
+    },
     "provenance": {
       "type": "object",
       "additionalProperties": false,

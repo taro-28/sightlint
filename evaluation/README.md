@@ -44,6 +44,14 @@ built Rust binary. The original six projections retain their explicit acquisitio
 browser output is not copied into those oracles. Neither corpus establishes representative
 adapter accuracy or real-world UI/UX precision.
 
+`evaluation/interaction/` is the separate ADR 0047 dynamic regression corpus. Its eight public
+Atlas cases use a controlled step clock and denied external network, keep acquisition truth apart
+from rule truth, exercise slow success and failure/retry, kill missing-pending and missing-recovery
+mutations, accept save-draft as a hard-negative recovery alternative, and preserve conflict,
+inapplicable, and untested outcomes. Per-step screenshot bytes remain ephemeral. The public source
+and oracles are visible to implementers, so the corpus has no protected holdout and makes no
+representative interaction-accuracy claim.
+
 This bootstrap corpus does **not** prove real-world precision or UX value. Those claims require
 human-reviewed native artifacts and rule-specific validation.
 

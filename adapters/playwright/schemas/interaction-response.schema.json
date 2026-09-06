@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:playwright-interaction-response:0.1.0",
+  "title": "SightLint Playwright interaction response 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "status", "adapter", "requestDigest", "sourceDigest", "artifactIr", "trace", "controls", "limitations"],
+  "properties": {
+    "protocolVersion": { "const": "0.1.0" },
+    "status": { "enum": ["captured", "untested"] },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "nodeVersion", "platform", "architecture", "playwrightVersion", "browserName", "browserVersion"],
+      "properties": {
+        "name": { "const": "sightlint-playwright-interaction" },
+        "version": { "const": "0.1.0" },
+        "nodeVersion": { "type": "string", "minLength": 1 },
+        "platform": { "type": "string", "minLength": 1 },
+        "architecture": { "type": "string", "minLength": 1 },
+        "playwrightVersion": { "const": "1.63.0" },
+        "browserName": { "const": "chromium" },
+        "browserVersion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "requestDigest": { "$ref": "#/$defs/digest" },
+    "sourceDigest": { "$ref": "#/$defs/digest" },
+    "artifactIr": { "$ref": "#/$defs/file" },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "eventCount", "conflictCount", "stateCaptureCount", "clock", "snapshots"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "eventCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "conflictCount": { "type": "integer", "minimum": 0 },
+        "stateCaptureCount": { "type": "integer", "minimum": 0, "maximum": 16 },
+        "clock": { "const": "controlledSteps" },
+        "snapshots": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["step", "state", "recoveries", "viewport", "accessibilityDigest", "screenshot", "acquisitionOrder"],
+            "properties": {
+              "step": { "type": "integer", "minimum": 1, "maximum": 16 },
+              "state": { "enum": ["idle", "pending", "optimistic", "success", "failure"] },
+              "recoveries": { "type": "array", "uniqueItems": true, "items": { "enum": ["retry", "saveDraft"] } },
+              "viewport": { "$ref": "#/$defs/viewport" },
+              "accessibilityDigest": { "$ref": "#/$defs/digest" },
+              "screenshot": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["sha256", "byteLength", "pixelSize"],
+                "properties": {
+                  "sha256": { "$ref": "#/$defs/digest" },
+                  "byteLength": { "type": "integer", "minimum": 1, "maximum": 8388608 },
+                  "pixelSize": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["width", "height"],
+                    "properties": { "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 } }
+                  }
+                }
+              },
+              "acquisitionOrder": { "const": ["dom", "accessibility", "screenshot"] }
+            }
+          }
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalRequests", "externalProcessing", "screenshotPersistence"],
+      "properties": {
+        "externalRequests": { "type": "array", "maxItems": 0 },
+        "externalProcessing": { "const": false },
+        "screenshotPersistence": { "const": "digestOnly" }
+      }
+    },
+    "limitations": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "byteLength"],
+      "properties": { "sha256": { "$ref": "#/$defs/digest" }, "byteLength": { "type": "integer", "minimum": 1, "maximum": 8388608 } }
+    },
+    "viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "unit"],
+      "properties": { "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 }, "unit": { "const": "cssPixel" } }
+    }
+  }
+}

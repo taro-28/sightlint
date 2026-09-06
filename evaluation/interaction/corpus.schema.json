@@ -4,9 +4,10 @@
   "title": "SightLint interaction evaluation corpus 0.1.0",
   "type": "object",
   "additionalProperties": false,
-  "required": ["corpusVersion", "source", "splitPolicy", "holdout", "cases"],
+  "required": ["corpusVersion", "fixtureSourceSha256", "source", "splitPolicy", "holdout", "cases"],
   "properties": {
     "corpusVersion": { "const": "0.1.0" },
+    "fixtureSourceSha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "source": {
       "type": "object",
       "additionalProperties": false,

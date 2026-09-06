@@ -156,7 +156,7 @@ fn run(cli: Cli) -> ExitCode {
                 sightlint_engine::supported_schema_version(),
                 sightlint_engine::supported_visual_extension_version(),
                 sightlint_engine::supported_web_extension_version(),
-                sightlint_ir::INTERACTION_EXTENSION_VERSION,
+                sightlint_engine::supported_interaction_extension_version(),
                 sightlint_engine::REPORT_SCHEMA_VERSION,
                 env!("CARGO_PKG_VERSION")
             );
