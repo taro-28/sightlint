@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0047 or later. -->
+0048 or later. -->
 
 ## Evidence, applicability, and policy
 
