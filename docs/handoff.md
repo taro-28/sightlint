@@ -93,7 +93,9 @@ points to it.
 The repository description identifies SightLint as deterministic, evidence-backed visual linting;
 topics cover Rust, CLI, Playwright, accessibility, UI testing, and developer tooling. No separate
 project homepage is currently appropriate. Dependabot PR #38 was closed because Node 26 type
-definitions exceed the accepted Node 20–24 alpha compatibility range.
+definitions exceed the accepted Node 20–24 alpha compatibility range. The npm update configuration
+therefore ignores semver-major `@types/node` version updates while retaining compatible minor and
+patch updates in the existing dependency group.
 
 ### Release status
 
