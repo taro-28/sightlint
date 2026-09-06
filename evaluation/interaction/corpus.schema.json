@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:interaction-evaluation-corpus:0.1.0",
+  "title": "SightLint interaction evaluation corpus 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["corpusVersion", "fixtureSourceSha256", "source", "splitPolicy", "holdout", "cases"],
+  "properties": {
+    "corpusVersion": { "const": "0.1.0" },
+    "fixtureSourceSha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["application", "origin", "ownership", "license", "redistribution", "privacy", "review", "capturePipeline"],
+      "properties": {
+        "application": { "type": "string", "minLength": 1 },
+        "origin": { "const": "repositoryOwnedFixtureApplication" },
+        "ownership": { "type": "string", "minLength": 1 },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "const": "permitted" },
+        "privacy": { "const": "fictionalNoPersonalOrCustomerData" },
+        "review": { "const": "maintainerAuthoredAndVisuallyReviewedNotIndependent" },
+        "capturePipeline": { "type": "string", "minLength": 1 }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge"],
+      "properties": {
+        "smoke": { "type": "string", "minLength": 1 },
+        "development": { "type": "string", "minLength": 1 },
+        "challenge": { "type": "string", "minLength": 1 }
+      }
+    },
+    "holdout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": { "const": "notEstablished" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "split", "request", "acquisitionAnnotationId", "ruleAnnotationId", "relation"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "split": { "enum": ["smoke", "development", "challenge"] },
+          "request": { "$ref": "#/$defs/file" },
+          "acquisitionAnnotationId": { "type": "string", "minLength": 1 },
+          "ruleAnnotationId": { "type": "string", "minLength": 1 },
+          "relation": {
+            "oneOf": [
+              { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "baseline" } } },
+              { "type": "object", "additionalProperties": false, "required": ["kind", "baselineId", "changedProperty"], "properties": { "kind": { "enum": ["targetedMutation", "hardNegative", "abstentionCase"] }, "baselineId": { "type": "string", "minLength": 1 }, "changedProperty": { "type": "string", "minLength": 1 } } }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

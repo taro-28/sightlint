@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "fixtures" / "e2e"
 VISUAL_EXTENSION_KEY = "org.sightlint.visual"
 VISUAL_EXTENSION_VERSION = "0.1.0"
+INTERACTION_EXTENSION_KEY = "org.sightlint.interaction"
+INTERACTION_EXTENSION_VERSION = "0.1.0"
 
 
 def evidence(identifier: str, evidence_class: str, adapter: str) -> dict[str, Any]:
@@ -737,10 +739,221 @@ def build_m2_fixtures(documents: dict[str, dict[str, Any]]) -> None:
     documents["m2-invalid-visual-empty-contract-id.json"] = empty_contract_id
 
 
+def interaction_event(
+    sequence: int,
+    kind: str,
+    *,
+    attempt: str = "attempt-primary",
+    cause: int | None = None,
+    state: str | None = None,
+    resolution: str | None = None,
+    recovery: str | None = None,
+) -> dict[str, Any]:
+    event: dict[str, Any] = {
+        "id": f"event-{sequence:02d}",
+        "sequence": sequence,
+        "attemptId": attempt,
+        "evidenceIds": ["e-interaction-trace"],
+    }
+    if cause is not None:
+        event["causeEventId"] = f"event-{cause:02d}"
+    if state is not None:
+        detail: dict[str, Any] = {"kind": kind}
+        detail["state"] = state
+    if resolution is not None:
+        detail = {"kind": kind}
+        detail["resolution"] = resolution
+    if recovery is not None:
+        detail = {"kind": kind}
+        detail["recovery"] = recovery
+    if state is None and resolution is None and recovery is None:
+        detail = {"kind": kind}
+    event["detail"] = detail
+    return event
+
+
+def interaction_artifact(
+    artifact_id: str,
+    *,
+    latency: str = "observable",
+    recovery: list[str] | None = None,
+    events: list[dict[str, Any]] | None = None,
+    consistency: dict[str, Any] | None = None,
+    untested_reason: str | None = None,
+) -> dict[str, Any]:
+    document = base_artifact("web", artifact_id, include_relations=False)
+    document["nodes"] = [
+        node("node-save", None, None, name="Save settings"),
+    ]
+    document["evidence"].extend(
+        [
+            evidence("e-interaction-trace", "interactionTrace", "fixture-trace"),
+            evidence("e-declared-state", "declaredContract", "fixture-instrumentation"),
+        ]
+    )
+    recovery_contract: dict[str, Any]
+    if recovery is None:
+        recovery_contract = {"applicability": "inapplicable"}
+    else:
+        recovery_contract = {
+            "applicability": "required",
+            "acceptedAlternatives": recovery,
+        }
+    if untested_reason is None:
+        execution: dict[str, Any] = {"status": "captured"}
+        trace_events = events or []
+    else:
+        execution = {"status": "untested", "reason": untested_reason}
+        trace_events = []
+    document["extensions"] = {
+        INTERACTION_EXTENSION_KEY: {
+            "extensionVersion": INTERACTION_EXTENSION_VERSION,
+            "actions": [
+                {
+                    "id": "save-settings",
+                    "targetNodeId": "node-save",
+                    "contractEvidenceId": "e-contract",
+                    "effectLatency": latency,
+                    "recovery": recovery_contract,
+                }
+            ],
+            "traces": [
+                {
+                    "id": "trace-save-settings",
+                    "actionId": "save-settings",
+                    "execution": execution,
+                    "environment": {
+                        "clock": "controlledSteps",
+                        "network": "denyExternal",
+                        "viewportSize": {"width": 1280.0, "height": 800.0},
+                        "viewportUnit": "cssPixel",
+                        "locale": "en-US",
+                        "timezoneId": "UTC",
+                        "colorScheme": "light",
+                        "reducedMotion": "reduce",
+                        "externalProcessing": False,
+                    },
+                    "consistency": consistency or {"status": "agreement"},
+                    "events": trace_events,
+                }
+            ],
+        }
+    }
+    return document
+
+
+def build_m6_fixtures(documents: dict[str, dict[str, Any]]) -> None:
+    clean_events = [
+        interaction_event(1, "actionActivated"),
+        interaction_event(2, "stateObserved", cause=1, state="pending"),
+        interaction_event(3, "effectResolved", cause=1, resolution="success"),
+        interaction_event(4, "stateObserved", cause=3, state="success"),
+    ]
+    documents["m6-pass-async-feedback.json"] = interaction_artifact(
+        "artifact-m6-pass-async-feedback", events=clean_events
+    )
+
+    missing_pending = [
+        interaction_event(1, "actionActivated"),
+        interaction_event(2, "effectResolved", cause=1, resolution="success"),
+        interaction_event(3, "stateObserved", cause=2, state="success"),
+    ]
+    documents["m6-fail-async-feedback.json"] = interaction_artifact(
+        "artifact-m6-fail-async-feedback", events=missing_pending
+    )
+
+    recovery_events = [
+        interaction_event(1, "actionActivated"),
+        interaction_event(2, "stateObserved", cause=1, state="pending"),
+        interaction_event(3, "effectResolved", cause=1, resolution="failure"),
+        interaction_event(4, "stateObserved", cause=3, state="failure"),
+        interaction_event(5, "recoveryOffered", cause=4, recovery="retry"),
+        interaction_event(
+            6,
+            "recoveryActivated",
+            attempt="attempt-retry",
+            cause=5,
+            recovery="retry",
+        ),
+        interaction_event(
+            7,
+            "stateObserved",
+            attempt="attempt-retry",
+            cause=6,
+            state="pending",
+        ),
+        interaction_event(
+            8,
+            "effectResolved",
+            attempt="attempt-retry",
+            cause=6,
+            resolution="success",
+        ),
+        interaction_event(
+            9,
+            "stateObserved",
+            attempt="attempt-retry",
+            cause=8,
+            state="success",
+        ),
+    ]
+    documents["m6-pass-failure-retry.json"] = interaction_artifact(
+        "artifact-m6-pass-failure-retry", recovery=["retry"], events=recovery_events
+    )
+
+    no_recovery = recovery_events[:4]
+    documents["m6-fail-failure-recovery.json"] = interaction_artifact(
+        "artifact-m6-fail-failure-recovery", recovery=["retry"], events=no_recovery
+    )
+
+    save_draft = copy.deepcopy(recovery_events)
+    save_draft[4]["detail"]["recovery"] = "saveDraft"
+    save_draft[5]["detail"]["recovery"] = "saveDraft"
+    save_draft[5]["attemptId"] = "attempt-save-draft"
+    for event in save_draft[6:]:
+        event["attemptId"] = "attempt-save-draft"
+    documents["m6-pass-save-draft-hard-negative.json"] = interaction_artifact(
+        "artifact-m6-pass-save-draft-hard-negative",
+        recovery=["retry", "saveDraft"],
+        events=save_draft,
+    )
+
+    documents["m6-cant-tell-conflict.json"] = interaction_artifact(
+        "artifact-m6-cant-tell-conflict",
+        recovery=["retry"],
+        events=clean_events,
+        consistency={
+            "status": "conflict",
+            "evidenceIds": ["e-interaction-trace", "e-declared-state"],
+            "reason": "declared pending state conflicts with the native visible state",
+        },
+    )
+    documents["m6-inapplicable-immediate.json"] = interaction_artifact(
+        "artifact-m6-inapplicable-immediate",
+        latency="immediate",
+        events=[
+            interaction_event(1, "actionActivated"),
+            interaction_event(2, "effectResolved", cause=1, resolution="success"),
+            interaction_event(3, "stateObserved", cause=2, state="success"),
+        ],
+    )
+    documents["m6-untested.json"] = interaction_artifact(
+        "artifact-m6-untested",
+        recovery=["retry"],
+        untested_reason="controlled trace execution was not requested",
+    )
+    invalid_version = copy.deepcopy(documents["m6-pass-async-feedback.json"])
+    invalid_version["extensions"][INTERACTION_EXTENSION_KEY][
+        "extensionVersion"
+    ] = "9.9.9"
+    documents["m6-invalid-interaction-version.json"] = invalid_version
+
+
 def build_fixtures() -> dict[str, str]:
     documents: dict[str, dict[str, Any]] = {}
     build_m1_fixtures(documents)
     build_m2_fixtures(documents)
+    build_m6_fixtures(documents)
 
     rendered = {
         name: json.dumps(document, indent=2, ensure_ascii=False) + "\n"
@@ -771,6 +984,14 @@ M2 coverage:
   numeric, typography-unit, and empty-style validation.
 - `m2-inapplicable-visual.json` proves every M2 rule explicitly abstains without a target contract.
 - `m2-unknown-extension.json` proves unknown namespaced data survives canonical normalization.
+
+M6 coverage:
+
+- `m6-pass-*` covers observable pending feedback, failure/retry recovery, and the save-draft
+  alternative hard negative.
+- `m6-fail-*` kills pending feedback and failure recovery independently.
+- `m6-cant-tell-*`, `m6-inapplicable-*`, and `m6-untested*` preserve distinct abstention outcomes.
+- `m6-invalid-interaction-*` proves malformed recognized interaction data exits 2.
 
 Do not hand-edit generated JSON. Change the generator, regenerate, inspect the diff, and run the
 binary E2E suite. Every new rule requires pass, targeted mutation, `cantTell`, inapplicable,

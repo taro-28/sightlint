@@ -5,12 +5,21 @@
 
 #![forbid(unsafe_code)]
 
+mod interaction;
 mod json;
 mod model;
 mod schema;
 mod validation;
 mod visual;
 
+pub use interaction::{
+    EffectLatency, EffectResolution, INTERACTION_EXTENSION_KEY, INTERACTION_EXTENSION_VERSION,
+    InteractionAction, InteractionExtension, InteractionExtensionErrors, InteractionTrace,
+    InteractionValidationCode, InteractionValidationIssue, RecoveryContract, RecoveryKind,
+    TraceClock, TraceColorScheme, TraceConsistency, TraceEnvironment, TraceEvent, TraceEventDetail,
+    TraceExecution, TraceNetwork, TraceReducedMotion, VisibleState,
+    interaction_extension_schema_json,
+};
 pub use json::{LoadError, serialize_canonical};
 pub use model::{
     ArtifactDescriptor, ArtifactIr, ArtifactKind, Axis, BoxKind, Canvas, CategoricalAlternative,

@@ -49,6 +49,9 @@ exact source-alpha geometry without introducing a padding rule. Issue #27 is com
 gap. Issue #28 adds the first local perception protocol foundation without OCR/model accuracy or
 blocking claims. [Issue #29](https://github.com/taro-28/sightlint/issues/29) now includes bounded
 PPTX, PDF, instrumented Android, and paired UIKit/XCUITest iOS capture slices.
+[Issue #30](https://github.com/taro-28/sightlint/issues/30) adds the first bounded controlled
+interaction trace, async-feedback, and recovery slice; it does not provide arbitrary-app or broad
+interaction coverage.
 
 ## Why
 
@@ -161,6 +164,20 @@ it does not skip validation of a recognized Web extension. Recommended failures 
 therefore do not fail the default process gate. This first pack is evaluated only on the public,
 repository-owned fictional application, so it does not establish WCAG conformance, complete hit
 regions, representative real-world precision, or blocking maturity.
+
+### Controlled interaction contracts
+
+`org.sightlint.interaction@0.1.0` represents declared actions, categorical effect latency,
+accepted retry/save-draft alternatives, controlled-step ordering, captured or `untested` traces,
+and explicit conflict evidence without raw timestamps. The bounded `sightlint-interaction`
+Playwright process drives a repository-owned Atlas settings app with external network denied and
+records DOM, accessibility, screenshot, viewport, and app-declared effect evidence separately.
+
+The Rust kernel evaluates `interaction.async-feedback@0.1.0` and
+`interaction.failure-recovery@0.1.0` as advisory base-profile rules. Eight public cases cover slow
+success, failure/retry, two targeted mutations, a valid save-draft alternative, `cantTell`,
+inapplicable, and `untested`. These synthetic regression cases have no protected holdout and do
+not establish general interaction, accessibility, or UI/UX accuracy.
 
 ### Deterministic PNG acquisition
 
@@ -391,6 +408,7 @@ cargo run --locked -p sightlint-cli -- \
 # Canonicalize valid IR and expose the schema/version.
 cargo run --locked -p sightlint-cli -- normalize fixtures/e2e/pass-web-shuffled.json
 cargo run --locked -p sightlint-cli -- schema
+cargo run --locked -p sightlint-cli -- schema --kind interaction
 cargo run --locked -p sightlint-cli -- version
 ```
 
@@ -522,13 +540,13 @@ Read:
 | #28 | completed local OCR/CV/VLM protocol foundation; real model evaluation remains untested |
 | #29 | PPTX, PDF, Android, and iOS first slices implemented |
 | #60 | completed bounded iOS UIKit/XCUITest capture adapter slice |
-| #30 | interaction states, effects, traces, and recovery |
+| #30 | completed bounded interaction trace, async-feedback, and declared recovery slice |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0047 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0048 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

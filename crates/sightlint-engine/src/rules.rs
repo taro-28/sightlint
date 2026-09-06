@@ -31,6 +31,10 @@ pub enum InputAspect {
     WebStructure,
     /// Synchronized browser geometry and reconciliation from the official Web extension.
     WebReconciliation,
+    /// Declared action/effect/recovery policy from the official interaction extension.
+    InteractionActionContract,
+    /// Canonically ordered controlled trace events from the official interaction extension.
+    InteractionTrace,
 }
 
 /// Static, inspectable definition of an executable rule.

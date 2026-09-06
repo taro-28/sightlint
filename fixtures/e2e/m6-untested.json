@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "0.1.0",
+  "artifact": {
+    "id": "artifact-m6-untested",
+    "kind": "web",
+    "title": "Fixture artifact",
+    "sourceName": "artifact-m6-untested.json"
+  },
+  "canvases": [
+    {
+      "id": "canvas-main",
+      "size": {
+        "width": 400.0,
+        "height": 300.0
+      },
+      "unit": "cssPixel",
+      "horizontalDirection": "right",
+      "verticalDirection": "down",
+      "evidenceId": "e-render"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "node-save",
+      "kind": {
+        "value": "control",
+        "evidenceId": "e-source"
+      },
+      "coordinateSpaceId": "canvas-main",
+      "role": {
+        "value": "button",
+        "evidenceId": "e-source"
+      },
+      "name": {
+        "value": "Save settings",
+        "evidenceId": "e-source"
+      },
+      "geometry": {}
+    }
+  ],
+  "relations": [],
+  "evidence": [
+    {
+      "id": "e-source",
+      "class": "exactSource",
+      "source": {
+        "adapter": "fixture-native",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-render",
+      "class": "exactRender",
+      "source": {
+        "adapter": "fixture-renderer",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-contract",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "fixture-contract",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-interaction-trace",
+      "class": "interactionTrace",
+      "source": {
+        "adapter": "fixture-trace",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    },
+    {
+      "id": "e-declared-state",
+      "class": "declaredContract",
+      "source": {
+        "adapter": "fixture-instrumentation",
+        "adapterVersion": "0.1.0",
+        "externalProcessing": false
+      }
+    }
+  ],
+  "extensions": {
+    "org.sightlint.interaction": {
+      "extensionVersion": "0.1.0",
+      "actions": [
+        {
+          "id": "save-settings",
+          "targetNodeId": "node-save",
+          "contractEvidenceId": "e-contract",
+          "effectLatency": "observable",
+          "recovery": {
+            "applicability": "required",
+            "acceptedAlternatives": [
+              "retry"
+            ]
+          }
+        }
+      ],
+      "traces": [
+        {
+          "id": "trace-save-settings",
+          "actionId": "save-settings",
+          "execution": {
+            "status": "untested",
+            "reason": "controlled trace execution was not requested"
+          },
+          "environment": {
+            "clock": "controlledSteps",
+            "network": "denyExternal",
+            "viewportSize": {
+              "width": 1280.0,
+              "height": 800.0
+            },
+            "viewportUnit": "cssPixel",
+            "locale": "en-US",
+            "timezoneId": "UTC",
+            "colorScheme": "light",
+            "reducedMotion": "reduce",
+            "externalProcessing": false
+          },
+          "consistency": {
+            "status": "agreement"
+          },
+          "events": []
+        }
+      ]
+    }
+  }
+}

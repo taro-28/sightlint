@@ -69,6 +69,11 @@ of the published alpha.2 archive and therefore do not retroactively change that 
 | iOS adapter implementation | `0.1.0` | Unreleased dependency-free Python 3.9+ source-tree file process; runtime version is provenance, and Xcode/simulator orchestration is not part of this surface. |
 | iOS evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth, explicit public splits, and no protected holdout; implementation output cannot rewrite an oracle. |
 | iOS metric contract | `0.1.0` | Defines public-corpus acquisition coverage, verdict precision, abstention, false-positive, and mutation expectations without storing observed implementation output as truth. |
+| Interaction extension | `org.sightlint.interaction@0.1.0` | Medium-neutral declared action policy and ordered captured/untested traces; malformed recognized data is rejected and incompatible semantics require a new extension version. |
+| Interaction evaluation contracts | `0.1.0` | Public acquisition and rule truth remain separate; all cases are visible development data and no protected holdout is claimed. |
+| Playwright interaction request/response protocol | `0.1.0` | Strict repository-local controlled steps, fixed environment, denied external network, bounded resources, digest-only screenshots, and fail-closed errors. |
+| Playwright interaction adapter | `0.1.0` | Unreleased private Node process; exact runtime/browser versions are provenance and cross-platform screenshot byte identity is not claimed. |
+| Private Playwright Node package after ADR 0047 | `0.5.0` | Adds `sightlint-interaction`; existing capture/workflow protocols and their adapter versions remain independent compatibility surfaces. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.
@@ -89,7 +94,8 @@ machine surface: consumers must check its own schema/version fields and must not
 from package version alone. Ordering and repeated output are byte-stable only within the declared
 normalized inputs and compatibility environment documented by the applicable adapter/report.
 
-`sightlint-web`, `sightlint-web-check`, and `sightlint-perception` require Node `>=20 <25`.
+`sightlint-web`, `sightlint-web-check`, `sightlint-interaction`, and `sightlint-perception` require
+Node `>=20 <25`.
 `sightlint-pptx`, `sightlint-android`, and `sightlint-ios` require Python 3.9+.
 `sightlint-pdf` requires Python 3.9+ and exactly pypdf 6.17.0. All report the exact runtime patch
 version; repeated canonical bytes are guaranteed for the same declared input and compatibility

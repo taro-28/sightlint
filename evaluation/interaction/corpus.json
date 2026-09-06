@@ -1,0 +1,89 @@
+{
+  "corpusVersion": "0.1.0",
+  "fixtureSourceSha256": "sha256:1ac3e2e3f4a09ca13f77eb6ac4b1086b569bfaa68c5677e1c9da06032a8ab050",
+  "source": {
+    "application": "evaluation/interaction/fixture-app",
+    "origin": "repositoryOwnedFixtureApplication",
+    "ownership": "SightLint project",
+    "license": "MIT OR Apache-2.0",
+    "redistribution": "permitted",
+    "privacy": "fictionalNoPersonalOrCustomerData",
+    "review": "maintainerAuthoredAndVisuallyReviewedNotIndependent",
+    "capturePipeline": "controlled-playwright-dom-accessibility-screenshot-and-app-instrumentation"
+  },
+  "splitPolicy": {
+    "smoke": "Required clean latent success and failure/retry paths.",
+    "development": "Visible targeted mutations for missing pending and missing recovery behavior.",
+    "challenge": "Public alternative, conflict, inapplicable, and untested cases for false-positive and abstention behavior."
+  },
+  "holdout": {
+    "status": "notEstablished",
+    "reason": "All fixture source, controlled scripts, annotations, and expected outcomes are public to implementers and maintainer-authored."
+  },
+  "cases": [
+    {
+      "id": "failure-no-recovery-mutant",
+      "split": "development",
+      "request": { "path": "evaluation/interaction/requests/failure-no-recovery-mutant.json", "sha256": "sha256:9631ccaf02083c2e06ed710d23d6127b280e910a4a1945889373aac34d312c72" },
+      "acquisitionAnnotationId": "failure-no-recovery-mutant-acquisition",
+      "ruleAnnotationId": "failure-no-recovery-mutant-rules",
+      "relation": { "kind": "targetedMutation", "baselineId": "failure-retry-clean", "changedProperty": "The failure state no longer exposes the declared retry control; the primary pending and failure observations are unchanged." }
+    },
+    {
+      "id": "failure-retry-clean",
+      "split": "smoke",
+      "request": { "path": "evaluation/interaction/requests/failure-retry-clean.json", "sha256": "sha256:7b0e982391c6f50d55fb74b5f6424b8ea7f310f7a665da8ef39da03cd81c566b" },
+      "acquisitionAnnotationId": "failure-retry-clean-acquisition",
+      "ruleAnnotationId": "failure-retry-clean-rules",
+      "relation": { "kind": "baseline" }
+    },
+    {
+      "id": "failure-save-draft-alternative",
+      "split": "challenge",
+      "request": { "path": "evaluation/interaction/requests/failure-save-draft-alternative.json", "sha256": "sha256:d978357a00eaa143f3f6ece2da5a49342de99a8f44ee85f911335fb7c482e39a" },
+      "acquisitionAnnotationId": "failure-save-draft-alternative-acquisition",
+      "ruleAnnotationId": "failure-save-draft-alternative-rules",
+      "relation": { "kind": "hardNegative", "baselineId": "failure-retry-clean", "changedProperty": "A declared save-draft recovery replaces retry and still reaches visible success; absence of retry is not a defect." }
+    },
+    {
+      "id": "immediate-success",
+      "split": "challenge",
+      "request": { "path": "evaluation/interaction/requests/immediate-success.json", "sha256": "sha256:02f5b3fe0960ec3b27dabf470c80194f606567e0917066c1aa06528e23b6943a" },
+      "acquisitionAnnotationId": "immediate-success-acquisition",
+      "ruleAnnotationId": "immediate-success-rules",
+      "relation": { "kind": "abstentionCase", "baselineId": "slow-success-clean", "changedProperty": "The action contract declares immediate completion, making latent feedback inapplicable." }
+    },
+    {
+      "id": "missing-pending-mutant",
+      "split": "development",
+      "request": { "path": "evaluation/interaction/requests/missing-pending-mutant.json", "sha256": "sha256:c549a8a3fde9b5a9003a596e707482a6556f46a902e0e709c6ff492c785cfb97" },
+      "acquisitionAnnotationId": "missing-pending-mutant-acquisition",
+      "ruleAnnotationId": "missing-pending-mutant-rules",
+      "relation": { "kind": "targetedMutation", "baselineId": "slow-success-clean", "changedProperty": "Only the pending state is removed between activation and successful resolution." }
+    },
+    {
+      "id": "pending-conflict",
+      "split": "challenge",
+      "request": { "path": "evaluation/interaction/requests/pending-conflict.json", "sha256": "sha256:cb51ac46e9b33f053587d4f693b1a6a09a6442d7984f0ca29881ebc3ddc9749f" },
+      "acquisitionAnnotationId": "pending-conflict-acquisition",
+      "ruleAnnotationId": "pending-conflict-rules",
+      "relation": { "kind": "abstentionCase", "baselineId": "slow-success-clean", "changedProperty": "App instrumentation declares pending while the native DOM remains idle, requiring conflict-preserving cantTell." }
+    },
+    {
+      "id": "slow-success-clean",
+      "split": "smoke",
+      "request": { "path": "evaluation/interaction/requests/slow-success-clean.json", "sha256": "sha256:cc6fc201372414745f64383900966e1d5da387cd500f59bb95befb905062a918" },
+      "acquisitionAnnotationId": "slow-success-clean-acquisition",
+      "ruleAnnotationId": "slow-success-clean-rules",
+      "relation": { "kind": "baseline" }
+    },
+    {
+      "id": "trace-untested",
+      "split": "challenge",
+      "request": { "path": "evaluation/interaction/requests/trace-untested.json", "sha256": "sha256:dc0a9ae66b7b3d54657e75177a0037d6d5d2cc1927ece6d3a1fe5930b571f9ab" },
+      "acquisitionAnnotationId": "trace-untested-acquisition",
+      "ruleAnnotationId": "trace-untested-rules",
+      "relation": { "kind": "abstentionCase", "baselineId": "slow-success-clean", "changedProperty": "The declared action remains present but controlled trace execution is explicitly omitted." }
+    }
+  ]
+}

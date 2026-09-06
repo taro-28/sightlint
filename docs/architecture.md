@@ -358,16 +358,18 @@ Broad aesthetic critique is not a trusted blocking obligation.
 
 ## Interaction architecture
 
-Future dynamic analysis adds versioned action/effect/state/trace extensions rather than pretending
-a static screenshot proves behavior.
+ADR 0047 adds the first versioned action/effect/state/trace extension rather than pretending a
+static screenshot proves behavior.
 
 Potential sources include browser/mobile automation, application-declared effects, controlled
 network/failure harnesses, and screenshots at named states. The kernel normalizes ordering,
 durations, causal IDs, scope, and alternatives before evaluating obligations such as pending
 feedback, idempotency, recovery, destructive safeguards, and focus behavior.
 
-Browsers/devices and controlled clocks remain adapter/test-harness responsibilities. Issue #30
-contains the interaction roadmap.
+Browsers/devices and controlled clocks remain adapter/test-harness responsibilities. The first
+Playwright slice uses a controlled step clock, denied external network, separately acquired native,
+accessibility, and screenshot evidence, and application-declared effect resolution. The kernel
+consumes only validated normalized events and retains conflicts as `cantTell`.
 
 ## Evaluation architecture
 

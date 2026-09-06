@@ -255,6 +255,20 @@ still validated before base rules run.
 These rules consume declared/evidence-backed inputs. Current `inspect-image` observations do not
 become trusted semantic peers or blocking spacing failures.
 
+ADR 0047 adds two medium-neutral interaction rules to `sightlint:base`:
+
+- `interaction.async-feedback@0.1.0` applies only to an action whose declared effect latency is
+  observable and requires pending or optimistic native-state evidence after activation and before
+  controlled resolution;
+- `interaction.failure-recovery@0.1.0` applies to an exercised declared failure path and accepts
+  any declared retry or save-draft alternative that is offered, activated, resolves successfully,
+  and reaches visible success.
+
+Both are advisory maturity and enforcement. Missing trace execution is `untested`, immediate
+completion or an unexercised failure path is `inapplicable`, and retained native/instrumentation
+conflict is `cantTell`. App-declared resolution does not become proof of an invisible real-world
+effect, and screenshot pixels alone cannot satisfy either rule.
+
 ## Further recommended candidates
 
 The first admitted slice is intentionally narrow. Further candidates remain evidence-gated:

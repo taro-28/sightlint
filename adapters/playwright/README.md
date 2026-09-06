@@ -9,19 +9,26 @@ deterministic Rust `sightlint` binary.
 The adapter and local orchestration command are governed by ADRs 0033–0036. They are not part of
 the Rust kernel and do not decide whether a UI is good or bad.
 
+ADR 0047 also defines the separate `sightlint-interaction` process for bounded controlled traces.
+It drives only the repository-owned Atlas interaction fixture and emits the medium-neutral
+`org.sightlint.interaction@0.1.0` extension. It is not an arbitrary Playwright script runner.
+
 ## Compatibility
 
 - Node.js: 20 through 24; CI verifies that the hosted runtime is in range and records its exact
   version in every capture.
 - Playwright: exactly `1.63.0` with its matching Chromium build.
 - Schema validation: AJV exactly `8.20.0` in development/E2E.
-- private adapter package: `0.4.0`.
+- private adapter package: `0.5.0` (adds the interaction command; existing Web commands retain
+  their own protocol and adapter versions).
 - capture request/response: `0.1.0`.
 - adapter implementation: `0.3.0`.
 - `org.sightlint.web` extension: `0.3.0`; strict `0.1.0` and `0.2.0` schemas remain available for
   version dispatch and historical validation.
 - Artifact IR: `0.1.0`.
 - local workflow report: `0.1.0`; it embeds CheckReport `0.3.0` without changing its verdicts.
+- interaction request/response and extension: `0.1.0`.
+- interaction adapter implementation: `0.1.0`.
 
 Install the locked dependencies and browser once:
 
@@ -83,6 +90,35 @@ to stderr, nothing to stdout, and exits 2. Rule verdicts belong to the subsequen
 The default recommended Web rules are advisory, while pre-existing base-rule failures retain their
 blocking exit behavior.
 
+## Controlled interaction path
+
+The bounded interaction command accepts an ordered script of `activate`, `resolveSuccess`,
+`reject`, and declared recovery activation steps. The fixture harness controls completion without
+raw timers or real network requests:
+
+```bash
+interaction_dir="$(mktemp -d)"
+node adapters/playwright/dist/src/interaction-cli.js \
+  --request evaluation/interaction/requests/failure-retry-clean.json \
+  --repository-root "$PWD" \
+  --artifact-ir-out "$interaction_dir/artifact-ir.json" \
+  > "$interaction_dir/response.json"
+
+target/debug/sightlint check "$interaction_dir/artifact-ir.json" \
+  --profile base --format json
+```
+
+Each controlled step observes DOM state, a locator-scoped accessibility snapshot, and a viewport
+screenshot in a documented sequential order. Screenshot bytes are not persisted; their digest,
+extent, and byte count remain in the adapter response and evidence. App instrumentation supplies
+only declared effect-resolution events. A native/instrumentation disagreement becomes explicit
+conflict evidence and `cantTell` in the kernel.
+
+The first two interaction rules are advisory even though they run in `sightlint:base`; therefore a
+reviewed mutation produces a failed result with exit 0. `--deny-cant-tell` remains the caller's
+explicit strict-policy override. Acquisition and verdict annotations live separately under
+`evaluation/interaction/`.
+
 ## Trust, network, and privacy boundary
 
 Protocol `0.1.0` accepts only a repository-contained `file:` HTML entrypoint and exactly one main
@@ -143,3 +179,9 @@ abstention/hard-negative behavior. It reports per-rule contract coverage, failur
 precision, reviewed abstention, mutation kill rate, and hard-negative failures with explicit
 denominators. Linux is the required browser E2E platform; cross-platform screenshot byte identity
 is not claimed.
+
+The interaction E2E adds eight public cases: controlled slow success, failure/retry, two targeted
+mutations, a save-draft hard negative, evidence conflict, immediate inapplicability, and untested
+execution. It validates request/response/generated-extension/evaluation schemas, separate
+acquisition and rule truth, normalization, advisory exit behavior, mutation kills, abstention,
+privacy non-leakage, output collision, and repeated byte stability within one declared runtime.

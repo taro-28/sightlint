@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:interaction-rule-annotation:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "kind", "provenance", "annotations"],
+  "properties": {
+    "annotationVersion": { "const": "0.1.0" },
+    "kind": { "const": "ruleGroundTruth" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringMethod", "guideVersion", "implementationOutputUsed", "reviewer"],
+      "properties": {
+        "authoringMethod": { "const": "fixtureIntentAndVersionedRuleContract" },
+        "guideVersion": { "const": "0.1.0" },
+        "implementationOutputUsed": { "const": false },
+        "reviewer": { "const": "maintainerOnly" }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "caseId", "policyProfile", "expectedExit", "expectations", "forbidUnexpectedFailures", "rationale", "falsePositiveRisk"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "caseId": { "type": "string", "minLength": 1 },
+          "policyProfile": { "const": "sightlint:base" },
+          "expectedExit": { "const": 0 },
+          "expectations": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["ruleId", "ruleVersion", "outcome"],
+              "properties": {
+                "ruleId": { "enum": ["interaction.async-feedback", "interaction.failure-recovery"] },
+                "ruleVersion": { "const": "0.1.0" },
+                "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] }
+              }
+            }
+          },
+          "forbidUnexpectedFailures": { "const": true },
+          "rationale": { "type": "string", "minLength": 1 },
+          "falsePositiveRisk": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
