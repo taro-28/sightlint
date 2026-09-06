@@ -11,16 +11,16 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of the release-transport repair, the latest verified baseline was:
+The branch for issue #25 started from this verified green `main` baseline:
 
-- commit: `4bb5c3aebf602f2aec467d6e2f07d22b6de4ceb9`
-- tree: `5c51c27f4f728f119de48b1948037455be01dc29`
-- merged PR: #46
-- main CI: run 33999994040, all six jobs successful
-- main CodeQL: run 33999993971, Rust and JavaScript/TypeScript successful
+- commit: `8a358b753648fd72db84097b66496bbeeb9923ba`
+- tree: `d100f164083b04050c4259daccf8ebceb3e6e296`
+- merged PR: #48
+- main CI: run 34000753514, all six jobs successful
+- main CodeQL: run 34000753417, Rust and JavaScript/TypeScript successful
 
-The release PR and tag workflow supersede that hash once merged and published. Never hard-code the
-recorded baseline as a branch base; verify the latest `main`, its exact CI, and the release page.
+Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
+and the release page.
 
 Use this source-of-truth order:
 
@@ -108,10 +108,12 @@ definitions exceed the accepted Node 20–24 alpha compatibility range.
 
 The immutable `v0.1.0-alpha.1` tag is an unpublished failed release candidate, not a supported
 release. Run 34000128047 created its draft assets but the read-only matrix could not access a draft
-release. ADR 0038 keeps verification jobs read-only by using a short-retention workflow artifact,
-requires the final write-enabled job to compare that artifact with the draft assets byte-for-byte,
-and moves the first publishable version to alpha.2. The stale alpha.1 draft is removed only after
-the failure evidence and successful replacement release are recorded; its tag is retained.
+release. ADR 0038 keeps verification jobs read-only by using a short-retention workflow artifact
+and requires the final write-enabled job to compare it with the draft assets byte-for-byte. Release
+run 34000898691 published alpha.2 after every job passed. The public source archive is 367,534 bytes
+with SHA-256 `67290954e7ed0e2e88bac59efe7e0e765c139e2e31580220afba4348d4ba5355`;
+the asset digest, checksum sidecar, public download, and two local rebuilds agreed. The alpha.1
+draft was then removed while its immutable tag and failure history were retained.
 
 Accepted ADR 0007 defines the license boundary. ADR 0037 and `docs/release.md` define the first
 release, supported environments, verification procedure, and explicit non-claims. Checksums detect
@@ -126,7 +128,8 @@ The Rust workspace contains:
 - `sightlint-ir`: versioned medium-neutral data contracts, validation, evidence, units, and
   canonicalization;
 - `sightlint-engine`: deterministic geometry queries, atomic rules, result/report construction;
-- `sightlint-adapter-png`: bounded PNG parsing, raster acquisition, and advisory image inspection;
+- `sightlint-adapter-png`: bounded PNG parsing, raster acquisition, advisory image inspection, and
+  an evaluation-only segmentation comparison;
 - `sightlint-cli`: public command surface and exit-code behavior.
 
 The trusted kernel can consume structured Artifact IR and emit deterministic, evidence-linked
@@ -198,6 +201,20 @@ Under one narrow policy—fully opaque raster and one identical perimeter color�
 The clean/mutated synthetic card pair is measured as `[1, 1]` versus `[1, 2]`. This proves the
 narrow measurement path, not that unequal spacing is semantically wrong in a real interface.
 Identical pixels with an “intentional grouping” annotation receive the same output.
+
+ADR 0039 keeps that strict default unchanged and adds `benchmark-image-segmentation` solely for
+research comparison. Its `0.1.0` canonical report compares strict flood fill, ranked exact-border
+flood fill, and 95%-qualified corner row-run/union-find. Candidate backgrounds are unconfirmed,
+semantic applicability is `cantTell`, rule outcome is `untested`, and the command never blocks.
+The nine-case Northstar corpus has separate source-authored acquisition and rule oracles, public
+smoke/development/challenge labels, hard negatives, targeted mutation, metamorphic relations, and
+bounded resource refusal. Screenshots and implementation reports remain temporary.
+
+The qualified policy recovers one edge-contaminated acquisition case and correctly abstains on two
+required hard negatives; ranked selection observes both hard negatives unsafely. Realistic shadows
+merge multiple dashboard surfaces under all three exact-color policies. The corpus therefore does
+not admit a new default, downstream rule, blocking result, holdout claim, or real-world accuracy
+claim.
 
 ### Realistic Web evaluation foundation
 
@@ -355,6 +372,8 @@ SightLint treats tests as part of the product specification.
   semantic spacing pair;
 - 30-case image-inspection corpus with independently declared region/gap oracles,
   19 observed cases, nine explicit unavailable cases, and two malformed inputs;
+- nine-case realistic segmentation benchmark with separate acquisition/rule oracles, three named
+  policies, hard negatives, targeted mutation, metamorphic variants, and checkerboard limits;
 - negative controls for blockers, differing sizes/colors, holes, mixed regions, touching and
   diagonal components, border variation, transparency, translation, scaling, recoloring, and
   intentional unequal grouping;
@@ -464,8 +483,8 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 
 ## Other preserved backlog
 
-- **#25:** compare strict/current background policy with ranked-border candidates and scalable
-  row-run/union-find segmentation against realistic hard negatives.
+- **#25 (complete):** compared strict/current background policy with ranked-border and
+  95%-qualified row-run candidates; neither broader policy was admitted.
 - **#26:** exact alpha-visible geometry for transparent assets.
 - **#27:** optional PNG palette/sub-byte/16-bit/`tRNS` support, only if product evidence justifies
   more codec maintenance and after an explicit library-versus-custom decision.
@@ -474,8 +493,8 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The earliest remaining research gate is #25. Later issues remain demand- and evidence-gated; the
-completed alpha does not make stale branches authoritative.
+The earliest remaining implementation gate is #26. Later issues remain demand- and evidence-gated;
+the completed alpha and benchmark do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -571,6 +590,7 @@ cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
@@ -646,8 +666,8 @@ A local Codex session is continuing SightLint correctly when it can explain, bef
 - why SightLint separates acquisition, evidence, policy, applicability, and judgment;
 - why native structure and pixels are reconciled rather than one replacing the other;
 - why uncertainty is a result rather than an error to hide;
-- why the next research gate is issue #25 and why broader background hypotheses must be benchmarked
-  against realistic hard negatives before replacing the strict baseline;
+- why issue #25 retained the strict baseline after broader background hypotheses failed realistic
+  hard-negative and false-grouping evidence, and why issue #26 is next;
 - why stale Draft branches are not a shortcut;
 - which exact E2E proves the public claim;
 - what remains unimplemented and what the PR must not claim.

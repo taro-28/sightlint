@@ -43,7 +43,8 @@ The bounded first-alpha execution epic,
 5. [#33](https://github.com/taro-28/sightlint/issues/33) — license, compatibility, packaging, and
    first alpha release (complete).
 
-The earliest remaining research gate is [#25](https://github.com/taro-28/sightlint/issues/25).
+The #25 benchmark is complete without changing the strict image-inspection default. The earliest
+remaining implementation gate is [#26](https://github.com/taro-28/sightlint/issues/26).
 
 ## Why
 
@@ -197,6 +198,19 @@ advisory, while `uxVerdict` remains `cantTell`: identical pixels could express i
 This prototype does not generally support text, rounded cards, shadows, gradients, photos,
 antialiasing, hierarchy, semantic roles, or design intent.
 
+### Evaluation-only segmentation benchmark
+
+`benchmark-image-segmentation` compares the unchanged strict perimeter/flood-fill policy with a
+ranked exact-border candidate and a 95%-qualified corner/row-run candidate. Its versioned canonical
+report records candidates, exact device-pixel regions, evidence, resource counters, and explicit
+abstention. It never emits a rule verdict, never blocks, and does not affect `inspect-image`.
+
+The nine-case repository-owned Northstar fixture includes a targeted edge mutation, metamorphic
+variants, split-pane and gradient hard negatives, and checkerboard resource stress. It shows that
+the 95% policy narrowly recovers edge contamination, while realistic shadows still merge semantic
+surfaces and the ranked policy selects both unsafe hard negatives. No policy is admitted as the
+product default; see [`evaluation/image-segmentation/results.md`](evaluation/image-segmentation/results.md).
+
 ## Install and current commands
 
 The first alpha is a source-only GitHub prerelease with a deterministic archive and SHA-256
@@ -230,6 +244,10 @@ cargo run --locked -p sightlint-cli -- \
 # Obtain advisory region and gap observations.
 cargo run --locked -p sightlint-cli -- \
   inspect-image screenshot.png --format json
+
+# Compare three nonblocking segmentation hypotheses in canonical JSON.
+cargo run --locked -p sightlint-cli -- \
+  benchmark-image-segmentation screenshot.png
 
 # Binary stdin is supported.
 cat screenshot.png | cargo run --locked -p sightlint-cli -- adapt-image -
@@ -292,6 +310,8 @@ Current committed assets include:
 - a versioned synthetic rule smoke oracle under `evaluation/`;
 - **38 PNG raster cases** with exact independent pixel, unavailable, or malformed outcomes;
 - **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
+- a nine-case realistic image-segmentation benchmark with separate acquisition/rule oracles,
+  hard negatives, abstention, targeted mutation, metamorphic relations, and bounded refusal;
 - a repository-owned realistic Web fixture foundation with six separately annotated acquisition
   and rule cases, including one targeted mutation and one intentional-grouping hard negative;
 - a 23-case Playwright companion that captures selected DOM/accessibility structure, computed
@@ -353,7 +373,7 @@ Read:
 | #22 | realistic human-reviewed evaluation gate |
 | #23 | Playwright web adapter and reconciliation |
 | #24 | zero-setup recommended rule packs |
-| #25 | background/segmentation benchmark research |
+| #25 | completed background/segmentation benchmark research; no production admission |
 | #26 | exact alpha-visible transparent-asset geometry |
 | #27 | optional broader PNG coverage and decoder strategy |
 | #28 | isolated OCR/CV/VLM worker protocol |
@@ -364,7 +384,7 @@ Read:
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0039 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0040 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

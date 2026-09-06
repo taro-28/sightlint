@@ -431,7 +431,9 @@ Important historical detail:
 - ADR 0037 defines the source-only first alpha release and surface-specific compatibility policy;
 - ADR 0038 preserves read-only verification and immutable public tags after the unpublished
   alpha.1 workflow-transport failure;
-- new ADRs should continue at 0039 or later rather than silently reusing historical numbers.
+- ADR 0039 compares broader exact-color segmentation hypotheses without replacing the strict
+  default after the realistic corpus exposes unsafe selection and false grouping;
+- new ADRs should continue at 0040 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -441,7 +443,6 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - representative corpus expansion and protected holdout operation beyond the public #22 slice;
 - arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
-- background/segmentation policy after benchmarking: issue #25;
 - alpha geometry implementation details on current raster: issue #26;
 - custom versus library decoding for broader formats: issue #27;
 - perception-worker protocol/calibration: issue #28;

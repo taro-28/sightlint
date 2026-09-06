@@ -28,6 +28,20 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 | Agent workflow oracle | `0.1.0` | Public smoke regression only, not a holdout or generalization estimate. |
 | Perception-worker protocol | not implemented | `untested`; no compatibility promise exists until issue #28 accepts a versioned protocol. |
 
+## Unreleased current-`main` additions after alpha.2
+
+The source tree after `v0.1.0-alpha.2` adds an evaluation-only image-segmentation surface. It is not
+part of the published alpha.2 archive and therefore does not retroactively change that release.
+
+| Surface | Version or contract | Compatibility rule |
+|---|---|---|
+| Segmentation benchmark report | `0.1.0` | Strict canonical JSON; incompatible fields or semantics require a new report version. It is not a CheckReport. |
+| Segmentation evaluation corpus | `0.1.0` | Human-authored acquisition and rule oracles remain separate; implementation output cannot rewrite either oracle. |
+| `benchmark-image-segmentation` | evaluation-only command | Exit `0` returns a complete report, including explicit unavailability; usage, I/O, validation, or decoding errors exit `2`; it never exits `1`. |
+
+The three candidate policies are versioned inside the report. None is a supported semantic UI
+segmentation guarantee or a replacement for `inspect-image`.
+
 ## CLI and process behavior
 
 The `0.1` alpha line reserves these exit meanings:

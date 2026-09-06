@@ -259,7 +259,11 @@ Current examples:
 
 - the 38-case PNG raster corpus compares complete decoded pixels and unavailability/errors;
 - the 30-case image-inspection corpus compares region bounds, groups, gaps, abstentions, evidence,
-  and errors under the strict perimeter hypothesis.
+  and errors under the strict perimeter hypothesis;
+- the nine-case image-segmentation benchmark captures one realistic repository-owned application,
+  validates separate acquisition/rule annotations, runs three policies through the built binary,
+  and measures region matching, false grouping, hard-negative abstention, mutation, metamorphic
+  behavior, deterministic bytes, and bounded refusal.
 
 The Playwright evidence matrix uses 23 repository-owned states with selected
 DOM/accessibility/computed geometry, overflow/clipping/center-hit reconciliation, and synchronized
@@ -389,6 +393,7 @@ cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps

@@ -109,7 +109,8 @@ accuracy. The corpus has one fictional application family, maintainer-only revie
 development labels, no private holdout, no pixel-content identity, no complete hit regions, no
 semantic peer inference, and no representative sampling. The three new rules therefore remain
 advisory. The scripted edit is not a claim about autonomous agent quality or arbitrary
-repositories. The earliest remaining research gate is #25.
+repositories. Issue #25 now provides the bounded comparison without admitting a broader
+segmentation default. The earliest remaining implementation gate is #26.
 
 ## Scope-selection rules
 
@@ -237,11 +238,20 @@ Current evaluation includes:
 
 - 38 committed source-raster cases with independent exact pixel/unavailable/error oracles;
 - 30 committed image-inspection cases with independent region/gap/abstention/error oracles;
+- nine realistic image-segmentation benchmark cases with separate acquisition/rule annotations,
+  public split declarations, targeted mutation, hard negatives, metamorphic variants, and bounded
+  resource refusal;
 - API, file, stdin, human/JSON, malformed, limits, metamorphic, and repeated-byte E2E;
 - a narrow `inspect-image` policy for fully opaque images with one exact perimeter color;
 - four-connected regions and simple same-size/same-color solid-rectangle row/column candidates;
 - exact gaps and nonblocking `uniform`/`unequal` observations;
 - `uxVerdict: cantTell` because image geometry alone does not prove semantic peer intent.
+
+ADR 0039 compares the strict policy with ranked exact-border flood fill and a 95%-qualified
+corner/row-run policy. Qualified selection recovers the edge mutation and abstains on the two
+required hard negatives, while ranked selection observes both hard negatives unsafely. All three
+policies false-group realistic shadow-connected surfaces, so none is admitted as a semantic or
+blocking product path.
 
 ### Explicit limitations
 
@@ -254,8 +264,8 @@ Current evaluation includes:
 
 ### Active follow-ups
 
-- #22 — realistic UI acquisition/rule corpus; this is the main M3/M4 gate;
-- #25 — benchmark broader background hypotheses and scalable segmentation against hard negatives;
+- #22 — realistic UI acquisition/rule corpus (complete foundation);
+- #25 — broader background and scalable segmentation benchmark (complete; no admission);
 - #26 — exact alpha-visible geometry for transparent assets;
 - #27 — optional palette/sub-byte/16-bit/`tRNS` support after a custom-vs-library strategy and
   demonstrated product need.
@@ -458,7 +468,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0039 or later.
+- New architecture decision numbers continue at 0040 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -477,7 +487,7 @@ Every public behavior must satisfy the applicable matrix:
 | #22 | realistic human-reviewed UI evaluation gate |
 | #23 | Playwright native/pixel web adapter |
 | #24 | zero-setup recommended rule packs |
-| #25 | background/segmentation benchmark research |
+| #25 | completed background/segmentation benchmark research; strict default retained |
 | #26 | exact alpha-visible transparent-asset geometry |
 | #27 | optional broader PNG format coverage and decoder strategy |
 | #28 | OCR/CV/VLM perception-worker protocol |
