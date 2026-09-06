@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:github-actions-projection-oracle:0.1.0",
+  "title": "SightLint GitHub Actions projection oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "provenance", "cases"],
+  "properties": {
+    "$schema": { "const": "../projection-annotation.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "const": "githubActionsProjectionOracle" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "cases": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringBasis", "implementationOutputUsedAsOracle", "reviewer", "reviewedAt"],
+      "properties": {
+        "authoringBasis": { "const": "adr0050AndIndependentRuleSourceContracts" },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "reviewer": { "const": "maintainerOnly" },
+        "reviewedAt": { "type": "string", "format": "date" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "targetKind", "targetId", "targetAspect"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "targetKind": { "enum": ["artifact", "canvas", "node", "relation"] },
+        "targetId": { "$ref": "#/$defs/nonEmptyString" },
+        "targetAspect": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/nonEmptyString" }
+          ]
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "startLine", "endLine"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "startLine": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding", "status", "level", "location", "reason"],
+      "properties": {
+        "finding": { "$ref": "#/$defs/finding" },
+        "status": { "enum": ["emitted", "sourceUnavailable", "omitted"] },
+        "level": {
+          "oneOf": [
+            { "type": "null" },
+            { "enum": ["error", "warning", "notice"] }
+          ]
+        },
+        "location": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/location" }
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            { "type": "null" },
+            { "enum": ["sourceMapNotProvided", "sourceLocationNotDeclared", "annotationLimit"] }
+          ]
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "expectedExit", "dispositions", "forbidUnexpectedProjectedResults", "rationale"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "expectedExit": { "enum": [0, 1] },
+        "dispositions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/disposition" }
+        },
+        "forbidUnexpectedProjectedResults": { "const": true },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}

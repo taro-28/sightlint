@@ -3,6 +3,7 @@ members = [
   "crates/sightlint-adapter-png",
   "crates/sightlint-cli",
   "crates/sightlint-engine",
+  "crates/sightlint-github-actions",
   "crates/sightlint-ir",
 ]
 resolver = "3"

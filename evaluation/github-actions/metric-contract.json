@@ -1,0 +1,29 @@
+{
+  "$schema": "./metric-contract.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "githubActionsMetricContract",
+  "caseCount": 8,
+  "minimums": {
+    "executedCases": 8,
+    "reviewedFailures": 2,
+    "exactSourceAnnotations": 2,
+    "preservedAbstentions": 4,
+    "summaryOnlyAbstentions": 4,
+    "killedMutations": 2,
+    "cleanCases": 2,
+    "hardNegatives": 2
+  },
+  "maximums": {
+    "unexpectedFailures": 0,
+    "falsePositiveFailures": 0,
+    "hardNegativeFailures": 0,
+    "unexpectedAnnotations": 0
+  },
+  "aggregateScore": false,
+  "notes": [
+    "Every metric is reported as an integer numerator and denominator rather than a universal score.",
+    "Failure precision concerns reviewed corpus results only and is not a real-world precision estimate.",
+    "Abstention coverage keeps cantTell and untested separate in the projection report.",
+    "A zero unexpected-failure count in public fixtures is regression evidence, not a blocking-maturity claim."
+  ]
+}

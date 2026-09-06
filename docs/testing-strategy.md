@@ -353,6 +353,16 @@ an isolated fixture copy, named-finding removal, no new failure, and retained am
 `cantTell` controls. Because the edit and oracle are visible, it does not estimate autonomous
 agent selection or real-world success.
 
+ADR 0050 adds a downstream GitHub Actions integration corpus without redefining rule truth. Eight
+public Atlas dashboard/settings cases join the existing independently reviewed rule expectations
+to separately authored exact-source maps and a third projection-disposition oracle. Public-binary
+E2E checks file/stdin input, exact error/warning/notice mapping, summary-only abstentions, strict
+gate policy, malformed/stale/unsafe declarations, command escaping, the 50-annotation cap, the
+1 MiB explicit summary boundary, repeated bytes, and paired clean reruns. The recorded integer
+precision/coverage/abstention/false-positive/mutation counts are regression evidence only: all
+cases and labels are visible, no protected holdout exists, and the suite does not estimate
+real-world UI/UX or GitHub usability.
+
 ## Layer 11 — Performance and resource tests
 
 Test bounded behavior at and around declared limits:
@@ -414,6 +424,8 @@ At handoff time, normal CI requires:
 
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
+python3 tools/generate_github_actions_schemas.py --check
+python3 tools/check_github_actions_evaluation.py
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
@@ -450,12 +462,14 @@ cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
+cargo test --locked -p sightlint-cli --test github_actions_e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
+cargo test --locked -p sightlint-cli --test github_actions_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture

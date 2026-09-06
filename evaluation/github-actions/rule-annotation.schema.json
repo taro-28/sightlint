@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:github-actions-rule-oracle:0.1.0",
+  "title": "SightLint GitHub Actions evaluation rule oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "provenance", "basisDocuments", "cases"],
+  "properties": {
+    "$schema": { "const": "../rule-annotation.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "const": "ruleOracle" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "basisDocuments": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringBasis", "implementationOutputUsedAsOracle", "reviewer", "reviewedAt"],
+      "properties": {
+        "authoringBasis": { "const": "fixtureIntentAndVersionedRuleContracts" },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "reviewer": { "const": "maintainerOnly" },
+        "reviewedAt": { "type": "string", "format": "date" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "aspect"],
+      "properties": {
+        "kind": { "enum": ["artifact", "canvas", "node", "relation"] },
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "aspect": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/nonEmptyString" }
+          ]
+        }
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "ruleVersion", "outcome", "enforcement", "target"],
+      "properties": {
+        "ruleId": { "$ref": "#/$defs/nonEmptyString" },
+        "ruleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "outcome": { "enum": ["passed", "failed", "cantTell", "inapplicable", "untested"] },
+        "enforcement": { "enum": ["advisory", "blocking"] },
+        "target": { "$ref": "#/$defs/target" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "profile", "expectedExit", "expectations", "forbidUnexpectedFailures", "rationale", "falsePositiveRisk"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "profile": { "enum": ["base", "recommended"] },
+        "expectedExit": { "enum": [0, 1] },
+        "expectations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/expectation" }
+        },
+        "forbidUnexpectedFailures": { "const": true },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" },
+        "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}

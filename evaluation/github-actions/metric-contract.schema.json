@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:github-actions-metric-contract:0.1.0",
+  "title": "SightLint GitHub Actions evaluation metric contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "caseCount", "minimums", "maximums", "aggregateScore", "notes"],
+  "properties": {
+    "$schema": { "const": "./metric-contract.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "const": "githubActionsMetricContract" },
+    "caseCount": { "const": 8 },
+    "minimums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executedCases", "reviewedFailures", "exactSourceAnnotations", "preservedAbstentions", "summaryOnlyAbstentions", "killedMutations", "cleanCases", "hardNegatives"],
+      "properties": {
+        "executedCases": { "const": 8 },
+        "reviewedFailures": { "const": 2 },
+        "exactSourceAnnotations": { "const": 2 },
+        "preservedAbstentions": { "const": 4 },
+        "summaryOnlyAbstentions": { "const": 4 },
+        "killedMutations": { "const": 2 },
+        "cleanCases": { "const": 2 },
+        "hardNegatives": { "const": 2 }
+      }
+    },
+    "maximums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unexpectedFailures", "falsePositiveFailures", "hardNegativeFailures", "unexpectedAnnotations"],
+      "properties": {
+        "unexpectedFailures": { "const": 0 },
+        "falsePositiveFailures": { "const": 0 },
+        "hardNegativeFailures": { "const": 0 },
+        "unexpectedAnnotations": { "const": 0 }
+      }
+    },
+    "aggregateScore": { "const": false },
+    "notes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

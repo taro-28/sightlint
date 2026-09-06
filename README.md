@@ -51,7 +51,10 @@ blocking claims. [Issue #29](https://github.com/taro-28/sightlint/issues/29) now
 PPTX, PDF, instrumented Android, and paired UIKit/XCUITest iOS capture slices.
 [Issue #30](https://github.com/taro-28/sightlint/issues/30) adds the first bounded controlled
 interaction trace, async-feedback, and recovery slice; it does not provide arbitrary-app or broad
-interaction coverage.
+interaction coverage. [Issue #31](https://github.com/taro-28/sightlint/issues/31) is complete for
+its exit criteria through the source alpha, one-command local agent path, and the deterministic
+GitHub Actions job-check integration; MCP, editor/browser UI, and broader package channels remain
+demand-led non-goals rather than required completion work.
 
 ## Why
 
@@ -348,6 +351,17 @@ cargo run --locked -p sightlint-cli -- \
 cargo run --locked -p sightlint-cli -- \
   check fixtures/e2e/pass-web.json --profile base --format json
 
+# Project the same authoritative report into versioned GitHub Actions JSON.
+cargo run --locked -p sightlint-cli -- \
+  github-check evaluation/web/inputs/dashboard-peer-spacing-clean.json --format json
+
+# In a GitHub Actions step, emit exact declared annotations and explicitly append the job summary.
+# This reviewed mutation intentionally exits 1 because its kernel result is blocking.
+cargo run --locked -p sightlint-cli -- \
+  github-check evaluation/web/inputs/dashboard-peer-spacing-mutant.json \
+  --source-map evaluation/github-actions/source-maps/dashboard-peer-spacing-mutant.json \
+  --format github-actions --write-step-summary
+
 # Validate/adapt supported PNG source facts.
 cargo run --locked -p sightlint-cli -- \
   adapt-image screenshot.png
@@ -410,6 +424,8 @@ cargo run --locked -p sightlint-cli -- \
 cargo run --locked -p sightlint-cli -- normalize fixtures/e2e/pass-web-shuffled.json
 cargo run --locked -p sightlint-cli -- schema
 cargo run --locked -p sightlint-cli -- schema --kind interaction
+cargo run --locked -p sightlint-cli -- schema --kind github-source-map
+cargo run --locked -p sightlint-cli -- schema --kind github-actions-report
 cargo run --locked -p sightlint-cli -- version
 ```
 
@@ -552,13 +568,13 @@ Read:
 | #29 | PPTX, PDF, Android, and iOS first slices implemented |
 | #60 | completed bounded iOS UIKit/XCUITest capture adapter slice |
 | #30 | completed bounded interaction trace, async-feedback, and declared recovery slice |
-| #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
+| #31 | completed M7 exit criteria through local agent and GitHub job-check surfaces; MCP/editor/local UI remain demand-led |
 | #62 | completed managed loopback Web capture and `/entries/new` dogfood slice of #31 |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0049 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0051 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

@@ -18,7 +18,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M4 — Structured adapters | active | process-isolated file and managed-loopback Playwright capture, 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | portability characterization and broader representative evaluation |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | active | interaction extension `0.1.0`, controlled Playwright/Atlas traces, async-feedback and failure-recovery advisory rules, eight-case evaluation | offline/permission/stale/partial/destructive/focus/mobile traces and broader evidence |
-| M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, managed target-repository server lifecycle, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
+| M7 — Ecosystem and release | complete for exit criteria | local CLI, bounded one-command Web agent workflow, managed target-repository server lifecycle, deterministic GitHub job-check projection, dual license, source-only alpha release | demand-led MCP/editor surfaces and binary/package channels |
 
 The project has a narrowly scoped source-only alpha. The kernel and structured-IR path are much
 more mature than the ability to infer useful structure and applicability from an arbitrary
@@ -517,7 +517,16 @@ repository development-server lifecycle behind explicit command authorization. I
 0049 make its acquisition and rule oracles independently reviewable and derive precision,
 coverage, abstention, false-positive, and mutation-kill counts from those documents. Neither slice
 adds MCP, hosted processing, source edit, existing-server attachment, remote URL, or package
-channel. The next #31 slice must remain focused on one evidence-preserving ecosystem surface.
+channel.
+
+Issue #67 and ADR 0050 complete the remaining M7 integration exit criterion with a deterministic
+`github-check` projection into the existing GitHub Actions job check. Exact file/line annotations
+require separately reviewed anchored source declarations; missing locations stay summary-only.
+The command preserves kernel outcome/enforcement/evidence/policy, bounds output at 50 annotations,
+escapes runner commands, and performs no network request, upload, source edit, or REST check-run
+creation. Its eight public Atlas cases separate rule, source, and projection truth and report
+integer precision/coverage/abstention/false-positive/mutation evidence without a holdout or
+aggregate score.
 
 ### First alpha release
 
@@ -534,15 +543,15 @@ channel. The next #31 slice must remain focused on one evidence-preserving ecosy
 
 ### Sequencing rule
 
-Do not polish MCP, GitHub annotations, GUI, or installers to compensate for weak product evidence.
-The minimum local agent loop in #34 may precede broad ecosystem work; full M7 follows evaluated
-usefulness.
+Do not add MCP, GUI, or installers to compensate for weak product evidence. Those optional surfaces
+remain demand-led after the bounded local-agent and GitHub job-check paths met M7's exit criteria.
 
 ### M7 exit criteria
 
 - one stable local install path on supported desktop systems;
 - agent-friendly canonical command/protocol backed by the same kernel;
 - source/evidence navigation and post-fix rerun demonstrated;
+- GitHub Actions job-check integration backed by the same kernel;
 - privacy/offline behavior tested;
 - license and compatibility policy resolved;
 - release artifacts verified and documented;
@@ -568,7 +577,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0049 or later.
+- New architecture decision numbers continue at 0051 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -595,9 +604,10 @@ Every public behavior must satisfy the applicable matrix:
 | #56 | bounded Android instrumented-capture adapter slice |
 | #60 | bounded iOS UIKit/XCUITest capture adapter slice |
 | #30 | completed bounded interaction extension/trace/async-feedback/recovery slice; broader M6 scenarios remain evidence-gated |
-| #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
+| #31 | completed M7 exit criteria through local agent and GitHub job-check surfaces; optional MCP/editor/local UI remains demand-led |
 | #62 | managed loopback target-repository Web capture and `/entries/new` dogfood |
 | #65 | separate managed-loopback acquisition and rule evaluation oracles |
+| #67 | deterministic GitHub Actions job-check projection and exact-source annotations |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha execution epic |

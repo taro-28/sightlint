@@ -1,0 +1,932 @@
+{
+  "$defs": {
+    "AnnotationDisposition": {
+      "description": "Annotation disposition for one failed or abstaining rule result.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "An exact source annotation is present.",
+          "properties": {
+            "annotation": {
+              "$ref": "#/$defs/GithubAnnotation",
+              "description": "Complete platform-neutral annotation fields."
+            },
+            "status": {
+              "const": "emitted",
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "annotation"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Exact source attribution is unavailable and the result remains summary-only.",
+          "properties": {
+            "reason": {
+              "$ref": "#/$defs/SourceUnavailableReason",
+              "description": "Why exact attribution was unavailable."
+            },
+            "status": {
+              "const": "sourceUnavailable",
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Exact source attribution exists but the bounded output cap omitted the annotation.",
+          "properties": {
+            "reason": {
+              "$ref": "#/$defs/AnnotationOmissionReason",
+              "description": "Why the annotation was omitted."
+            },
+            "status": {
+              "const": "omitted",
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "AnnotationLevel": {
+      "description": "GitHub annotation level derived only from outcome plus enforcement.",
+      "oneOf": [
+        {
+          "const": "error",
+          "description": "Failed blocking result.",
+          "type": "string"
+        },
+        {
+          "const": "warning",
+          "description": "Failed advisory result.",
+          "type": "string"
+        },
+        {
+          "const": "notice",
+          "description": "`cantTell` or `untested` coverage signal.",
+          "type": "string"
+        }
+      ]
+    },
+    "AnnotationOmissionReason": {
+      "description": "Explicit reason a source-located result was not emitted as an annotation.",
+      "oneOf": [
+        {
+          "const": "annotationLimit",
+          "description": "A higher-priority set already consumed the bounded annotation budget.",
+          "type": "string"
+        }
+      ]
+    },
+    "ArtifactKind": {
+      "description": "Broad medium represented by an artifact.",
+      "oneOf": [
+        {
+          "const": "web",
+          "description": "A web interface or viewport.",
+          "type": "string"
+        },
+        {
+          "const": "mobile",
+          "description": "A mobile application interface.",
+          "type": "string"
+        },
+        {
+          "const": "slide",
+          "description": "A presentation or slide deck.",
+          "type": "string"
+        },
+        {
+          "const": "document",
+          "description": "A paginated or flowing document.",
+          "type": "string"
+        },
+        {
+          "const": "pdf",
+          "description": "A Portable Document Format artifact.",
+          "type": "string"
+        },
+        {
+          "const": "image",
+          "description": "A raster or vector image.",
+          "type": "string"
+        },
+        {
+          "const": "other",
+          "description": "A medium not represented by another variant.",
+          "type": "string"
+        }
+      ]
+    },
+    "CheckReport": {
+      "additionalProperties": false,
+      "description": "Complete deterministic check report for one artifact.",
+      "properties": {
+        "artifactId": {
+          "$ref": "#/$defs/Identifier",
+          "description": "Artifact identifier."
+        },
+        "artifactKind": {
+          "$ref": "#/$defs/ArtifactKind",
+          "description": "Artifact medium."
+        },
+        "engineVersion": {
+          "description": "Version of the engine that produced the report.",
+          "type": "string"
+        },
+        "extensionVersions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Independently versioned official extensions consumed by the engine.",
+          "type": "object"
+        },
+        "profiles": {
+          "description": "Named rule profiles selected for this execution, in stable order.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "reportSchemaVersion": {
+          "description": "Version of the report schema.",
+          "type": "string"
+        },
+        "results": {
+          "description": "Results in stable rule and target order.",
+          "items": {
+            "$ref": "#/$defs/RuleResult"
+          },
+          "type": "array"
+        },
+        "summary": {
+          "$ref": "#/$defs/ReportSummary",
+          "description": "Outcome counts."
+        }
+      },
+      "required": [
+        "reportSchemaVersion",
+        "engineVersion",
+        "artifactId",
+        "artifactKind",
+        "profiles",
+        "summary",
+        "results"
+      ],
+      "type": "object"
+    },
+    "EvidenceClass": {
+      "description": "Authority and acquisition class of an evidence record.",
+      "oneOf": [
+        {
+          "const": "exactSource",
+          "description": "Exact declaration from a source format or user contract.",
+          "type": "string"
+        },
+        {
+          "const": "exactRender",
+          "description": "Exact measurement from deterministic rendered output.",
+          "type": "string"
+        },
+        {
+          "const": "platformSemantics",
+          "description": "Semantics supplied by an accessibility or platform API.",
+          "type": "string"
+        },
+        {
+          "const": "visionMeasured",
+          "description": "Deterministic or bounded measurement from pixels.",
+          "type": "string"
+        },
+        {
+          "const": "visionInferred",
+          "description": "Probabilistic inference from OCR, detection, or a model.",
+          "type": "string"
+        },
+        {
+          "const": "interactionTrace",
+          "description": "Reproducible event, focus, state, or network trace.",
+          "type": "string"
+        },
+        {
+          "const": "declaredContract",
+          "description": "Explicit project, design-system, API, or effect contract.",
+          "type": "string"
+        },
+        {
+          "const": "unknown",
+          "description": "Evidence whose authority is not known.",
+          "type": "string"
+        }
+      ]
+    },
+    "FindingIdentity": {
+      "additionalProperties": false,
+      "description": "Stable identity of a rule result, excluding its outcome and enforcement.",
+      "properties": {
+        "ruleId": {
+          "description": "Stable rule identifier.",
+          "type": "string"
+        },
+        "ruleVersion": {
+          "description": "Semantic rule version.",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/Target",
+          "description": "Exact target and optional aspect evaluated by the rule."
+        }
+      },
+      "required": [
+        "ruleId",
+        "ruleVersion",
+        "target"
+      ],
+      "type": "object"
+    },
+    "GithubActionsReportSchemaVersion": {
+      "description": "Serialized projection-report version discriminator.",
+      "oneOf": [
+        {
+          "const": "0.1.0",
+          "description": "Projection report contract `0.1.0`.",
+          "type": "string"
+        }
+      ]
+    },
+    "GithubAnnotation": {
+      "additionalProperties": false,
+      "description": "One exact, escaped GitHub Actions annotation before workflow-command rendering.",
+      "properties": {
+        "endLine": {
+          "description": "One-based final line, inclusive.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "findingKey": {
+          "description": "Stable projection key used for ordering and deduplication.",
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/$defs/AnnotationLevel",
+          "description": "GitHub annotation level."
+        },
+        "message": {
+          "description": "Evidence- and policy-bearing message derived from the trusted result.",
+          "type": "string"
+        },
+        "path": {
+          "description": "Repository-relative exact source path.",
+          "type": "string"
+        },
+        "startLine": {
+          "description": "One-based first line.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "title": {
+          "description": "Human-readable title derived from the trusted result.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "findingKey",
+        "level",
+        "path",
+        "startLine",
+        "endLine",
+        "title",
+        "message"
+      ],
+      "type": "object"
+    },
+    "Identifier": {
+      "description": "A stable identifier within one artifact document.",
+      "type": "string"
+    },
+    "IntegrationIdentity": {
+      "additionalProperties": false,
+      "description": "Identity of the GitHub Actions projection boundary.",
+      "properties": {
+        "name": {
+          "description": "Stable integration name.",
+          "type": "string"
+        },
+        "network": {
+          "description": "Network behavior of the projection process.",
+          "type": "string"
+        },
+        "verdictOwner": {
+          "description": "Component that remains authoritative for every rule verdict.",
+          "type": "string"
+        },
+        "version": {
+          "description": "Package implementation version.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "verdictOwner",
+        "network"
+      ],
+      "type": "object"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "description": "Numeric value reported by a rule with an explicit unit.",
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/Unit",
+          "description": "Unit of the value."
+        },
+        "value": {
+          "description": "Numeric value.",
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "type": "object"
+    },
+    "PolicyProvenance": {
+      "additionalProperties": false,
+      "description": "Versioned provenance for the expectation evaluated by a rule.",
+      "properties": {
+        "profile": {
+          "description": "Named built-in profile that selected the rule.",
+          "type": "string"
+        },
+        "reference": {
+          "description": "Human- or machine-navigable source reference.",
+          "type": "string"
+        },
+        "sourceId": {
+          "description": "Stable policy or standard identifier.",
+          "type": "string"
+        },
+        "sourceKind": {
+          "$ref": "#/$defs/PolicySourceKind",
+          "description": "Authority category for the expectation."
+        },
+        "sourceVersion": {
+          "description": "Version of the policy source.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile",
+        "sourceKind",
+        "sourceId",
+        "sourceVersion",
+        "reference"
+      ],
+      "type": "object"
+    },
+    "PolicySourceKind": {
+      "description": "Authority category that supplied a rule expectation.",
+      "oneOf": [
+        {
+          "const": "declaredContract",
+          "description": "An explicit project, design-system, or artifact contract.",
+          "type": "string"
+        },
+        {
+          "const": "platformStandard",
+          "description": "A named platform or accessibility standard.",
+          "type": "string"
+        },
+        {
+          "const": "conservativeBuiltIn",
+          "description": "A narrow conservative baseline shipped by `SightLint`.",
+          "type": "string"
+        }
+      ]
+    },
+    "ProjectedResult": {
+      "additionalProperties": false,
+      "description": "Projection metadata for one failed, `cantTell`, or `untested` result.",
+      "properties": {
+        "annotation": {
+          "$ref": "#/$defs/AnnotationDisposition",
+          "description": "Annotation or explicit reason no annotation was emitted."
+        },
+        "enforcement": {
+          "$ref": "#/$defs/RuleEnforcement",
+          "description": "Trusted kernel enforcement, separate from the outcome."
+        },
+        "evidenceClasses": {
+          "description": "Evidence classes preserved from the trusted result.",
+          "items": {
+            "$ref": "#/$defs/EvidenceClass"
+          },
+          "type": "array"
+        },
+        "evidenceIds": {
+          "description": "Evidence identifiers preserved from the trusted result.",
+          "items": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "type": "array"
+        },
+        "finding": {
+          "$ref": "#/$defs/FindingIdentity",
+          "description": "Result identity excluding verdict fields."
+        },
+        "findingKey": {
+          "description": "Stable projection key.",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/RuleOutcome",
+          "description": "Trusted kernel outcome, preserved without coercion."
+        }
+      },
+      "required": [
+        "findingKey",
+        "finding",
+        "outcome",
+        "enforcement",
+        "evidenceClasses",
+        "evidenceIds",
+        "annotation"
+      ],
+      "type": "object"
+    },
+    "ProjectionSummary": {
+      "additionalProperties": false,
+      "description": "Deterministic projection counts and gate policy.",
+      "properties": {
+        "actionableResults": {
+          "description": "Failed, `cantTell`, and `untested` results considered for annotation.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "advisoryFailures": {
+          "description": "Advisory failed results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "annotationLimit": {
+          "description": "Fixed per-step annotation cap.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "annotationsEmitted": {
+          "description": "Exact annotations emitted after applying the cap.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "annotationsOmitted": {
+          "description": "Exact annotations omitted after the deterministic cap.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "blockingFailures": {
+          "description": "Blocking failed results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "cantTell": {
+          "description": "Ambiguous results preserved as `cantTell`.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "denyCantTell": {
+          "description": "Whether the caller explicitly made `cantTell` gate-failing.",
+          "type": "boolean"
+        },
+        "gateExitCode": {
+          "description": "Public process exit code implied by the trusted report and explicit gate policy.",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "inapplicable": {
+          "description": "Results that did not meet applicability conditions.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "sourceUnavailable": {
+          "description": "Actionable results without declared exact source attribution.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "untested": {
+          "description": "Required observations or executions that were not performed.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "blockingFailures",
+        "advisoryFailures",
+        "cantTell",
+        "untested",
+        "inapplicable",
+        "actionableResults",
+        "annotationsEmitted",
+        "sourceUnavailable",
+        "annotationsOmitted",
+        "annotationLimit",
+        "denyCantTell",
+        "gateExitCode"
+      ],
+      "type": "object"
+    },
+    "ReportSummary": {
+      "additionalProperties": false,
+      "description": "Deterministic counts of rule outcomes.",
+      "properties": {
+        "cantTell": {
+          "description": "Number of ambiguous results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "failed": {
+          "description": "Number of failing results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "inapplicable": {
+          "description": "Number of inapplicable results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "passed": {
+          "description": "Number of passing results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "untested": {
+          "description": "Number of unexecuted results.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "passed",
+        "failed",
+        "inapplicable",
+        "cantTell",
+        "untested"
+      ],
+      "type": "object"
+    },
+    "RuleEnforcement": {
+      "description": "Whether a failed result changes the default process gate.",
+      "oneOf": [
+        {
+          "const": "advisory",
+          "description": "Report the result without failing the default process gate.",
+          "type": "string"
+        },
+        {
+          "const": "blocking",
+          "description": "A failed result causes the default process gate to fail.",
+          "type": "string"
+        }
+      ]
+    },
+    "RuleKind": {
+      "description": "Executable rule composition kind.",
+      "oneOf": [
+        {
+          "const": "atomic",
+          "description": "One narrow, independently testable expectation.",
+          "type": "string"
+        },
+        {
+          "const": "composite",
+          "description": "A deterministic composition of other rule outcomes.",
+          "type": "string"
+        }
+      ]
+    },
+    "RuleMaturity": {
+      "description": "Validation maturity of a rule implementation.",
+      "oneOf": [
+        {
+          "const": "experimental",
+          "description": "Rule semantics and fixtures are still being established.",
+          "type": "string"
+        },
+        {
+          "const": "advisory",
+          "description": "Rule is useful for review but not a default blocking gate.",
+          "type": "string"
+        },
+        {
+          "const": "blockingEligible",
+          "description": "Rule has earned eligibility for explicit blocking policy.",
+          "type": "string"
+        }
+      ]
+    },
+    "RuleOutcome": {
+      "description": "ACT-inspired result of evaluating one applicable target.",
+      "oneOf": [
+        {
+          "const": "passed",
+          "description": "The expectation was satisfied with sufficient evidence.",
+          "type": "string"
+        },
+        {
+          "const": "failed",
+          "description": "The expectation was violated with sufficient evidence.",
+          "type": "string"
+        },
+        {
+          "const": "inapplicable",
+          "description": "The target did not meet the rule's applicability conditions.",
+          "type": "string"
+        },
+        {
+          "const": "cantTell",
+          "description": "Available evidence was insufficient or incomparable.",
+          "type": "string"
+        },
+        {
+          "const": "untested",
+          "description": "A required observation or execution was not performed.",
+          "type": "string"
+        }
+      ]
+    },
+    "RuleResult": {
+      "additionalProperties": false,
+      "description": "Result of one rule evaluation against one target.",
+      "properties": {
+        "enforcement": {
+          "$ref": "#/$defs/RuleEnforcement",
+          "description": "Whether a failure changes the default process gate."
+        },
+        "evidenceClasses": {
+          "description": "Evidence classes represented by `evidenceIds`.",
+          "items": {
+            "$ref": "#/$defs/EvidenceClass"
+          },
+          "type": "array"
+        },
+        "evidenceIds": {
+          "description": "Evidence records used by the rule.",
+          "items": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "$ref": "#/$defs/RuleKind",
+          "description": "Rule composition kind."
+        },
+        "maturity": {
+          "$ref": "#/$defs/RuleMaturity",
+          "description": "Current validation maturity."
+        },
+        "measurements": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Measurement"
+          },
+          "description": "Named, explicitly unit-qualified measurements.",
+          "type": "object"
+        },
+        "message": {
+          "description": "Stable explanation of the observed result.",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/RuleOutcome",
+          "description": "ACT-inspired outcome."
+        },
+        "policy": {
+          "$ref": "#/$defs/PolicyProvenance",
+          "description": "Provenance of the expectation applied to this result."
+        },
+        "relatedNodeIds": {
+          "description": "Nodes involved in a relation-level result.",
+          "items": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "type": "array"
+        },
+        "ruleId": {
+          "description": "Stable rule identifier.",
+          "type": "string"
+        },
+        "ruleVersion": {
+          "description": "Semantic rule version.",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/Target",
+          "description": "Evaluated target."
+        },
+        "title": {
+          "description": "Human-readable rule title.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ruleId",
+        "ruleVersion",
+        "title",
+        "kind",
+        "maturity",
+        "policy",
+        "enforcement",
+        "target",
+        "outcome",
+        "message"
+      ],
+      "type": "object"
+    },
+    "SourceUnavailableReason": {
+      "description": "Explicit reason an actionable result has no source annotation.",
+      "oneOf": [
+        {
+          "const": "sourceMapNotProvided",
+          "description": "The caller supplied no source-location declaration.",
+          "type": "string"
+        },
+        {
+          "const": "sourceLocationNotDeclared",
+          "description": "A valid declaration did not contain this exact finding identity.",
+          "type": "string"
+        }
+      ]
+    },
+    "Target": {
+      "additionalProperties": false,
+      "description": "Stable reference to one evaluated target.",
+      "properties": {
+        "aspect": {
+          "description": "Optional aspect such as `renderBox` or a node pair.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/Identifier",
+          "description": "Stable target identifier."
+        },
+        "kind": {
+          "$ref": "#/$defs/TargetKind",
+          "description": "Target category."
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    },
+    "TargetKind": {
+      "description": "Stable kind of target evaluated by a rule.",
+      "oneOf": [
+        {
+          "const": "artifact",
+          "description": "Whole artifact.",
+          "type": "string"
+        },
+        {
+          "const": "canvas",
+          "description": "Canvas, page, screen, or viewport.",
+          "type": "string"
+        },
+        {
+          "const": "node",
+          "description": "Visual or semantic node.",
+          "type": "string"
+        },
+        {
+          "const": "relation",
+          "description": "Explicit source or inferred relation.",
+          "type": "string"
+        }
+      ]
+    },
+    "Unit": {
+      "description": "Unit used by one coordinate space.",
+      "oneOf": [
+        {
+          "const": "cssPixel",
+          "description": "Cascading Style Sheets logical pixel.",
+          "type": "string"
+        },
+        {
+          "const": "devicePixel",
+          "description": "Device or bitmap pixel.",
+          "type": "string"
+        },
+        {
+          "const": "dp",
+          "description": "Android density-independent pixel.",
+          "type": "string"
+        },
+        {
+          "const": "point",
+          "description": "Typographic or platform point.",
+          "type": "string"
+        },
+        {
+          "const": "emu",
+          "description": "English Metric Unit used by Office formats.",
+          "type": "string"
+        },
+        {
+          "const": "pdfPoint",
+          "description": "PDF point.",
+          "type": "string"
+        },
+        {
+          "const": "normalized",
+          "description": "Coordinate normalized to the closed interval from zero to one.",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$id": "urn:sightlint:schema:github-actions-report:0.1.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Complete deterministic GitHub Actions projection of one trusted check report.",
+  "properties": {
+    "checkReport": {
+      "$ref": "#/$defs/CheckReport",
+      "description": "Complete authoritative report produced by the deterministic kernel."
+    },
+    "githubActionsReportSchemaVersion": {
+      "$ref": "#/$defs/GithubActionsReportSchemaVersion",
+      "description": "Projection report schema version."
+    },
+    "integration": {
+      "$ref": "#/$defs/IntegrationIdentity",
+      "description": "Projection implementation and trust boundary."
+    },
+    "limitations": {
+      "description": "Stable limitations and non-claims of this projection.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "projectedResults": {
+      "description": "Failed and abstaining results with exact annotation disposition.",
+      "items": {
+        "$ref": "#/$defs/ProjectedResult"
+      },
+      "type": "array"
+    },
+    "projectionSummary": {
+      "$ref": "#/$defs/ProjectionSummary",
+      "description": "Projection-specific counts and exit policy."
+    }
+  },
+  "required": [
+    "githubActionsReportSchemaVersion",
+    "integration",
+    "checkReport",
+    "projectionSummary",
+    "projectedResults",
+    "limitations"
+  ],
+  "title": "SightLint GitHub Actions report 0.1.0",
+  "type": "object"
+}

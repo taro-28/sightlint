@@ -1,0 +1,190 @@
+{
+  "$schema": "../rule-annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "ruleOracle",
+  "provenance": {
+    "authoringBasis": "fixtureIntentAndVersionedRuleContracts",
+    "implementationOutputUsedAsOracle": false,
+    "reviewer": "maintainerOnly",
+    "reviewedAt": "2026-09-06"
+  },
+  "basisDocuments": [
+    "docs/decisions/0035-recommended-web-profile-and-advisory-enforcement.md",
+    "docs/decisions/0047-deterministic-interaction-contracts-and-traces.md",
+    "evaluation/interaction/annotations/rules.json",
+    "evaluation/web/annotations/rules.json"
+  ],
+  "cases": [
+    {
+      "caseId": "atlas-dashboard-intentional-grouping-hard-negative",
+      "profile": "recommended",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "passed",
+          "enforcement": "blocking",
+          "target": { "kind": "relation", "id": "relation-metrics", "aspect": "horizontal:renderBox" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The artifact declares exactly two metric peers with the required gap; the adjacent promotion card is not a relation member.",
+      "falsePositiveRisk": "Inferring peer membership from proximity would wrongly include the promotion card."
+    },
+    {
+      "caseId": "atlas-dashboard-peer-spacing-clean",
+      "profile": "recommended",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "passed",
+          "enforcement": "blocking",
+          "target": { "kind": "relation", "id": "relation-metrics", "aspect": "horizontal:renderBox" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "All three declared peer gaps equal the declared 24 CSS-pixel expectation.",
+      "falsePositiveRisk": "The reviewed relation is fixture-specific and must not be inferred for arbitrary cards."
+    },
+    {
+      "caseId": "atlas-dashboard-peer-spacing-mutant",
+      "profile": "recommended",
+      "expectedExit": 1,
+      "expectations": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "enforcement": "blocking",
+          "target": { "kind": "relation", "id": "relation-metrics", "aspect": "horizontal:renderBox" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The targeted transform changes one declared peer gap from 24 to 40 CSS pixels while tolerance remains zero.",
+      "falsePositiveRisk": "This failure is justified by the explicit relation; similar visible asymmetry without that contract could be intentional."
+    },
+    {
+      "caseId": "atlas-settings-missing-pending-mutant",
+      "profile": "base",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "interaction.async-feedback",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-fail-async-feedback", "aspect": "interaction.action:save-settings" }
+        },
+        {
+          "ruleId": "interaction.failure-recovery",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-fail-async-feedback", "aspect": "interaction.action:save-settings" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The observable-latency trace resolves with no pending or optimistic observation; no recovery contract applies.",
+      "falsePositiveRisk": "A feedback channel omitted from the declared contract could make this observation incomplete."
+    },
+    {
+      "caseId": "atlas-settings-native-declaration-conflict",
+      "profile": "base",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "interaction.async-feedback",
+          "ruleVersion": "0.1.0",
+          "outcome": "cantTell",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-cant-tell-conflict", "aspect": "interaction.action:save-settings" }
+        },
+        {
+          "ruleId": "interaction.failure-recovery",
+          "ruleVersion": "0.1.0",
+          "outcome": "cantTell",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-cant-tell-conflict", "aspect": "interaction.action:save-settings" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "App-declared pending conflicts with the native DOM state, so neither obligation may guess pass or failure.",
+      "falsePositiveRisk": "Favoring either source would erase evidence conflict and manufacture certainty."
+    },
+    {
+      "caseId": "atlas-settings-save-draft-hard-negative",
+      "profile": "base",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "interaction.async-feedback",
+          "ruleVersion": "0.1.0",
+          "outcome": "passed",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-pass-save-draft-hard-negative", "aspect": "interaction.action:save-settings" }
+        },
+        {
+          "ruleId": "interaction.failure-recovery",
+          "ruleVersion": "0.1.0",
+          "outcome": "passed",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-pass-save-draft-hard-negative", "aspect": "interaction.action:save-settings" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "Pending is observed and the declared save-draft recovery alternative reaches visible success.",
+      "falsePositiveRisk": "Requiring retry specifically would reject a valid declared alternative."
+    },
+    {
+      "caseId": "atlas-settings-slow-success-clean",
+      "profile": "base",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "interaction.async-feedback",
+          "ruleVersion": "0.1.0",
+          "outcome": "passed",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-pass-async-feedback", "aspect": "interaction.action:save-settings" }
+        },
+        {
+          "ruleId": "interaction.failure-recovery",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-pass-async-feedback", "aspect": "interaction.action:save-settings" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "Pending feedback is observed before the controlled success resolution and no failure-recovery contract applies.",
+      "falsePositiveRisk": "The trace evaluates only the declared state channel and does not prove human perception."
+    },
+    {
+      "caseId": "atlas-settings-trace-untested",
+      "profile": "base",
+      "expectedExit": 0,
+      "expectations": [
+        {
+          "ruleId": "interaction.async-feedback",
+          "ruleVersion": "0.1.0",
+          "outcome": "untested",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-untested", "aspect": "interaction.action:save-settings" }
+        },
+        {
+          "ruleId": "interaction.failure-recovery",
+          "ruleVersion": "0.1.0",
+          "outcome": "untested",
+          "enforcement": "advisory",
+          "target": { "kind": "artifact", "id": "artifact-m6-untested", "aspect": "interaction.action:save-settings" }
+        }
+      ],
+      "forbidUnexpectedFailures": true,
+      "rationale": "The action and obligations are declared but the controlled trace was not executed.",
+      "falsePositiveRisk": "Treating absent execution as pass hides coverage; treating it as failure claims an unobserved defect."
+    }
+  ]
+}

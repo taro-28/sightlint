@@ -194,6 +194,23 @@ combined test constant. This establishes the opt-in startup/capture/check/cleanu
 redaction contract; because it reuses the same Atlas family and public labels, it does not add a
 holdout, representative sampling, or evidence for changing rule maturity or enforcement.
 
+### GitHub Actions projection evaluation
+
+`evaluation/github-actions/` implements ADR 0050 as a downstream integration evaluation, not a
+new rule or acquisition benchmark. Eight public Atlas dashboard/settings cases reference existing
+Artifact IR projections and independently reviewed rule truth. Separate source maps declare only
+anchored exact repository locations, while a third oracle declares the expected GitHub annotation
+or explicit source-unavailable disposition without restating rule outcomes or enforcement.
+
+The public `sightlint github-check` E2E records 8/8 executed cases, 2/2 reviewed failures, 2/2 exact
+source annotations, 4/4 preserved abstentions, 4/4 summary-only abstentions, 2/2 killed mutations,
+and zero unexpected, false-positive, or hard-negative failures/annotations. Clean reruns must
+remove each targeted failure. All fixtures, labels, and locations are visible public
+smoke/development data owned by the repository under `MIT OR Apache-2.0`; they contain no personal
+or customer data, external assets, or external processing. There is no protected holdout or
+independent review, so these integer counts prove deterministic integration regression only—not
+representative precision, general UI/UX accuracy, or GitHub user effectiveness.
+
 ### PDF source-adapter evaluation
 
 `evaluation/pdf/` implements ADR 0044 with three deterministic repository-owned report pages and

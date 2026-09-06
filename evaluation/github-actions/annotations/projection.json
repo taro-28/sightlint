@@ -1,0 +1,159 @@
+{
+  "$schema": "../projection-annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "githubActionsProjectionOracle",
+  "provenance": {
+    "authoringBasis": "adr0050AndIndependentRuleSourceContracts",
+    "implementationOutputUsedAsOracle": false,
+    "reviewer": "maintainerOnly",
+    "reviewedAt": "2026-09-06"
+  },
+  "cases": [
+    {
+      "caseId": "atlas-dashboard-intentional-grouping-hard-negative",
+      "expectedExit": 0,
+      "dispositions": [],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "Passed and inapplicable results do not create annotations; the valid grouping alternative remains free of false-positive output."
+    },
+    {
+      "caseId": "atlas-dashboard-peer-spacing-clean",
+      "expectedExit": 0,
+      "dispositions": [],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "The clean reviewed relation produces no failed or abstaining result and therefore no GitHub annotation."
+    },
+    {
+      "caseId": "atlas-dashboard-peer-spacing-mutant",
+      "expectedExit": 1,
+      "dispositions": [
+        {
+          "finding": {
+            "ruleId": "visual.spacing.peer-consistency",
+            "ruleVersion": "0.1.0",
+            "targetKind": "relation",
+            "targetId": "relation-metrics",
+            "targetAspect": "horizontal:renderBox"
+          },
+          "status": "emitted",
+          "level": "error",
+          "location": {
+            "path": "evaluation/web/fixture-app/styles.css",
+            "startLine": 233,
+            "endLine": 235
+          },
+          "reason": null
+        }
+      ],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "The independently reviewed blocking spacing failure maps to the exact declared mutation block and keeps exit 1."
+    },
+    {
+      "caseId": "atlas-settings-missing-pending-mutant",
+      "expectedExit": 0,
+      "dispositions": [
+        {
+          "finding": {
+            "ruleId": "interaction.async-feedback",
+            "ruleVersion": "0.1.0",
+            "targetKind": "artifact",
+            "targetId": "artifact-m6-fail-async-feedback",
+            "targetAspect": "interaction.action:save-settings"
+          },
+          "status": "emitted",
+          "level": "warning",
+          "location": {
+            "path": "evaluation/interaction/fixture-app/app.js",
+            "startLine": 42,
+            "endLine": 44
+          },
+          "reason": null
+        }
+      ],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "The reviewed missing-feedback mutation remains advisory, emits a warning at exact declared source, and does not fail the default gate."
+    },
+    {
+      "caseId": "atlas-settings-native-declaration-conflict",
+      "expectedExit": 0,
+      "dispositions": [
+        {
+          "finding": {
+            "ruleId": "interaction.async-feedback",
+            "ruleVersion": "0.1.0",
+            "targetKind": "artifact",
+            "targetId": "artifact-m6-cant-tell-conflict",
+            "targetAspect": "interaction.action:save-settings"
+          },
+          "status": "sourceUnavailable",
+          "level": null,
+          "location": null,
+          "reason": "sourceMapNotProvided"
+        },
+        {
+          "finding": {
+            "ruleId": "interaction.failure-recovery",
+            "ruleVersion": "0.1.0",
+            "targetKind": "artifact",
+            "targetId": "artifact-m6-cant-tell-conflict",
+            "targetAspect": "interaction.action:save-settings"
+          },
+          "status": "sourceUnavailable",
+          "level": null,
+          "location": null,
+          "reason": "sourceMapNotProvided"
+        }
+      ],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "Both conflicting obligations remain cantTell and summary-only; no source defect or exact location is invented."
+    },
+    {
+      "caseId": "atlas-settings-save-draft-hard-negative",
+      "expectedExit": 0,
+      "dispositions": [],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "The accepted save-draft recovery alternative passes and produces no warning or error."
+    },
+    {
+      "caseId": "atlas-settings-slow-success-clean",
+      "expectedExit": 0,
+      "dispositions": [],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "The clean observable-latency trace passes while the recovery obligation is inapplicable, so neither produces an annotation."
+    },
+    {
+      "caseId": "atlas-settings-trace-untested",
+      "expectedExit": 0,
+      "dispositions": [
+        {
+          "finding": {
+            "ruleId": "interaction.async-feedback",
+            "ruleVersion": "0.1.0",
+            "targetKind": "artifact",
+            "targetId": "artifact-m6-untested",
+            "targetAspect": "interaction.action:save-settings"
+          },
+          "status": "sourceUnavailable",
+          "level": null,
+          "location": null,
+          "reason": "sourceMapNotProvided"
+        },
+        {
+          "finding": {
+            "ruleId": "interaction.failure-recovery",
+            "ruleVersion": "0.1.0",
+            "targetKind": "artifact",
+            "targetId": "artifact-m6-untested",
+            "targetAspect": "interaction.action:save-settings"
+          },
+          "status": "sourceUnavailable",
+          "level": null,
+          "location": null,
+          "reason": "sourceMapNotProvided"
+        }
+      ],
+      "forbidUnexpectedProjectedResults": true,
+      "rationale": "Both obligations remain untested and summary-only; absence of execution is neither pass, failure, nor source-localized defect."
+    }
+  ]
+}

@@ -369,6 +369,8 @@ fn schema_and_version_commands_expose_machine_and_human_contract_versions() {
     assert!(version.contains("Web extension 0.4.0"));
     assert!(version.contains("Interaction extension 0.1.0"));
     assert!(version.contains("Report schema 0.3.0"));
+    assert!(version.contains("GitHub source map 0.1.0"));
+    assert!(version.contains("GitHub Actions report 0.1.0"));
 
     let mut visual_schema_command = binary();
     visual_schema_command
@@ -382,6 +384,23 @@ fn schema_and_version_commands_expose_machine_and_human_contract_versions() {
         visual_schema_json["$id"],
         "urn:sightlint:schema:visual-extension:0.1.0"
     );
+
+    for (kind, expected_id) in [
+        (
+            "github-source-map",
+            "urn:sightlint:schema:github-source-map:0.1.0",
+        ),
+        (
+            "github-actions-report",
+            "urn:sightlint:schema:github-actions-report:0.1.0",
+        ),
+    ] {
+        let mut command = binary();
+        command.args(["schema", "--kind", kind]);
+        let output = run(&mut command, None);
+        assert_code(&output, EXIT_SUCCESS);
+        assert_eq!(parse_stdout(&output)["$id"], expected_id);
+    }
 }
 
 #[test]

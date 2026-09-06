@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:github-actions-evaluation-corpus:0.1.0",
+  "title": "SightLint GitHub Actions evaluation corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "corpus", "provenance", "splitPolicy", "metricContract", "projectionOracle", "cases", "limitations"],
+  "properties": {
+    "$schema": { "const": "./corpus.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "corpus": { "const": "sightlint-github-actions-public-v0" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "splitPolicy": { "$ref": "#/$defs/splitPolicy" },
+    "metricContract": { "$ref": "#/$defs/relativeJsonPath" },
+    "projectionOracle": { "$ref": "#/$defs/relativeJsonPath" },
+    "cases": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/case" }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "relativeJsonPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.json$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringBasis", "implementationOutputUsedAsOracle", "ownership", "license", "redistribution", "privacyReview", "externalAssets", "externalProcessing", "sourceIds"],
+      "properties": {
+        "authoringBasis": { "const": "humanReviewedFixtureRuleAndProjectionContracts" },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "$ref": "#/$defs/nonEmptyString" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "externalAssets": { "const": false },
+        "externalProcessing": { "const": false },
+        "sourceIds": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "enum": ["atlas-dashboard-repository-fixture-v0", "atlas-interaction-repository-fixture-v0"] }
+        }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibility", "holdoutStatus", "leakageRisk", "allowedSplits"],
+      "properties": {
+        "visibility": { "const": "public" },
+        "holdoutStatus": { "const": "notHoldout" },
+        "leakageRisk": { "$ref": "#/$defs/nonEmptyString" },
+        "allowedSplits": {
+          "type": "array",
+          "const": ["development", "smoke"]
+        }
+      }
+    },
+    "ruleOracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document", "collection", "caseId"],
+      "properties": {
+        "document": { "$ref": "#/$defs/relativeJsonPath" },
+        "collection": { "enum": ["annotations", "cases"] },
+        "caseId": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "sourceId", "split", "classification", "input", "profile", "sourceMap", "ruleOracle", "pairedCleanCase", "falsePositiveRisk", "nonClaim"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "sourceId": { "enum": ["atlas-dashboard-repository-fixture-v0", "atlas-interaction-repository-fixture-v0"] },
+        "split": { "enum": ["development", "smoke"] },
+        "classification": { "enum": ["clean", "targetedMutation", "hardNegative", "cantTell", "untested"] },
+        "input": { "$ref": "#/$defs/relativeJsonPath" },
+        "profile": { "enum": ["base", "recommended"] },
+        "sourceMap": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/relativeJsonPath" }
+          ]
+        },
+        "ruleOracle": { "$ref": "#/$defs/ruleOracle" },
+        "pairedCleanCase": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/nonEmptyString" }
+          ]
+        },
+        "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" },
+        "nonClaim": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}

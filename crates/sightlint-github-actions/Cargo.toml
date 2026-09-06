@@ -1,6 +1,6 @@
 [package]
-name = "sightlint-cli"
-description = "Command-line interface for SightLint"
+name = "sightlint-github-actions"
+description = "Deterministic GitHub Actions projection contracts for SightLint reports"
 publish = false
 version.workspace = true
 edition.workspace = true
@@ -8,16 +8,11 @@ rust-version.workspace = true
 repository.workspace = true
 license.workspace = true
 
-[[bin]]
-name = "sightlint"
-path = "src/main.rs"
-
 [dependencies]
-clap.workspace = true
+schemars.workspace = true
+serde.workspace = true
 serde_json.workspace = true
-sightlint-adapter-png = { path = "../sightlint-adapter-png" }
 sightlint-engine = { path = "../sightlint-engine" }
-sightlint-github-actions = { path = "../sightlint-github-actions" }
 sightlint-ir = { path = "../sightlint-ir" }
 
 [lints]

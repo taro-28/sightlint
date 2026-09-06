@@ -105,10 +105,11 @@ complete for protocol v0 through ADR 0042: a bounded local wrapper and typed per
 exist, but real OCR/model quality remains `untested`. Issue #29 now has focused PPTX, PDF, Android,
 and iOS slices through ADRs 0043–0046. Issue #30's bounded interaction slice is complete. Issue #62
 completes managed loopback Web capture through ADR 0048; issue #65 and ADR 0049 separate that
-slice's acquisition and rule evaluation authorities without broadening the remaining #31
-ecosystem backlog. Later milestones do not automatically outrank current evidence needs because
-historical code once existed on a stale branch. Explain any deviation from the remaining sequence
-in the issue and PR.
+slice's acquisition and rule evaluation authorities. Issue #67 and ADR 0050 complete #31's
+same-kernel integration exit criterion through a deterministic GitHub Actions job-check
+projection. Optional ecosystem expansion requires a new demand-led issue. Later milestones do not
+automatically outrank current evidence needs because historical code once existed on a stale
+branch. Explain any deviation from the remaining sequence in the issue and PR.
 
 ## Before editing
 
@@ -141,7 +142,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0050 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0051 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -165,6 +166,8 @@ baseline is:
 
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
+python3 tools/generate_github_actions_schemas.py --check
+python3 tools/check_github_actions_evaluation.py
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
@@ -204,12 +207,14 @@ cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
+cargo test --locked -p sightlint-cli --test github_actions_e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
+cargo test --locked -p sightlint-cli --test github_actions_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
