@@ -140,9 +140,10 @@ streams its SHA-256, and rejects files above the request limit. Request maxima a
 - annotations: 10,000 total and 1,000 per page;
 - canonical response and Artifact IR: 16 MiB each.
 
-The adapter uses `PdfReader(..., strict=True, root_object_recovery_limit=1)` and does not access
-content streams, images, attachments, outlines, XMP, forms, or text extraction. Encrypted input is
-rejected rather than decrypted. Missing/invalid catalog or page tree, indirect-reference
+The adapter uses `PdfReader(..., strict=True, root_object_recovery_limit=1)` and walks the raw
+page tree iteratively with cycle detection instead of using pypdf's inherited-page-property
+expansion. It does not access content streams, images, attachments, outlines, XMP, forms, or text
+extraction. Encrypted input is rejected rather than decrypted. Missing/invalid catalog or page tree, indirect-reference
 collisions, malformed boxes/annotations, source/render digest mismatch, path escape, dependency
 version mismatch, over-budget input/object/page/annotation/output, Rust rejection, and exclusive
 output collision have stable error categories and produce no partial artifact file.

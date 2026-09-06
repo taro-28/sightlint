@@ -180,8 +180,8 @@ Palette/indexed, sub-byte, 16-bit, `tRNS`, animation, and over-budget cases are 
 unavailable instead of guessed.
 
 ADR 0041 keeps that boundary after a versioned format-demand assessment found that all five
-source-alpha assets, all three later PPTX differential renders, and the nine pinned-browser
-product captures use the supported subset.
+source-alpha assets, all three PPTX differential renders, all three PDF page renders, and the nine
+pinned-browser product captures use the supported subset.
 Unsupported formats remain conformance controls rather than product-demand evidence; no decoder
 dependency, automatic conversion, compatibility change, prevalence claim, or protected holdout is
 introduced. A future observed gap requires a new issue and ADR.

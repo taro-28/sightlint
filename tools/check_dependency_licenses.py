@@ -83,13 +83,48 @@ def npm_licenses() -> tuple[int, int]:
     return len(lock_paths), external
 
 
+def python_licenses() -> int:
+    """Validate the exact hash-locked Python adapter dependency records."""
+    lock_path = ROOT / "adapters" / "pdf" / "dependency-lock.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    packages = lock.get("packages")
+    if lock.get("lockVersion") != "0.1.0" or not isinstance(packages, list):
+        raise SystemExit("PDF Python dependency lock has an unsupported shape")
+    if len(packages) != 1:
+        raise SystemExit("PDF Python dependency lock must contain exactly one package")
+    package = packages[0]
+    if not isinstance(package, dict):
+        raise SystemExit("PDF Python dependency lock contains an invalid package")
+    identifier = f"Python {package.get('name', '?')}@{package.get('version', '?')}"
+    validate_license(package.get("license"), identifier)
+    if (
+        package.get("name") != "pypdf"
+        or package.get("version") != "6.17.0"
+        or package.get("requiresPython") != ">=3.9"
+    ):
+        raise SystemExit(f"{identifier} differs from the reviewed PDF dependency")
+    digest = package.get("sha256")
+    if not isinstance(digest, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", digest) is None:
+        raise SystemExit(f"{identifier} has no valid wheel digest")
+    requirements = (ROOT / "adapters" / "pdf" / "requirements.txt").read_text(
+        encoding="utf-8"
+    )
+    if (
+        "--only-binary=:all:" not in requirements
+        or f"pypdf=={package['version']} --hash={digest}" not in requirements
+    ):
+        raise SystemExit(f"{identifier} is not exact and hash-locked in requirements.txt")
+    return len(packages)
+
+
 def main() -> None:
-    """Validate both locked ecosystems."""
+    """Validate every locked package ecosystem."""
     cargo_count = cargo_licenses()
     npm_roots, npm_count = npm_licenses()
+    python_count = python_licenses()
     print(
         f"dependency licenses: {cargo_count} Cargo and {npm_count} external npm packages "
-        f"across {npm_roots} private roots verified"
+        f"across {npm_roots} private roots, plus {python_count} Python package, verified"
     )
 
 

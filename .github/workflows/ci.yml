@@ -69,6 +69,13 @@ jobs:
           python3 tools/generate_pptx_fixtures.py --check
           python3 tools/check_pptx_evaluation.py
           python3 -m unittest adapters/pptx/tests/test_adapter.py
+      - name: Install and verify the locked PDF adapter dependency and evaluation
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+          python3 tools/generate_pdf_fixtures.py --check
+          python3 tools/check_pdf_evaluation.py
+          python3 -m unittest adapters/pdf/tests/test_adapter.py
       - name: Verify release and dependency-license contracts
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
@@ -111,6 +118,9 @@ jobs:
       - name: Run PPTX source-adapter evaluation explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
+      - name: Run PDF source-adapter evaluation explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
       - name: Build documentation
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         env:
@@ -203,11 +213,18 @@ jobs:
         working-directory: adapters/perception
       - name: Build the public SightLint binary
         run: cargo build --locked -p sightlint-cli
+      - name: Install locked PDF parser dependency
+        run: ${{ matrix.python }} -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
       - name: Verify PPTX fixture and evaluation contracts
         run: |
           ${{ matrix.python }} tools/generate_pptx_fixtures.py --check
           ${{ matrix.python }} tools/check_pptx_evaluation.py
           ${{ matrix.python }} -m unittest adapters/pptx/tests/test_adapter.py
+      - name: Verify PDF fixture and evaluation contracts
+        run: |
+          ${{ matrix.python }} tools/generate_pdf_fixtures.py --check
+          ${{ matrix.python }} tools/check_pdf_evaluation.py
+          ${{ matrix.python }} -m unittest adapters/pdf/tests/test_adapter.py
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E
