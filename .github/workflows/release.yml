@@ -119,6 +119,13 @@ jobs:
       - name: Test extracted Rust workspace
         shell: bash
         run: cargo test --manifest-path "release-unpacked/sightlint-$RELEASE_TAG/Cargo.toml" --locked --workspace --all-features
+      - name: Verify extracted PPTX evaluation contracts
+        shell: bash
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}
+        run: |
+          "${{ matrix.python }}" tools/generate_pptx_fixtures.py --check
+          "${{ matrix.python }}" tools/check_pptx_evaluation.py
+          "${{ matrix.python }}" -m unittest adapters/pptx/tests/test_adapter.py
       - name: Verify hosted Node compatibility
         shell: bash
         run: node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 20 || major > 24) process.exit(1)'
@@ -167,6 +174,9 @@ jobs:
           python3 tools/check_png_format_demand.py
           python3 tools/check_web_evaluation.py
           python3 tools/check_perception_evaluation.py
+          python3 tools/generate_pptx_fixtures.py --check
+          python3 tools/check_pptx_evaluation.py
+          python3 -m unittest adapters/pptx/tests/test_adapter.py
           python3 tools/check_dependency_licenses.py
           python3 -m unittest tools/test_release.py
       - name: Install the locked perception wrapper
@@ -184,6 +194,7 @@ jobs:
         working-directory: release-unpacked/sightlint-${{ github.ref_name }}
         run: |
           cargo build --locked -p sightlint-cli --bin sightlint
+          cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
           npm run test:e2e --prefix adapters/perception
           npm run test:e2e --prefix adapters/playwright
 

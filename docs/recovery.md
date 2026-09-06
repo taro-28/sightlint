@@ -122,4 +122,5 @@ The incident is closed as an implementation recovery. Issue #34's sequence—rea
 Codex fix-and-rerun workflow (#42), and the source-only release gate (#33)—is complete. Issues #25
 and #26 are complete, ADR 0041 closes #27 without admitting broader decoding, and ADR 0042
 completes the local protocol-v0 perception boundary for #28 without claiming model quality. The
-earliest remaining roadmap gate is #29.
+first bounded PPTX source-geometry slice of #29 is implemented through ADR 0043; remaining #29 work
+starts with the PDF/document candidate.

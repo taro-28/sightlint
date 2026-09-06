@@ -224,6 +224,19 @@ all pixels or automatically create semantic component nodes.
 trusted Artifact IR/CheckReport meaning. Its region/gap candidates are conditional hypotheses, not
 accepted semantic relations. ADRs 0030 and 0031 define these boundaries.
 
+## Current PPTX use
+
+ADR 0043 leaves Artifact IR at `0.1.0` and maps a supported presentation slide to an `emu` canvas,
+direct source shapes/groups to ordinary `shape`/`container` nodes, and supported source transforms
+to evidence-linked `layoutBox` values. PPTX native IDs, local z-order, placeholder fields,
+digest-only source-text metadata, acquisition coverage, unsupported features, and render
+reconciliation live in `org.sightlint.pptx@0.1.0` rather than mandatory core fields.
+
+The synchronized PNG is a second `devicePixel` canvas with separate exact-render evidence. Source
+and render dimensions are both retained when their declared scale conflicts. No `renderBox` or
+`inkBox` is inferred for a source node, and shape-to-pixel identity remains `cantTell`. The shared
+canvas-containment rule may consume exact source `layoutBox` facts without learning PPTX concepts.
+
 ## Interaction extension
 
 Interaction data is optional for static artifacts and remains future work under issue #30. A
@@ -296,5 +309,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0043 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0044 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

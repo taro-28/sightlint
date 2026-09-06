@@ -56,9 +56,24 @@ Assume:
 - dependency update automation
 - no artifact uploads in the foundation milestone
 
+## Current PPTX parser boundary
+
+ADR 0043 treats OOXML ZIP/XML parsing as an untrusted local process. The adapter requires
+repository-contained digest-pinned paths, inventories archive members before decompression,
+rejects traversal/duplicate/encrypted/unsupported-compression entries and DTD/entities, caps
+archive/render/XML/expanded/object/depth/output resources, follows only the required internal
+presentation/slide relationships, never extracts the archive, and never launches Office or an
+embedded object. Candidate IR still passes the trusted public normalizer before rules run.
+
+These controls are not an OS sandbox or hard process-memory limit. The standard-library parsers
+and Python runtime remain in the adapter trust zone. Digest-only text metadata also has a privacy
+limit: unsalted hashes of low-entropy strings may be guessed offline, while caller-supplied title
+and relative path metadata remains visible. Treat output as source-derived sensitive data.
+
 ## Future work
 
-Before accepting real artifact files, add parser-specific resource budgets, archive expansion
-limits, decompression-bomb protection, path-traversal tests, fuzzing, and sandbox guidance.
+Before broadening PPTX or accepting other real artifact formats, add format-specific fuzzing,
+parser/runtime compatibility characterization, and stronger sandbox guidance; every new parser
+still needs its own resource and archive policy.
 Before browser support, define origin isolation, credential handling, request interception,
 and trace redaction.

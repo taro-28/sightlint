@@ -15,7 +15,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
-| M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix and first advisory recommended Web pack | portability characterization, broader representative evaluation, then other media by demand |
+| M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded PPTX source-geometry process with three-case differential regression | portability characterization, broader representative evaluation, then PDF/document and mobile by demand |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
 | M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
@@ -113,8 +113,9 @@ repositories. Issue #25 provides the bounded comparison without admitting a broa
 default. ADR 0040 and issue #26 add exact source-alpha geometry without admitting a padding rule.
 ADR 0041 and issue #27 retain explicit unavailability for broader PNG formats because current
 product evidence does not establish a coverage gap. ADR 0042 and issue #28 add the local
-perception protocol foundation without semantic promotion or model-accuracy claims. The earliest
-remaining roadmap gate is #29.
+perception protocol foundation without semantic promotion or model-accuracy claims. ADR 0043 adds
+the first bounded PPTX source-geometry slice under #29; the remaining structured-medium sequence
+starts with PDF/document.
 
 ## Scope-selection rules
 
@@ -326,13 +327,20 @@ independently evaluated evidence exists.
 
 Add one at a time according to demand and fixture quality:
 
-1. PPTX/slides;
-2. structured PDF/document;
+1. PPTX/slides — first bounded source-geometry slice implemented through ADR 0043;
+2. structured PDF/document — next candidate;
 3. Android semantics/accessibility plus screenshot;
 4. iOS XCUI/accessibility plus screenshot.
 
 This order is provisional. Every adapter needs an ADR, native fixture corpus, unit/coordinate plan,
 trust/privacy/resource model, compatibility strategy, rendered differential tests, and public E2E.
+
+The PPTX `0.1.0` process maps direct unrotated slide shapes/groups, native IDs, hierarchy, z-order,
+text digests, and exact EMU layout boxes. It retains a separately evidenced PNG canvas and extent
+agreement while rendered node identity stays `cantTell`. Its clean/mutation/hard-negative corpus
+proves shared canvas containment without kernel medium-specific logic. Master/layout/theme
+resolution, other DrawingML objects, representative files, a protected holdout, and PPTX-specific
+recommended rules remain later slices; the implementation therefore reports partial coverage.
 
 ### M4 exit criteria
 
@@ -494,7 +502,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0043 or later.
+- New architecture decision numbers continue at 0044 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -517,7 +525,7 @@ Every public behavior must satisfy the applicable matrix:
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand and decoder strategy decision; broader coverage not admitted |
 | #28 | completed local OCR/CV/VLM perception protocol foundation; model quality remains untested |
-| #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
+| #29 | PPTX first slice implemented; PDF/document and Android/iOS remain |
 | #30 | interaction states/effects/traces/recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #32 | completed legacy branch and repository-setting cleanup |

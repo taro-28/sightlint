@@ -102,10 +102,11 @@ inspection policy. Issue #26 adds exact source-alpha geometry without introducin
 #27 is complete through ADR 0041: current product evidence does not admit broader PNG decoding, so
 unsupported formats remain explicitly unavailable and no decoder dependency was added. #28 is
 complete for protocol v0 through ADR 0042: a bounded local wrapper and typed perception records
-exist, but real OCR/model quality remains `untested`. The earliest remaining roadmap gate is #29.
-Other work is preserved in #30–#31; later milestones do not automatically outrank it because
-historical code once existed on a stale branch. Explain any deviation from the remaining sequence
-in the issue and PR.
+exist, but real OCR/model quality remains `untested`. Issue #29 now has its first focused PPTX
+source-geometry slice through ADR 0043; PDF/document is the next candidate, with mobile later in
+the same umbrella. Other work is preserved in #30–#31; later milestones do not automatically
+outrank it because historical code once existed on a stale branch. Explain any deviation from the
+remaining sequence in the issue and PR.
 
 ## Before editing
 
@@ -138,7 +139,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0043 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0044 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -169,6 +170,9 @@ python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 python3 tools/check_perception_evaluation.py
+python3 tools/generate_pptx_fixtures.py --check
+python3 tools/check_pptx_evaluation.py
+python3 -m unittest adapters/pptx/tests/test_adapter.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
@@ -191,6 +195,7 @@ cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

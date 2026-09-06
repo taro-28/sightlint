@@ -110,6 +110,10 @@ The best language may differ by platform:
 - Swift for iOS accessibility and UI automation;
 - Python for OCR, CV, and model experiments.
 
+ADR 0043 also uses Python 3.9+ standard-library ZIP/XML parsing for the first bounded PPTX slice.
+It remains a separate local process: the Rust kernel receives only normalized medium-neutral facts
+and never depends on OOXML parsing code.
+
 Early development prefers versioned process protocols to a shared in-process plugin ABI. Process
 isolation limits crashes, memory, dependency conflicts, runtime choice, and untrusted content.
 
@@ -128,6 +132,22 @@ Every adapter declares:
 
 Medium-specific fields live in versioned namespaced extensions. A field does not enter core IR
 only because one platform exposes it.
+
+## Current PPTX adapter boundary
+
+The `sightlint-pptx` process validates a strict local request, streams source/render digests within
+caller limits, inventories an OOXML archive before bounded XML decompression, maps directly
+declared unrotated shapes/groups and group transforms to exact source EMU `layoutBox` geometry,
+and passes candidate IR through public `sightlint normalize`. Native IDs, parentage, local z-order,
+placeholder metadata, and digest-only source-text metadata live in
+`org.sightlint.pptx@0.1.0`.
+
+Optional repository-contained PNG renders are validated by public `sightlint adapt-image` and
+remain a separate `devicePixel` canvas with `ExactRender` evidence. The adapter records extent
+agreement/conflict but does not manufacture node-to-pixel identity. Master/layout objects,
+theme-resolved styles, strict OOXML, rotated/flipped geometry, other DrawingML objects, rendered
+ink, and text layout remain partial/unsupported/`cantTell`. The Python ZIP/XML implementation is
+an untrusted sensor and is not an operating-system sandbox.
 
 ## Current PNG adapter boundary
 

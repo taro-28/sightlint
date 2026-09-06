@@ -334,8 +334,10 @@ The sequence is:
 - add interaction traces only through isolated protocols;
 - add MCP/GitHub/editor/UI surfaces after the core produces useful evidence.
 
-ADR 0042 completes the protocol-v0 perception boundary. Issues #29, #30, and #31 preserve the
-remaining later stages.
+ADR 0042 completes the protocol-v0 perception boundary. ADR 0043 then selects PPTX as the first
+post-Web structured medium and proves a bounded direct-shape/source-geometry slice without moving
+OOXML into the kernel. The remaining PDF/document and mobile work stays sequenced inside #29;
+issues #30 and #31 preserve the later stages.
 
 ## Local-first and privacy
 
@@ -452,7 +454,9 @@ Important historical detail:
   establishes a gap;
 - ADR 0042 defines the local perception-worker protocol, typed observation families, and
   non-promotion boundary;
-- new ADRs should continue at 0043 or later rather than silently reusing historical numbers.
+- ADR 0043 defines the bounded PPTX source-geometry process, separate rendered extent evidence,
+  and public acquisition-versus-rule evaluation boundary;
+- new ADRs should continue at 0044 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -466,7 +470,8 @@ inside an unmerged branch and does not make them accepted repository decisions.
   gap after ADR 0041;
 - real OCR/CV/VLM model selection, calibration, and representative perception evaluation after
   the issue #28 protocol foundation;
-- adapter ordering after web: issue #29;
+- adapter ordering after the bounded PPTX slice: PDF/document next within issue #29, with mobile
+  still evidence- and demand-gated;
 - interaction trace/effect schema: issue #30;
 - MCP/GitHub/editor/local UI and later package channels: issue #31;
 - signing/attestation identity and any future registry or prebuilt-binary channel after the

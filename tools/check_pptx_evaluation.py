@@ -139,7 +139,9 @@ def main() -> None:
 
     require(set(acquisition_by_id) == {case["acquisitionAnnotationId"] for case in cases.values()}, "orphan acquisition annotation")
     require(set(rules_by_id) == {case["ruleAnnotationId"] for case in cases.values()}, "orphan rule annotation")
-    require({item.get("id") for item in metrics.get("metrics", [])} == {"acquisitionFactCoverage", "evaluatedCaseCoverage", "verdictPrecision", "abstentionRetention", "falsePositiveRate", "mutationKillRate"}, "metric set is incomplete")
+    metric_items = metrics.get("metrics", [])
+    require(len(metric_items) == 6, "metric set must contain exactly six entries")
+    require({item.get("id") for item in metric_items} == {"acquisitionFactCoverage", "evaluatedCaseCoverage", "verdictPrecision", "abstentionRetention", "falsePositiveRate", "mutationKillRate"}, "metric set is incomplete")
     print("PPTX evaluation: 3 cases, 15 node facts, 15 rule targets, provenance and digests verified")
 
 

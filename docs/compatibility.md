@@ -31,8 +31,9 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 ## Unreleased current-`main` additions after alpha.2
 
 The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation, exact PNG
-source-alpha geometry, and the PNG format-demand decision. They are not part of the published
-alpha.2 archive and therefore do not retroactively change that release.
+source-alpha geometry, the PNG format-demand decision, the local perception protocol foundation,
+and the first bounded PPTX source-adapter slice. They are not part of the published alpha.2
+archive and therefore do not retroactively change that release.
 
 | Surface | Version or contract | Compatibility rule |
 |---|---|---|
@@ -48,6 +49,11 @@ alpha.2 archive and therefore do not retroactively change that release.
 | Perception extension | `org.sightlint.perception@0.1.0` | Digest/identity/status/mapping summary; inferred semantics are not promoted into core IR. |
 | Private perception Node package | `0.1.0` | Not published to npm; requires Node `>=20 <25` and has no package dependencies. |
 | Perception evaluation corpus | `0.1.0` | Public three-state development data with separate acquisition/rule annotations and no protected holdout. |
+| PPTX request/response protocol | `0.1.0` | Strict local process fields, digest-pinned source/renders, resource bounds, and partial coverage; incompatible fields or semantics require a new version. |
+| PPTX extension | `org.sightlint.pptx@0.1.0` | Native IDs, hierarchy, z-order, digest-only text metadata, exact source geometry status, unsupported features, and render extent reconciliation remain versioned outside core IR. |
+| PPTX adapter implementation | `0.1.0` | Unreleased Python 3.9+ source-tree process using transitional OOXML; runtime version is provenance, not a protocol version. |
+| PPTX evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth and no protected holdout; implementation output cannot rewrite an oracle. |
+| PPTX metric contract | `0.1.0` | Defines public-corpus coverage/precision/abstention/false-positive/mutation metrics without storing observed implementation output as truth. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.
@@ -68,7 +74,10 @@ machine surface: consumers must check its own schema/version fields and must not
 from package version alone. Ordering and repeated output are byte-stable only within the declared
 normalized inputs and compatibility environment documented by the applicable adapter/report.
 
-`sightlint-web`, `sightlint-web-check`, and `sightlint-perception` require Node `>=20 <25`. The evaluated browser path uses
+`sightlint-web`, `sightlint-web-check`, and `sightlint-perception` require Node `>=20 <25`.
+`sightlint-pptx` requires Python 3.9+ and reports the exact runtime patch version; repeated canonical
+bytes are guaranteed for the same declared input and compatibility environment, not across
+different Python/runtime versions. The evaluated browser path uses
 the lockfile's Playwright/Chromium build on Linux. The private Node package can build on the hosted
 macOS arm64 and Windows x64 runners, but cross-platform screenshot byte identity and browser E2E
 support are not claimed.

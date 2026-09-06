@@ -106,6 +106,13 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ["evaluation/perception/annotation.schema.json", "evaluation/perception/annotations/acquisition.json"],
     ["evaluation/perception/annotation.schema.json", "evaluation/perception/annotations/rules.json"],
     ["adapters/perception/schemas/response.schema.json", "fixtures/perception/inferred-response.json"],
+    ["evaluation/pptx/corpus.schema.json", "evaluation/pptx/corpus.json"],
+    ["evaluation/pptx/acquisition-annotation.schema.json", "evaluation/pptx/annotations/acquisition.json"],
+    ["evaluation/pptx/rule-annotation.schema.json", "evaluation/pptx/annotations/rules.json"],
+    ["evaluation/pptx/metric-contract.schema.json", "evaluation/pptx/metric-contract.json"],
+    ["adapters/pptx/schemas/request.schema.json", "evaluation/pptx/requests/atlas-clean.json"],
+    ["adapters/pptx/schemas/request.schema.json", "evaluation/pptx/requests/atlas-off-slide-mutant.json"],
+    ["adapters/pptx/schemas/request.schema.json", "evaluation/pptx/requests/atlas-asymmetric-hard-negative.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {
@@ -119,6 +126,8 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     "adapters/perception/schemas/response.schema.json",
     "adapters/perception/schemas/run-report.schema.json",
     "adapters/perception/schemas/perception-extension.schema.json",
+    "adapters/pptx/schemas/response.schema.json",
+    "adapters/pptx/schemas/pptx-extension.schema.json",
   ]) {
     const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
     ajv.compile(await json(schemaPath) as AnySchema);

@@ -5,6 +5,16 @@ independent compatibility surfaces changed by the release.
 
 ## Unreleased
 
+- Accepted ADR 0043 and added a bounded local PPTX process protocol/extension `0.1.0` that maps
+  directly declared unrotated slide shapes/groups and exact source EMU layout geometry while
+  preserving separate digest-pinned PNG extent evidence and rendered-node `cantTell`.
+- Added deterministic repository-owned PPTX fixtures, reviewed LibreOffice-derived renders,
+  separate acquisition/rule annotations, a targeted off-slide mutation, an asymmetric hard
+  negative, explicit provenance/license/privacy/non-holdout records, metric contracts, parser
+  safety tests, and public-process E2E through `adapt-image`, `normalize`, and `check`.
+- Kept PPTX coverage explicitly partial: master/layout/theme resolution, other DrawingML objects,
+  full text, rendered ink/identity, PPTX-specific rules, protected holdout evidence, and general
+  presentation-quality accuracy remain unimplemented or untested.
 - Accepted ADR 0042 and added local perception process protocol `0.1.0` with strict typed
   region/text/role/hierarchy/peer observations, bounded resources, explicit confidence and
   alternatives, worker/model/runtime/input provenance, and nonblocking `untested` rule status.

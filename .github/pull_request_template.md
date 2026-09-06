@@ -64,6 +64,9 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/check_png_format_demand.py`
 - [ ] `python3 tools/check_web_evaluation.py`
 - [ ] `python3 tools/check_perception_evaluation.py`
+- [ ] `python3 tools/generate_pptx_fixtures.py --check`
+- [ ] `python3 tools/check_pptx_evaluation.py`
+- [ ] `python3 -m unittest adapters/pptx/tests/test_adapter.py`
 - [ ] `python3 tools/release.py validate-tag --tag v0.1.0-alpha.2`
 - [ ] `python3 tools/check_dependency_licenses.py`
 - [ ] `python3 -m unittest tools/test_release.py`
@@ -86,6 +89,7 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture`
 - [ ] `cargo test --locked -p sightlint-cli --test evaluation_corpus`
 - [ ] `cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture`
+- [ ] `cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture`
 - [ ] `RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps`
 - [ ] `cargo +1.85.0 check --workspace --all-targets --all-features --locked`
 - [ ] any new generator/process-adapter/public-E2E command is also in CI, `AGENTS.md`, and handoff
