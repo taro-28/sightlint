@@ -1,0 +1,392 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-evaluation-registry:1.0.0",
+  "title": "SightLint multi-family Web evaluation registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "registry",
+    "annotationGuide",
+    "families",
+    "datasets",
+    "splitPolicy",
+    "holdoutAdmission",
+    "metricContract",
+    "nonClaims"
+  ],
+  "properties": {
+    "$schema": { "const": "./evaluation-v1.schema.json" },
+    "schemaVersion": { "const": "1.0.0" },
+    "registry": { "$ref": "#/$defs/registry" },
+    "annotationGuide": { "$ref": "#/$defs/versionedPath" },
+    "families": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/family" }
+    },
+    "datasets": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/dataset" }
+    },
+    "splitPolicy": { "$ref": "#/$defs/splitPolicy" },
+    "holdoutAdmission": { "$ref": "#/$defs/holdoutReference" },
+    "metricContract": { "$ref": "#/$defs/metricContract" },
+    "nonClaims": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._/-]+$"
+    },
+    "versionedPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "path"],
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "path": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "purpose", "limitations"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/version" },
+        "purpose": { "$ref": "#/$defs/nonEmptyString" },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "sourceGovernance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "ownership",
+        "license",
+        "redistribution",
+        "privacyReview",
+        "personalOrCustomerData",
+        "externalAssets",
+        "externalNetwork",
+        "externalProcessing"
+      ],
+      "properties": {
+        "kind": { "const": "repositoryOwnedFixture" },
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "$ref": "#/$defs/nonEmptyString" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "personalOrCustomerData": { "const": false },
+        "externalAssets": { "const": false },
+        "externalNetwork": { "const": false },
+        "externalProcessing": { "const": false }
+      }
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "tuningVisible", "implementationOutputUsedAsOracle"],
+      "properties": {
+        "classification": { "enum": ["publicDevelopmentData", "controlledHoldout"] },
+        "tuningVisible": { "type": "boolean" },
+        "implementationOutputUsedAsOracle": { "const": false }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "classification": { "const": "publicDevelopmentData" } },
+            "required": ["classification"]
+          },
+          "then": { "properties": { "tuningVisible": { "const": true } } }
+        },
+        {
+          "if": {
+            "properties": { "classification": { "const": "controlledHoldout" } },
+            "required": ["classification"]
+          },
+          "then": { "properties": { "tuningVisible": { "const": false } } }
+        }
+      ]
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "qualification", "independentFromAnnotationAuthor"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "role": { "enum": ["annotationAuthor", "independentReviewer", "adjudicator"] },
+        "qualification": { "$ref": "#/$defs/nonEmptyString" },
+        "independentFromAnnotationAuthor": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "role": { "const": "annotationAuthor" } },
+            "required": ["role"]
+          },
+          "then": { "properties": { "independentFromAnnotationAuthor": { "const": false } } }
+        },
+        {
+          "if": {
+            "properties": { "role": { "enum": ["independentReviewer", "adjudicator"] } },
+            "required": ["role"]
+          },
+          "then": { "properties": { "independentFromAnnotationAuthor": { "const": true } } }
+        }
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewers", "agreement", "adjudication", "rationale"],
+      "properties": {
+        "status": { "enum": ["maintainerOnly", "independentlyReviewed", "adjudicated"] },
+        "reviewers": {
+          "type": "array",
+          "minItems": 1,
+          "contains": {
+            "type": "object",
+            "properties": { "role": { "const": "annotationAuthor" } },
+            "required": ["role"]
+          },
+          "items": { "$ref": "#/$defs/reviewer" }
+        },
+        "agreement": { "enum": ["notMeasured", "agreed", "disagreed", "partiallyAgreed"] },
+        "adjudication": { "enum": ["notRequired", "notPerformed", "completed"] },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "maintainerOnly" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "reviewers": {
+                "type": "array",
+                "not": {
+                  "contains": {
+                    "type": "object",
+                    "properties": { "role": { "enum": ["independentReviewer", "adjudicator"] } },
+                    "required": ["role"]
+                  }
+                }
+              },
+              "agreement": { "const": "notMeasured" },
+              "adjudication": { "const": "notPerformed" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "independentlyReviewed" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "reviewers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": { "role": { "const": "independentReviewer" } },
+                  "required": ["role"]
+                }
+              },
+              "agreement": { "enum": ["agreed", "disagreed", "partiallyAgreed"] },
+              "adjudication": { "enum": ["notRequired", "notPerformed"] }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "adjudicated" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "reviewers": {
+                "type": "array",
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": { "role": { "const": "independentReviewer" } },
+                      "required": ["role"]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": { "role": { "const": "adjudicator" } },
+                      "required": ["role"]
+                    }
+                  }
+                ]
+              },
+              "agreement": { "enum": ["disagreed", "partiallyAgreed"] },
+              "adjudication": { "const": "completed" }
+            }
+          }
+        }
+      ]
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "name",
+        "productContext",
+        "reviewedTasks",
+        "sourceRoot",
+        "sourceRevisionBasis",
+        "governance",
+        "exposure",
+        "review",
+        "samplingLimitations"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/version" },
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "productContext": { "$ref": "#/$defs/nonEmptyString" },
+        "reviewedTasks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "sourceRoot": { "$ref": "#/$defs/relativePath" },
+        "sourceRevisionBasis": { "$ref": "#/$defs/nonEmptyString" },
+        "governance": { "$ref": "#/$defs/sourceGovernance" },
+        "exposure": { "$ref": "#/$defs/exposure" },
+        "review": { "$ref": "#/$defs/review" },
+        "samplingLimitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "oracleReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document", "schema", "documentType"],
+      "properties": {
+        "document": { "$ref": "#/$defs/relativePath" },
+        "schema": { "$ref": "#/$defs/relativePath" },
+        "documentType": { "enum": ["browserAcquisitionOracle", "browserRuleOracle"] }
+      }
+    },
+    "caseInventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "request", "split", "classification"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/nonEmptyString" },
+        "request": { "$ref": "#/$defs/relativePath" },
+        "split": { "enum": ["smoke", "development", "challenge"] },
+        "classification": { "enum": ["clean", "targetedMutation", "hardNegative", "ambiguous"] }
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "familyId",
+        "commandSurface",
+        "acquisitionOracle",
+        "ruleOracle",
+        "cases"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/version" },
+        "familyId": { "$ref": "#/$defs/nonEmptyString" },
+        "commandSurface": { "$ref": "#/$defs/nonEmptyString" },
+        "acquisitionOracle": { "$ref": "#/$defs/oracleReference" },
+        "ruleOracle": { "$ref": "#/$defs/oracleReference" },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/caseInventory" }
+        }
+      }
+    },
+    "splitPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["smoke", "development", "challenge", "holdout"],
+      "properties": {
+        "smoke": { "$ref": "#/$defs/nonEmptyString" },
+        "development": { "$ref": "#/$defs/nonEmptyString" },
+        "challenge": { "$ref": "#/$defs/nonEmptyString" },
+        "holdout": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "holdoutReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "path", "status"],
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "status": { "enum": ["notOperational", "operational"] }
+      }
+    },
+    "metricContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groupBy", "measures", "zeroDenominator", "universalScore"],
+      "properties": {
+        "groupBy": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": { "enum": ["fixtureFamily", "split", "ruleId", "evidenceClass"] }
+        },
+        "measures": {
+          "type": "array",
+          "minItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "caseCoverage",
+              "acquisitionExpectationCoverage",
+              "failurePrecision",
+              "falsePositiveFailures",
+              "reviewedAbstentionAgreement",
+              "mutationKillRate",
+              "nativePixelConflictCategories"
+            ]
+          }
+        },
+        "zeroDenominator": { "const": "reportIntegerCountsWithoutPercentage" },
+        "universalScore": { "const": false }
+      }
+    }
+  }
+}

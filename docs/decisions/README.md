@@ -65,6 +65,7 @@ background, alternatives, and disposition of historical experiments.
 - [0048 — Managed loopback Web capture and server lifecycle](0048-managed-loopback-web-capture.md)
 - [0049 — Separate managed-loopback acquisition and rule oracles](0049-separate-managed-loopback-evaluation-oracles.md)
 - [0050 — Deterministic GitHub Actions report projection](0050-deterministic-github-actions-report-projection.md)
+- [0051 — Multi-family Web evaluation and protected-holdout admission](0051-multi-family-web-evaluation-and-holdout-admission.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions

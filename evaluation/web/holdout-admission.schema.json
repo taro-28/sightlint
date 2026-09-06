@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-holdout-admission:1.0.0",
+  "title": "SightLint Web protected-holdout admission",
+  "oneOf": [
+    { "$ref": "#/$defs/notOperational" },
+    { "$ref": "#/$defs/operational" }
+  ],
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._/-]+$"
+    },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "gitCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "$schema",
+        "schemaVersion",
+        "status",
+        "publicRepositoryRole",
+        "implementationOutputUsedAsOracle",
+        "publicCasesEligible",
+        "requiredControls",
+        "forbiddenClaims"
+      ],
+      "properties": {
+        "$schema": { "const": "./holdout-admission.schema.json" },
+        "schemaVersion": { "const": "1.0.0" },
+        "status": { "enum": ["notOperational", "operational"] },
+        "publicRepositoryRole": { "const": "admissionMetadataOnly" },
+        "implementationOutputUsedAsOracle": { "const": false },
+        "publicCasesEligible": { "const": false },
+        "requiredControls": { "$ref": "#/$defs/requiredControls" },
+        "forbiddenClaims": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "blockers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "operationalRecord": { "$ref": "#/$defs/operationalRecord" }
+      }
+    },
+    "requiredControls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "freeze",
+        "access",
+        "evaluator",
+        "leakage",
+        "execution",
+        "oracleCorrection",
+        "reporting"
+      ],
+      "properties": {
+        "freeze": { "$ref": "#/$defs/nonEmptyString" },
+        "access": { "$ref": "#/$defs/nonEmptyString" },
+        "evaluator": { "$ref": "#/$defs/nonEmptyString" },
+        "leakage": { "$ref": "#/$defs/nonEmptyString" },
+        "execution": { "$ref": "#/$defs/nonEmptyString" },
+        "oracleCorrection": { "$ref": "#/$defs/nonEmptyString" },
+        "reporting": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "qualification", "independentFromTuning", "conflictOfInterestReviewed"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "qualification": { "$ref": "#/$defs/nonEmptyString" },
+        "independentFromTuning": { "const": true },
+        "conflictOfInterestReviewed": { "const": true }
+      }
+    },
+    "accessRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "artifactAccess", "labelAccess", "tuningAccess"],
+      "properties": {
+        "role": { "$ref": "#/$defs/nonEmptyString" },
+        "artifactAccess": { "type": "boolean" },
+        "labelAccess": { "type": "boolean" },
+        "tuningAccess": { "const": false }
+      }
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject", "scope", "reason", "recordedAt"],
+      "properties": {
+        "subject": { "$ref": "#/$defs/nonEmptyString" },
+        "scope": { "$ref": "#/$defs/nonEmptyString" },
+        "reason": { "$ref": "#/$defs/nonEmptyString" },
+        "recordedAt": { "type": "string", "format": "date" }
+      }
+    },
+    "operationalRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bundleId",
+        "bundleVersion",
+        "bundleDigest",
+        "freezeCommit",
+        "storageAuthority",
+        "accessPolicyVersion",
+        "accessRoles",
+        "evaluator",
+        "exposureLog",
+        "tuningExclusion",
+        "evaluationCommand",
+        "environmentManifestDigest",
+        "oracleCorrectionProcedure",
+        "reportingPlan",
+        "admittedAt",
+        "admittedBy"
+      ],
+      "properties": {
+        "bundleId": { "$ref": "#/$defs/nonEmptyString" },
+        "bundleVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "bundleDigest": { "$ref": "#/$defs/sha256" },
+        "freezeCommit": { "$ref": "#/$defs/gitCommit" },
+        "storageAuthority": { "$ref": "#/$defs/nonEmptyString" },
+        "accessPolicyVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "accessRoles": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/accessRole" }
+        },
+        "evaluator": { "$ref": "#/$defs/evaluator" },
+        "exposureLog": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/exposure" }
+        },
+        "tuningExclusion": { "$ref": "#/$defs/nonEmptyString" },
+        "evaluationCommand": { "$ref": "#/$defs/nonEmptyString" },
+        "environmentManifestDigest": { "$ref": "#/$defs/sha256" },
+        "oracleCorrectionProcedure": { "$ref": "#/$defs/relativePath" },
+        "reportingPlan": { "$ref": "#/$defs/nonEmptyString" },
+        "admittedAt": { "type": "string", "format": "date" },
+        "admittedBy": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "notOperational": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "required": ["blockers"],
+          "not": {
+            "type": "object",
+            "properties": { "operationalRecord": true },
+            "required": ["operationalRecord"]
+          },
+          "properties": {
+            "status": { "const": "notOperational" },
+            "blockers": true
+          }
+        }
+      ]
+    },
+    "operational": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "required": ["operationalRecord"],
+          "not": {
+            "type": "object",
+            "properties": { "blockers": true },
+            "required": ["blockers"]
+          },
+          "properties": {
+            "status": { "const": "operational" },
+            "operationalRecord": true
+          }
+        }
+      ]
+    }
+  }
+}

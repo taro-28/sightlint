@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "check": "npm run build && node --test dist/tests/unit.test.js",
+    "check": "npm run build && node --test dist/tests/unit.test.js dist/tests/evaluation-contract.test.js",
     "install:browser": "playwright install chromium",
     "test:e2e": "npm run build && node --test dist/tests/e2e.test.js dist/tests/interaction-e2e.test.js dist/tests/segmentation-evaluation.test.js dist/tests/workflow-e2e.test.js && node --test dist/tests/perception-evaluation.test.js",
     "test:managed-e2e": "npm run build && node --test dist/tests/managed-e2e.test.js",
