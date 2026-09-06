@@ -18,7 +18,7 @@
 
 <!-- Link accepted ADRs. State whether this changes architecture, schema, protocol, trust boundary,
 compatibility, policy precedence, resource model, or report semantics. New ADR numbers continue at
-0048 or later. -->
+0049 or later. -->
 
 ## Evidence, applicability, and policy
 
@@ -90,6 +90,8 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `cargo build --locked -p sightlint-cli`
 - [ ] `npm --prefix adapters/perception run test:e2e`
 - [ ] `npm --prefix adapters/playwright run test:e2e`
+- [ ] `npm --prefix adapters/playwright run test:managed-e2e`
+- [ ] `npm --prefix adapters/playwright run test:server-e2e`
 - [ ] `cargo fmt --all -- --check`
 - [ ] `cargo clippy --locked --workspace --all-targets --all-features -- -D warnings`
 - [ ] `cargo test --locked --workspace --all-features`

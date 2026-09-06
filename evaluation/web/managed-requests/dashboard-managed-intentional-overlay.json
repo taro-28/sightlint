@@ -1,0 +1,51 @@
+{
+  "$schema": "../../../adapters/playwright/schemas/capture-request-0.2.schema.json",
+  "protocolVersion": "0.2.0",
+  "artifact": {
+    "id": "web-dashboard-managed-intentional-overlay",
+    "title": "Atlas managed intentional overlay"
+  },
+  "target": {
+    "kind": "managedLoopbackHttp",
+    "pathAndQuery": "/redirect?case=intentional-overlay&textScale=1&private=not-serialized",
+    "state": "intentional-overlay",
+    "readinessSelector": "html[data-managed-ready=\"true\"]"
+  },
+  "server": {
+    "argv": [
+      "node",
+      "adapters/playwright/tests/fixtures/managed-server.mjs",
+      "--mode",
+      "serve",
+      "--port",
+      "{port}",
+      "--delay-ms",
+      "50"
+    ],
+    "port": 43173,
+    "startupTimeoutMs": 10000
+  },
+  "environment": {
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "unit": "cssPixel"
+    },
+    "deviceScaleFactor": 1,
+    "textScale": 1,
+    "locale": "en-US",
+    "timezoneId": "UTC",
+    "colorScheme": "light",
+    "reducedMotion": "reduce"
+  },
+  "privacy": {
+    "accessibleNameMode": "selectedNodes",
+    "externalProcessing": false
+  },
+  "network": {
+    "mode": "sameOriginLoopback"
+  },
+  "screenshot": {
+    "reference": "evaluation/web/generated/web-dashboard-managed-intentional-overlay.png"
+  }
+}

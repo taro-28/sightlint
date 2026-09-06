@@ -1,12 +1,13 @@
 # Playwright Web adapter
 
 `sightlint-web` is SightLint's process-isolated, untrusted browser acquisition adapter. It loads a
-repository-owned local HTML fixture in the Playwright-pinned Chromium build, captures selected DOM
+repository-owned local HTML fixture or an explicitly authorized managed loopback page in the
+Playwright-pinned Chromium build, captures selected DOM
 and accessibility observations, computed layout/render geometry, bounded clipping/overflow and
 center-hit samples, and a synchronized viewport screenshot, then writes Artifact IR for the
 deterministic Rust `sightlint` binary.
 
-The adapter and local orchestration command are governed by ADRs 0033–0036. They are not part of
+The adapter and local orchestration command are governed by ADRs 0033–0036 and 0048. They are not part of
 the Rust kernel and do not decide whether a UI is good or bad.
 
 ADR 0047 also defines the separate `sightlint-interaction` process for bounded controlled traces.
@@ -19,14 +20,15 @@ It drives only the repository-owned Atlas interaction fixture and emits the medi
   version in every capture.
 - Playwright: exactly `1.63.0` with its matching Chromium build.
 - Schema validation: AJV exactly `8.20.0` in development/E2E.
-- private adapter package: `0.5.0` (adds the interaction command; existing Web commands retain
-  their own protocol and adapter versions).
-- capture request/response: `0.1.0`.
-- adapter implementation: `0.3.0`.
-- `org.sightlint.web` extension: `0.3.0`; strict `0.1.0` and `0.2.0` schemas remain available for
-  version dispatch and historical validation.
+- private adapter package: `0.6.0` (contains both the interaction command and managed Web capture).
+- capture request/response: `0.1.0` for repository-contained `file:` fixtures and `0.2.0` for
+  managed loopback HTTP. Valid `0.1.0` requests retain their existing canonical output.
+- adapter implementation: `0.3.0` for `0.1.0` capture and `0.4.0` for `0.2.0` capture.
+- `org.sightlint.web` extension: `0.3.0` for legacy capture and `0.4.0` for managed capture;
+  strict `0.1.0` and `0.2.0` schemas remain historical validation fixtures.
 - Artifact IR: `0.1.0`.
-- local workflow report: `0.1.0`; it embeds CheckReport `0.3.0` without changing its verdicts.
+- local workflow report: `0.1.0` for legacy capture and `0.2.0` for managed capture; both embed
+  CheckReport `0.3.0` without changing its verdicts.
 - interaction request/response and extension: `0.1.0`.
 - interaction adapter implementation: `0.1.0`.
 
@@ -65,6 +67,47 @@ The reviewed E2E uses the same command on an isolated copy of the Atlas unnamed-
 applies only the human-authored edit from `evaluation/web/annotations/agent-workflow.json`, and
 reruns it. It verifies that the named finding disappears and no new failure appears. This scripted
 public smoke case is not evidence of autonomous fix selection or representative agent accuracy.
+
+## Managed loopback check
+
+Capture protocol `0.2.0` starts one development server in the canonical target-repository root,
+checks one path, and owns cleanup of the process tree. A request uses a direct argv array with no
+shell; `{port}` must occur exactly once. Both commands require the bare authorization flag before
+they will start the untrusted command:
+
+```bash
+node adapters/playwright/dist/src/check-cli.js \
+  --request /absolute/path/to/managed-request.json \
+  --repository-root /absolute/path/to/target-repository \
+  --sightlint-binary "$PWD/target/debug/sightlint" \
+  --format json \
+  --allow-server-command
+```
+
+The request target is `managedLoopbackHttp`; `pathAndQuery` is resolved only against literal
+`http://127.0.0.1:<port>`, `network.mode` is `sameOriginLoopback`, and readiness requires TCP
+listen, final HTTP 2xx, `load`, the requested selector, and `document.fonts.ready`. The command is
+started with the caller environment, so env-file changes are unnecessary, but those environment
+variables and server logs are never copied into a report.
+
+The browser permits same-origin HTTP methods and buffers each observed response for its digest.
+External HTTP(S), WebSocket, and service-worker activity is blocked. The report retains only
+route path, target/request/body-independent digests, status-derived aggregate identity, byte/count
+summaries, and blocked-transport counts: raw queries, request/response bodies, changing headers,
+server output, and PIDs are omitted. The child process itself still has the caller's network and
+filesystem privileges; this is explicit command authorization and lifecycle management, not an OS
+sandbox.
+
+Startup is capped at 180 seconds, argv at 64 elements/8 KiB, combined server output at 1 MiB,
+request bodies at 1 MiB, individual responses at 16 MiB, and the full session at 64 MiB/512
+responses. A preoccupied port, early exit, timeout, output overflow, network violation, or capture
+failure produces a stable operational error and releases the port. POSIX cleanup targets the
+process group with TERM then KILL after five seconds; Windows uses validated-PID
+`taskkill.exe /T /F`.
+
+Loopback observations cannot prove which source file or line caused a finding. Managed workflow
+targets therefore preserve the native locator but declare `sourceAttribution: "unavailable"` and
+`sourceFiles: []`.
 
 ## Public process path
 
@@ -167,6 +210,8 @@ real-world Web UI/UX accuracy, accessibility conformance, or blocking rule matur
 npm --prefix adapters/playwright run check
 cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run test:e2e
+npm --prefix adapters/playwright run test:managed-e2e
+npm --prefix adapters/playwright run test:server-e2e
 ```
 
 The E2E executes the actual Node processes and built Rust binary, validates current and historical
@@ -185,3 +230,9 @@ mutations, a save-draft hard negative, evidence conflict, immediate inapplicabil
 execution. It validates request/response/generated-extension/evaluation schemas, separate
 acquisition and rule truth, normalization, advisory exit behavior, mutation kills, abstention,
 privacy non-leakage, output collision, and repeated byte stability within one declared runtime.
+
+The managed E2E adds delayed startup, redirect, same-origin POST, network and resource
+violations, authorization, process-tree signal cleanup, three independently annotated product
+cases, source-attribution refusal, redaction, and repeated canonical bytes. Linux is the required
+browser E2E platform; the lifecycle implementation is also exercised on hosted macOS and Windows,
+but cross-platform screenshot byte identity is not claimed.

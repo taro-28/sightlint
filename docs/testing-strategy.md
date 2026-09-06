@@ -289,6 +289,15 @@ contract coverage, failure precision, reviewed abstention, mutation kill rate, a
 failures. Broader representative Web applications and future OCR/CV/VLM outputs still require
 comparison with independent reviewed annotations.
 
+ADR 0048 adds a separate managed-loopback suite rather than rewriting that 23-case oracle. Three
+independently annotated clean/mutation/hard-negative cases execute a repository-owned Node server,
+redirect and same-origin API through `sightlint-web-check` and the built kernel. Lifecycle
+conformance separately exercises authorization-before-spawn, delayed listen, early exit, startup
+timeout, port conflict, combined-log overflow, external requests, request/response bounds,
+WebSocket/service-worker blocking, missing-kernel cleanup, normal cleanup, and signal-driven
+process-tree cleanup. The suite asserts redaction and unavailable source attribution; it does not
+claim that lifecycle coverage improves Web rule accuracy.
+
 The perception protocol adds process conformance for exact canonical requests/responses, all five
 typed observation families, model/source identity, unavailable acquisition, inferred-family
 non-promotion, timeout, stdout overflow, malformed output, and identity mismatch. Its differential
@@ -351,7 +360,7 @@ Test bounded behavior at and around declared limits:
 - adapter nodes, frames/pages, text, relations, output bytes, and process duration;
 - perception tiles/objects/hierarchy depth;
 - interaction trace events and controlled-step counts; raw wall-clock duration is not a rule input
-  in ADR 0047;
+  in ADR 0048;
 - memory allocations and fallible allocation paths;
 - worst-case component/run/graph shapes;
 - deterministic timeout/error/untested classification.
@@ -433,6 +442,8 @@ npm --prefix adapters/playwright run check
 cargo build --locked -p sightlint-cli
 npm --prefix adapters/perception run test:e2e
 npm --prefix adapters/playwright run test:e2e
+npm --prefix adapters/playwright run test:managed-e2e
+npm --prefix adapters/playwright run test:server-e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features

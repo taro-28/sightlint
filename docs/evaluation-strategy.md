@@ -181,6 +181,16 @@ All cases and labels are public maintainer-authored development data. There is n
 holdout or independent reviewer, so perfect regression results do not establish representative
 interaction, accessibility, or UI/UX accuracy.
 
+### Managed loopback Web evaluation
+
+ADR 0048 adds a separate managed-loopback oracle with three public cases: clean, one named
+unnamed-control mutation, and an intentional-overlay hard negative. The adapter must start the
+repository-owned server, traverse a redirect and same-origin API call, run the built kernel, and
+release its process tree and port. A separate lifecycle matrix evaluates failures and resource
+boundaries. This establishes the opt-in startup/capture/check/cleanup path and its redaction
+contract; because it reuses the same Atlas family and public labels, it does not add a holdout,
+representative sampling, or evidence for changing rule maturity or enforcement.
+
 ### PDF source-adapter evaluation
 
 `evaluation/pdf/` implements ADR 0044 with three deterministic repository-owned report pages and

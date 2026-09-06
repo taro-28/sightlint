@@ -6,14 +6,17 @@ import { join } from "node:path";
 import { capture } from "./capture.js";
 import {
   AdapterError,
+  MANAGED_PROTOCOL_VERSION,
   WEB_EXTENSION_KEY,
+  type CaptureOptions,
   type CaptureRequest,
   type CaptureResponse,
   type JsonObject,
   type JsonValue,
 } from "./types.js";
 
-export const WORKFLOW_REPORT_VERSION = "0.1.0";
+export const LEGACY_WORKFLOW_REPORT_VERSION = "0.1.0";
+export const WORKFLOW_REPORT_VERSION = "0.2.0";
 export const WORKFLOW_COMMAND = "sightlint-web-check";
 const CHECK_REPORT_VERSION = "0.3.0";
 const MAX_CHILD_OUTPUT_BYTES = 16 * 1024 * 1024;
@@ -22,6 +25,12 @@ const WORKFLOW_LIMITATIONS = [
   "Source targets join exact captured node identifiers to native locators and source-bundle files; they do not prove an exact source-code line or cause.",
   "Pixel-content identity, complete hit regions, and unresolved native/render conflicts keep their existing cantTell or untested status.",
   "Advisory findings do not become blocking, and this public fixture workflow is not representative real-world UI/UX or agent-accuracy evidence.",
+] as const;
+
+const MANAGED_WORKFLOW_LIMITATIONS = [
+  "Source targets join exact captured node identifiers to native locators, but loopback responses cannot establish a source file or line.",
+  "Pixel-content identity, complete hit regions, and unresolved native/render conflicts keep their existing cantTell or untested status.",
+  "Advisory findings do not become blocking, and one managed page is not representative real-world UI/UX or agent-accuracy evidence.",
 ] as const;
 
 interface KernelRun {
@@ -39,6 +48,7 @@ interface Locator {
 export interface SourceTarget {
   nodeId: string;
   locator: Locator;
+  sourceAttribution?: "unavailable";
   sourceFiles: string[];
   evidenceIds: string[];
 }
@@ -214,7 +224,7 @@ function parseArtifactIr(bytes: Buffer): JsonObject {
   return parseJson(bytes, "invalid-capture-output", "captured Artifact IR is not valid JSON");
 }
 
-function sourceTargets(ir: JsonObject, report: JsonObject): SourceTarget[] {
+function sourceTargets(ir: JsonObject, report: JsonObject, managed: boolean): SourceTarget[] {
   const extensions = object(ir.extensions, "Artifact IR extensions");
   const web = object(extensions[WEB_EXTENSION_KEY], "Artifact IR Web extension");
   const captureRecord = object(web.capture, "Web extension capture");
@@ -266,7 +276,7 @@ function sourceTargets(ir: JsonObject, report: JsonObject): SourceTarget[] {
       if (evidenceIds.size === 0) {
         throw new AdapterError("source-target-missing", "a node result has no evidence identifiers");
       }
-      return {
+      const target: SourceTarget = {
         nodeId,
         locator: {
           type: locatorType,
@@ -276,6 +286,8 @@ function sourceTargets(ir: JsonObject, report: JsonObject): SourceTarget[] {
         sourceFiles: [...sourceFiles],
         evidenceIds: [...evidenceIds].sort(),
       };
+      if (managed) target.sourceAttribution = "unavailable";
+      return target;
     })
     .sort((left, right) => left.nodeId < right.nodeId ? -1 : left.nodeId > right.nodeId ? 1 : 0);
 }
@@ -321,6 +333,7 @@ export async function runWebCheck(
   request: CaptureRequest,
   repositoryRoot: string,
   sightlintBinary: string,
+  captureOptions: CaptureOptions = { allowServerCommand: false },
 ): Promise<WorkflowExecution> {
   const temporaryDirectory = await mkdtemp(join(tmpdir(), "sightlint-web-check-")).catch(() => {
     throw new AdapterError("temporary-directory", "failed to create private capture storage");
@@ -328,7 +341,12 @@ export async function runWebCheck(
   const artifactIrPath = join(temporaryDirectory, "artifact-ir.json");
   const screenshotPath = join(temporaryDirectory, "screenshot.png");
   try {
-    const captureResponse = await capture(request, repositoryRoot, { artifactIrPath, screenshotPath });
+    const captureResponse = await capture(
+      request,
+      repositoryRoot,
+      { artifactIrPath, screenshotPath },
+      captureOptions,
+    );
     const artifactIrBytes = await readFile(artifactIrPath).catch(() => {
       throw new AdapterError("invalid-capture-output", "failed to read captured Artifact IR");
     });
@@ -349,19 +367,21 @@ export async function runWebCheck(
     if (checkReport.artifactId !== request.artifact.id || checkReport.artifactKind !== "web") {
       throw new AdapterError("invalid-kernel-report", "check report does not identify the captured Web artifact");
     }
+    const managed = request.protocolVersion === MANAGED_PROTOCOL_VERSION;
+    const workflowVersion = managed ? WORKFLOW_REPORT_VERSION : LEGACY_WORKFLOW_REPORT_VERSION;
     const report: WorkflowReport = {
-      schemaVersion: WORKFLOW_REPORT_VERSION,
+      schemaVersion: workflowVersion,
       workflow: {
         command: WORKFLOW_COMMAND,
-        version: WORKFLOW_REPORT_VERSION,
+        version: workflowVersion,
         profile: "sightlint:recommended",
         verdictOwner: "sightlint-rust-kernel",
         externalProcessing: false,
       },
       capture: captureResponse,
-      sourceTargets: sourceTargets(artifactIr, checkReport),
+      sourceTargets: sourceTargets(artifactIr, checkReport, managed),
       checkReport,
-      limitations: [...WORKFLOW_LIMITATIONS],
+      limitations: managed ? [...MANAGED_WORKFLOW_LIMITATIONS] : [...WORKFLOW_LIMITATIONS],
     };
     return { report, exitCode: kernel.code };
   } finally {
@@ -408,7 +428,11 @@ export function humanWorkflowReport(report: WorkflowReport): string {
     const sourceTarget = targets.get(targetId);
     if (sourceTarget !== undefined) {
       lines.push(`  source selector: ${sourceTarget.locator.selector}`);
-      lines.push(`  source bundle: ${sourceTarget.sourceFiles.join(", ")}`);
+      if (sourceTarget.sourceAttribution === "unavailable") {
+        lines.push("  source attribution: unavailable");
+      } else {
+        lines.push(`  source bundle: ${sourceTarget.sourceFiles.join(", ")}`);
+      }
     }
     if (result.evidenceIds !== undefined) {
       lines.push(`  evidence: ${array(result.evidenceIds, "check report evidenceIds").join(", ")}`);

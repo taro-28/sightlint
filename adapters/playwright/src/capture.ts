@@ -10,21 +10,26 @@ import {
   ADAPTER_NAME,
   ADAPTER_VERSION,
   AdapterError,
+  LEGACY_ADAPTER_VERSION,
+  LEGACY_PROTOCOL_VERSION,
+  LEGACY_WEB_EXTENSION_VERSION,
   LIMITS,
+  MANAGED_PROTOCOL_VERSION,
   PLAYWRIGHT_VERSION,
-  PROTOCOL_VERSION,
   WEB_EXTENSION_KEY,
   WEB_EXTENSION_VERSION,
   type AccessibilitySummary,
   type BrowserNode,
   type CaptureOutputs,
+  type CaptureOptions,
   type CaptureRequest,
   type CaptureResponse,
   type JsonObject,
   type JsonValue,
   type RectValue,
 } from "./types.js";
-import { resolveFixture } from "./validate.js";
+import { ManagedServer } from "./server.js";
+import { resolveFixture, resolveRepositoryRoot } from "./validate.js";
 
 interface BrowserSnapshot {
   nodes: BrowserNode[];
@@ -43,6 +48,13 @@ interface CapturedNode {
 interface SourceBundle {
   digest: string;
   files: string[];
+  kind: "repositoryFiles" | "loopbackResponses";
+  routePath?: string;
+  targetDigest?: string;
+  requestCount?: number;
+  responseBytes?: number;
+  blockedWebSocketCount?: number;
+  blockedServiceWorkerCount?: number;
 }
 
 function roundCss(value: number): number {
@@ -78,7 +90,7 @@ async function sourceBundle(root: string, resourcePaths: Set<string>): Promise<S
     digest.update(Buffer.from([0]));
     digest.update(await readFile(join(root, file)));
   }
-  return { digest: `sha256:${digest.digest("hex")}`, files };
+  return { digest: `sha256:${digest.digest("hex")}`, files, kind: "repositoryFiles" };
 }
 
 function externalRequestLabel(url: URL): string {
@@ -107,6 +119,155 @@ async function routeRequest(
   }
   externalRequests.add(externalRequestLabel(requestUrl));
   await route.abort("blockedbyclient");
+}
+
+interface LoopbackResponse {
+  method: string;
+  targetDigest: string;
+  requestBodyDigest: string;
+  status: number;
+  body: Buffer;
+  responseDigest: string;
+}
+
+class ManagedNetworkRecorder {
+  readonly #allowedOrigin: string;
+  readonly #target: URL;
+  readonly #responses: LoopbackResponse[] = [];
+  readonly #externalRequests = new Set<string>();
+  #requestCount = 0;
+  #responseBytes = 0;
+  #blockedWebSocketCount = 0;
+  #blockedServiceWorkerCount = 0;
+  #failure: AdapterError | null = null;
+
+  public constructor(port: number, pathAndQuery: string) {
+    this.#allowedOrigin = `http://127.0.0.1:${port}`;
+    this.#target = new URL(pathAndQuery, this.#allowedOrigin);
+  }
+
+  public get destination(): string {
+    return this.#target.href;
+  }
+
+  public get routePath(): string {
+    return this.#target.pathname;
+  }
+
+  public get targetDigest(): string {
+    return sha256(this.#target.href);
+  }
+
+  public get externalRequests(): string[] {
+    return [...this.#externalRequests].sort();
+  }
+
+  public blockWebSocket(url: string): void {
+    const target = new URL(url);
+    if (target.protocol === "ws:" || target.protocol === "wss:") {
+      this.#blockedWebSocketCount += 1;
+    }
+  }
+
+  public blockServiceWorker(): void {
+    this.#blockedServiceWorkerCount += 1;
+  }
+
+  public async route(route: Route): Promise<void> {
+    const request = route.request();
+    const target = new URL(request.url());
+    if (["about:", "data:", "blob:"].includes(target.protocol)) {
+      await route.continue();
+      return;
+    }
+    if (target.protocol !== "http:" || target.origin !== this.#allowedOrigin) {
+      this.#externalRequests.add(externalRequestLabel(target));
+      await route.abort("blockedbyclient");
+      return;
+    }
+    if (this.#requestCount >= LIMITS.maxLoopbackResponses) {
+      this.#failure = new AdapterError("response-count-limit", "capture exceeded 512 loopback responses");
+      await route.abort("blockedbyclient");
+      return;
+    }
+    this.#requestCount += 1;
+    const requestBody = request.postDataBuffer() ?? Buffer.alloc(0);
+    if (requestBody.byteLength > LIMITS.maxRequestBodyBytes) {
+      this.#failure = new AdapterError("request-body-too-large", "loopback request body exceeded 1048576 bytes");
+      await route.abort("blockedbyclient");
+      return;
+    }
+    try {
+      const response = await route.fetch({ maxRedirects: 0, timeout: LIMITS.timeoutMs });
+      const body = await response.body();
+      if (body.byteLength > LIMITS.maxResponseBytes) {
+        this.#failure = new AdapterError("response-too-large", "one loopback response exceeded 16777216 bytes");
+        await route.abort("blockedbyclient");
+        return;
+      }
+      if (this.#responseBytes + body.byteLength > LIMITS.maxAggregateResponseBytes) {
+        this.#failure = new AdapterError("response-bytes-limit", "loopback responses exceeded 67108864 bytes");
+        await route.abort("blockedbyclient");
+        return;
+      }
+      this.#responseBytes += body.byteLength;
+      this.#responses.push({
+        method: request.method(),
+        targetDigest: sha256(target.href),
+        requestBodyDigest: sha256(requestBody),
+        status: response.status(),
+        body,
+        responseDigest: sha256(body),
+      });
+      await route.fulfill({ response, body });
+    } catch (error) {
+      if (this.#failure !== null) throw this.#failure;
+      if (error instanceof AdapterError) throw error;
+      this.#failure = new AdapterError("loopback-request", "failed to capture a same-origin loopback response");
+      throw this.#failure;
+    }
+  }
+
+  public throwIfFailed(): void {
+    if (this.#failure !== null) throw this.#failure;
+    if (this.#externalRequests.size > 0) {
+      throw new AdapterError("external-request", "page attempted a request outside the same-origin loopback allowlist");
+    }
+  }
+
+  public source(): SourceBundle {
+    this.throwIfFailed();
+    if (this.#responses.length === 0) {
+      throw new AdapterError("missing-response", "capture observed no loopback HTTP response");
+    }
+    const records = [...this.#responses].sort((left, right) => {
+      const leftKey = `${left.method}\0${left.targetDigest}\0${left.requestBodyDigest}\0${left.status}\0${left.responseDigest}`;
+      const rightKey = `${right.method}\0${right.targetDigest}\0${right.requestBodyDigest}\0${right.status}\0${right.responseDigest}`;
+      return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+    });
+    const digest = createHash("sha256");
+    for (const response of records) {
+      digest.update(canonicalJson({
+        method: response.method,
+        targetDigest: response.targetDigest,
+        requestBodyDigest: response.requestBodyDigest,
+        status: response.status,
+        responseBytes: response.body.byteLength,
+      }));
+      digest.update(response.body);
+    }
+    return {
+      digest: `sha256:${digest.digest("hex")}`,
+      files: [],
+      kind: "loopbackResponses",
+      routePath: this.routePath,
+      targetDigest: this.targetDigest,
+      requestCount: records.length,
+      responseBytes: this.#responseBytes,
+      blockedWebSocketCount: this.#blockedWebSocketCount,
+      blockedServiceWorkerCount: this.#blockedServiceWorkerCount,
+    };
+  }
 }
 
 function accessibilityRootEligible(node: BrowserNode): boolean {
@@ -540,6 +701,7 @@ function evidenceRecord(
   id: string,
   evidenceClass: string,
   sourceDigest: string,
+  adapterVersion: string,
   nativeId?: string,
 ): JsonObject {
   const value: JsonObject = {
@@ -547,7 +709,7 @@ function evidenceRecord(
     class: evidenceClass,
     source: {
       adapter: ADAPTER_NAME,
-      adapterVersion: ADAPTER_VERSION,
+      adapterVersion,
       inputDigest: sourceDigest,
       externalProcessing: false,
     },
@@ -567,10 +729,24 @@ function buildArtifactIr(
   browserVersion: string,
   externalRequests: string[],
 ): JsonObject {
+  const managed = request.protocolVersion === MANAGED_PROTOCOL_VERSION;
+  const adapterVersion = managed ? ADAPTER_VERSION : LEGACY_ADAPTER_VERSION;
+  const extensionVersion = managed ? WEB_EXTENSION_VERSION : LEGACY_WEB_EXTENSION_VERSION;
+  const sourcePath = managed ? source.routePath : request.fixture.entrypoint;
+  const state = managed ? request.target.state : request.fixture.state;
+  const readinessSelector = managed
+    ? request.target.readinessSelector
+    : request.fixture.readinessSelector;
+  if (sourcePath === undefined) {
+    throw new AdapterError("invalid-capture-output", "managed capture is missing its route path");
+  }
+  if (managed && (source.blockedWebSocketCount === undefined || source.blockedServiceWorkerCount === undefined)) {
+    throw new AdapterError("invalid-capture-output", "managed capture is missing blocked transport counts");
+  }
   const locatorToId = new Map(nodes.map((node) => [node.browser.locator.value, node.nodeId]));
   const evidence: JsonObject[] = [
-    evidenceRecord("e-web-viewport", "exactRender", source.digest),
-    evidenceRecord("e-web-screenshot", "exactRender", source.digest),
+    evidenceRecord("e-web-viewport", "exactRender", source.digest, adapterVersion),
+    evidenceRecord("e-web-screenshot", "exactRender", source.digest, adapterVersion),
   ];
   const coreNodes: JsonObject[] = [];
   const extensionNodes: JsonObject[] = [];
@@ -579,10 +755,10 @@ function buildArtifactIr(
     const domEvidence = `e-dom-${node.nodeId}`;
     const renderEvidence = `e-render-${node.nodeId}`;
     const axEvidence = `e-ax-${node.nodeId}`;
-    evidence.push(evidenceRecord(domEvidence, "exactSource", source.digest, node.browser.locator.value));
-    evidence.push(evidenceRecord(renderEvidence, "exactRender", source.digest, node.browser.locator.value));
+    evidence.push(evidenceRecord(domEvidence, "exactSource", source.digest, adapterVersion, node.browser.locator.value));
+    evidence.push(evidenceRecord(renderEvidence, "exactRender", source.digest, adapterVersion, node.browser.locator.value));
     if (node.accessibility.status === "observed") {
-      evidence.push(evidenceRecord(axEvidence, "platformSemantics", source.digest, node.browser.locator.value));
+      evidence.push(evidenceRecord(axEvidence, "platformSemantics", source.digest, adapterVersion, node.browser.locator.value));
     }
     const geometry: JsonObject = {
       renderBox: observedRect(node.browser.renderBox, renderEvidence),
@@ -679,21 +855,55 @@ function buildArtifactIr(
       ancestorClip: ancestorClip(node.browser),
       pixelContentMatch: {
         status: "cantTell",
-        reason: "web extension 0.3 does not perform pixel-content segmentation or identity matching",
+        reason: `web extension ${extensionVersion.slice(0, 3)} does not perform pixel-content segmentation or identity matching`,
       },
     });
   }
   evidence.sort((left, right) => String(left.id) < String(right.id) ? -1 : String(left.id) > String(right.id) ? 1 : 0);
+  const captureRecord: JsonObject = {
+    sourceFiles: source.files,
+    sourceDigest: source.digest,
+    screenshot: {
+      reference: screenshot.reference,
+      sha256: screenshot.digest,
+      byteLength: screenshot.byteLength,
+      pixelSize: { width: screenshot.width, height: screenshot.height },
+      format: "png",
+      scale: "css",
+      animations: "disabled",
+      caret: "hide",
+      colorAssumptions: "PNG encoded channels; no colorimetric or compositing claim",
+    },
+    network: managed
+      ? {
+          mode: "sameOriginLoopback",
+          externalRequests,
+          blockedWebSocketCount: source.blockedWebSocketCount ?? 0,
+          blockedServiceWorkerCount: source.blockedServiceWorkerCount ?? 0,
+        }
+      : { mode: "deny", externalRequests },
+    privacy: { accessibleNameMode: "selectedNodes", descendantsRedacted: true, externalProcessing: false },
+  };
+  if (managed) {
+    captureRecord.sourceKind = "loopbackResponses";
+    captureRecord.loopbackResponses = {
+      digest: source.digest,
+      requestCount: source.requestCount,
+      responseBytes: source.responseBytes,
+      routePath: sourcePath,
+      targetDigest: source.targetDigest,
+    } as unknown as JsonObject;
+  }
   const extension: JsonObject = {
-    extensionVersion: WEB_EXTENSION_VERSION,
+    extensionVersion,
     document: {
       id: "document-main",
       frameId: "frame-main",
-      frames: [{ id: "frame-main", parentId: null, kind: "main", sourcePath: request.fixture.entrypoint }],
+      frames: [{ id: "frame-main", parentId: null, kind: "main", sourcePath }],
       frameCount: 1,
-      sourcePath: request.fixture.entrypoint,
-      state: request.fixture.state,
-      readinessSelector: request.fixture.readinessSelector,
+      sourcePath,
+      state,
+      readinessSelector,
       scroll: { x: roundCss(snapshot.scroll.x), y: roundCss(snapshot.scroll.y), unit: "cssPixel" },
       documentSize: { ...snapshot.documentSize, unit: "cssPixel" },
       viewportSize: request.environment.viewport,
@@ -707,23 +917,7 @@ function buildArtifactIr(
       platform: process.platform,
       architecture: process.arch,
     } as unknown as JsonObject,
-    capture: {
-      sourceFiles: source.files,
-      sourceDigest: source.digest,
-      screenshot: {
-        reference: screenshot.reference,
-        sha256: screenshot.digest,
-        byteLength: screenshot.byteLength,
-        pixelSize: { width: screenshot.width, height: screenshot.height },
-        format: "png",
-        scale: "css",
-        animations: "disabled",
-        caret: "hide",
-        colorAssumptions: "PNG encoded channels; no colorimetric or compositing claim",
-      },
-      network: { mode: "deny", externalRequests },
-      privacy: { accessibleNameMode: "selectedNodes", descendantsRedacted: true, externalProcessing: false },
-    },
+    capture: captureRecord,
     nodes: extensionNodes,
     reconciliation: {
       screenshotViewport: {
@@ -737,7 +931,7 @@ function buildArtifactIr(
       nodes: reconciliationNodes,
       pixelContentComparison: {
         status: "cantTell",
-        reason: "pixel-content identity is outside web extension 0.3",
+        reason: `pixel-content identity is outside web extension ${extensionVersion.slice(0, 3)}`,
       },
     },
   };
@@ -747,7 +941,9 @@ function buildArtifactIr(
       id: request.artifact.id,
       kind: "web",
       title: request.artifact.title,
-      sourceName: `${request.fixture.entrypoint}?case=${request.fixture.state}&textScale=${request.environment.textScale}`,
+      sourceName: managed
+        ? `${sourcePath}#state=${state}&textScale=${request.environment.textScale}`
+        : `${request.fixture.entrypoint}?case=${request.fixture.state}&textScale=${request.environment.textScale}`,
     },
     canvases: [
       {
@@ -804,7 +1000,7 @@ async function writeOutputPair(outputs: CaptureOutputs, artifactIr: string, scre
   }
 }
 
-async function configureContext(
+async function configureLegacyContext(
   context: BrowserContext,
   root: string,
   resourcePaths: Set<string>,
@@ -815,18 +1011,60 @@ async function configureContext(
   await context.route("**/*", async (route) => routeRequest(route, root, resourcePaths, externalRequests));
 }
 
-export async function capture(
+async function configureManagedContext(
+  context: BrowserContext,
+  recorder: ManagedNetworkRecorder,
+): Promise<void> {
+  context.setDefaultTimeout(LIMITS.timeoutMs);
+  context.setDefaultNavigationTimeout(LIMITS.timeoutMs);
+  await context.exposeBinding("__sightlintRecordBlockedServiceWorker", async () => {
+    recorder.blockServiceWorker();
+  });
+  await context.addInitScript(() => {
+    const scope = globalThis as typeof globalThis & {
+      __sightlintRecordBlockedServiceWorker?: () => Promise<void>;
+    };
+    if ("serviceWorker" in navigator) {
+      const serviceWorker = navigator.serviceWorker;
+      const replacement = async (): Promise<never> => {
+        await scope.__sightlintRecordBlockedServiceWorker?.();
+        throw new DOMException("Service workers are blocked by SightLint", "SecurityError");
+      };
+      for (const target of [serviceWorker, Object.getPrototypeOf(serviceWorker) as object]) {
+        try {
+          Object.defineProperty(target, "register", {
+            configurable: true,
+            value: replacement,
+          });
+          break;
+        } catch {
+          // Try the prototype when Chromium rejects an instance property.
+        }
+      }
+    }
+  });
+  await context.routeWebSocket("**/*", (webSocket) => {
+    recorder.blockWebSocket(webSocket.url());
+    webSocket.close({ code: 1008, reason: "blocked by SightLint" });
+  });
+  await context.route("**/*", async (route) => recorder.route(route));
+}
+
+async function captureWithBrowser(
   request: CaptureRequest,
-  repositoryRoot: string,
+  root: string,
+  destination: string,
   outputs: CaptureOutputs,
+  resourcePaths: Set<string>,
+  recorder: ManagedNetworkRecorder | null,
+  managedServer: CaptureResponse["capture"]["managedServer"] | undefined,
 ): Promise<CaptureResponse> {
-  const resolved = await resolveFixture(repositoryRoot, request.fixture.entrypoint);
   if (request.environment.viewport.width * request.environment.viewport.height > LIMITS.maxScreenshotPixels) {
     throw new AdapterError("screenshot-budget", "requested screenshot exceeds the pixel budget");
   }
   const requestBytes = canonicalJson(request as unknown as JsonValue);
-  const resourcePaths = new Set<string>([resolved.entrypoint]);
   const externalRequests = new Set<string>();
+  const managed = request.protocolVersion === MANAGED_PROTOCOL_VERSION;
   const browser = await chromium.launch({
     headless: true,
     args: [
@@ -850,23 +1088,65 @@ export async function capture(
       colorScheme: request.environment.colorScheme,
       reducedMotion: request.environment.reducedMotion,
       serviceWorkers: "block",
-      offline: true,
+      offline: !managed,
       permissions: [],
     });
-    await configureContext(context, resolved.root, resourcePaths, externalRequests);
+    if (recorder === null) {
+      await configureLegacyContext(context, root, resourcePaths, externalRequests);
+    } else {
+      await configureManagedContext(context, recorder);
+    }
     const page = await context.newPage();
-    const destination = pathToFileURL(resolved.entrypoint);
-    destination.searchParams.set("case", request.fixture.state);
-    destination.searchParams.set("textScale", String(request.environment.textScale));
-    await page.goto(destination.href, { waitUntil: "load", timeout: LIMITS.timeoutMs });
-    await page.waitForSelector(request.fixture.readinessSelector, { state: "attached", timeout: LIMITS.timeoutMs });
-    await page.evaluate(async () => document.fonts.ready);
+    let navigationResponse;
+    if (!managed) {
+      navigationResponse = await page.goto(destination, { waitUntil: "load", timeout: LIMITS.timeoutMs });
+    } else {
+      try {
+        navigationResponse = await page.goto(destination, { waitUntil: "load", timeout: LIMITS.timeoutMs });
+      } catch {
+        recorder?.throwIfFailed();
+        throw new AdapterError("navigation", "failed to load the requested page");
+      }
+    }
+    if (managed) {
+      const finalUrl = new URL(page.url());
+      const allowedOrigin = `http://127.0.0.1:${request.server.port}`;
+      if (finalUrl.origin !== allowedOrigin) {
+        throw new AdapterError("external-navigation", "final navigation left the same-origin loopback target");
+      }
+      if (navigationResponse === null || navigationResponse.status() < 200 || navigationResponse.status() > 299) {
+        throw new AdapterError("http-status", "final loopback navigation did not return HTTP 2xx");
+      }
+    }
+    const readinessSelector = managed
+      ? request.target.readinessSelector
+      : request.fixture.readinessSelector;
+    await page.waitForSelector(readinessSelector, { state: "attached", timeout: LIMITS.timeoutMs });
+    if (!managed) {
+      await page.evaluate(async () => document.fonts.ready);
+    } else {
+      let fontTimeout: ReturnType<typeof setTimeout> | undefined;
+      try {
+        await Promise.race([
+          page.evaluate(async () => document.fonts.ready),
+          new Promise<never>((_resolve, reject) => {
+            fontTimeout = setTimeout(
+              () => reject(new AdapterError("fonts-timeout", "document fonts did not become ready within 20000 ms")),
+              LIMITS.timeoutMs,
+            );
+          }),
+        ]);
+      } finally {
+        clearTimeout(fontTimeout);
+      }
+    }
+    recorder?.throwIfFailed();
     const frameCount = page.frames().length;
     if (frameCount > LIMITS.maxFrames) {
       throw new AdapterError("frame-budget", `capture exceeds ${LIMITS.maxFrames} frames`);
     }
     if (frameCount !== 1 || context.pages().length !== 1) {
-      throw new AdapterError("unsupported-frame", "protocol 0.1 supports one main frame and one page");
+      throw new AdapterError("unsupported-frame", `protocol ${request.protocolVersion.slice(0, 3)} supports one main frame and one page`);
     }
     const snapshot = await collectBrowserSnapshot(page);
     if (snapshot.duplicateLocators.length > 0) {
@@ -886,11 +1166,11 @@ export async function capture(
     if (screenshotBytes.byteLength > LIMITS.maxScreenshotBytes) {
       throw new AdapterError("screenshot-budget", "captured screenshot exceeds the byte budget");
     }
-    if (externalRequests.size > 0) {
+    if (recorder === null && externalRequests.size > 0) {
       throw new AdapterError("external-request", "fixture attempted a request outside the local allowlist");
     }
     const dimensions = pngDimensions(screenshotBytes);
-    const source = await sourceBundle(resolved.root, resourcePaths);
+    const source = recorder === null ? await sourceBundle(root, resourcePaths) : recorder.source();
     const browserVersion = browser.version();
     const screenshotDigest = sha256(screenshotBytes);
     const artifactIr = buildArtifactIr(
@@ -906,18 +1186,55 @@ export async function capture(
         height: dimensions.height,
       },
       browserVersion,
-      [...externalRequests].sort(),
+      recorder === null ? [...externalRequests].sort() : recorder.externalRequests,
     );
     const artifactIrBytes = canonicalJson(artifactIr);
     if (Buffer.byteLength(artifactIrBytes) > LIMITS.maxOutputBytes) {
       throw new AdapterError("output-budget", "canonical Artifact IR exceeds the output budget");
     }
+    const responseCapture: CaptureResponse["capture"] = {
+      pageCount: 1,
+      frameCount,
+      nodeCount: nodes.length,
+      externalRequests: [],
+      deterministicOptions: managed
+        ? {
+            headless: true,
+            offline: false,
+            serviceWorkers: "blockAndCountRegistration",
+            webSockets: "blockAndCount",
+            wait: ["tcpListen", "finalHttp2xx", "load", readinessSelector, "document.fonts.ready"],
+            screenshot: { animations: "disabled", caret: "hide", scale: "css", format: "png" },
+          }
+        : {
+            headless: true,
+            offline: true,
+            serviceWorkers: "block",
+            wait: ["load", readinessSelector, "document.fonts.ready"],
+            screenshot: { animations: "disabled", caret: "hide", scale: "css", format: "png" },
+          },
+    };
+    if (managed) {
+      if (source.routePath === undefined || source.targetDigest === undefined || source.requestCount === undefined || source.responseBytes === undefined || source.blockedWebSocketCount === undefined || source.blockedServiceWorkerCount === undefined || managedServer === undefined) {
+        throw new AdapterError("invalid-capture-output", "managed capture summary is incomplete");
+      }
+      responseCapture.loopbackResponses = {
+        digest: source.digest,
+        requestCount: source.requestCount,
+        responseBytes: source.responseBytes,
+        routePath: source.routePath,
+        targetDigest: source.targetDigest,
+        blockedWebSocketCount: source.blockedWebSocketCount,
+        blockedServiceWorkerCount: source.blockedServiceWorkerCount,
+      };
+      responseCapture.managedServer = managedServer;
+    }
     const response: CaptureResponse = {
-      protocolVersion: PROTOCOL_VERSION,
+      protocolVersion: request.protocolVersion,
       status: "captured",
       adapter: {
         name: ADAPTER_NAME,
-        version: ADAPTER_VERSION,
+        version: managed ? ADAPTER_VERSION : LEGACY_ADAPTER_VERSION,
         nodeVersion: process.versions.node,
         platform: process.platform,
         architecture: process.arch,
@@ -939,25 +1256,21 @@ export async function capture(
         pixelSize: dimensions,
         colorAssumptions: "PNG encoded channels; no colorimetric or compositing claim",
       },
-      capture: {
-        pageCount: 1,
-        frameCount,
-        nodeCount: nodes.length,
-        externalRequests: [],
-        deterministicOptions: {
-          headless: true,
-          offline: true,
-          serviceWorkers: "block",
-          wait: ["load", request.fixture.readinessSelector, "document.fonts.ready"],
-          screenshot: { animations: "disabled", caret: "hide", scale: "css", format: "png" },
-        },
-      },
-      limitations: [
-        "pixel-content matching is cantTell in protocol 0.1.0",
-        "complete hit regions are cantTell; center-point samples are not hit rectangles",
-        "host font and raster differences are recorded but not normalized across platforms",
-        "only repository-contained file fixtures are supported",
-      ],
+      capture: responseCapture,
+      limitations: managed
+        ? [
+            "pixel-content matching is cantTell in protocol 0.2.0",
+            "complete hit regions are cantTell; center-point samples are not hit rectangles",
+            "host font and raster differences are recorded but not normalized across platforms",
+            "loopback locators do not establish source file or line attribution",
+            "the explicitly authorized server command is not sandboxed and its own network is not controlled",
+          ]
+        : [
+            "pixel-content matching is cantTell in protocol 0.1.0",
+            "complete hit regions are cantTell; center-point samples are not hit rectangles",
+            "host font and raster differences are recorded but not normalized across platforms",
+            "only repository-contained file fixtures are supported",
+          ],
     };
     const responseBytes = canonicalJson(response as unknown as JsonValue);
     if (Buffer.byteLength(responseBytes) > LIMITS.maxOutputBytes) {
@@ -968,5 +1281,51 @@ export async function capture(
     return response;
   } finally {
     await browser.close();
+  }
+}
+
+export async function capture(
+  request: CaptureRequest,
+  repositoryRoot: string,
+  outputs: CaptureOutputs,
+  options: CaptureOptions = { allowServerCommand: false },
+): Promise<CaptureResponse> {
+  if (request.protocolVersion === LEGACY_PROTOCOL_VERSION) {
+    const resolved = await resolveFixture(repositoryRoot, request.fixture.entrypoint);
+    const destination = pathToFileURL(resolved.entrypoint);
+    destination.searchParams.set("case", request.fixture.state);
+    destination.searchParams.set("textScale", String(request.environment.textScale));
+    return captureWithBrowser(
+      request,
+      resolved.root,
+      destination.href,
+      outputs,
+      new Set<string>([resolved.entrypoint]),
+      null,
+      undefined,
+    );
+  }
+  if (!options.allowServerCommand) {
+    throw new AdapterError(
+      "server-command-not-allowed",
+      "managed loopback capture requires --allow-server-command",
+    );
+  }
+  const root = await resolveRepositoryRoot(repositoryRoot);
+  const recorder = new ManagedNetworkRecorder(request.server.port, request.target.pathAndQuery);
+  const server = new ManagedServer(request, root);
+  await server.start();
+  try {
+    return await server.guard(captureWithBrowser(
+      request,
+      root,
+      recorder.destination,
+      outputs,
+      new Set<string>(),
+      recorder,
+      server.record,
+    ));
+  } finally {
+    await server.stop();
   }
 }

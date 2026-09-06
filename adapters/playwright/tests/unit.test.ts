@@ -89,15 +89,74 @@ test("request parser enforces byte, viewport, and closed-environment limits", as
   );
 });
 
+async function managedRequest(): Promise<Record<string, unknown>> {
+  return await json("evaluation/web/managed-requests/dashboard-managed-clean.json") as Record<string, unknown>;
+}
+
+test("managed request parser accepts the strict loopback contract and Japanese locale", async () => {
+  const base = await managedRequest();
+  const environment = base["environment"] as { locale: string };
+  environment.locale = "ja-JP";
+  const request = parseCaptureRequest(Buffer.from(JSON.stringify(base)));
+  assert.equal(request.protocolVersion, "0.2.0");
+  assert.equal(request.environment.locale, "ja-JP");
+  if (request.protocolVersion !== "0.2.0") assert.fail("managed request expected");
+  assert.equal(request.target.kind, "managedLoopbackHttp");
+  assert.equal(request.server.port, 43173);
+});
+
+test("managed request parser rejects unsafe paths, ports, timeouts, and unknown fields", async () => {
+  for (const pathAndQuery of ["relative", "//example.invalid/path", "/path#fragment", "/path\n", "/path?x=%0a"]) {
+    const candidate = await managedRequest() as { target: { pathAndQuery: string } };
+    candidate.target.pathAndQuery = pathAndQuery;
+    assert.throws(
+      () => parseCaptureRequest(Buffer.from(JSON.stringify(candidate))),
+      /pathAndQuery/u,
+      pathAndQuery,
+    );
+  }
+  for (const port of [1023, 65536, 4173.5]) {
+    const candidate = await managedRequest() as { server: { port: number } };
+    candidate.server.port = port;
+    assert.throws(() => parseCaptureRequest(Buffer.from(JSON.stringify(candidate))), /port must be an integer/u);
+  }
+  for (const timeout of [0, 180001, 1.5]) {
+    const candidate = await managedRequest() as { server: { startupTimeoutMs: number } };
+    candidate.server.startupTimeoutMs = timeout;
+    assert.throws(() => parseCaptureRequest(Buffer.from(JSON.stringify(candidate))), /startupTimeoutMs/u);
+  }
+  const unknown = await managedRequest();
+  Object.assign(unknown, { invented: true });
+  assert.throws(() => parseCaptureRequest(Buffer.from(JSON.stringify(unknown))), /request fields must be exactly/u);
+});
+
+test("managed request parser enforces argv placeholder and resource limits", async () => {
+  for (const argv of [["node", "server.mjs"], ["node", "{port}", "{port}"], ["node", "{port}{port}"]]) {
+    const candidate = await managedRequest() as { server: { argv: string[] } };
+    candidate.server.argv = argv;
+    assert.throws(() => parseCaptureRequest(Buffer.from(JSON.stringify(candidate))), /\{port\} exactly once/u);
+  }
+  const tooMany = await managedRequest() as { server: { argv: string[] } };
+  tooMany.server.argv = ["{port}", ...Array.from({ length: 64 }, () => "x")];
+  assert.throws(() => parseCaptureRequest(Buffer.from(JSON.stringify(tooMany))), /1 through 64 elements/u);
+
+  const tooLarge = await managedRequest() as { server: { argv: string[] } };
+  tooLarge.server.argv = ["{port}", "x".repeat(8192)];
+  assert.throws(() => parseCaptureRequest(Buffer.from(JSON.stringify(tooLarge))), /exceeds 8192 UTF-8 bytes/u);
+});
+
 test("all protocol and oracle examples satisfy their versioned JSON Schemas", async () => {
   const requestFiles = (await readdir(resolve(repositoryRoot, "evaluation/web/requests")))
     .filter((name) => name.endsWith(".json"))
     .sort();
   const pairs = [
     ...requestFiles.map((name) => ["adapters/playwright/schemas/capture-request.schema.json", `evaluation/web/requests/${name}`] as const),
+    ...["dashboard-managed-clean.json", "dashboard-managed-unnamed-control.json", "dashboard-managed-intentional-overlay.json"]
+      .map((name) => ["adapters/playwright/schemas/capture-request-0.2.schema.json", `evaluation/web/managed-requests/${name}`] as const),
     ["evaluation/web/browser-acquisition.schema.json", "evaluation/web/annotations/browser-acquisition.json"],
     ["evaluation/web/browser-rule.schema.json", "evaluation/web/annotations/browser-rules.json"],
     ["evaluation/web/agent-workflow.schema.json", "evaluation/web/annotations/agent-workflow.json"],
+    ["evaluation/web/managed-loopback.schema.json", "evaluation/web/annotations/managed-loopback.json"],
     ["evaluation/image-alpha/corpus.schema.json", "evaluation/image-alpha/corpus.json"],
     ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/acquisition.json"],
     ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/rules.json"],
@@ -207,6 +266,11 @@ test("workflow report schema compiles with the capture response compatibility su
   ajv.addSchema(await json("adapters/playwright/schemas/capture-response.schema.json") as AnySchema);
   const validate = ajv.compile(await json("adapters/playwright/schemas/web-workflow-report.schema.json") as AnySchema);
   assert.equal(typeof validate, "function");
+
+  const managedAjv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  managedAjv.addSchema(await json("adapters/playwright/schemas/capture-response-0.2.schema.json") as AnySchema);
+  const managedValidate = managedAjv.compile(await json("adapters/playwright/schemas/web-workflow-report-0.2.schema.json") as AnySchema);
+  assert.equal(typeof managedValidate, "function");
 });
 
 test("previous strict schemas remain available and reject current documents", async () => {
@@ -218,6 +282,9 @@ test("previous strict schemas remain available and reject current documents", as
   const previousExtension = await json("adapters/playwright/schemas/web-extension-0.1.schema.json") as Record<string, unknown>;
   assert.equal(previousExtension["$id"], "urn:sightlint:schema:web-extension:0.1.0");
   assert.deepEqual((previousExtension["properties"] as Record<string, unknown>)["extensionVersion"], { const: "0.1.0" });
+
+  const retainedCurrentExtension = await json("adapters/playwright/schemas/web-extension-0.3.schema.json") as Record<string, unknown>;
+  assert.equal(retainedCurrentExtension["$id"], "urn:sightlint:schema:web-extension:0.3.0");
 });
 
 test("protocol schemas reject extension fields", async () => {
@@ -227,4 +294,10 @@ test("protocol schemas reject extension fields", async () => {
   request["futureField"] = true;
   assert.equal(validate(request), false);
   assert.match(ajv.errorsText(validate.errors), /additional properties/u);
+
+  const managedValidate = ajv.compile(await json("adapters/playwright/schemas/capture-request-0.2.schema.json") as AnySchema);
+  const managed = await managedRequest() as { server: { argv: string[] } };
+  managed.server.argv = ["node", "server.mjs", "--port={port}{port}"];
+  assert.equal(managedValidate(managed), false);
+  assert.match(ajv.errorsText(managedValidate.errors), /must match pattern/u);
 });

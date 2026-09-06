@@ -31,6 +31,12 @@ control clipping, and intentional-asymmetry/overlay cases.
 binary. Captured Artifact IR and screenshots remain temporary review/test artifacts and are never
 copied into either oracle.
 
+ADR 0048 adds a three-case managed-loopback product slice over the same fixture family. Its
+independent `annotations/managed-loopback.json` oracle covers a clean page, the existing unnamed-
+control mutation, and the intentional-overlay hard negative through a real started HTTP server,
+redirect, same-origin API request, `sightlint-web-check`, and built Rust binary. This adds lifecycle
+and public-path evidence; it does not increase the diversity of the Web accuracy corpus.
+
 This corpus is realistic in structure, not representative in sampling. It contains one application
 family, one language, one theme, and a small set of explicitly reviewed rule paths. It does not
 establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
@@ -52,7 +58,10 @@ establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
 - `agent-workflow.schema.json` and `annotations/agent-workflow.json`: the independent reviewed
   source-navigation, fix/rerun, abstention, hard-negative, governance, and non-claim contract for
   the one-command issue #42 path. It is public smoke data, not generated output or a holdout.
+- `managed-loopback.schema.json` and `annotations/managed-loopback.json`: the independent
+  three-case managed-server product oracle, provenance, split, and explicit non-claims.
 - `requests/`: versioned deterministic capture requests for the Playwright adapter.
+- `managed-requests/`: protocol `0.2.0` requests for the repository-owned Node server fixture.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
 - `inputs/`: independently authored Artifact IR projections for currently runnable rule cases.
 
@@ -112,6 +121,8 @@ The browser companion uses the actual Node adapter process and built Rust binary
 npm --prefix adapters/playwright run check
 cargo build --locked -p sightlint-cli
 npm --prefix adapters/playwright run test:e2e
+npm --prefix adapters/playwright run test:managed-e2e
+npm --prefix adapters/playwright run test:server-e2e
 ```
 
 Together they currently report 23/23 case coverage, 76 reviewed acquisition expectations, 45
@@ -125,3 +136,10 @@ The agent-workflow E2E additionally reports 1/1 initial named finding, 1/1 sourc
 reviewed fix verified, zero new failures, 2/2 repeated JSON and human byte checks, and 2/2 reviewed
 `cantTell` controls with zero false-positive failures. The task, edit, and labels are public, so
 these are workflow regression counts rather than agent-generalization metrics.
+
+The managed E2E reports 3/3 product cases, 1/1 mutation kill, zero hard-negative failures, 6/6
+normal product port cleanups, and stable authorization/lifecycle/network/resource failure counts.
+It also verifies direct capture, Rust `0.4.0` extension dispatch, repeated bytes within one
+environment, signal-driven descendant cleanup, query/body/log redaction, and unavailable source
+attribution. The lifecycle and networking fixture tests are conformance evidence, not an oracle
+for arbitrary-application quality.

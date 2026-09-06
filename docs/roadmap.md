@@ -15,10 +15,10 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
-| M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | portability characterization and broader representative evaluation |
+| M4 — Structured adapters | active | process-isolated file and managed-loopback Playwright capture, 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | portability characterization and broader representative evaluation |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | active | interaction extension `0.1.0`, controlled Playwright/Atlas traces, async-feedback and failure-recovery advisory rules, eight-case evaluation | offline/permission/stale/partial/destructive/focus/mobile traces and broader evidence |
-| M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
+| M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, managed target-repository server lifecycle, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
 
 The project has a narrowly scoped source-only alpha. The kernel and structured-IR path are much
 more mature than the ability to infer useful structure and applicability from an arbitrary
@@ -323,6 +323,21 @@ future compatibility/capability work rather than part of the bounded local-fixtu
 Pixel-content identity, complete hit regions, and semantic peer relations remain abstentions until
 independently evaluated evidence exists.
 
+### Managed loopback Web capture — #62, focused child of #31
+
+ADR 0048 adds capture protocol `0.2.0` for a caller-authorized development server in the target
+repository. `sightlint-web` and `sightlint-web-check` require `--allow-server-command`, start a
+shell-free argv on an unused loopback port, wait for final HTTP 2xx plus page readiness, constrain
+browser traffic to that same origin, and stop the full process tree on every terminal path. Managed
+captures emit adapter `0.4.0`, `org.sightlint.web@0.4.0`, and workflow report `0.2.0`; the `0.1.0`
+repository-file path and output remain unchanged.
+
+The public three-case Atlas slice plus lifecycle matrix prove startup, redirect, same-origin API,
+capture/check, redaction, unavailable source attribution, deterministic bytes, bounded failures,
+and cleanup. The tabisaifu `/test/login?next=%2Fentries%2Fnew` dogfood is a real-application smoke
+run, not committed evaluation data. It does not establish whole-app quality, source causality,
+representative accuracy, WCAG conformance, or blocking maturity.
+
 ### Other adapters — #29
 
 Add one at a time according to demand and fixture quality:
@@ -497,6 +512,11 @@ contracts justify them.
 - temporary artifacts stay local and are removed; no hosted processor or automatic source editor
   is introduced.
 
+The next focused #31 slice is issue #62: managed loopback protocol `0.2.0` lets the same commands
+own one target-repository development-server lifecycle behind explicit command authorization. It
+adds no MCP, hosted processing, source edit, existing-server attachment, remote URL, or package
+channel.
+
 ### First alpha release
 
 - `v0.1.0-alpha.2` is a source-only GitHub prerelease under `MIT OR Apache-2.0`;
@@ -546,7 +566,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0048 or later.
+- New architecture decision numbers continue at 0049 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -574,6 +594,7 @@ Every public behavior must satisfy the applicable matrix:
 | #60 | bounded iOS UIKit/XCUITest capture adapter slice |
 | #30 | completed bounded interaction extension/trace/async-feedback/recovery slice; broader M6 scenarios remain evidence-gated |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
+| #62 | managed loopback target-repository Web capture and `/entries/new` dogfood |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha execution epic |

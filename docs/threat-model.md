@@ -37,6 +37,9 @@ Assume:
 - explicit coordinate and unit declarations
 - content digests for evidence reconciliation
 
+“Sandbox” here is a trust zone and design objective, not a claim that every adapter runs in an OS
+sandbox. Each adapter section below states its actual enforcement boundary.
+
 ### Optional remote perception
 
 - opt-in only
@@ -55,6 +58,30 @@ Assume:
 - least-privilege GitHub Actions permissions
 - dependency update automation
 - no artifact uploads in the foundation milestone
+
+## Current managed Web boundary
+
+ADR 0048 treats the target page and caller-authorized development server as untrusted. Protocol
+`0.2.0` accepts only a direct argv array, verifies that `{port}` appears once, canonicalizes the
+target-repository working directory, checks the requested 1024–65535 port before spawn, and
+requires the explicit `--allow-server-command` flag before any process is started. The adapter
+drains but does not serialize bounded server stdout/stderr. It owns shutdown on success, failure,
+SIGINT, and SIGTERM: POSIX targets the child process group with TERM then KILL, and Windows uses a
+validated positive PID with `taskkill.exe /T /F`.
+
+The browser accepts only same-origin HTTP at literal `127.0.0.1:<port>`, aborts external HTTP(S),
+and blocks/counts WebSocket and service-worker attempts. Request bodies, each response, aggregate
+response bytes, response count, argv size, startup duration, and server output are bounded. The
+serialized source identity is derived from method, target/request-body digests, status, byte count,
+and buffered response bytes; raw query strings, request/response bodies, variable headers, server
+logs, environment values, and PIDs are omitted. Runtime selectors are retained, but source-file
+and source-line attribution is explicitly unavailable.
+
+These controls are not an OS sandbox. The server command inherits all caller environment variables
+and host privileges, and its own outbound network is not intercepted. The authorization flag is
+therefore a consent boundary, not proof that the command is safe. A hostile page still executes in
+Chromium, and digest-only fields can reveal equality or permit guessing of low-entropy values.
+Treat the report and screenshot as sensitive source-derived artifacts.
 
 ## Current PPTX parser boundary
 
@@ -127,5 +154,7 @@ into Artifact IR.
 Before broadening PPTX/PDF/Android/iOS or accepting other real artifact formats, add format-specific
 fuzzing, parser/runtime compatibility characterization, and stronger sandbox guidance; every new
 parser still needs its own resource and archive policy.
-Before browser support, define origin isolation, credential handling, request interception,
-and trace redaction.
+Before broader browser support, define credential/storage isolation for authenticated production
+sessions, iframe and worker policy, arbitrary host/origin handling, and interaction-trace
+redaction. Managed protocol `0.2.0` deliberately covers only one newly started loopback origin and
+does not admit an existing server, remote URL, browser profile, or stored session.

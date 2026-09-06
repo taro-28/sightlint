@@ -436,7 +436,7 @@ test("reviewed browser acquisition and rule oracles pass through the public proc
   const ruleCases = new Map((array(ruleDocument["cases"], "rule cases") as unknown as RuleCase[]).map((item) => [item.caseId, item]));
   const ruleContracts = array(ruleDocument["ruleContracts"], "rule contracts") as unknown as RuleContract[];
   const responseValidator = await schemaValidator("adapters/playwright/schemas/capture-response.schema.json");
-  const extensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension.schema.json");
+  const extensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension-0.3.schema.json");
   const secondExtensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension-0.2.schema.json");
   const previousExtensionValidator = await schemaValidator("adapters/playwright/schemas/web-extension-0.1.schema.json");
   const completed: CaptureRun[] = [];

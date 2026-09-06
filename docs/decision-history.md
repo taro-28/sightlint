@@ -199,6 +199,10 @@ ADRs 0033 and 0034 implement issue #23's bounded local-fixture adapter, determin
 contract, and evidence matrix. ADR 0035 promotes the versioned Web payload to an official optional
 extension consumed only after strict Rust validation; Playwright remains outside the kernel.
 Complete hit regions and pixel-content identity remain explicitly unresolved rather than inferred.
+ADR 0048 extends only the adapter boundary with explicit managed-server authorization, loopback-
+only browser interception, bounded response identity, and process-tree cleanup. It preserves the
+legacy file protocol and does not move process launch, source attribution, or verdict ownership
+into Rust.
 
 ## Image path decisions
 
@@ -469,7 +473,11 @@ Important historical detail:
 - ADR 0046 defines the bounded iOS paired UIKit/XCUITest capture adapter, separate source/platform/
   render evidence, clipped-scroll/offscreen abstention, and public acquisition/rule evaluation
   boundary;
-- new ADRs should continue at 0048 or later rather than silently reusing historical numbers.
+- ADR 0047 defines medium-neutral deterministic interaction contracts, controlled traces, and
+  separate acquisition/rule evidence;
+- ADR 0048 defines opt-in managed loopback Web capture, server lifecycle ownership, browser-side
+  same-origin enforcement, digest/redaction rules, and unavailable source attribution;
+- new ADRs should continue at 0049 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -477,7 +485,8 @@ inside an unmerged branch and does not make them accepted repository decisions.
 ## Decisions still open
 
 - representative corpus expansion and protected holdout operation beyond the public #22 slice;
-- arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
+- broader arbitrary-project and cross-platform Playwright compatibility beyond the bounded
+  managed-loopback #62 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
 - exact unsupported PNG formats and decoder admission if future product evidence establishes a
   gap after ADR 0041;
