@@ -286,19 +286,18 @@ rule consumes only admitted UIKit allocation facts and learns no iOS concept.
 
 ## Interaction extension
 
-Interaction data is optional for static artifacts and remains future work under issue #30. A
-versioned extension may represent:
+ADR 0047 adds optional `org.sightlint.interaction@0.1.0` without changing core Artifact IR. The
+first version represents stable actions, declared categorical effect latency, accepted retry or
+save-draft recovery alternatives, captured/`untested` traces, canonical one-based event order,
+attempt and causal identifiers, visible pending/optimistic/success/failure states, effect
+resolution, recovery events, and retained cross-source conflicts.
 
-- actions and preconditions;
-- expected effects and affected scope;
-- pending, optimistic, success, empty, failure, partial, retry, undo, and confirmation states;
-- state transitions and causal trace events;
-- focus/navigation behavior;
-- network/platform/application events;
-- idempotency, safeguards, and recovery alternatives.
-
-The static core remains valid without this extension. A static screenshot cannot prove an invisible
-effect or temporal obligation.
+Every action contract references `declaredContract` evidence. Every captured event includes
+`interactionTrace` evidence and may additionally retain exact-render, platform-semantics, or
+declared evidence. The schema contains no wall-clock timestamps. Static artifacts remain valid
+without the extension, and a static screenshot cannot prove an invisible effect or temporal
+obligation. Empty, partial, destructive safeguards, undo, focus/navigation, and broader recovery
+types require later evaluated extension versions.
 
 ## Schema invariants
 

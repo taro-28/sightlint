@@ -391,6 +391,7 @@ cargo run --locked -p sightlint-cli -- \
 # Canonicalize valid IR and expose the schema/version.
 cargo run --locked -p sightlint-cli -- normalize fixtures/e2e/pass-web-shuffled.json
 cargo run --locked -p sightlint-cli -- schema
+cargo run --locked -p sightlint-cli -- schema --kind interaction
 cargo run --locked -p sightlint-cli -- version
 ```
 

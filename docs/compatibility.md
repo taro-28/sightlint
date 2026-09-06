@@ -69,6 +69,8 @@ of the published alpha.2 archive and therefore do not retroactively change that 
 | iOS adapter implementation | `0.1.0` | Unreleased dependency-free Python 3.9+ source-tree file process; runtime version is provenance, and Xcode/simulator orchestration is not part of this surface. |
 | iOS evaluation corpus and annotations | `0.1.0` | Public repository-owned regression data with separate acquisition/rule truth, explicit public splits, and no protected holdout; implementation output cannot rewrite an oracle. |
 | iOS metric contract | `0.1.0` | Defines public-corpus acquisition coverage, verdict precision, abstention, false-positive, and mutation expectations without storing observed implementation output as truth. |
+| Interaction extension | `org.sightlint.interaction@0.1.0` | Medium-neutral declared action policy and ordered captured/untested traces; malformed recognized data is rejected and incompatible semantics require a new extension version. |
+| Interaction evaluation contracts | `0.1.0` | Public acquisition and rule truth remain separate; all cases are visible development data and no protected holdout is claimed. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.

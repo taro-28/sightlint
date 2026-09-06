@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:interaction-acquisition-annotation:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "kind", "provenance", "annotations"],
+  "properties": {
+    "annotationVersion": { "const": "0.1.0" },
+    "kind": { "const": "acquisitionGroundTruth" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "annotations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "caseId", "traceExecution", "orderedFacts", "conflicts", "abstentions"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "caseId": { "type": "string", "minLength": 1 },
+          "traceExecution": { "enum": ["captured", "untested"] },
+          "orderedFacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "attemptId", "evidenceSources"],
+              "properties": {
+                "kind": { "enum": ["actionActivated", "stateObserved", "effectResolved", "recoveryOffered", "recoveryActivated"] },
+                "attemptId": { "type": "string", "minLength": 1 },
+                "state": { "enum": ["pending", "optimistic", "success", "failure"] },
+                "resolution": { "enum": ["success", "failure"] },
+                "recovery": { "enum": ["retry", "saveDraft"] },
+                "evidenceSources": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["browserAction", "domState", "accessibilityState", "screenshot", "appDeclaredInstrumentation"] } }
+              }
+            }
+          },
+          "conflicts": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+          "abstentions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringMethod", "guideVersion", "implementationOutputUsed", "reviewer"],
+      "properties": {
+        "authoringMethod": { "const": "fixtureIntentAndManualBrowserReview" },
+        "guideVersion": { "const": "0.1.0" },
+        "implementationOutputUsed": { "const": false },
+        "reviewer": { "const": "maintainerOnly" }
+      }
+    }
+  }
+}

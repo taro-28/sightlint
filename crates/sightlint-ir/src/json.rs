@@ -6,8 +6,12 @@ use std::fmt;
 use serde::Serialize;
 use serde_json::Value;
 
+use crate::interaction::canonicalize_interaction_extension;
 use crate::visual::canonicalize_visual_extension;
-use crate::{ArtifactIr, Relation, VISUAL_EXTENSION_KEY, ValidationErrors, VisualExtensionErrors};
+use crate::{
+    ArtifactIr, INTERACTION_EXTENSION_KEY, InteractionExtensionErrors, Relation,
+    VISUAL_EXTENSION_KEY, ValidationErrors, VisualExtensionErrors,
+};
 
 /// Failure while decoding or validating an Artifact IR JSON document.
 #[derive(Debug)]
@@ -18,6 +22,8 @@ pub enum LoadError {
     Validation(ValidationErrors),
     /// The recognized official visual extension is malformed or invalid.
     VisualExtension(VisualExtensionErrors),
+    /// The recognized official interaction extension is malformed or invalid.
+    InteractionExtension(InteractionExtensionErrors),
 }
 
 impl fmt::Display for LoadError {
@@ -26,6 +32,7 @@ impl fmt::Display for LoadError {
             Self::Json(error) => write!(formatter, "failed to decode Artifact IR JSON: {error}"),
             Self::Validation(errors) => errors.fmt(formatter),
             Self::VisualExtension(errors) => errors.fmt(formatter),
+            Self::InteractionExtension(errors) => errors.fmt(formatter),
         }
     }
 }
@@ -36,6 +43,7 @@ impl Error for LoadError {
             Self::Json(error) => Some(error),
             Self::Validation(errors) => Some(errors),
             Self::VisualExtension(errors) => Some(errors),
+            Self::InteractionExtension(errors) => Some(errors),
         }
     }
 }
@@ -54,6 +62,9 @@ impl ArtifactIr {
         document
             .visual_extension()
             .map_err(LoadError::VisualExtension)?;
+        document
+            .interaction_extension()
+            .map_err(LoadError::InteractionExtension)?;
         Ok(document)
     }
 
@@ -82,6 +93,9 @@ impl ArtifactIr {
 
         if let Some(extension) = canonical.extensions.get_mut(VISUAL_EXTENSION_KEY) {
             canonicalize_visual_extension(extension);
+        }
+        if let Some(extension) = canonical.extensions.get_mut(INTERACTION_EXTENSION_KEY) {
+            canonicalize_interaction_extension(extension);
         }
 
         canonical

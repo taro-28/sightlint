@@ -113,6 +113,7 @@ impl From<Profile> for CheckProfile {
 enum SchemaKind {
     ArtifactIr,
     Visual,
+    Interaction,
 }
 
 fn main() -> ExitCode {
@@ -141,6 +142,7 @@ fn run(cli: Cli) -> ExitCode {
             let schema = match kind {
                 SchemaKind::ArtifactIr => sightlint_ir::artifact_ir_schema_json(),
                 SchemaKind::Visual => sightlint_ir::visual_extension_schema_json(),
+                SchemaKind::Interaction => sightlint_ir::interaction_extension_schema_json(),
             };
             match schema {
                 Ok(schema) => write_success(&schema),
@@ -149,11 +151,12 @@ fn run(cli: Cli) -> ExitCode {
         }
         Command::Version => {
             let output = format!(
-                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nWeb extension {}\nReport schema {}\nPNG adapter {}\n",
+                "SightLint {}\nArtifact IR schema {}\nVisual extension {}\nWeb extension {}\nInteraction extension {}\nReport schema {}\nPNG adapter {}\n",
                 env!("CARGO_PKG_VERSION"),
                 sightlint_engine::supported_schema_version(),
                 sightlint_engine::supported_visual_extension_version(),
                 sightlint_engine::supported_web_extension_version(),
+                sightlint_ir::INTERACTION_EXTENSION_VERSION,
                 sightlint_engine::REPORT_SCHEMA_VERSION,
                 env!("CARGO_PKG_VERSION")
             );

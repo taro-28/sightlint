@@ -1,0 +1,43 @@
+{
+  "corpusVersion": "0.1.0",
+  "implementationOutputsStoredAsOracle": false,
+  "metrics": [
+    {
+      "denominator": "all manually reviewed ordered acquisition facts",
+      "id": "acquisitionFactCoverage",
+      "numerator": "reviewed facts matched exactly by the controlled adapter",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "all public interaction corpus cases",
+      "id": "evaluatedCaseCoverage",
+      "numerator": "cases executing adapter-to-public-check E2E",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "all observed failed interaction results",
+      "id": "failurePrecision",
+      "numerator": "failures matching independently authored rule annotations",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "all reviewed clean and hard-negative cases",
+      "id": "falsePositiveRate",
+      "numerator": "cases with an unexpected failed interaction result",
+      "requiredMaximum": 0.0
+    },
+    {
+      "denominator": "all reviewed cantTell, inapplicable, and untested expectations",
+      "id": "abstentionRetention",
+      "numerator": "expected abstention outcomes preserved without pass/fail coercion",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "all targeted interaction mutations",
+      "id": "mutationKillRate",
+      "numerator": "mutations producing the independently expected failed rule",
+      "requiredMinimum": 1.0
+    }
+  ],
+  "nonClaim": "Perfect results on a public maintainer-authored fixture establish regression behavior only, not representative Web interaction, accessibility, or UI/UX accuracy."
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:interaction-metric-contract:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["corpusVersion", "implementationOutputsStoredAsOracle", "metrics", "nonClaim"],
+  "properties": {
+    "corpusVersion": { "const": "0.1.0" },
+    "implementationOutputsStoredAsOracle": { "const": false },
+    "metrics": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "numerator", "denominator"],
+        "properties": {
+          "id": { "enum": ["acquisitionFactCoverage", "evaluatedCaseCoverage", "failurePrecision", "falsePositiveRate", "abstentionRetention", "mutationKillRate"] },
+          "numerator": { "type": "string", "minLength": 1 },
+          "denominator": { "type": "string", "minLength": 1 },
+          "requiredMinimum": { "type": "number", "minimum": 0, "maximum": 1 },
+          "requiredMaximum": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "oneOf": [
+          { "required": ["requiredMinimum"], "not": { "required": ["requiredMaximum"] } },
+          { "required": ["requiredMaximum"], "not": { "required": ["requiredMinimum"] } }
+        ]
+      }
+    },
+    "nonClaim": { "type": "string", "minLength": 1 }
+  }
+}
