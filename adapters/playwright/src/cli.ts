@@ -12,12 +12,20 @@ interface Arguments {
   repositoryRoot: string;
   artifactIrOut: string;
   screenshotOut: string;
+  allowServerCommand: boolean;
 }
 
 function parseArguments(values: string[]): Arguments {
   const parsed = new Map<string, string>();
-  for (let index = 0; index < values.length; index += 2) {
+  let allowServerCommand = false;
+  for (let index = 0; index < values.length;) {
     const flag = values[index];
+    if (flag === "--allow-server-command") {
+      if (allowServerCommand) throw new AdapterError("usage", "duplicate argument --allow-server-command");
+      allowServerCommand = true;
+      index += 1;
+      continue;
+    }
     const value = values[index + 1];
     if (flag === undefined || value === undefined || !flag.startsWith("--")) {
       throw new AdapterError("usage", "expected flag/value pairs");
@@ -29,6 +37,7 @@ function parseArguments(values: string[]): Arguments {
       throw new AdapterError("usage", `duplicate argument ${flag}`);
     }
     parsed.set(flag, value);
+    index += 2;
   }
   const request = parsed.get("--request");
   const repositoryRoot = parsed.get("--repository-root");
@@ -43,7 +52,7 @@ function parseArguments(values: string[]): Arguments {
   if (artifactIrOut === screenshotOut) {
     throw new AdapterError("usage", "Artifact IR and screenshot outputs must be different files");
   }
-  return { request, repositoryRoot, artifactIrOut, screenshotOut };
+  return { request, repositoryRoot, artifactIrOut, screenshotOut, allowServerCommand };
 }
 
 async function main(): Promise<void> {
@@ -55,7 +64,7 @@ async function main(): Promise<void> {
   const response = await capture(request, args.repositoryRoot, {
     artifactIrPath: args.artifactIrOut,
     screenshotPath: args.screenshotOut,
-  });
+  }, { allowServerCommand: args.allowServerCommand });
   process.stdout.write(canonicalJson(response as unknown as JsonValue));
 }
 

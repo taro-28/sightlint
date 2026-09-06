@@ -11,12 +11,12 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #30 started from this verified green `main` baseline:
+The branch for issue #62, a focused child of #31, started from this verified green `main` baseline:
 
-- commit: `bf19b0e7da6bdf50b9e061e747ff49d23477b049`
-- tree: `25d86902cfd65898ea2ff737a07c9b69016469ba`
-- merged PR: #61
-- main CI: run 34021165856, all six jobs successful
+- commit: `9bd568d6073c323bfe4f0e13c90d31d4cf875054`
+- tree: `3c276d9737292cae2cb97eaac429e1d3ac8c435b`
+- merged PR: #63
+- main CI: run 34024953532, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -455,6 +455,55 @@ finding, zero new failures, and retained `cantTell` for an ambiguous control and
 overlay. It does not prove autonomous edit selection, representative agent success, a protected
 holdout, WCAG conformance, or general Web UI/UX accuracy.
 
+### Managed loopback Web capture
+
+Issue #62, a focused child of #31, is implemented by ADR 0048. Capture protocol `0.2.0` accepts
+`managedLoopbackHttp`, a path/query, state, readiness selector, a bounded direct argv with one
+`{port}` placeholder, port/startup bounds, and `sameOriginLoopback`. Both `sightlint-web` and
+`sightlint-web-check` require bare `--allow-server-command` before spawning. The canonical target
+repository is the working directory and the caller environment is inherited; no shell is used.
+
+The adapter verifies that the port is initially free, waits for TCP listen, final HTTP 2xx,
+`load`, the readiness selector, and fonts, and then stops the server on success, capture/kernel
+failure, SIGINT, or SIGTERM. POSIX cleanup uses the process group with TERM, a five-second grace,
+then KILL; Windows validates the PID and calls `taskkill.exe /T /F`. Combined stdout/stderr is
+drained to 1 MiB and never serialized. Early exit, timeout, port conflict, and log overflow have
+stable operational diagnostics.
+
+Browser-side traffic is restricted to `http://127.0.0.1:<port>` on the same origin. External
+HTTP(S) fails capture; WebSocket and service-worker attempts are blocked and counted. Request
+bodies, individual responses, aggregate bytes, and response count are bounded. Source identity is
+derived from method, query-hiding target and request-body digests, status, byte count, and buffered
+response bytes. Raw queries, bodies, variable headers, environment values, server output, and PIDs
+are absent from reports. The command itself is not sandboxed and its outbound traffic remains
+uncontrolled.
+
+Managed captures emit adapter `0.4.0`, `org.sightlint.web@0.4.0`, and workflow report `0.2.0`.
+Runtime locators do not prove source locations, so managed source targets declare
+`sourceAttribution: "unavailable"` and `sourceFiles: []`. Rust explicitly dispatches Web extension
+`0.3.0` and `0.4.0`; Artifact IR `0.1.0`, CheckReport `0.3.0`, the three advisory rule versions,
+maturity, enforcement, and the legacy capture/workflow bytes remain unchanged.
+
+The committed three-case managed Atlas oracle covers clean, unnamed-control mutation, and
+intentional-overlay hard-negative behavior. The public E2E also covers redirect, same-origin POST,
+authorization, lifecycle/network/resource failures, redaction, repeated bytes, direct capture,
+kernel dispatch, and process-tree cleanup. This is public single-family regression evidence, not
+general UI/UX accuracy, WCAG conformance, whole-application coverage, source causality, or blocking
+maturity. The tabisaifu `/test/login?next=%2Fentries%2Fnew` run is dogfood only and does not become
+committed oracle data or modify that target repository.
+
+The 2026-09-06 dogfood used tabisaifu commit
+`94269ee4452ea4b96ea27c7499eea8375303c8f5` with explicit Wrangler test vars and no `.dev.vars`
+change. It reached the final `<main>`, captured 47 nodes including 「支払いを追加」 and
+「支払いを記録」 at a 412×839 CSS-pixel viewport, DPR 2, `ja-JP`, UTC, light theme, and reduced
+motion, emitted valid JSON and human `0.2.0` reports, and released port 4173. The JSON report
+exited 1 with 12 existing blocking `visual.bounds.within-canvas` results across six nested
+details/form targets; this is a dogfood finding, not a managed-lifecycle failure. One guarded
+capture compared the complete tracked diff immediately before and after and found identical bytes.
+Another active task changed unrelated tabisaifu files during the broader session, so only that
+single-invocation paired comparison is claimed. No tabisaifu request, capture, screenshot, log, or
+source change is committed here.
+
 ### Public commands
 
 The current command families include:
@@ -825,6 +874,9 @@ Issue #34's bounded execution sequence is complete:
 5. **#33 — alpha release gate (complete).** Dual licensing, surface-specific compatibility,
    source-only packaging, dependency checks, cross-platform source verification, and the first
    prerelease are present.
+6. **#62 — managed loopback Web capture (complete).** Protocol `0.2.0` adds explicit server-command
+   authorization, one target-repository page, loopback-only browser traffic, bounded HTTP evidence,
+   unavailable source attribution, and owned process-tree cleanup without changing `0.1.0`.
 
 Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by placing browser/model
 logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete product.
@@ -843,7 +895,8 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
   source/capture adapters and separate regression corpora.
 - **#30 (complete for the bounded first slice):** medium-neutral actions/effects/states,
   deterministic controlled traces, async feedback, and declared recovery alternatives.
-- **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
+- **#31:** managed-loopback child #62 is complete; Codex/MCP/GitHub/editor/local-UI ecosystem and
+  later package surfaces remain open.
 
 The bounded first slices inside #29 and #30 are implemented. The next preserved product issue is
 #31 for ecosystem surfaces. Later expansion remains demand- and evidence-gated; the completed
@@ -958,6 +1011,8 @@ npm --prefix adapters/perception run check
 cargo build --locked -p sightlint-cli
 npm --prefix adapters/perception run test:e2e
 npm --prefix adapters/playwright run test:e2e
+npm --prefix adapters/playwright run test:managed-e2e
+npm --prefix adapters/playwright run test:server-e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features

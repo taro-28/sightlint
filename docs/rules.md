@@ -236,8 +236,8 @@ Current structured-IR rules/contracts include:
 - project-supplied minimum font size;
 - direction, coordinate-space, unit, tolerance, evidence, and ambiguity handling.
 
-The additive zero-setup `sightlint:recommended` profile also includes three
-`org.sightlint.web@0.3.0` rules:
+The additive zero-setup `sightlint:recommended` profile also includes three rules for strictly
+validated `org.sightlint.web@0.3.0` and managed-loopback `org.sightlint.web@0.4.0` inputs:
 
 - `web.accessibility.interactive-name@0.1.0` for visible DOM-interactive nodes with an observed
   platform role in a conservative UI-control set;
@@ -251,6 +251,9 @@ accessibility data, intentional/source-observed dialog overlays, transformed con
 scrollable clipping. They do not convert generic overflow, screenshot heuristics, or repeated
 geometry into verdicts. `--profile base` is the explicit opt-out; recognized Web extensions are
 still validated before base rules run.
+
+ADR 0048 changes acquisition provenance and source attribution only. It does not change any rule
+identifier, version, applicability, policy, maturity, outcome, or enforcement behavior.
 
 These rules consume declared/evidence-backed inputs. Current `inspect-image` observations do not
 become trusted semantic peers or blocking spacing failures.

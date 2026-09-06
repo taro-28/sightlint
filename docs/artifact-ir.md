@@ -184,6 +184,13 @@ optional platform-accessibility evidence references per selected node. The deter
 strictly validates that extension and consumes it only for Web-profile rules; acquisition remains
 in the untrusted Node process. A later generalized conflict model may require a core/schema ADR.
 
+ADR 0048 admits `org.sightlint.web@0.4.0` for managed loopback capture without changing core IR
+`0.1.0`. Its extension-only capture record distinguishes `loopbackResponses` from repository-file
+source, retains a route path without query, target/source digests, response count and byte totals,
+and blocked WebSocket/service-worker counts. Core evidence continues to reference a source digest,
+but runtime DOM locators do not establish a source file or line; workflow attribution is therefore
+explicitly unavailable rather than guessed.
+
 ## Policy is not an observation
 
 Artifact IR records facts and evidence. Rule policy may be supplied by:
@@ -355,5 +362,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0048 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0049 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

@@ -32,11 +32,18 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 
 The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation, exact PNG
 source-alpha geometry, the PNG format-demand decision, the local perception protocol foundation,
-and the first bounded PPTX, PDF, Android, and iOS source/capture-adapter slices. They are not part
+the first bounded PPTX, PDF, Android, and iOS source/capture-adapter slices, deterministic
+interaction contracts, and managed loopback Web capture. They are not part
 of the published alpha.2 archive and therefore do not retroactively change that release.
 
 | Surface | Version or contract | Compatibility rule |
 |---|---|---|
+| Managed Playwright capture protocol | `0.2.0` | Adds only `managedLoopbackHttp`; strict `0.1.0` repository-contained `file:` requests retain their behavior and canonical `0.1.0` response. Unknown fields and versions are rejected. |
+| Managed Web extension | `org.sightlint.web@0.4.0` | Adds loopback response identity, source-kind, route-path, and blocked-transport facts. Rust explicitly dispatches both admitted `0.3.0` and `0.4.0`; older historical schemas are not admitted runtime versions. |
+| Playwright adapter implementation | `0.4.0` | Emitted only for managed protocol `0.2.0`; legacy protocol continues to record implementation `0.3.0`. |
+| Private Playwright Node package | `0.6.0` | Not published to npm; adds opt-in server lifecycle ownership after interaction package `0.5.0` without changing the published alpha.2 package. |
+| Managed Web workflow report | `0.2.0` | Adds unavailable source attribution for loopback targets; legacy protocol continues to emit workflow report `0.1.0`. |
+| Managed loopback evaluation | `0.1.0` | Three public, repository-owned product cases plus lifecycle/network/resource regressions; it is not a holdout or a representative accuracy claim. |
 | Segmentation benchmark report | `0.1.0` | Strict canonical JSON; incompatible fields or semantics require a new report version. It is not a CheckReport. |
 | Segmentation evaluation corpus | `0.1.0` | Human-authored acquisition and rule oracles remain separate; implementation output cannot rewrite either oracle. |
 | `benchmark-image-segmentation` | evaluation-only command | Exit `0` returns a complete report, including explicit unavailability; usage, I/O, validation, or decoding errors exit `2`; it never exits `1`. |
@@ -103,6 +110,12 @@ environment, not across different Python/runtime versions. The evaluated browser
 the lockfile's Playwright/Chromium build on Linux. The private Node package can build on the hosted
 macOS arm64 and Windows x64 runners, but cross-platform screenshot byte identity and browser E2E
 support are not claimed.
+
+Managed protocol `0.2.0` additionally requires explicit `--allow-server-command` authorization.
+That flag is a new requirement only for the new request version; omitting it fails before process
+creation with exit 2 and empty stdout. The server command inherits the caller environment and is
+not sandboxed. Browser traffic is limited to same-origin literal IPv4 loopback, while the child
+process's own network remains uncontrolled and explicitly reported as such.
 
 ## Change and migration policy
 

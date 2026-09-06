@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "0.1.0",
+  "provenance": {
+    "source": "repositoryOwnedAtlasFixture",
+    "owner": "SightLint contributors",
+    "license": "MIT OR Apache-2.0",
+    "privacy": "fictionalDataNoSecrets",
+    "implementationOutputUsedAsOracle": false,
+    "externalProcessing": false
+  },
+  "split": {
+    "kind": "publicSmokeDevelopmentChallenge",
+    "holdoutStatus": "notHoldout",
+    "reviewer": "maintainer",
+    "independentReview": false
+  },
+  "cases": [
+    {
+      "caseId": "managed-clean",
+      "request": "evaluation/web/managed-requests/dashboard-managed-clean.json",
+      "classification": "clean",
+      "expectedFailureCount": 0,
+      "expectedResult": null
+    },
+    {
+      "caseId": "managed-unnamed-control-mutant",
+      "request": "evaluation/web/managed-requests/dashboard-managed-unnamed-control.json",
+      "classification": "targetedMutation",
+      "expectedFailureCount": 1,
+      "expectedResult": {
+        "ruleId": "web.accessibility.interactive-name",
+        "ruleVersion": "0.1.0",
+        "outcome": "failed",
+        "enforcement": "advisory",
+        "targetKind": "node",
+        "targetId": "web-help-action"
+      }
+    },
+    {
+      "caseId": "managed-intentional-overlay-hard-negative",
+      "request": "evaluation/web/managed-requests/dashboard-managed-intentional-overlay.json",
+      "classification": "hardNegative",
+      "expectedFailureCount": 0,
+      "expectedResult": {
+        "ruleId": "web.interaction.center-hit",
+        "ruleVersion": "0.1.0",
+        "outcome": "cantTell",
+        "enforcement": "advisory",
+        "targetKind": "node",
+        "targetId": "web-review-action"
+      }
+    }
+  ],
+  "nonClaims": [
+    "This public single-family corpus is not a protected holdout or representative Web accuracy evidence.",
+    "Managed startup and one captured page do not establish whole-application UI or UX quality.",
+    "A loopback runtime locator does not identify a source file or line."
+  ]
+}

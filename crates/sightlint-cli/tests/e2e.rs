@@ -366,7 +366,7 @@ fn schema_and_version_commands_expose_machine_and_human_contract_versions() {
     let version = String::from_utf8(version.stdout).expect("version output is UTF-8");
     assert!(version.contains("Artifact IR schema 0.1.0"));
     assert!(version.contains("Visual extension 0.1.0"));
-    assert!(version.contains("Web extension 0.3.0"));
+    assert!(version.contains("Web extension 0.4.0"));
     assert!(version.contains("Interaction extension 0.1.0"));
     assert!(version.contains("Report schema 0.3.0"));
 

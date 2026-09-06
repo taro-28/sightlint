@@ -214,7 +214,7 @@ mod tests {
     fn engine_and_ir_agree_on_contract_versions() {
         assert_eq!(supported_schema_version(), "0.1.0");
         assert_eq!(supported_visual_extension_version(), "0.1.0");
-        assert_eq!(supported_web_extension_version(), "0.3.0");
+        assert_eq!(supported_web_extension_version(), "0.4.0");
         assert_eq!(supported_interaction_extension_version(), "0.1.0");
     }
 }

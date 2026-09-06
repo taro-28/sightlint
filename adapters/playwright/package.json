@@ -1,6 +1,6 @@
 {
   "name": "@sightlint/adapter-playwright",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Process-isolated Playwright acquisition and local check orchestration for SightLint",
   "type": "module",
@@ -17,6 +17,8 @@
     "check": "npm run build && node --test dist/tests/unit.test.js",
     "install:browser": "playwright install chromium",
     "test:e2e": "npm run build && node --test dist/tests/e2e.test.js dist/tests/interaction-e2e.test.js dist/tests/segmentation-evaluation.test.js dist/tests/workflow-e2e.test.js && node --test dist/tests/perception-evaluation.test.js",
+    "test:managed-e2e": "npm run build && node --test dist/tests/managed-e2e.test.js",
+    "test:server-e2e": "npm run build && node --test dist/tests/server-e2e.test.js",
     "test:segmentation-evaluation": "npm run build && node --test dist/tests/segmentation-evaluation.test.js"
   },
   "dependencies": {

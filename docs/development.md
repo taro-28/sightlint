@@ -54,8 +54,9 @@ Issue #25 is complete as an evaluation-only benchmark and did not admit a broade
 #27 is complete through ADR 0041 without decoder expansion because current product evidence did
 not establish a format gap. Issue #28 is complete for protocol v0 through ADR 0042; real OCR/model
 quality remains `untested`. Issue #29's focused PPTX, PDF, Android, and iOS slices are implemented
-through ADRs 0043–0046. Other work
-remains available in #30–#31, but historical branch code does not change priority. Explain any
+through ADRs 0043–0046. Issue #62 is the explicitly selected focused #31 slice for managed
+loopback Web capture through ADR 0048; it does not broaden the remaining ecosystem backlog. Other
+work remains available in #30–#31, but historical branch code does not change priority. Explain any
 deviation in the issue and PR.
 
 ## Planning before implementation
@@ -155,6 +156,8 @@ npm --prefix adapters/perception run check
 cargo build --locked -p sightlint-cli
 npm --prefix adapters/perception run test:e2e
 npm --prefix adapters/playwright run test:e2e
+npm --prefix adapters/playwright run test:managed-e2e
+npm --prefix adapters/playwright run test:server-e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
@@ -296,7 +299,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0048 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0049 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

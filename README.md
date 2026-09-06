@@ -154,7 +154,8 @@ screenshot.
 ### Zero-setup recommended Web rules
 
 `sightlint check` now selects `sightlint:recommended` by default. For a validated
-`org.sightlint.web@0.3.0` extension, the deterministic Rust kernel emits three narrow advisory
+`org.sightlint.web@0.3.0` or managed-loopback `org.sightlint.web@0.4.0` extension, the deterministic
+Rust kernel emits three narrow advisory
 rules for programmatic control names, one render-box-center hit sample, and rectangular clipping
 of native controls by non-scrollable ancestors. Each result records its profile, policy source,
 maturity, enforcement, and exact DOM/render/accessibility evidence identifiers.
@@ -449,6 +450,13 @@ The reviewed E2E runs this same command on the unnamed-control mutation, applies
 authored edit to an isolated fixture copy, and reruns it. It checks that the named finding is gone
 and no new failure appears; it does not let the edit itself declare success.
 
+Capture protocol `0.2.0` can instead own one target-repository development server and page. Its
+request supplies a shell-free argv with one `{port}` placeholder plus a loopback path/query. Both
+commands require explicit `--allow-server-command`; browser traffic is restricted to same-origin
+`127.0.0.1`, process-tree cleanup is mandatory, HTTP evidence is bounded and digest-only, and
+source-file attribution is unavailable. See the adapter README and ADR 0048 for the exact request,
+privacy, lifecycle, and non-sandbox boundary. Protocol `0.1.0` remains byte-compatible.
+
 ## Executable verification
 
 SightLint separates conformance, acquisition evaluation, semantic rule evaluation, and eventual
@@ -473,6 +481,9 @@ Current committed assets include:
 - a versioned one-command agent report and one reviewed temporary source-edit/fix/rerun case with
   byte-stable JSON/human output, native source navigation, and retained ambiguity/hard-negative
   controls;
+- a three-case managed-loopback capture/check corpus plus startup, redirect, network/resource,
+  redaction, and signal-cleanup E2E on Linux, with process-tree/port cleanup additionally exercised
+  on every supported CI operating system;
 - three deterministic PDF pages/renders with separate acquisition/rule oracles, one source-only
   off-page mutation, one `QuadPoints` abstention hard negative, explicit provenance/license/
   privacy/non-holdout records, and public-process byte-stability/fail-closed checks;
@@ -542,11 +553,12 @@ Read:
 | #60 | completed bounded iOS UIKit/XCUITest capture adapter slice |
 | #30 | completed bounded interaction trace, async-feedback, and declared recovery slice |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
+| #62 | completed managed loopback Web capture and `/entries/new` dogfood slice of #31 |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0048 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0049 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

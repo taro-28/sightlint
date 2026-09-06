@@ -10,9 +10,11 @@ use sightlint_ir::{
 };
 
 pub(crate) const WEB_EXTENSION_KEY: &str = "org.sightlint.web";
-pub(crate) const WEB_EXTENSION_VERSION: &str = "0.3.0";
+pub(crate) const LEGACY_WEB_EXTENSION_VERSION: &str = "0.3.0";
+pub(crate) const WEB_EXTENSION_VERSION: &str = "0.4.0";
 const WEB_ADAPTER_NAME: &str = "sightlint-playwright";
-const WEB_ADAPTER_VERSION: &str = "0.3.0";
+const LEGACY_WEB_ADAPTER_VERSION: &str = "0.3.0";
+const WEB_ADAPTER_VERSION: &str = "0.4.0";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum WebValidationCode {
@@ -65,7 +67,7 @@ impl WebExtensionErrors {
             code: WebValidationCode::UnsupportedVersion,
             path: "/extensionVersion".to_owned(),
             message: format!(
-                "expected Web extension version {WEB_EXTENSION_VERSION}, found {version}"
+                "expected Web extension version {LEGACY_WEB_EXTENSION_VERSION} or {WEB_EXTENSION_VERSION}, found {version}"
             ),
         }])
     }
@@ -169,8 +171,10 @@ struct WebEnvironment {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct WebCapture {
+    source_kind: Option<String>,
     source_files: Vec<String>,
     source_digest: String,
+    loopback_responses: Option<LoopbackResponses>,
     screenshot: WebScreenshot,
     network: WebNetwork,
     privacy: WebPrivacy,
@@ -195,6 +199,18 @@ struct WebScreenshot {
 struct WebNetwork {
     mode: String,
     external_requests: Vec<String>,
+    blocked_web_socket_count: Option<u64>,
+    blocked_service_worker_count: Option<u64>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct LoopbackResponses {
+    digest: String,
+    request_count: u64,
+    response_bytes: u64,
+    route_path: String,
+    target_digest: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -502,7 +518,7 @@ pub(crate) fn decode_web_extension(
         .get("extensionVersion")
         .and_then(serde_json::Value::as_str)
         .ok_or_else(|| WebExtensionErrors::decode("extensionVersion must be a string"))?;
-    if version != WEB_EXTENSION_VERSION {
+    if version != LEGACY_WEB_EXTENSION_VERSION && version != WEB_EXTENSION_VERSION {
         return Err(WebExtensionErrors::unsupported(version));
     }
     let extension = serde_json::from_value::<WebExtension>(value.clone())
@@ -514,7 +530,10 @@ pub(crate) fn decode_web_extension(
 impl WebExtension {
     fn validate(&self, document: &ArtifactIr) -> Result<(), WebExtensionErrors> {
         let mut validator = WebValidator::default();
-        debug_assert_eq!(self.extension_version, WEB_EXTENSION_VERSION);
+        debug_assert!(
+            self.extension_version == LEGACY_WEB_EXTENSION_VERSION
+                || self.extension_version == WEB_EXTENSION_VERSION
+        );
         if document.artifact.kind != ArtifactKind::Web {
             validator.issue(
                 WebValidationCode::InvalidArtifactKind,
@@ -536,6 +555,11 @@ impl WebExtension {
             .collect::<BTreeMap<_, _>>();
         let mut node_ids = BTreeSet::new();
         let mut locators = BTreeSet::new();
+        let adapter_version = if self.extension_version == WEB_EXTENSION_VERSION {
+            WEB_ADAPTER_VERSION
+        } else {
+            LEGACY_WEB_ADAPTER_VERSION
+        };
         for (index, node) in self.nodes.iter().enumerate() {
             let path = format!("/nodes/{index}");
             if !node_ids.insert(node.node_id.clone()) {
@@ -558,6 +582,7 @@ impl WebExtension {
                 core_nodes.get(&node.node_id).copied(),
                 &evidence,
                 &self.capture.source_digest,
+                adapter_version,
                 &mut validator,
             );
         }
@@ -635,7 +660,7 @@ fn validate_environment(extension: &WebExtension, validator: &mut WebValidator) 
         validator.issue(
             WebValidationCode::InvalidValue,
             "/",
-            "Web extension 0.3 constant and required string fields are inconsistent",
+            "Web extension constant and required string fields are inconsistent",
         );
     }
 }
@@ -650,7 +675,7 @@ fn validate_document_environment(extension: &WebExtension, validator: &mut WebVa
         validator.issue(
             WebValidationCode::InvalidValue,
             "/document/frames",
-            "Web extension 0.3 requires exactly one main frame",
+            "the Web extension requires exactly one main frame",
         );
     }
     if document.id != "document-main"
@@ -663,7 +688,7 @@ fn validate_document_environment(extension: &WebExtension, validator: &mut WebVa
         validator.issue(
             WebValidationCode::InvalidValue,
             "/document",
-            "Web extension 0.3 requires the stable document-main/frame-main identity",
+            "the Web extension requires the stable document-main/frame-main identity",
         );
     }
     if document.document_size.width == 0
@@ -692,28 +717,92 @@ fn validate_document_environment(extension: &WebExtension, validator: &mut WebVa
 
 fn validate_capture_environment(extension: &WebExtension, validator: &mut WebValidator) {
     let capture = &extension.capture;
-    if capture.privacy.external_processing
-        || !capture.privacy.descendants_redacted
-        || capture.network.mode != "deny"
-        || !capture.network.external_requests.is_empty()
-    {
+    if capture.privacy.external_processing || !capture.privacy.descendants_redacted {
         validator.issue(
             WebValidationCode::InvalidValue,
             "/capture",
-            "the local Web extension requires denied network access, redacted descendants, and no external processing",
+            "the local Web extension requires redacted descendants and no external processing",
         );
     }
-    if capture.source_files.is_empty()
-        || capture.screenshot.byte_length == 0
+    if capture.screenshot.byte_length == 0
         || capture.screenshot.pixel_size.width == 0
         || capture.screenshot.pixel_size.height == 0
     {
         validator.issue(
             WebValidationCode::InvalidValue,
             "/capture",
-            "source files and positive screenshot dimensions are required",
+            "positive screenshot dimensions are required",
         );
     }
+    if extension.extension_version == LEGACY_WEB_EXTENSION_VERSION {
+        if capture.source_kind.is_some()
+            || capture.loopback_responses.is_some()
+            || capture.source_files.is_empty()
+            || capture.network.mode != "deny"
+            || !capture.network.external_requests.is_empty()
+            || capture.network.blocked_web_socket_count.is_some()
+            || capture.network.blocked_service_worker_count.is_some()
+        {
+            validator.issue(
+                WebValidationCode::InvalidValue,
+                "/capture",
+                "Web extension 0.3 requires repository files and denied network access",
+            );
+        }
+        return;
+    }
+    let valid_loopback = capture.source_kind.as_deref() == Some("loopbackResponses")
+        && capture.source_files.is_empty()
+        && is_sha256_digest(&capture.source_digest)
+        && is_sha256_digest(&capture.screenshot.sha256)
+        && capture.network.mode == "sameOriginLoopback"
+        && capture.network.external_requests.is_empty()
+        && capture.network.blocked_web_socket_count.is_some()
+        && capture.network.blocked_service_worker_count.is_some()
+        && capture
+            .loopback_responses
+            .as_ref()
+            .is_some_and(|responses| {
+                responses.digest == capture.source_digest
+                    && is_sha256_digest(&responses.digest)
+                    && responses.request_count > 0
+                    && responses.request_count <= 512
+                    && responses.response_bytes <= 64 * 1024 * 1024
+                    && is_route_path(&responses.route_path)
+                    && is_sha256_digest(&responses.target_digest)
+                    && extension.document.source_path == responses.route_path
+                    && extension
+                        .document
+                        .frames
+                        .first()
+                        .is_some_and(|frame| frame.source_path == responses.route_path)
+            });
+    if !valid_loopback {
+        validator.issue(
+            WebValidationCode::InvalidValue,
+            "/capture",
+            "Web extension 0.4 requires bounded same-origin loopback response evidence without source-file attribution",
+        );
+    }
+}
+
+fn is_sha256_digest(value: &str) -> bool {
+    value.strip_prefix("sha256:").is_some_and(|hex| {
+        hex.len() == 64
+            && hex
+                .bytes()
+                .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    })
+}
+
+fn is_route_path(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 2048
+        && value.starts_with('/')
+        && !value.starts_with("//")
+        && !value
+            .bytes()
+            .any(|byte| byte <= 0x1f || byte == 0x7f || matches!(byte, b'?' | b'#' | b'\\'))
 }
 
 fn validate_screenshot_reconciliation(extension: &WebExtension, validator: &mut WebValidator) {
@@ -773,8 +862,10 @@ fn self_consistency_strings(extension: &WebExtension) -> Result<(), ()> {
         screenshot.sha256.as_str(),
         screenshot.color_assumptions.as_str(),
     ];
+    let locale_valid = environment.locale == "en-US"
+        || (extension.extension_version == WEB_EXTENSION_VERSION && environment.locale == "ja-JP");
     if values.iter().any(|value| value.is_empty())
-        || environment.locale != "en-US"
+        || !locale_valid
         || environment.timezone_id != "UTC"
         || environment.color_scheme != "light"
         || environment.reduced_motion != "reduce"
@@ -798,6 +889,7 @@ fn validate_node(
     core: Option<&sightlint_ir::Node>,
     evidence: &BTreeMap<&Identifier, &Evidence>,
     source_digest: &str,
+    adapter_version: &str,
     validator: &mut WebValidator,
 ) {
     let Some(core) = core else {
@@ -808,7 +900,15 @@ fn validate_node(
         );
         return;
     };
-    validate_node_evidence(node, path, core, evidence, source_digest, validator);
+    validate_node_evidence(
+        node,
+        path,
+        core,
+        evidence,
+        source_digest,
+        adapter_version,
+        validator,
+    );
     validate_node_values(node, path, validator);
     for (index, ancestor) in node.clipping_ancestors.iter().enumerate() {
         validator.rect(
@@ -824,22 +924,26 @@ fn validate_node_evidence(
     core: &sightlint_ir::Node,
     evidence: &BTreeMap<&Identifier, &Evidence>,
     source_digest: &str,
+    adapter_version: &str,
     validator: &mut WebValidator,
 ) {
+    let expected_source = EvidenceSourceExpectation {
+        locator: &node.locator.value,
+        source_digest,
+        adapter_version,
+    };
     validator.evidence(
         &node.dom_evidence_id,
         EvidenceClass::ExactSource,
         &format!("{path}/domEvidenceId"),
-        &node.locator.value,
-        source_digest,
+        expected_source,
         evidence,
     );
     validator.evidence(
         &node.render_evidence_id,
         EvidenceClass::ExactRender,
         &format!("{path}/renderEvidenceId"),
-        &node.locator.value,
-        source_digest,
+        expected_source,
         evidence,
     );
     if core.kind.evidence_id != node.dom_evidence_id
@@ -874,8 +978,7 @@ fn validate_node_evidence(
                 accessibility_id,
                 EvidenceClass::PlatformSemantics,
                 &format!("{path}/accessibilityEvidenceId"),
-                &node.locator.value,
-                source_digest,
+                expected_source,
                 evidence,
             );
             if node.accessibility.role.is_none()
@@ -1093,6 +1196,13 @@ struct WebValidator {
     issues: Vec<WebValidationIssue>,
 }
 
+#[derive(Clone, Copy)]
+struct EvidenceSourceExpectation<'a> {
+    locator: &'a str,
+    source_digest: &'a str,
+    adapter_version: &'a str,
+}
+
 impl WebValidator {
     fn issue(
         &mut self,
@@ -1112,8 +1222,7 @@ impl WebValidator {
         id: &Identifier,
         expected: EvidenceClass,
         path: &str,
-        locator: &str,
-        source_digest: &str,
+        expected_source: EvidenceSourceExpectation<'_>,
         evidence: &BTreeMap<&Identifier, &Evidence>,
     ) {
         match evidence.get(id) {
@@ -1132,20 +1241,22 @@ impl WebValidator {
             ),
             Some(actual)
                 if actual.source.adapter != WEB_ADAPTER_NAME
-                    || actual.source.adapter_version != WEB_ADAPTER_VERSION
-                    || actual.source.input_digest.as_deref() != Some(source_digest)
+                    || actual.source.adapter_version != expected_source.adapter_version
+                    || actual.source.input_digest.as_deref()
+                        != Some(expected_source.source_digest)
                     || actual.source.model.is_some()
                     || actual.source.external_processing
                     || !matches!(
                         actual.selector.as_ref(),
-                        Some(Selector::NativeId { native_id }) if native_id == locator
+                        Some(Selector::NativeId { native_id }) if native_id == expected_source.locator
                     ) =>
             {
                 self.issue(
                     WebValidationCode::InvalidEvidenceProvenance,
                     path,
                     format!(
-                        "evidence {id} must identify the local {WEB_ADAPTER_NAME}@{WEB_ADAPTER_VERSION} source digest and native locator"
+                        "evidence {id} must identify the local {WEB_ADAPTER_NAME}@{} source digest and native locator",
+                        expected_source.adapter_version
                     ),
                 );
             }

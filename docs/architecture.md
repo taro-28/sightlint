@@ -317,6 +317,12 @@ Issue #23 uses Playwright as the first structured adapter and reconciliation pro
 matrix without adding browser dependencies to the Rust kernel. ADR 0035 makes the resulting
 `org.sightlint.web@0.3.0` payload an official optional extension: Rust strictly validates its
 normalized records and evidence references but never launches Playwright or reads the screenshot.
+ADR 0048 adds an opt-in `0.2.0` capture path in the same untrusted Node boundary. Node may launch
+one caller-specified development-server argv in the canonical target repository, constrain the
+browser to same-origin literal loopback, collect bounded response identity, and own process-tree
+cleanup. The kernel sees only strictly validated `org.sightlint.web@0.4.0` observations; it never
+receives the command, logs, PID, raw query, HTTP bodies, or headers and still does not launch the
+server or browser.
 
 ## Artifact IR boundaries
 

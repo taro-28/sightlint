@@ -62,10 +62,11 @@ background, alternatives, and disposition of historical experiments.
 - [0045 — Bounded Android instrumented-capture process adapter](0045-bounded-android-instrumented-capture-adapter.md)
 - [0046 — Bounded iOS source/XCUI capture process adapter](0046-bounded-ios-xcui-capture-adapter.md)
 - [0047 — Medium-neutral deterministic interaction contracts and controlled traces](0047-deterministic-interaction-contracts-and-traces.md)
+- [0048 — Managed loopback Web capture and server lifecycle](0048-managed-loopback-web-capture.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0047** or later.
+continue at **0049** or later.
 
 ## Historical branch decisions 0025–0029
 
@@ -101,4 +102,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0048.
+Use [the template](template.md) and the next unused number at or after 0049.
