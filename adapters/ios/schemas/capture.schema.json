@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:protocol:ios-capture:0.1.0",
+  "title": "SightLint instrumented iOS capture 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["captureVersion", "captureId", "scenario", "application", "runner", "build", "device", "capture", "sourceHierarchy", "xcuiHierarchy", "screenshot"],
+  "properties": {
+    "captureVersion": { "const": "0.1.0" },
+    "captureId": { "$ref": "#/$defs/token" },
+    "scenario": { "enum": ["clean", "off-canvas-control-mutant", "scroll-offscreen-hard-negative"] },
+    "application": { "$ref": "#/$defs/application" },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "captureApi"],
+      "properties": {
+        "name": { "const": "sightlint-atlas-ios-capture" },
+        "version": { "const": "0.1.0" },
+        "captureApi": { "const": "instrumented-uikit-and-xcui" }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixtureSourceSha256", "xcodeVersion", "xcodeBuild", "swiftVersion", "sdkVersion", "deploymentTarget"],
+      "properties": {
+        "fixtureSourceSha256": { "$ref": "#/$defs/digest" },
+        "xcodeVersion": { "const": "26.3" },
+        "xcodeBuild": { "const": "17C529" },
+        "swiftVersion": { "const": "6.2.4" },
+        "sdkVersion": { "const": "26.3" },
+        "deploymentTarget": { "const": "26.0" }
+      }
+    },
+    "device": { "$ref": "#/$defs/device" },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "atomic", "animationsDisabled", "testCommand", "limitations"],
+      "properties": {
+        "order": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "waitForQuiescence" },
+            { "const": "sourceHierarchy" },
+            { "const": "xcuiHierarchy" },
+            { "const": "screenshot" }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "atomic": { "const": false },
+        "animationsDisabled": { "const": true },
+        "testCommand": { "$ref": "#/$defs/nonEmptyString" },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "sourceHierarchy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rootIdentifier", "unidentifiedNodeCount", "nodes"],
+      "properties": {
+        "rootIdentifier": { "$ref": "#/$defs/identifier" },
+        "unidentifiedNodeCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/sourceNode" }
+        }
+      }
+    },
+    "xcuiHierarchy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["queryRoot", "unmatchedQueryCount", "nodes"],
+      "properties": {
+        "queryRoot": { "const": "XCUIApplication" },
+        "unmatchedQueryCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": { "$ref": "#/$defs/xcuiNode" }
+        }
+      }
+    },
+    "screenshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "sha256", "widthPixels", "heightPixels", "captureSequence"],
+      "properties": {
+        "reference": { "$ref": "#/$defs/reference" },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "widthPixels": { "const": 1206 },
+        "heightPixels": { "const": 2622 },
+        "captureSequence": { "const": 4 }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "identifier": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,127}$" },
+    "nullableIdentifier": { "anyOf": [{ "$ref": "#/$defs/identifier" }, { "type": "null" }] },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "reference": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\\\/].*" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number", "minimum": -1048576, "maximum": 1048576 },
+        "y": { "type": "number", "minimum": -1048576, "maximum": 1048576 },
+        "width": { "type": "number", "minimum": 0, "maximum": 1048576 },
+        "height": { "type": "number", "minimum": 0, "maximum": 1048576 }
+      }
+    },
+    "nullableRect": { "anyOf": [{ "$ref": "#/$defs/rect" }, { "type": "null" }] },
+    "insets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom"],
+      "properties": {
+        "left": { "const": 0 },
+        "top": { "const": 62 },
+        "right": { "const": 0 },
+        "bottom": { "const": 34 }
+      }
+    },
+    "stringFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["utf8ByteLength", "sha256"],
+      "properties": {
+        "utf8ByteLength": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "nullableStringFact": { "anyOf": [{ "$ref": "#/$defs/stringFact" }, { "type": "null" }] },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundleIdentifier", "version", "buildNumber", "testBundleIdentifier"],
+      "properties": {
+        "bundleIdentifier": { "const": "org.sightlint.fixtures.atlas.ios" },
+        "version": { "const": "0.1.0" },
+        "buildNumber": { "const": "1" },
+        "testBundleIdentifier": { "const": "org.sightlint.fixtures.atlas.ios.capture-tests" }
+      }
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["widthPoints", "heightPoints", "scale", "widthPixels", "heightPixels", "orientation"],
+      "properties": {
+        "widthPoints": { "const": 402 },
+        "heightPoints": { "const": 874 },
+        "scale": { "const": 3 },
+        "widthPixels": { "const": 1206 },
+        "heightPixels": { "const": 2622 },
+        "orientation": { "const": "portrait" }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locale", "layoutDirection", "contentSizeCategory", "interfaceStyle", "reduceMotion"],
+      "properties": {
+        "locale": { "const": "en-US" },
+        "layoutDirection": { "const": "ltr" },
+        "contentSizeCategory": { "const": "large" },
+        "interfaceStyle": { "const": "light" },
+        "reduceMotion": { "const": true }
+      }
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtimeVersion", "runtimeBuild", "deviceType", "modelIdentifier", "architecture", "display", "configuration", "safeAreaInsetsPoints"],
+      "properties": {
+        "runtimeVersion": { "const": "26.3.1" },
+        "runtimeBuild": { "const": "23D8133" },
+        "deviceType": { "const": "iPhone 17 Pro" },
+        "modelIdentifier": { "const": "iPhone18,1" },
+        "architecture": { "const": "arm64" },
+        "display": { "$ref": "#/$defs/display" },
+        "configuration": { "$ref": "#/$defs/configuration" },
+        "safeAreaInsetsPoints": { "$ref": "#/$defs/insets" }
+      }
+    },
+    "sourceState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hidden", "alpha", "userInteractionEnabled", "enabled", "selected", "windowAttached"],
+      "properties": {
+        "hidden": { "type": "boolean" },
+        "alpha": { "type": "number", "minimum": 0, "maximum": 1 },
+        "userInteractionEnabled": { "type": "boolean" },
+        "enabled": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
+        "selected": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
+        "windowAttached": { "type": "boolean" }
+      }
+    },
+    "sourceNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "parentIdentifier", "depth", "className", "layoutBoundsPoints", "identityTransform", "windowIntersectionPoints", "safeAreaIntersectionPoints", "state", "label", "value"],
+      "properties": {
+        "identifier": { "$ref": "#/$defs/identifier" },
+        "parentIdentifier": { "$ref": "#/$defs/nullableIdentifier" },
+        "depth": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "className": { "$ref": "#/$defs/nonEmptyString" },
+        "layoutBoundsPoints": { "$ref": "#/$defs/rect" },
+        "identityTransform": { "type": "boolean" },
+        "windowIntersectionPoints": { "$ref": "#/$defs/nullableRect" },
+        "safeAreaIntersectionPoints": { "$ref": "#/$defs/nullableRect" },
+        "state": { "$ref": "#/$defs/sourceState" },
+        "label": { "$ref": "#/$defs/nullableStringFact" },
+        "value": { "$ref": "#/$defs/nullableStringFact" }
+      }
+    },
+    "xcuiNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "query", "elementType", "exists", "enabled", "selected", "hittable", "focusStatus", "frameStatus", "framePoints", "label", "value", "title", "placeholder"],
+      "properties": {
+        "identifier": { "$ref": "#/$defs/identifier" },
+        "query": { "$ref": "#/$defs/nonEmptyString" },
+        "elementType": { "enum": ["application", "window", "other", "scrollView", "staticText", "button", "switch", "textField"] },
+        "exists": { "type": "boolean" },
+        "enabled": { "type": "boolean" },
+        "selected": { "type": "boolean" },
+        "hittable": { "type": "boolean" },
+        "focusStatus": { "enum": ["focused", "notFocused", "unavailable"] },
+        "frameStatus": { "enum": ["exact", "unavailable"] },
+        "framePoints": { "$ref": "#/$defs/nullableRect" },
+        "label": { "$ref": "#/$defs/nullableStringFact" },
+        "value": { "$ref": "#/$defs/nullableStringFact" },
+        "title": { "$ref": "#/$defs/nullableStringFact" },
+        "placeholder": { "$ref": "#/$defs/nullableStringFact" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "frameStatus": { "const": "exact" } }, "required": ["frameStatus"] },
+          "then": { "properties": { "framePoints": { "$ref": "#/$defs/rect" } } },
+          "else": { "properties": { "framePoints": { "type": "null" } } }
+        }
+      ]
+    }
+  }
+}

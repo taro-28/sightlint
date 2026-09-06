@@ -1,0 +1,43 @@
+{
+  "corpusVersion": "0.1.0",
+  "implementationOutputsStoredAsOracle": false,
+  "metrics": [
+    {
+      "denominator": "reviewed source and XCUI facts in acquisition annotations",
+      "id": "acquisitionFactCoverage",
+      "numerator": "reviewed acquisition facts matched exactly by the adapter",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "three public corpus cases",
+      "id": "evaluatedCaseCoverage",
+      "numerator": "cases executing capture-to-normalize-to-check through public processes",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "all observed rule failures in the three public cases",
+      "id": "failurePrecision",
+      "numerator": "observed failures matching independently authored expected failures",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "one reviewed hard-negative excluded target",
+      "id": "abstentionRetention",
+      "numerator": "excluded target receiving no manufactured core box or rule result",
+      "requiredMinimum": 1.0
+    },
+    {
+      "denominator": "all reviewed clean and hard-negative cases",
+      "id": "falsePositiveRate",
+      "numerator": "cases with an unexpected failed rule result",
+      "requiredMaximum": 0.0
+    },
+    {
+      "denominator": "one targeted source-layout mutation",
+      "id": "mutationKillRate",
+      "numerator": "mutations producing the independently expected bounds failure",
+      "requiredMinimum": 1.0
+    }
+  ],
+  "nonClaim": "Perfect results on three public maintainer-authored captures establish regression behavior only, not representative iOS, accessibility, device, or UI/UX accuracy."
+}
