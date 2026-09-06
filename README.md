@@ -47,8 +47,8 @@ The #25 benchmark is complete without changing the strict image-inspection defau
 exact source-alpha geometry without introducing a padding rule. Issue #27 is complete through ADR
 0041 without broadening PNG coverage because current product evidence did not establish a format
 gap. Issue #28 adds the first local perception protocol foundation without OCR/model accuracy or
-blocking claims. The earliest remaining roadmap gate is
-[#29](https://github.com/taro-28/sightlint/issues/29).
+blocking claims. [Issue #29](https://github.com/taro-28/sightlint/issues/29) now includes a first
+bounded PPTX source-geometry slice; PDF/document is the next candidate in that umbrella.
 
 ## Why
 
@@ -180,7 +180,8 @@ Palette/indexed, sub-byte, 16-bit, `tRNS`, animation, and over-budget cases are 
 unavailable instead of guessed.
 
 ADR 0041 keeps that boundary after a versioned format-demand assessment found that all five
-repository PNG assets and the nine pinned-browser product captures use the supported subset.
+source-alpha assets, all three later PPTX differential renders, and the nine pinned-browser
+product captures use the supported subset.
 Unsupported formats remain conformance controls rather than product-demand evidence; no decoder
 dependency, automatic conversion, compatibility change, prevalence claim, or protected holdout is
 introduced. A future observed gap requires a new issue and ADR.
@@ -246,6 +247,22 @@ negative. The selected ranked background remains explicitly unconfirmed. OCR, mo
 semantic role/hierarchy/peer accuracy, and downstream rule quality are still `untested`; see
 [`adapters/perception/README.md`](adapters/perception/README.md).
 
+### Bounded PPTX source acquisition
+
+ADR 0043 adds the first non-Web structured adapter as a local Python 3.9+ standard-library
+process. It validates bounded transitional OOXML ZIP/XML input and maps directly declared,
+unrotated slide shapes/groups, native IDs, hierarchy, local z-order, digest-only text metadata, and
+exact source EMU `layoutBox` geometry. Candidate IR must pass the public `sightlint normalize`
+command; the existing deterministic canvas-containment rule then runs through public
+`sightlint check` without PPTX-specific kernel logic.
+
+A caller may pair each slide with a digest-pinned local PNG. The render remains a separate
+device-pixel canvas and only slide-extent agreement/conflict is reported; rendered node identity,
+ink, font substitution, text layout, masters/layouts, theme resolution, and unsupported DrawingML
+objects are not guessed. All successful v0 responses therefore report partial coverage. The
+three-case public synthetic corpus is regression evidence only, with no protected holdout or
+general slide-quality claim; see [`adapters/pptx/README.md`](adapters/pptx/README.md).
+
 ## Install and current commands
 
 The first alpha is a source-only GitHub prerelease with a deterministic archive and SHA-256
@@ -283,6 +300,14 @@ cargo run --locked -p sightlint-cli -- \
 # Compare three nonblocking segmentation hypotheses in canonical JSON.
 cargo run --locked -p sightlint-cli -- \
   benchmark-image-segmentation screenshot.png
+
+# Acquire bounded PPTX source geometry, then use the public rule engine.
+python3 adapters/pptx/sightlint_pptx.py \
+  --request evaluation/pptx/requests/atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-clean.ir.json
+target/debug/sightlint check /tmp/atlas-clean.ir.json --profile base --format json
 
 # Binary stdin is supported.
 cat screenshot.png | cargo run --locked -p sightlint-cli -- adapt-image -
@@ -414,14 +439,14 @@ Read:
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand/decoder strategy decision; broader coverage not admitted |
 | #28 | completed local OCR/CV/VLM protocol foundation; real model evaluation remains untested |
-| #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
+| #29 | PPTX first slice implemented; PDF/document and Android/iOS adapters remain |
 | #30 | interaction states, effects, traces, and recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0043 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0044 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

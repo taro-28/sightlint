@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:protocol:pptx-request:0.1.0",
+  "title": "SightLint PPTX adapter request 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "requestId", "artifact", "input", "renders", "privacy", "execution"],
+  "properties": {
+    "protocolVersion": { "const": "0.1.0" },
+    "requestId": { "$ref": "#/$defs/token" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 256 }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "sha256"],
+      "properties": {
+        "reference": { "$ref": "#/$defs/reference" },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "renders": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slideIndex", "reference", "sha256", "emuPerPixel"],
+        "properties": {
+          "slideIndex": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "reference": { "$ref": "#/$defs/reference" },
+          "sha256": { "$ref": "#/$defs/digest" },
+          "emuPerPixel": { "type": "integer", "minimum": 1, "maximum": 914400 }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "textPolicy"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "textPolicy": { "const": "digestOnly" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxArchiveBytes", "maxRenderBytes", "maxEntries", "maxExpandedBytes", "maxXmlBytes", "maxCompressionRatio", "maxSlides", "maxNodes", "maxGroupDepth", "maxOutputBytes"],
+      "properties": {
+        "maxArchiveBytes": { "type": "integer", "minimum": 1, "maximum": 67108864 },
+        "maxRenderBytes": { "type": "integer", "minimum": 1, "maximum": 67108864 },
+        "maxEntries": { "type": "integer", "minimum": 1, "maximum": 2048 },
+        "maxExpandedBytes": { "type": "integer", "minimum": 1, "maximum": 134217728 },
+        "maxXmlBytes": { "type": "integer", "minimum": 1, "maximum": 8388608 },
+        "maxCompressionRatio": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "maxSlides": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "maxNodes": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "maxGroupDepth": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "maxOutputBytes": { "type": "integer", "minimum": 1024, "maximum": 16777216 }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "reference": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\\\/].*" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

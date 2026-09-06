@@ -1,0 +1,66 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "none",
+      "caseId": "atlas-clean",
+      "caseRole": "clean",
+      "expectations": [
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:2" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:3" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:4" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:5" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:6" }
+      ],
+      "falsePositiveRisk": "Passing source layout boxes does not prove that text, effects, clipping, or rendered ink are visible or acceptable.",
+      "forbidUnexpectedFailures": true,
+      "id": "atlas-clean-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "Every fixture-specified source layout box is contained by the exact EMU slide canvas."
+    },
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "atlas-off-slide-mutant",
+      "caseRole": "targetedMutation",
+      "expectations": [
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:2" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:3" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:4" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:5" },
+        { "aspect": "layoutBox", "expectedOutcome": "failed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:6" }
+      ],
+      "falsePositiveRisk": "A source object may be intentionally off-slide or clipped; v0 proves exact source containment only, not that every off-slide authoring pattern is a user-facing defect.",
+      "forbidUnexpectedFailures": true,
+      "id": "atlas-off-slide-mutant-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "Only Card 6 was moved; its source right edge exceeds the exact slide width and is eligible for the existing deterministic blocking rule."
+    },
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "none",
+      "caseId": "atlas-asymmetric-hard-negative",
+      "caseRole": "hardNegative",
+      "expectations": [
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:2" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:3" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:4" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:5" },
+        { "aspect": "layoutBox", "expectedOutcome": "passed", "ruleId": "visual.bounds.within-canvas", "ruleVersion": "0.1.0", "targetId": "pptx:slide:256:node:6" }
+      ],
+      "falsePositiveRisk": "Asymmetry is intentional and no peer-spacing relation is declared; inferring one from proximity would create a false positive.",
+      "forbidUnexpectedFailures": true,
+      "id": "atlas-asymmetric-hard-negative-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "All exact source boxes remain contained, and the fixture does not authorize a spacing or equal-size verdict."
+    }
+  ],
+  "kind": "ruleGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureIntentAndRuleContract",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "artifact": {
+    "id": "pptx-asymmetric-hard-negative",
+    "title": "Atlas presentation asymmetric-hard-negative"
+  },
+  "execution": {
+    "maxArchiveBytes": 1048576,
+    "maxCompressionRatio": 20,
+    "maxEntries": 64,
+    "maxExpandedBytes": 2097152,
+    "maxGroupDepth": 8,
+    "maxNodes": 64,
+    "maxOutputBytes": 1048576,
+    "maxRenderBytes": 1048576,
+    "maxSlides": 4,
+    "maxXmlBytes": 262144
+  },
+  "input": {
+    "reference": "fixtures/pptx/atlas-asymmetric-hard-negative.pptx",
+    "sha256": "sha256:34ebee8aa670941569dbaee5a65d29f9730d8022916ae555e794bb4f504ed679"
+  },
+  "privacy": {
+    "externalProcessing": false,
+    "retention": "none",
+    "textPolicy": "digestOnly"
+  },
+  "protocolVersion": "0.1.0",
+  "renders": [
+    {
+      "emuPerPixel": 9525,
+      "reference": "evaluation/pptx/renders/atlas-asymmetric-hard-negative.png",
+      "sha256": "sha256:912d5272519f03b5a704252288a8837aa0ef519b1e0fc02396f48cf27d379a1f",
+      "slideIndex": 1
+    }
+  ],
+  "requestId": "pptx-asymmetric-hard-negative"
+}

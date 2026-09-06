@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:pptx-rules:0.1.0",
+  "title": "SightLint PPTX rule annotations 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "kind", "provenance", "annotations"],
+  "properties": {
+    "annotationVersion": { "const": "0.1.0" },
+    "kind": { "const": "ruleGroundTruth" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringMethod", "implementationOutputUsed", "reviewer", "guideVersion"],
+      "properties": {
+        "authoringMethod": { "const": "fixtureIntentAndRuleContract" },
+        "implementationOutputUsed": { "const": false },
+        "reviewer": { "const": "maintainerOnly" },
+        "guideVersion": { "const": "0.1.0" }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "caseId", "caseRole", "policyProfile", "applicabilityGroundTruth", "expectations", "forbidUnexpectedFailures", "blockingAuthority", "falsePositiveRisk", "rationale"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "caseId": { "$ref": "#/$defs/id" },
+          "caseRole": { "enum": ["clean", "targetedMutation", "hardNegative"] },
+          "policyProfile": { "const": "sightlint:base" },
+          "applicabilityGroundTruth": { "enum": ["applicable", "inapplicable", "cantTell"] },
+          "expectations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["ruleId", "ruleVersion", "targetId", "aspect", "expectedOutcome"],
+              "properties": {
+                "ruleId": { "const": "visual.bounds.within-canvas" },
+                "ruleVersion": { "const": "0.1.0" },
+                "targetId": { "type": "string", "minLength": 1 },
+                "aspect": { "const": "layoutBox" },
+                "expectedOutcome": { "enum": ["passed", "failed", "inapplicable", "cantTell", "untested"] }
+              }
+            }
+          },
+          "forbidUnexpectedFailures": { "type": "boolean" },
+          "blockingAuthority": { "enum": ["existingExactSourceRule", "none"] },
+          "falsePositiveRisk": { "type": "string", "minLength": 1 },
+          "rationale": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" }
+  }
+}

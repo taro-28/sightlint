@@ -63,6 +63,12 @@ jobs:
       - name: Verify perception evaluation governance
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/check_perception_evaluation.py
+      - name: Verify PPTX fixtures, evaluation governance, and parser units
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 tools/generate_pptx_fixtures.py --check
+          python3 tools/check_pptx_evaluation.py
+          python3 -m unittest adapters/pptx/tests/test_adapter.py
       - name: Verify release and dependency-license contracts
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
@@ -102,6 +108,9 @@ jobs:
       - name: Run realistic Web evaluation foundation explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
+      - name: Run PPTX source-adapter evaluation explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
       - name: Build documentation
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         env:
@@ -169,10 +178,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
+        include:
+          - os: ubuntu-latest
+            python: python3
+          - os: macos-latest
+            python: python3
+          - os: windows-latest
+            python: python
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -191,6 +203,11 @@ jobs:
         working-directory: adapters/perception
       - name: Build the public SightLint binary
         run: cargo build --locked -p sightlint-cli
+      - name: Verify PPTX fixture and evaluation contracts
+        run: |
+          ${{ matrix.python }} tools/generate_pptx_fixtures.py --check
+          ${{ matrix.python }} tools/check_pptx_evaluation.py
+          ${{ matrix.python }} -m unittest adapters/pptx/tests/test_adapter.py
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E

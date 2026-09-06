@@ -39,6 +39,12 @@
       "required": ["sourceManifest", "cases"],
       "properties": {
         "sourceManifest": { "const": "evaluation/image-alpha/corpus.json" },
+        "additionalSourceManifests": {
+          "type": "array",
+          "items": { "const": "evaluation/pptx/corpus.json" },
+          "maxItems": 1,
+          "uniqueItems": true
+        },
         "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/asset" } }
       }
     },

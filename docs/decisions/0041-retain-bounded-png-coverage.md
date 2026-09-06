@@ -15,6 +15,8 @@ use establishes a meaningful coverage gap and requires a decoder strategy decisi
 The current repository-owned product evidence does not establish that gap:
 
 - all five committed transparent UI assets are non-interlaced eight-bit RGBA;
+- all three later ADR 0043 PPTX differential renders are non-interlaced eight-bit RGB and are
+  inventoried by the same assessment checker;
 - the pinned Playwright/Chromium segmentation evaluation produces non-interlaced eight-bit RGB
   PNGs and already exercises them through the public image command;
 - indexed, packed, 16-bit, `tRNS`, and animation inputs exist only as explicit conformance
@@ -133,7 +135,8 @@ contract; they do not silently modify `encodedRgba8Raster@0.1.0` or `alphaGeomet
 
 ## Consequences
 
-- Current product paths remain covered without increasing codec scope.
+- Current product paths, including the later PPTX differential renders, remain covered without
+  increasing codec scope.
 - Unsupported inputs keep stable explicit reason codes and are not relabeled passed or failed.
 - Users needing unsupported encodings must opt into conversion and understand the evidence scope.
 - `org.sightlint.adapter.png@0.2.0`, current allocation limits, and command/exit behavior do not
@@ -143,8 +146,8 @@ contract; they do not silently modify `encodedRgba8Raster@0.1.0` or `alphaGeomet
 ## Verification
 
 - strict schema validation of the format-demand assessment;
-- drift check over every committed `.png`, its digest, dimensions, depth, color type, and interlace
-  method;
+- drift check over all eight committed `.png` files, their digests, dimensions, depth, color type,
+  and interlace method;
 - explicit linkage to the five unsupported conformance cases and their stable reason codes;
 - nine-case Playwright segmentation E2E assertion that generated screenshots are eight-bit RGB
   PNG before the public binary consumes them;

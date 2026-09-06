@@ -1,0 +1,93 @@
+{
+  "cases": [
+    {
+      "acquisitionAnnotationId": "atlas-clean-acquisition",
+      "id": "atlas-clean",
+      "input": {
+        "path": "fixtures/pptx/atlas-clean.pptx",
+        "sha256": "sha256:1e44806612394bf8b5e8b6ce7e490fa911ba8b70a8554d1ded039c66d0f060f0"
+      },
+      "relation": {
+        "kind": "baseline"
+      },
+      "render": {
+        "path": "evaluation/pptx/renders/atlas-clean.png",
+        "sha256": "sha256:3b2d1379c416235dbd03d38e7bd0b6416c7276189524e97638aa7ad2c16332ed"
+      },
+      "request": {
+        "path": "evaluation/pptx/requests/atlas-clean.json",
+        "sha256": "sha256:1c35df1d862ecf6397009a70136f402d9f3085c040ab07be99b6c1286b727971"
+      },
+      "ruleAnnotationId": "atlas-clean-rules",
+      "split": "smoke"
+    },
+    {
+      "acquisitionAnnotationId": "atlas-off-slide-mutant-acquisition",
+      "id": "atlas-off-slide-mutant",
+      "input": {
+        "path": "fixtures/pptx/atlas-off-slide-mutant.pptx",
+        "sha256": "sha256:1a342da99d0e7a4b6fbbb530cccf31f46292ce2beac22156953f7fd526de5925"
+      },
+      "relation": {
+        "baselineId": "atlas-clean",
+        "changedProperty": "Card 6 source x offset only; its right edge crosses the slide boundary.",
+        "kind": "targetedMutation"
+      },
+      "render": {
+        "path": "evaluation/pptx/renders/atlas-off-slide-mutant.png",
+        "sha256": "sha256:3a9d9c5ce782cf5133f704beebb12dc4eb6193d37fd2713ebded97f4900309b4"
+      },
+      "request": {
+        "path": "evaluation/pptx/requests/atlas-off-slide-mutant.json",
+        "sha256": "sha256:73b4780137f31ccf8ee422e368341803b20eb39a5a7f0af2f3c85316fb8f4fb9"
+      },
+      "ruleAnnotationId": "atlas-off-slide-mutant-rules",
+      "split": "development"
+    },
+    {
+      "acquisitionAnnotationId": "atlas-asymmetric-hard-negative-acquisition",
+      "id": "atlas-asymmetric-hard-negative",
+      "input": {
+        "path": "fixtures/pptx/atlas-asymmetric-hard-negative.pptx",
+        "sha256": "sha256:34ebee8aa670941569dbaee5a65d29f9730d8022916ae555e794bb4f504ed679"
+      },
+      "relation": {
+        "baselineId": "atlas-clean",
+        "changedProperty": "Card widths, labels, and gaps are intentionally asymmetric while every declared source box remains inside the slide.",
+        "kind": "hardNegative"
+      },
+      "render": {
+        "path": "evaluation/pptx/renders/atlas-asymmetric-hard-negative.png",
+        "sha256": "sha256:912d5272519f03b5a704252288a8837aa0ef519b1e0fc02396f48cf27d379a1f"
+      },
+      "request": {
+        "path": "evaluation/pptx/requests/atlas-asymmetric-hard-negative.json",
+        "sha256": "sha256:b95b395709dc1ac79d3373bc2ca4728cce01d993343ccf0b5dd12a34cc6050ac"
+      },
+      "ruleAnnotationId": "atlas-asymmetric-hard-negative-rules",
+      "split": "challenge"
+    }
+  ],
+  "corpusVersion": "0.1.0",
+  "holdout": {
+    "reason": "All three repository-owned cases are public and maintainer-authored; an independent protected PPTX set does not yet exist.",
+    "status": "notEstablished"
+  },
+  "source": {
+    "fixtureGenerator": "tools/generate_pptx_fixtures.py",
+    "license": "MIT OR Apache-2.0",
+    "origin": "repositoryOwnedFixture",
+    "ownership": "SightLint project",
+    "privacy": "fictionalNoPersonalOrCustomerData",
+    "redistribution": "permitted",
+    "renderPipeline": "soffice-headless-to-pdf+pdftoppm-960x540",
+    "renderer": "LibreOfficeDev",
+    "rendererVersion": "26.8.0.0.alpha0+2c87e51eeaa2b413ff4ae097b2705eea1995d8e5",
+    "review": "maintainerAuthoredNotIndependent"
+  },
+  "splitPolicy": {
+    "challenge": "Public asymmetric hard negative; catches accidental inference of an undeclared uniform peer relation.",
+    "development": "Public one-property mutation; proves acquisition sensitivity and mutation kill behavior.",
+    "smoke": "Public clean baseline used for process, schema, and byte-stability checks."
+  }
+}

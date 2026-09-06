@@ -1,0 +1,220 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "abstentions": [
+        "shape-to-pixel identity",
+        "visible ink bounds",
+        "text layout and wrapping",
+        "font substitution",
+        "effects and clipping",
+        "rendered z-order appearance"
+      ],
+      "caseId": "atlas-clean",
+      "id": "atlas-clean-acquisition",
+      "nodes": [
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:2",
+          "nativeId": 2,
+          "nativeType": "shape",
+          "rectEmu": { "height": 685800, "width": 7772400, "x": 685800, "y": 457200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:79d20f722d8adcf37d635b4d9845c64b942154e71d9e2c3654d82cb82cd4c867", "status": "digestOnly", "utf8Bytes": 20 },
+          "zOrder": 0
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:3",
+          "nativeId": 3,
+          "nativeType": "group",
+          "rectEmu": { "height": 1828800, "width": 7467600, "x": 685800, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "status": "absent" },
+          "zOrder": 1
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:4",
+          "nativeId": 4,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 2286000, "x": 685800, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:b8e3c6d2e8a44efc01e14e3853678ebc4f7713499b8654d332c95950173516d0", "status": "digestOnly", "utf8Bytes": 13 },
+          "zOrder": 0
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:5",
+          "nativeId": 5,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 2286000, "x": 3276600, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:d4055fafa3794fa88b1e89e70c167d5a9575067a1442a6d94e9520d65a575378", "status": "digestOnly", "utf8Bytes": 10 },
+          "zOrder": 1
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:6",
+          "nativeId": 6,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 2286000, "x": 5867400, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:07674f7ecdcb96939749ec9fae4f89fc2c995baba79002c7b65c405369182ec7", "status": "digestOnly", "utf8Bytes": 12 },
+          "zOrder": 2
+        }
+      ],
+      "render": { "emuPerPixel": 9525, "evidenceClass": "exactRender", "extentReconciliation": "agreement", "heightPixels": 540, "nodeIdentity": "cantTell", "widthPixels": 960 },
+      "slide": { "evidenceClass": "exactSource", "heightEmu": 5143500, "id": "pptx:slide:256", "index": 1, "nativeId": 256, "part": "ppt/slides/slide1.xml", "widthEmu": 9144000 }
+    },
+    {
+      "abstentions": [
+        "shape-to-pixel identity",
+        "visible ink bounds",
+        "text layout and wrapping",
+        "font substitution",
+        "effects and clipping",
+        "rendered z-order appearance"
+      ],
+      "caseId": "atlas-off-slide-mutant",
+      "id": "atlas-off-slide-mutant-acquisition",
+      "nodes": [
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:2",
+          "nativeId": 2,
+          "nativeType": "shape",
+          "rectEmu": { "height": 685800, "width": 7772400, "x": 685800, "y": 457200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:79d20f722d8adcf37d635b4d9845c64b942154e71d9e2c3654d82cb82cd4c867", "status": "digestOnly", "utf8Bytes": 20 },
+          "zOrder": 0
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:3",
+          "nativeId": 3,
+          "nativeType": "group",
+          "rectEmu": { "height": 1828800, "width": 7467600, "x": 685800, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "status": "absent" },
+          "zOrder": 1
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:4",
+          "nativeId": 4,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 2286000, "x": 685800, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:b8e3c6d2e8a44efc01e14e3853678ebc4f7713499b8654d332c95950173516d0", "status": "digestOnly", "utf8Bytes": 13 },
+          "zOrder": 0
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:5",
+          "nativeId": 5,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 2286000, "x": 3276600, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:d4055fafa3794fa88b1e89e70c167d5a9575067a1442a6d94e9520d65a575378", "status": "digestOnly", "utf8Bytes": 10 },
+          "zOrder": 1
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:6",
+          "nativeId": 6,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 2286000, "x": 8915400, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:07674f7ecdcb96939749ec9fae4f89fc2c995baba79002c7b65c405369182ec7", "status": "digestOnly", "utf8Bytes": 12 },
+          "zOrder": 2
+        }
+      ],
+      "render": { "emuPerPixel": 9525, "evidenceClass": "exactRender", "extentReconciliation": "agreement", "heightPixels": 540, "nodeIdentity": "cantTell", "widthPixels": 960 },
+      "slide": { "evidenceClass": "exactSource", "heightEmu": 5143500, "id": "pptx:slide:256", "index": 1, "nativeId": 256, "part": "ppt/slides/slide1.xml", "widthEmu": 9144000 }
+    },
+    {
+      "abstentions": [
+        "shape-to-pixel identity",
+        "visible ink bounds",
+        "text layout and wrapping",
+        "font substitution",
+        "effects and clipping",
+        "rendered z-order appearance",
+        "undeclared peer spacing intent"
+      ],
+      "caseId": "atlas-asymmetric-hard-negative",
+      "id": "atlas-asymmetric-hard-negative-acquisition",
+      "nodes": [
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:2",
+          "nativeId": 2,
+          "nativeType": "shape",
+          "rectEmu": { "height": 685800, "width": 7772400, "x": 685800, "y": 457200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:79d20f722d8adcf37d635b4d9845c64b942154e71d9e2c3654d82cb82cd4c867", "status": "digestOnly", "utf8Bytes": 20 },
+          "zOrder": 0
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:3",
+          "nativeId": 3,
+          "nativeType": "group",
+          "rectEmu": { "height": 1828800, "width": 7467600, "x": 685800, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "status": "absent" },
+          "zOrder": 1
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:4",
+          "nativeId": 4,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 3352800, "x": 685800, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:b92b702da60edda58248c9acb03ac3bce82708132191e893e7fb55b217342bc7", "status": "digestOnly", "utf8Bytes": 17 },
+          "zOrder": 0
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:5",
+          "nativeId": 5,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 1371600, "x": 4343400, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:ba9fb8733a2f64993836215fba8c9c19c48d20cd0581c69e9712ef26b19fc3bb", "status": "digestOnly", "utf8Bytes": 15 },
+          "zOrder": 1
+        },
+        {
+          "geometryStatus": "exact",
+          "id": "pptx:slide:256:node:6",
+          "nativeId": 6,
+          "nativeType": "shape",
+          "parentId": "pptx:slide:256:node:3",
+          "rectEmu": { "height": 1828800, "width": 1828800, "x": 6324600, "y": 1600200 },
+          "sourceEvidenceClass": "exactSource",
+          "text": { "sha256": "sha256:365987d015f79bfb9698ff14a8b19af6d94c689c6f5b6a5a17c4adf187fbe321", "status": "digestOnly", "utf8Bytes": 11 },
+          "zOrder": 2
+        }
+      ],
+      "render": { "emuPerPixel": 9525, "evidenceClass": "exactRender", "extentReconciliation": "agreement", "heightPixels": 540, "nodeIdentity": "cantTell", "widthPixels": 960 },
+      "slide": { "evidenceClass": "exactSource", "heightEmu": 5143500, "id": "pptx:slide:256", "index": 1, "nativeId": 256, "part": "ppt/slides/slide1.xml", "widthEmu": 9144000 }
+    }
+  ],
+  "kind": "acquisitionGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureSpecification",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

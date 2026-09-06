@@ -373,6 +373,9 @@ Issue #25 preserves broader background/segmentation experiments. ADR 0041 retain
 unavailability for broader PNG formats because current product inputs establish no coverage gap;
 future format work requires new evidence and a new issue. ADR 0042 implements issue #28's local
 perception protocol foundation while leaving real OCR/model accuracy and calibration untested.
+ADR 0043 selects a bounded PPTX source-geometry process as the first post-Web structured medium;
+it deliberately leaves rendered node identity, master/layout/theme resolution, and representative
+slide-quality evaluation unresolved.
 Issue #22 remains the evaluation basis before promoting broad heuristics.
 
 ## Interaction quality
@@ -470,7 +473,8 @@ The following remain intentionally unresolved or evidence-gated:
 - rule-maturity thresholds for blocking eligibility;
 - severity model;
 - arbitrary-project and cross-platform browser product compatibility beyond the bounded policy;
-- first non-web adapter after Playwright;
+- representative PPTX expansion and the next non-Web medium after the bounded ADR 0043
+  source-geometry slice;
 - perception models/runtimes and calibration requirements;
 - exact formats and decoder strategy if new product evidence re-admits unsupported PNG coverage;
 - interaction trace schema;

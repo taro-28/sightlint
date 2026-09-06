@@ -194,8 +194,9 @@ alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blo
 implemented.
 
 ADR 0041 resolves the optional broader-format decision without expanding the decoder. A versioned
-assessment inventories all five repository PNGs and verifies the nine pinned-browser product
-captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`, and animation cases remain
+assessment inventories five source-alpha assets plus three later PPTX renders and verifies the
+nine pinned-browser product captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`,
+and animation cases remain
 synthetic unavailable controls rather than product-demand evidence. No decoder dependency,
 automatic conversion, telemetry, protected holdout, prevalence claim, command/schema change, or
 broader accuracy claim is introduced. A caller-selected conversion proves facts about the
@@ -265,6 +266,25 @@ holdout. OCR/text/role/hierarchy/peer precision/recall, calibration, backend sen
 distributions, downstream rule accuracy, and real-world UI/UX accuracy remain `untested`. Process
 isolation is not an OS sandbox or generic memory ceiling; third-party workers remain able to use
 the caller's local privileges unless separately sandboxed.
+
+### Bounded PPTX source adapter
+
+ADR 0043 and `adapters/pptx/` add the first non-Web structured process adapter. Strict `0.1.0`
+request/response and `org.sightlint.pptx@0.1.0` extension surfaces bind local source/render paths,
+SHA-256 identity, digest-only text handling, resource limits, runtime provenance, and explicit
+partial coverage. Python standard-library ZIP/XML parsing remains outside the Rust kernel.
+
+Supported direct slide facts are slide size/order, shapes/groups, native IDs, parentage, local
+z-order, placeholders, text digest/count, and unrotated/group-transformed source `layoutBox`
+geometry in EMUs. Optional PNG renders are validated through public `adapt-image`, retained as a
+separate device-pixel canvas, and reconciled only at slide extent. Candidate IR is accepted through
+public `normalize`; public `check --profile base` reuses exact-source canvas containment and kills
+the off-slide mutation without a PPTX-specific kernel branch.
+
+The process always reports partial source coverage. It does not map master/layout objects,
+theme-resolved styles, full text, pictures/charts/tables/media, unsupported transforms, rendered
+ink/text layout, or shape-to-pixel identity. The three public synthetic cases have maintainer-only
+review and no protected holdout, so their perfect regression metrics are not real-world accuracy.
 
 ### Realistic Web evaluation foundation
 
@@ -416,6 +436,20 @@ Success and explicit partial/unsupported/ambiguous acquisition exit 0 with a can
 run report whose rule outcome is `untested`; operational/protocol/resource/mapping failures exit 2.
 The wrapper never exits 1.
 
+The first non-Web structured adapter is a separate local Python process:
+
+```bash
+python3 adapters/pptx/sightlint_pptx.py \
+  --request evaluation/pptx/requests/atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-clean.ir.json
+```
+
+It exits 0 with canonical response bytes and explicitly partial Artifact IR, or 2 for bounded
+request/path/archive/XML/resource/Rust-validation failures. A subsequent public `sightlint check`
+owns rule outcomes and exit 1. The process is an untrusted adapter, not a Rust-kernel dependency.
+
 For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
 `cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
 failures remain visible with exit 0. `inspect-image` never exits 1 for a heuristic; observations or
@@ -479,6 +513,23 @@ SightLint treats tests as part of the product specification.
 - public non-holdout development data, no committed captures/implementation output as oracle, no
   semantic/model-accuracy or blocking claim.
 
+### PPTX source-adapter fixtures
+
+- ADR 0043 plus strict request, response, and `org.sightlint.pptx@0.1.0` extension schemas;
+- a Python 3.9+ standard-library process that bounds and validates local transitional OOXML ZIP/XML
+  input, maps direct shapes/groups/native IDs/hierarchy/z-order and exact source EMU `layoutBox`
+  geometry, and never executes Office or follows external relationships;
+- three deterministic repository-owned PPTX packages and three reviewed LibreOffice-derived
+  960×540 renders with source/render digests, fictional-data ownership, dual-license, privacy, and
+  renderer provenance;
+- separate acquisition and rule annotations for a clean baseline, one off-slide mutation, and an
+  asymmetric hard negative, plus explicit public splits and no protected holdout;
+- public-process E2E through `adapt-image`, `normalize`, and `check`, including repeated-byte,
+  malformed/archive, resource, digest, output-collision, mutation-kill, false-positive, and
+  abstention assertions;
+- source geometry coverage remains `partial`; master/layout/theme resolution, full text, ink,
+  rendering fidelity, and shape-to-pixel identity are not claimed.
+
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
 ### Required normal CI
@@ -511,7 +562,8 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - color management, compositing, or trusted contrast from PNG samples;
 - arbitrary-URL, iframe, shadow-DOM, full accessibility-tree, or interaction capture;
 - automatic semantic peer inference from Playwright output;
-- PPTX, PDF/document, Android, or iOS adapters;
+- PDF/document, Android, or iOS adapters;
+- broad PPTX coverage beyond direct unrotated shapes/groups, or a PPTX-specific recommended rule;
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
 - dynamic interaction traces, pending/error/recovery/destructive-action rules;
@@ -574,12 +626,14 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#28 (complete for protocol v0):** isolated local perception process, typed OCR/CV/VLM
   observation families, bounded deterministic reference wrapper, non-promotion boundary, and
   three-state differential regression. Real model calibration/accuracy remains `untested`.
-- **#29:** structured PPTX, PDF/document, Android, and iOS adapter roadmap.
+- **#29 (PPTX slice implemented):** ADR 0043 provides the first bounded PPTX source-geometry
+  adapter and regression corpus; PDF/document is the next candidate, with Android/iOS later.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The earliest remaining roadmap gate is #29. Later issues remain demand- and evidence-gated;
-the completed alpha and benchmark do not make stale branches authoritative.
+The remaining work inside #29 starts with a focused PDF/document evidence and adapter decision.
+Later issues remain demand- and evidence-gated; the completed alpha, benchmark, and bounded PPTX
+slice do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -664,6 +718,9 @@ python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 python3 tools/check_perception_evaluation.py
+python3 tools/generate_pptx_fixtures.py --check
+python3 tools/check_pptx_evaluation.py
+python3 -m unittest adapters/pptx/tests/test_adapter.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
@@ -686,6 +743,7 @@ cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

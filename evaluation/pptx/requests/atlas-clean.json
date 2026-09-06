@@ -1,0 +1,37 @@
+{
+  "artifact": {
+    "id": "pptx-clean",
+    "title": "Atlas presentation clean"
+  },
+  "execution": {
+    "maxArchiveBytes": 1048576,
+    "maxCompressionRatio": 20,
+    "maxEntries": 64,
+    "maxExpandedBytes": 2097152,
+    "maxGroupDepth": 8,
+    "maxNodes": 64,
+    "maxOutputBytes": 1048576,
+    "maxRenderBytes": 1048576,
+    "maxSlides": 4,
+    "maxXmlBytes": 262144
+  },
+  "input": {
+    "reference": "fixtures/pptx/atlas-clean.pptx",
+    "sha256": "sha256:1e44806612394bf8b5e8b6ce7e490fa911ba8b70a8554d1ded039c66d0f060f0"
+  },
+  "privacy": {
+    "externalProcessing": false,
+    "retention": "none",
+    "textPolicy": "digestOnly"
+  },
+  "protocolVersion": "0.1.0",
+  "renders": [
+    {
+      "emuPerPixel": 9525,
+      "reference": "evaluation/pptx/renders/atlas-clean.png",
+      "sha256": "sha256:3b2d1379c416235dbd03d38e7bd0b6416c7276189524e97638aa7ad2c16332ed",
+      "slideIndex": 1
+    }
+  ],
+  "requestId": "pptx-clean"
+}

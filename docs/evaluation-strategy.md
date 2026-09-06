@@ -56,6 +56,13 @@ Acquisition metrics include:
 Acquisition success does not establish that a design rule applies. Correctly measuring gaps
 `[1, 2]` is not proof that the elements are semantic peers or that the layout is wrong.
 
+The ADR 0043 PPTX corpus applies this separation directly: acquisition annotations specify native
+IDs, group hierarchy, exact source EMU rectangles, digest-only text metadata, and slide/render
+extent reconciliation. A different rule annotation then evaluates only
+`visual.bounds.within-canvas`. The asymmetric challenge case declares no peer-spacing relation,
+and shape-to-pixel identity remains `cantTell`. Its in-memory CI metrics are public-regression
+measurements, not a protected-holdout or real-world presentation-accuracy estimate.
+
 ### 3. Rule/product evaluation
 
 **Question:** Given sufficient observations, applicability, and policy, did SightLint return the

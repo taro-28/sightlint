@@ -88,21 +88,32 @@ def verify_committed_assets(assessment: dict[str, Any]) -> None:
             f"committed PNG inventory differs: assessed={assessed_paths}, actual={actual_paths}"
         )
 
-    source_manifest = load(committed["sourceManifest"])
-    source_cases = {
-        case["id"]: case
-        for case in source_manifest.get("cases", [])
-        if isinstance(case, dict) and isinstance(case.get("id"), str)
-    }
-    if set(source_cases) != set(assessed):
-        raise SystemExit("source-alpha manifest and PNG demand assessment IDs differ")
+    manifest_paths = [committed["sourceManifest"], *committed.get("additionalSourceManifests", [])]
+    source_assets: dict[str, str] = {}
+    for manifest_path in manifest_paths:
+        manifest = load(manifest_path)
+        for manifest_case in manifest.get("cases", []):
+            if not isinstance(manifest_case, dict):
+                continue
+            if manifest_path == "evaluation/image-alpha/corpus.json":
+                path = manifest_case.get("path")
+                digest = manifest_case.get("byteSha256")
+            else:
+                render = manifest_case.get("render", {})
+                path = render.get("path") if isinstance(render, dict) else None
+                value = render.get("sha256") if isinstance(render, dict) else None
+                digest = value.removeprefix("sha256:") if isinstance(value, str) else None
+            if isinstance(path, str) and isinstance(digest, str):
+                source_assets[path] = digest
+    if set(source_assets) != set(assessed_paths):
+        raise SystemExit("source manifests and PNG demand assessment paths differ")
 
     for case_id, case in assessed.items():
         path = repository_file(case["path"], f"asset {case_id}")
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         if digest != case["byteSha256"]:
             raise SystemExit(f"{case_id} digest differs from the assessment")
-        if digest != source_cases[case_id]["byteSha256"]:
+        if digest != source_assets[case["path"]]:
             raise SystemExit(f"{case_id} digest differs from its source manifest")
         header = png_header(path)
         expected = {name: case[name] for name in header}
@@ -191,7 +202,7 @@ def main() -> None:
     verify_unsupported_controls(assessment)
     verify_decision(assessment)
     print(
-        "PNG format demand: 5/5 committed assets and 9 browser cases use the supported subset; "
+        "PNG format demand: 8/8 committed assets and 9 browser cases use the supported subset; "
         "5 unsupported controls remain conformance-only; broader decoding stays untested"
     )
 
