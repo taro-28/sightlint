@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SightLint fixture — Harbor support inbox</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="support-app" data-testid="support-inbox">
+      <header class="topbar" data-testid="support-topbar">
+        <a class="brand" href="#inbox" aria-label="Harbor support home">
+          <span class="brand-mark" aria-hidden="true">H</span>
+          <span>Harbor</span>
+        </a>
+        <label class="search-field">
+          <span class="visually-hidden">Search conversations</span>
+          <span aria-hidden="true">⌕</span>
+          <input type="search" placeholder="Search conversations" />
+        </label>
+        <button class="account-action" type="button" aria-label="Open account menu">
+          <span aria-hidden="true">MC</span>
+        </button>
+      </header>
+
+      <div class="workspace">
+        <aside class="queue-navigation" aria-label="Support queues" data-testid="queue-navigation">
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h1>Support inbox</h1>
+          </div>
+          <nav aria-label="Conversation views">
+            <a class="queue-link queue-link-active" href="#inbox" aria-current="page">
+              <span>Inbox</span><strong>12</strong>
+            </a>
+            <a class="queue-link" href="#assigned"><span>Assigned to me</span><strong>4</strong></a>
+            <a class="queue-link" href="#waiting"><span>Waiting</span><strong>3</strong></a>
+            <a class="queue-link" href="#resolved"><span>Resolved</span></a>
+          </nav>
+          <section class="coverage-note" aria-labelledby="coverage-heading">
+            <p class="eyebrow">Today</p>
+            <h2 id="coverage-heading">Coverage until 18:00</h2>
+            <p>Mae and Imani are handling the current queue.</p>
+          </section>
+        </aside>
+
+        <main class="inbox-layout" id="inbox" data-testid="inbox-main">
+          <section class="ticket-list" aria-labelledby="ticket-list-heading" data-testid="ticket-list">
+            <header class="panel-heading">
+              <div>
+                <p class="eyebrow">Priority view</p>
+                <h2 id="ticket-list-heading">Open conversations</h2>
+              </div>
+              <button class="filter-action" type="button">Filter</button>
+            </header>
+
+            <article class="ticket ticket-active" aria-label="Selected conversation from Mina Chen">
+              <span class="avatar avatar-coral" aria-hidden="true">MC</span>
+              <div class="ticket-copy">
+                <div><strong>Mina Chen</strong><time datetime="2026-09-06T09:24:00Z">9:24</time></div>
+                <p>Inviting another reviewer</p>
+                <span>I can open the workspace, but the invite…</span>
+              </div>
+            </article>
+            <article class="ticket" aria-label="Conversation from Luis Romero">
+              <span class="avatar avatar-blue" aria-hidden="true">LR</span>
+              <div class="ticket-copy">
+                <div><strong>Luis Romero</strong><time datetime="2026-09-06T08:51:00Z">8:51</time></div>
+                <p>Export completed</p>
+                <span>The report arrived and the totals look right.</span>
+              </div>
+            </article>
+            <article class="ticket" aria-label="Conversation from Jules Okafor">
+              <span class="avatar avatar-gold" aria-hidden="true">JO</span>
+              <div class="ticket-copy">
+                <div><strong>Jules Okafor</strong><time datetime="2026-09-06T08:17:00Z">8:17</time></div>
+                <p>Billing owner changed</p>
+                <span>Could you confirm which receipts move over?</span>
+              </div>
+            </article>
+          </section>
+
+          <section class="conversation" aria-labelledby="conversation-heading" data-testid="conversation-panel">
+            <header class="conversation-heading">
+              <div>
+                <p class="eyebrow">Atlas Research · Priority</p>
+                <h2 id="conversation-heading">Inviting another reviewer</h2>
+              </div>
+              <button class="more-action" type="button" aria-label="More conversation actions">
+                <span aria-hidden="true">•••</span>
+              </button>
+            </header>
+
+            <div class="message-thread" role="log" aria-label="Conversation messages">
+              <article class="message message-customer">
+                <header><strong>Mina Chen</strong><time datetime="2026-09-06T09:24:00Z">9:24</time></header>
+                <p>Hi! I can open the workspace, but the invite button is unavailable for our new reviewer.</p>
+              </article>
+              <article class="message message-agent">
+                <header><strong>Mae from Harbor</strong><time datetime="2026-09-06T09:31:00Z">9:31</time></header>
+                <p>Thanks, Mina. I am checking the workspace role and will send the safest next step.</p>
+              </article>
+            </div>
+
+            <form class="reply-composer" data-testid="reply-composer">
+              <label for="reply-message">Reply</label>
+              <textarea id="reply-message" rows="4">I confirmed the reviewer role. Please try the invite again.</textarea>
+              <button class="hidden-template-action" type="button" data-testid="hidden-template-action">
+                Use saved reply
+              </button>
+              <div class="composer-actions">
+                <button class="attach-action" type="button" aria-label="Attach a file">
+                  <span aria-hidden="true">＋</span>
+                </button>
+                <span id="reply-send-label" class="visually-hidden">Send reply</span>
+                <button
+                  class="send-action"
+                  type="button"
+                  aria-label="Send reply"
+                  data-testid="reply-send"
+                >
+                  <span aria-hidden="true">➜</span>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <aside class="customer-panel" aria-labelledby="customer-heading" data-testid="customer-panel">
+            <div class="customer-profile">
+              <span class="profile-avatar" aria-hidden="true">MC</span>
+              <h2 id="customer-heading">Mina Chen</h2>
+              <p>Atlas Research</p>
+            </div>
+            <dl>
+              <div><dt>Plan</dt><dd>Studio</dd></div>
+              <div><dt>Region</dt><dd>North America</dd></div>
+              <div><dt>Conversations</dt><dd>6</dd></div>
+            </dl>
+            <section class="context-card" aria-labelledby="context-heading">
+              <p class="eyebrow">Context</p>
+              <h3 id="context-heading">Review access</h3>
+              <p>The account has two active reviewer seats.</p>
+            </section>
+          </aside>
+        </main>
+      </div>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -69,7 +69,7 @@ background, alternatives, and disposition of historical experiments.
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0051** or later.
+continue at **0052** or later.
 
 ## Historical branch decisions 0025–0029
 
@@ -105,4 +105,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0051.
+Use [the template](template.md) and the next unused number at or after 0052.

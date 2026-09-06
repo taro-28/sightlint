@@ -161,6 +161,17 @@ complete hit regions, and semantic peer inference remain `cantTell`/`untested`. 
 regression evidence for one public fictional application, not real-world acquisition accuracy or
 representative rule precision.
 
+ADR 0051 adds an additive multi-family registry and protected-holdout admission schema without
+reinterpreting that historical Atlas corpus. Issue #72 adds a distinct repository-owned Harbor
+support-inbox family with clean, accessible-name mutation, `aria-labelledby` hard-negative, and
+ambiguous-control cases. Its public E2E records 4/4 selected acquisition expectations, 9/9 reviewed
+rule results, 6/6 reviewed abstention results, 1/1 failure precision, 1/1 mutation kill, and zero
+false-positive or hard-negative failures. It also requires the name-only mutation and valid
+alternate-name case to preserve clean PNG bytes. Both families remain maintainer-authored,
+English-language, public tuning data. The holdout admission status is `notOperational`, so these
+counts do not establish independent-review agreement, protected generalization, representative
+Web accuracy, WCAG conformance, or blocking maturity.
+
 ADR 0036 adds a separate public agent-workflow oracle and E2E. The test runs one combined local
 capture/check command, joins the reviewed finding to a native selector and source bundle, applies
 one human-authored edit only in a temporary fixture copy, and requires the named finding to

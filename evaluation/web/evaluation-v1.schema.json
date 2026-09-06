@@ -52,6 +52,7 @@
       "minLength": 1,
       "pattern": "^[A-Za-z0-9._/-]+$"
     },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "versionedPath": {
       "type": "object",
       "additionalProperties": false,
@@ -261,6 +262,8 @@
         "productContext",
         "reviewedTasks",
         "sourceRoot",
+        "sourceFiles",
+        "sourceDigest",
         "sourceRevisionBasis",
         "governance",
         "exposure",
@@ -278,6 +281,13 @@
           "items": { "$ref": "#/$defs/nonEmptyString" }
         },
         "sourceRoot": { "$ref": "#/$defs/relativePath" },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "sourceDigest": { "$ref": "#/$defs/sha256" },
         "sourceRevisionBasis": { "$ref": "#/$defs/nonEmptyString" },
         "governance": { "$ref": "#/$defs/sourceGovernance" },
         "exposure": { "$ref": "#/$defs/exposure" },

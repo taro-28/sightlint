@@ -485,14 +485,17 @@ Important historical detail:
 - ADR 0049 defines separate managed-loopback acquisition and rule evaluation authorities;
 - ADR 0050 defines the local, deterministic GitHub Actions projection, exact declared source-line
   boundary, outcome-to-annotation mapping, and no-token/no-upload job-check integration;
-- new ADRs should continue at 0051 or later rather than silently reusing historical numbers.
+- ADR 0051 defines the additive multi-family Web evaluation registry, honest maintainer-only
+  review status, and the machine-checkable admission boundary for an external protected holdout;
+- new ADRs should continue at 0052 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
 
 ## Decisions still open
 
-- representative corpus expansion and protected holdout operation beyond the public #22 slice;
+- independent review, representative corpus expansion beyond the two public families, and actual
+  protected-holdout operation after the ADR 0051 admission-contract slice;
 - broader arbitrary-project and cross-platform Playwright compatibility beyond the bounded
   managed-loopback #62 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;

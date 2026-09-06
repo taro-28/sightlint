@@ -15,7 +15,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
-| M4 — Structured adapters | active | process-isolated file and managed-loopback Playwright capture, 23-case evidence/rule matrix, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | portability characterization and broader representative evaluation |
+| M4 — Structured adapters | active | process-isolated file and managed-loopback Playwright capture, 23-case Atlas matrix, second four-case Harbor family, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | independent review, an operational protected holdout, portability characterization, and broader representative evaluation |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | active | interaction extension `0.1.0`, controlled Playwright/Atlas traces, async-feedback and failure-recovery advisory rules, eight-case evaluation | offline/permission/stale/partial/destructive/focus/mobile traces and broader evidence |
 | M7 — Ecosystem and release | complete for exit criteria | local CLI, bounded one-command Web agent workflow, managed target-repository server lifecycle, deterministic GitHub job-check projection, dual license, source-only alpha release | demand-led MCP/editor surfaces and binary/package channels |
@@ -105,9 +105,10 @@ bytes through a short-retention workflow artifact and comparing them with draft 
 publication. The immutable alpha.1 attempt was not published; alpha.2 is the first supported tag.
 
 This completes the bounded #22–#24, #42, and #33 sequence, but it is not evidence of general Web
-accuracy. The corpus has one fictional application family, maintainer-only review, visible
-development labels, no private holdout, no pixel-content identity, no complete hit regions, no
-semantic peer inference, and no representative sampling. The three new rules therefore remain
+accuracy. ADR 0051 and issue #72 later add a second fictional support-inbox family and a strict
+holdout-admission contract. Both families still have maintainer-only review, visible development
+labels, no operational protected holdout, no pixel-content identity, no complete hit regions, no
+semantic peer inference, and no representative sampling. The three rules therefore remain
 advisory. The scripted edit is not a claim about autonomous agent quality or arbitrary
 repositories. Issue #25 provides the bounded comparison without admitting a broader segmentation
 default. ADR 0040 and issue #26 add exact source-alpha geometry without admitting a padding rule.
@@ -116,6 +117,20 @@ product evidence does not establish a coverage gap. ADR 0042 and issue #28 add t
 perception protocol foundation without semantic promotion or model-accuracy claims. ADRs
 0043–0046 add bounded PPTX, PDF, instrumented Android, and UIKit/XCUITest iOS slices under #29.
 They establish public regression paths, not representative medium accuracy.
+
+### Current evidence expansion — #71 / #72
+
+Issue #71 is the post-alpha evidence-first roadmap epic. Its first child, #72, adds ADR 0051 and an
+additive multi-family Web registry without changing the historical `0.1.0` declared-IR corpus.
+The new Harbor support-inbox family contributes four public cases through the existing isolated
+Playwright and Rust command path: clean, one accessible-name mutation, one visually identical
+`aria-labelledby` hard negative, and one ambiguous focusable surface. Acquisition and rule truth
+remain separate, and results are grouped by family and split.
+
+The public admission schema rejects an operational holdout claim without freeze, digest, separate
+access authority, independent evaluator, leakage log, pinned execution, oracle-correction, and
+reporting records. Current status is deliberately `notOperational`; independent human review and
+an externally controlled bundle remain required follow-up work before holdout or maturity claims.
 
 ## Scope-selection rules
 
@@ -577,7 +592,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0051 or later.
+- New architecture decision numbers continue at 0052 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -608,6 +623,8 @@ Every public behavior must satisfy the applicable matrix:
 | #62 | managed loopback target-repository Web capture and `/entries/new` dogfood |
 | #65 | separate managed-loopback acquisition and rule evaluation oracles |
 | #67 | deterministic GitHub Actions job-check projection and exact-source annotations |
+| #71 | post-alpha evidence-first product maturity epic |
+| #72 | second realistic Web fixture family and protected-holdout admission contract |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha execution epic |

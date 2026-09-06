@@ -255,6 +255,11 @@ still validated before base rules run.
 ADR 0048 changes acquisition provenance and source attribution only. It does not change any rule
 identifier, version, applicability, policy, maturity, outcome, or enforcement behavior.
 
+ADR 0051/#72 exercise `web.accessibility.interactive-name@0.1.0` against a second public fixture
+family, including a valid `aria-labelledby` hard negative and an ambiguous focusable surface. This
+adds cross-family regression evidence but no independent review or operational holdout, so it does
+not change the rule's version, policy, applicability, advisory maturity, or enforcement.
+
 These rules consume declared/evidence-backed inputs. Current `inspect-image` observations do not
 become trusted semantic peers or blocking spacing failures.
 

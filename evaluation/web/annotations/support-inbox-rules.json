@@ -1,0 +1,294 @@
+{
+  "$schema": "../browser-rule.schema.json",
+  "schemaVersion": "0.2.0",
+  "documentType": "browserRuleOracle",
+  "commandSurface": "sightlint check --profile recommended --format json",
+  "profiles": ["sightlint:base", "sightlint:recommended"],
+  "ruleContracts": [
+    {
+      "ruleId": "web.accessibility.interactive-name",
+      "ruleVersion": "0.1.0",
+      "maturity": "advisory",
+      "enforcement": "advisory",
+      "policy": {
+        "profile": "sightlint:recommended",
+        "sourceKind": "platformStandard",
+        "sourceId": "wcag:4.1.2-name-role-value",
+        "sourceVersion": "2.2",
+        "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+      },
+      "applicability": "Visible DOM-interactive Web nodes with an observed platform accessibility role in the conservative supported control set.",
+      "requiredEvidence": [
+        "exact DOM interactivity and visibility",
+        "platform accessibility role and name"
+      ],
+      "validAlternatives": [
+        "visible text content",
+        "aria-label",
+        "aria-labelledby",
+        "another platform-supported accessible-name source"
+      ],
+      "severityInputs": {
+        "userHarm": "An unnamed send control can be undiscoverable or ambiguous to assistive-technology users.",
+        "affectedScope": "One observed reply action in one captured support-inbox state.",
+        "reversibility": "The local semantic label has several valid reversible implementations.",
+        "accessibilityImpact": "Direct programmatic-name impact; this evaluation does not derive a severity label."
+      },
+      "falsePositiveRisks": [
+        "an incomplete platform accessibility snapshot may appear unnamed",
+        "requiring aria-label specifically would reject valid alternative naming sources"
+      ],
+      "falseNegativeRisks": [
+        "a non-empty but misleading or duplicate name passes this atomic rule",
+        "unselected controls and unsupported platform roles abstain rather than fail"
+      ],
+      "evaluationCases": {
+        "pass": ["support-inbox-clean"],
+        "fail": ["support-inbox-unnamed-control"],
+        "cantTell": ["support-inbox-ambiguous-control"],
+        "inapplicable": ["support-inbox-clean"],
+        "hardNegative": ["support-inbox-labelledby-hard-negative"]
+      }
+    }
+  ],
+  "metrics": {
+    "failurePrecision": "Count matched reviewed failed results over all emitted failed results for this family and split.",
+    "caseCoverage": "Count executed reviewed cases over all registered cases for this family and split.",
+    "abstention": "Count matched reviewed cantTell, inapplicable, and untested results over reviewed abstention results.",
+    "falsePositives": "Count emitted failed results absent from the separate reviewed rule oracle, including hard-negative failures.",
+    "mutationKillRate": "Count targeted rule-eligible mutations emitting the reviewed failure over all targeted rule-eligible mutations.",
+    "limitations": [
+      "Four public cases in one repository-owned family are regression evidence, not representative precision or recall.",
+      "The labels are visible to implementers and are not protected holdout data.",
+      "Review is maintainer-only and does not establish independent reviewer agreement.",
+      "Only programmatic-name presence for one selected control is evaluated; complete WCAG or UI and UX quality is not."
+    ]
+  },
+  "cases": [
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "request": "evaluation/web/requests/support-inbox-ambiguous-control.json",
+      "classification": "ambiguous",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-support-inbox-ambiguous-control",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "cantTell",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Focusability and visible icon pixels do not prove a supported platform role or programmatic name.",
+      "nonClaim": "The abstention is not a pass; it records insufficient native semantics for this surface.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The generic focusable surface is deliberately outside the supported platform-role set, so the rule must abstain."
+      }
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "request": "evaluation/web/requests/support-inbox-clean.json",
+      "classification": "clean",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-support-inbox-clean",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "node",
+          "targetId": "web-hidden-template-action",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "passed",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "A source aria-label is insufficient unless the synchronized platform snapshot exposes the supported role and name.",
+      "nonClaim": "One named send control does not establish complete accessibility or support-inbox quality.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The platform-supported native button has the explicit programmatic name Send reply; the heading remains inapplicable."
+      }
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "request": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json",
+      "classification": "hardNegative",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-support-inbox-labelledby-hard-negative",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "passed",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "A checker that requires aria-label specifically would reject the valid aria-labelledby alternative.",
+      "nonClaim": "This hard negative proves one alternate name source only; it does not validate every accessible-name mechanism.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The same icon button remains programmatically named through a referenced repository-authored text node."
+      }
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "request": "evaluation/web/requests/support-inbox-unnamed-control.json",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 1,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "policy": {
+            "profile": "sightlint:base",
+            "sourceKind": "declaredContract",
+            "sourceId": "artifact-ir:peer-sequence.expected-gap",
+            "sourceVersion": "0.1.0",
+            "reference": "docs/artifact-ir.md#relations"
+          },
+          "outcome": "inapplicable",
+          "targetKind": "artifact",
+          "targetId": "web-support-inbox-unnamed-control",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "policy": {
+            "profile": "sightlint:recommended",
+            "sourceKind": "platformStandard",
+            "sourceId": "wcag:4.1.2-name-role-value",
+            "sourceVersion": "2.2",
+            "reference": "https://www.w3.org/TR/WCAG22/#name-role-value"
+          },
+          "outcome": "failed",
+          "targetKind": "node",
+          "targetId": "web-reply-send",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "An absent name may be an acquisition failure; this case fails only when the platform button role is observed with a null name.",
+      "nonClaim": "The advisory result covers one exact mutation and does not by itself justify blocking enforcement.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The mutation removes the only referenced name source while preserving native button semantics and rendered interaction evidence."
+      }
+    }
+  ]
+}
