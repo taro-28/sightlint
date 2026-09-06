@@ -172,6 +172,14 @@ English-language, public tuning data. The holdout admission status is `notOperat
 counts do not establish independent-review agreement, protected generalization, representative
 Web accuracy, WCAG conformance, or blocking maturity.
 
+ADR 0052 and issue #75 add machine-checkable external-manifest and sanitized-attestation contracts
+before any protected execution. A six-case public conformance chain exercises digest bindings,
+file containment, separate acquisition/rule truth, pinned process/environment records, explicit
+abstention, private integer metric cells, minimum-denominator suppression, and lifecycle states.
+It is deliberately fictional and tuning-visible, so its valid shape is not valid holdout evidence.
+The current public record remains `notRun`/`notOperational`; independent human review, external
+custody, signature verification, and a protected run remain unmeasured work in issue #74.
+
 ADR 0036 adds a separate public agent-workflow oracle and E2E. The test runs one combined local
 capture/check command, joins the reviewed finding to a native selector and source bundle, applies
 one human-authored edit only in a temporary fixture copy, and requires the named finding to

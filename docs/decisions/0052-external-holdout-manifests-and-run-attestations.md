@@ -32,7 +32,8 @@ without relabeling that data as holdout evidence.
 
 Define five independently versioned JSON surfaces at version `1.0.0`:
 
-1. a **protected bundle manifest** inventories opaque families, cases, and raw artifact digests;
+1. a **protected bundle manifest** inventories opaque families, cases, raw artifact digests,
+   source/ownership/license provenance, and privacy/retention review;
 2. a **protected oracle manifest** records separate acquisition and rule annotation document
    digests and reviewed outcome-category counts;
 3. an **invocation manifest** binds the repository commit and tree, build-input archive, public
@@ -93,6 +94,13 @@ old bytes.
 Browser automation and protected-data parsing remain untrusted external processes. The
 deterministic Rust rule kernel receives only normalized Artifact IR and configuration. Neither the
 kernel nor ordinary public CI reads holdout credentials or private manifests.
+
+Every bundle records a source authority, ownership basis, license identifier, redistribution
+decision, privacy review, personal/customer/credential status, external-processing status, and
+retention-policy version. Protected data may be controlled and non-redistributable; those fields
+do not authorize publication. Public conformance data must be repository-authored fictional data,
+redistributable under `MIT OR Apache-2.0`, processed locally, and contain no personal data,
+customer data, or credentials.
 
 ## Invocation and environment binding
 

@@ -2,7 +2,7 @@
   "$schema": "urn:sightlint:schema:protected-holdout-bundle:1.0.0",
   "schemaVersion": "1.0.0",
   "documentType": "protectedHoldoutBundleManifest",
-  "manifestDigest": "sha256:f829b82ff4ea1646b0e7c96227f1daf466ca8ac5385e698219737cc73a43f63f",
+  "manifestDigest": "sha256:f1c0bb8843a26e80000b407e2ca0aede983e3b7f5a184c0de6de1f14cde4f342",
   "dataClassification": "publicConformanceOnly",
   "bundle": {
     "id": "conformance-web-holdout",
@@ -11,6 +11,20 @@
     "storageAuthorityId": "conformance-authority",
     "tuningVisible": true,
     "implementationOutputUsedAsOracle": false
+  },
+  "provenance": {
+    "sourceAuthorityId": "sightlint-maintainers",
+    "ownershipBasis": "Repository-authored fictional protocol conformance data.",
+    "licenseId": "MIT OR Apache-2.0",
+    "redistribution": "permitted"
+  },
+  "privacy": {
+    "reviewed": true,
+    "containsPersonalData": false,
+    "containsCustomerData": false,
+    "containsCredentials": false,
+    "externalProcessing": false,
+    "retentionPolicyVersion": "1.0.0"
   },
   "limits": {
     "maximumFamilies": 2,

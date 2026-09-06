@@ -2,7 +2,7 @@
   "$schema": "urn:sightlint:schema:web-holdout-invocation:1.0.0",
   "schemaVersion": "1.0.0",
   "documentType": "protectedHoldoutInvocationManifest",
-  "manifestDigest": "sha256:24967ade1c05481ed13bb50fcce8264b39e58b1de3ea977bd8b37ad29c811d70",
+  "manifestDigest": "sha256:065b8224debe3ac696327b7a928195dd604a30182d2362f03cd212bd798dfb85",
   "dataClassification": "publicConformanceOnly",
   "source": {
     "commit": "1111111111111111111111111111111111111111",
@@ -15,12 +15,12 @@
   "bundleBinding": {
     "id": "conformance-web-holdout",
     "version": "1.0.0",
-    "manifestDigest": "sha256:f829b82ff4ea1646b0e7c96227f1daf466ca8ac5385e698219737cc73a43f63f"
+    "manifestDigest": "sha256:f1c0bb8843a26e80000b407e2ca0aede983e3b7f5a184c0de6de1f14cde4f342"
   },
   "oracleBinding": {
     "id": "conformance-web-oracle",
     "version": "1.0.0",
-    "manifestDigest": "sha256:117901b69db2412c93d6ec45da11c9878bcda87be9f6a4e73726dd32690808b2"
+    "manifestDigest": "sha256:29ca6f55050cd7381c9ae0d3596581da3d8eec9d4185119851980d905de9494c"
   },
   "commands": {
     "commandDigest": "sha256:d69426e2a7803f5db14e93e5cd1ebd2cc1a11d0e6ca2c4877f891feec2eac7c9",
@@ -47,6 +47,17 @@
       "json"
     ],
     "shellInterpolation": false
+  },
+  "evaluationContract": {
+    "profileId": "sightlint:recommended",
+    "profileVersion": "0.1.0",
+    "configurationDigest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+    "rules": [
+      { "id": "web.accessibility.interactive-name", "version": "0.1.0" },
+      { "id": "web.interaction.ancestor-clip", "version": "0.1.0" },
+      { "id": "web.interaction.center-hit", "version": "0.1.0" }
+    ],
+    "expectedExitCodes": [0, 1, 2]
   },
   "environment": {
     "manifestDigest": "sha256:24d850f64c24f623d505066ce361e8ea3d4888ed923601ab19500ab4d34dbcff",

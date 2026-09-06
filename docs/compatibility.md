@@ -82,6 +82,8 @@ of the published alpha.2 archive and therefore do not retroactively change that 
 | iOS metric contract | `0.1.0` | Defines public-corpus acquisition coverage, verdict precision, abstention, false-positive, and mutation expectations without storing observed implementation output as truth. |
 | Interaction extension | `org.sightlint.interaction@0.1.0` | Medium-neutral declared action policy and ordered captured/untested traces; malformed recognized data is rejected and incompatible semantics require a new extension version. |
 | Interaction evaluation contracts | `0.1.0` | Public acquisition and rule truth remain separate; all cases are visible development data and no protected holdout is claimed. |
+| Protected Web holdout external manifests | `1.0.0` | Strict bundle, separate oracle, invocation/environment, and private-result shapes; real records stay outside the repository and incompatible fields require a new version. |
+| Sanitized Web holdout run attestation | `1.0.0` | Public lifecycle, admission binding, assurance declarations, integer metric publication/suppression, and non-claim contract; conformance examples are never evidence eligible. |
 | Playwright interaction request/response protocol | `0.1.0` | Strict repository-local controlled steps, fixed environment, denied external network, bounded resources, digest-only screenshots, and fail-closed errors. |
 | Playwright interaction adapter | `0.1.0` | Unreleased private Node process; exact runtime/browser versions are provenance and cross-platform screenshot byte identity is not claimed. |
 | Private Playwright Node package after ADR 0047 | `0.5.0` | Adds `sightlint-interaction`; existing capture/workflow protocols and their adapter versions remain independent compatibility surfaces. |

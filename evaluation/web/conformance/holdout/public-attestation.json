@@ -2,7 +2,7 @@
   "$schema": "urn:sightlint:schema:web-holdout-run:1.0.0",
   "schemaVersion": "1.0.0",
   "documentType": "sanitizedHoldoutRunAttestation",
-  "manifestDigest": "sha256:5d5c420af0da32bbbafe29aa980f8279b44e441f2b5bfffad0390344575c5ebf",
+  "manifestDigest": "sha256:bc2965e6da756f1ae0702dcb28eff164e10bb13e11c6a737af298b4929becbb3",
   "recordPurpose": "conformanceExample",
   "lifecycle": "valid",
   "dataClassification": "publicConformanceOnly",
@@ -16,15 +16,15 @@
     "bundle": {
       "id": "conformance-web-holdout",
       "version": "1.0.0",
-      "manifestDigest": "sha256:f829b82ff4ea1646b0e7c96227f1daf466ca8ac5385e698219737cc73a43f63f"
+      "manifestDigest": "sha256:f1c0bb8843a26e80000b407e2ca0aede983e3b7f5a184c0de6de1f14cde4f342"
     },
     "oracle": {
       "id": "conformance-web-oracle",
       "version": "1.0.0",
-      "manifestDigest": "sha256:117901b69db2412c93d6ec45da11c9878bcda87be9f6a4e73726dd32690808b2"
+      "manifestDigest": "sha256:29ca6f55050cd7381c9ae0d3596581da3d8eec9d4185119851980d905de9494c"
     },
-    "invocationManifestDigest": "sha256:24967ade1c05481ed13bb50fcce8264b39e58b1de3ea977bd8b37ad29c811d70",
-    "privateResultManifestDigest": "sha256:d0737d7ec28a7c415042e13458c1f5db2283d2500a51959af8fcc2f7f98cd26a"
+    "invocationManifestDigest": "sha256:065b8224debe3ac696327b7a928195dd604a30182d2362f03cd212bd798dfb85",
+    "privateResultManifestDigest": "sha256:5c443b0dbad1a272fc719baccd391f305c46dfcff92fc1d7e8d26107a658b3b7"
   },
   "execution": {
     "status": "succeeded",

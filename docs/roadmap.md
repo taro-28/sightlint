@@ -15,7 +15,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M1 — Deterministic vertical slice | complete | Artifact IR, validation, canonicalization, evidence, rules, reports, CLI, binary E2E | continued compatibility discipline |
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
-| M4 — Structured adapters | active | process-isolated file and managed-loopback Playwright capture, 23-case Atlas matrix, second four-case Harbor family, first advisory recommended Web pack, and bounded three-case PPTX, PDF, Android, and iOS processes | independent review, an operational protected holdout, portability characterization, and broader representative evaluation |
+| M4 — Structured adapters | active | process-isolated file and managed-loopback Playwright capture, 23-case Atlas matrix, second four-case Harbor family, first advisory recommended Web pack, bounded three-case PPTX/PDF/Android/iOS processes, and strict external-holdout attestation contracts | independent review, an externally operated protected holdout, portability characterization, and broader representative evaluation |
 | M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | active | interaction extension `0.1.0`, controlled Playwright/Atlas traces, async-feedback and failure-recovery advisory rules, eight-case evaluation | offline/permission/stale/partial/destructive/focus/mobile traces and broader evidence |
 | M7 — Ecosystem and release | complete for exit criteria | local CLI, bounded one-command Web agent workflow, managed target-repository server lifecycle, deterministic GitHub job-check projection, dual license, source-only alpha release | demand-led MCP/editor surfaces and binary/package channels |
@@ -118,7 +118,7 @@ perception protocol foundation without semantic promotion or model-accuracy clai
 0043–0046 add bounded PPTX, PDF, instrumented Android, and UIKit/XCUITest iOS slices under #29.
 They establish public regression paths, not representative medium accuracy.
 
-### Current evidence expansion — #71 / #72
+### Current evidence expansion — #71 / #72 / #75 / #74
 
 Issue #71 is the post-alpha evidence-first roadmap epic. Its first child, #72, adds ADR 0051 and an
 additive multi-family Web registry without changing the historical `0.1.0` declared-IR corpus.
@@ -131,6 +131,15 @@ The public admission schema rejects an operational holdout claim without freeze,
 access authority, independent evaluator, leakage log, pinned execution, oracle-correction, and
 reporting records. Current status is deliberately `notOperational`; independent human review and
 an externally controlled bundle remain required follow-up work before holdout or maturity claims.
+
+Issue #75 and ADR 0052 now supply the technical handoff boundary for that follow-up: strict
+external bundle, separate oracle, invocation/environment, private-result, and sanitized public-run
+schemas; an explicit `notRun` status; and a read-only checker with a fictional public conformance
+chain. The chain covers all six case classes, digest/path/budget failures, private small-cell
+suppression, and byte-stable diagnostics, but is tuning-visible and permanently ineligible as
+holdout evidence. Issue #74 remains the next gate because only a real external authority,
+independent evaluator, second verifier, protected freeze/exposure log, and actual execution can
+make admission operational or create evidence.
 
 ## Scope-selection rules
 
@@ -592,7 +601,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0052 or later.
+- New architecture decision numbers continue at 0053 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -625,6 +634,8 @@ Every public behavior must satisfy the applicable matrix:
 | #67 | deterministic GitHub Actions job-check projection and exact-source annotations |
 | #71 | post-alpha evidence-first product maturity epic |
 | #72 | second realistic Web fixture family and protected-holdout admission contract |
+| #75 | external holdout manifests, sanitized run attestation, and conformance verifier foundation |
+| #74 | independent human review and externally operated protected holdout; remains externally gated |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha execution epic |

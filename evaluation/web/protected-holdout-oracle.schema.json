@@ -65,6 +65,55 @@
       "items": { "$ref": "#/$defs/outcomeCount" }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "dataClassification": { "const": "protectedHoldout" } },
+        "required": ["dataClassification"]
+      },
+      "then": {
+        "properties": {
+          "oracle": {
+            "type": "object",
+            "properties": {
+              "authoringBasis": { "const": "humanReviewedSourceContract" },
+              "reviewStatus": { "enum": ["independentlyReviewed", "adjudicated"] },
+              "reviewers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "role": { "const": "independentReviewer" },
+                    "independentFromAnnotationAuthors": { "const": true }
+                  },
+                  "required": ["role", "independentFromAnnotationAuthors"]
+                }
+              }
+            },
+            "required": ["authoringBasis", "reviewStatus", "reviewers"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "dataClassification": { "const": "publicConformanceOnly" } },
+        "required": ["dataClassification"]
+      },
+      "then": {
+        "properties": {
+          "oracle": {
+            "type": "object",
+            "properties": {
+              "authoringBasis": { "const": "publicConformanceContract" },
+              "reviewStatus": { "const": "conformanceOnly" }
+            },
+            "required": ["authoringBasis", "reviewStatus"]
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "ascii": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[ -~]+$" },
     "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
@@ -136,7 +185,7 @@
         "id": { "$ref": "#/$defs/id" },
         "path": { "$ref": "#/$defs/relativePath" },
         "sha256": { "$ref": "#/$defs/sha256" },
-        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1048576 },
         "caseCount": { "type": "integer", "minimum": 1, "maximum": 4096 }
       }
     },

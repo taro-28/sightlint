@@ -48,6 +48,15 @@ English-language application families, maintainer-only review, visible labels, a
 explicit rule paths. It does not establish real-world UI/UX accuracy, independent-review
 agreement, WCAG conformance, blocking maturity, or protected-holdout performance.
 
+ADR 0052 and issue #75 define the next boundary without pretending that the holdout already
+exists. Five strict `1.0.0` schemas cover an external protected bundle, separately authored
+acquisition/rule oracle, pinned invocation/environment, private case results, and sanitized public
+run attestation. The committed six-case chain under `conformance/holdout/` is fictional,
+tuning-visible protocol data. It covers clean, targeted-mutation, hard-negative, ambiguous,
+malformed, and resource-boundary classes, but is permanently `evidenceEligible: false`.
+`holdout-run.json` remains the authoritative public `notRun` status while admission is
+`notOperational`.
+
 ## Files and authority
 
 - `corpus.schema.json`: versioned artifact, provenance, split, environment, and execution contract.
@@ -76,6 +85,14 @@ agreement, WCAG conformance, blocking maturity, or protected-holdout performance
   exposure/review contract, oracle joins, split inventory, metrics, and non-claims.
 - `holdout-admission.schema.json` and `holdout-admission.json`: machine-checkable admission
   controls for a separately governed protected bundle. Current status is `notOperational`.
+- `protected-holdout-bundle.schema.json`, `protected-holdout-oracle.schema.json`,
+  `holdout-invocation.schema.json`, and `private-holdout-result.schema.json`: strict external
+  manifest contracts. Real instances remain outside the repository and protected from tuning.
+- `holdout-run.schema.json` and `holdout-run.json`: the sanitized public lifecycle/metric contract
+  and current `notRun` record. Counts below the disclosure threshold are omitted and digest-bound;
+  zero denominators are explicit and no aggregate quality score exists.
+- `conformance/holdout/`: public fictional positive and negative protocol fixtures. They validate
+  joins and disclosure rules but are not product-accuracy or protected-holdout evidence.
 - `annotation-guide-v1.md`: family, review, oracle, leakage, holdout, and reporting guidance.
 - `support-inbox-app/`, `annotations/support-inbox-acquisition.json`, and
   `annotations/support-inbox-rules.json`: the second realistic family and its separate public
@@ -127,6 +144,20 @@ Before holdout data is used, document its freeze commit, access policy, evaluato
 and oracle-correction process under `holdout-admission.schema.json`. Public CI must not require
 private raw artifacts. The current `notOperational` record is an admission contract, not holdout
 evidence.
+
+The read-only foundation checker validates current status and the public conformance chain without
+running the product, opening a network connection, writing a manifest, verifying a person's
+identity, or accessing an external store:
+
+```bash
+python3 tools/check_web_holdout_foundation.py
+python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
+```
+
+The second command proves only canonical digests, file containment, acquisition/rule truth
+separation, bounded integer metrics, small-cell suppression, and stable fail-closed diagnostics.
+Operationalization still requires issue #74's external authority, qualified independent evaluator,
+second verifier, protected bundle, exposure log, and detached signature process.
 
 ## Evaluation command
 

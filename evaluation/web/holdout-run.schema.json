@@ -332,13 +332,24 @@
               "then": {
                 "properties": {
                   "dataClassification": { "const": "sanitizedProtectedResult" },
-                  "evidenceEligible": { "const": true },
                   "admission": {
                     "type": "object",
                     "properties": { "status": { "const": "operational" } },
                     "required": ["status"]
                   }
                 }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "recordPurpose": { "const": "holdoutEvidence" },
+                  "lifecycle": { "const": "valid" }
+                },
+                "required": ["recordPurpose", "lifecycle"]
+              },
+              "then": {
+                "properties": { "evidenceEligible": { "const": true } }
               }
             },
             {

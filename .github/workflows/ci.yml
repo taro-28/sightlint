@@ -67,6 +67,8 @@ jobs:
         run: |
           python3 tools/check_web_evaluation.py
           python3 tools/check_web_evaluation_v1.py
+          python3 tools/check_web_holdout_foundation.py
+          python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
       - name: Verify perception evaluation governance
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/check_perception_evaluation.py

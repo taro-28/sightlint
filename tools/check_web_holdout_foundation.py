@@ -212,7 +212,9 @@ def validate_relative_file(root: Path, value: Any, expected_digest: Any, expecte
         raw = path.read_bytes()
     except OSError:
         fail("path", f"{label} is unavailable")
-    length = integer(expected_length, f"{label} byteLength", 0, 1_073_741_824)
+    if len(raw) > MAXIMUM_MANIFEST_BYTES:
+        fail("input-budget", f"{label} exceeds the 1048576-byte file limit")
+    length = integer(expected_length, f"{label} byteLength", 0, MAXIMUM_MANIFEST_BYTES)
     if len(raw) != length:
         fail("digest", f"{label} byteLength does not match the referenced file")
     recorded = validate_sha256(expected_digest, f"{label} sha256")
@@ -310,7 +312,7 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], list[str]]:
     bundle = load_json(root / "bundle-manifest.json", "bundle manifest")
     exact(
         bundle,
-        {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "bundle", "limits", "families", "cases"},
+        {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "bundle", "provenance", "privacy", "limits", "families", "cases"},
         "bundle manifest",
     )
     if bundle.get("dataClassification") != "publicConformanceOnly":
@@ -326,6 +328,32 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], list[str]]:
         fail("classification", "public conformance data must be tuning-visible")
     if metadata["implementationOutputUsedAsOracle"] is not False:
         fail("oracle", "implementation output must not be used as bundle truth")
+    provenance = exact(
+        bundle["provenance"],
+        {"sourceAuthorityId", "ownershipBasis", "licenseId", "redistribution"},
+        "bundle provenance",
+    )
+    identifier(provenance["sourceAuthorityId"], "bundle sourceAuthorityId")
+    if (
+        provenance["licenseId"] != "MIT OR Apache-2.0"
+        or provenance["redistribution"] != "permitted"
+        or "repository-authored fictional" not in text(provenance["ownershipBasis"], "bundle ownershipBasis").lower()
+    ):
+        fail("provenance", "public conformance data must retain its fictional dual-licensed provenance")
+    privacy = exact(
+        bundle["privacy"],
+        {"reviewed", "containsPersonalData", "containsCustomerData", "containsCredentials", "externalProcessing", "retentionPolicyVersion"},
+        "bundle privacy",
+    )
+    if privacy != {
+        "reviewed": True,
+        "containsPersonalData": False,
+        "containsCustomerData": False,
+        "containsCredentials": False,
+        "externalProcessing": False,
+        "retentionPolicyVersion": "1.0.0",
+    }:
+        fail("privacy", "public conformance data must remain reviewed, fictional, credential-free, and local")
     limits = exact(bundle["limits"], {"maximumFamilies", "maximumCases", "maximumFilesPerCase", "maximumManifestBytes"}, "bundle limits")
     maximum_families = integer(limits["maximumFamilies"], "maximumFamilies", 1, MAXIMUM_FAMILIES)
     maximum_cases = integer(limits["maximumCases"], "maximumCases", 1, MAXIMUM_CASES)
@@ -459,7 +487,7 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
     invocation = load_json(root / "invocation-manifest.json", "invocation manifest")
     exact(
         invocation,
-        {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "source", "bundleBinding", "oracleBinding", "commands", "environment", "resourceLimits", "createdAt", "createdBy"},
+        {"$schema", "schemaVersion", "documentType", "manifestDigest", "dataClassification", "source", "bundleBinding", "oracleBinding", "commands", "evaluationContract", "environment", "resourceLimits", "createdAt", "createdBy"},
         "invocation manifest",
     )
     if invocation.get("dataClassification") != "publicConformanceOnly":
@@ -485,6 +513,27 @@ def validate_invocation(root: Path, bundle: dict[str, Any], oracle: dict[str, An
         fail("command", "holdout commands must not use shell interpolation")
     if validate_sha256(commands["commandDigest"], "command digest") != digest(commands, "commandDigest"):
         fail("digest", "commandDigest does not match its canonical projection")
+    evaluation = exact(
+        invocation["evaluationContract"],
+        {"profileId", "profileVersion", "configurationDigest", "rules", "expectedExitCodes"},
+        "evaluation contract",
+    )
+    if evaluation["profileId"] != "sightlint:recommended" or evaluation["profileVersion"] != "0.1.0":
+        fail("command", "evaluation contract must pin the current recommended profile")
+    validate_sha256(evaluation["configurationDigest"], "evaluation configurationDigest")
+    rules = items(evaluation["rules"], "evaluation rule bindings", 1, 128)
+    if sorted_unique_ids(rules, "id", "evaluation rule bindings") != [
+        "web.accessibility.interactive-name",
+        "web.interaction.ancestor-clip",
+        "web.interaction.center-hit",
+    ]:
+        fail("command", "evaluation contract must pin the current recommended rule set")
+    for rule_value in rules:
+        rule = exact(rule_value, {"id", "version"}, "evaluation rule binding")
+        if rule["version"] != "0.1.0":
+            fail("command", "evaluation contract must pin current rule versions")
+    if evaluation["expectedExitCodes"] != [0, 1, 2]:
+        fail("command", "evaluation contract must preserve public exit-code semantics")
     environment = exact(
         invocation["environment"],
         {"manifestDigest", "operatingSystem", "architecture", "rustVersion", "nodeVersion", "playwrightVersion", "chromiumRevision", "locale", "timezone", "theme", "reducedMotion", "viewportWidthCssPixels", "viewportHeightCssPixels", "deviceScaleFactor", "textScale"},

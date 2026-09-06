@@ -11,6 +11,8 @@
     "manifestDigest",
     "dataClassification",
     "bundle",
+    "provenance",
+    "privacy",
     "limits",
     "families",
     "cases"
@@ -22,6 +24,8 @@
     "manifestDigest": { "$ref": "#/$defs/sha256" },
     "dataClassification": { "enum": ["protectedHoldout", "publicConformanceOnly"] },
     "bundle": { "$ref": "#/$defs/bundle" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "privacy": { "$ref": "#/$defs/privacy" },
     "limits": { "$ref": "#/$defs/limits" },
     "families": {
       "type": "array",
@@ -63,6 +67,23 @@
             "type": "object",
             "properties": { "tuningVisible": { "const": true } },
             "required": ["tuningVisible"]
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "licenseId": { "const": "MIT OR Apache-2.0" },
+              "redistribution": { "const": "permitted" }
+            },
+            "required": ["licenseId", "redistribution"]
+          },
+          "privacy": {
+            "type": "object",
+            "properties": {
+              "containsPersonalData": { "const": false },
+              "containsCustomerData": { "const": false },
+              "externalProcessing": { "const": false }
+            },
+            "required": ["containsPersonalData", "containsCustomerData", "externalProcessing"]
           }
         }
       }
@@ -101,6 +122,37 @@
         "implementationOutputUsedAsOracle": { "const": false }
       }
     },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceAuthorityId", "ownershipBasis", "licenseId", "redistribution"],
+      "properties": {
+        "sourceAuthorityId": { "$ref": "#/$defs/id" },
+        "ownershipBasis": { "$ref": "#/$defs/ascii" },
+        "licenseId": { "$ref": "#/$defs/ascii" },
+        "redistribution": { "enum": ["permitted", "prohibited"] }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewed",
+        "containsPersonalData",
+        "containsCustomerData",
+        "containsCredentials",
+        "externalProcessing",
+        "retentionPolicyVersion"
+      ],
+      "properties": {
+        "reviewed": { "const": true },
+        "containsPersonalData": { "type": "boolean" },
+        "containsCustomerData": { "type": "boolean" },
+        "containsCredentials": { "const": false },
+        "externalProcessing": { "type": "boolean" },
+        "retentionPolicyVersion": { "$ref": "#/$defs/semver" }
+      }
+    },
     "limits": {
       "type": "object",
       "additionalProperties": false,
@@ -135,7 +187,7 @@
         "role": { "enum": ["source", "request", "supportingAsset"] },
         "path": { "$ref": "#/$defs/relativePath" },
         "sha256": { "$ref": "#/$defs/sha256" },
-        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1048576 },
         "mediaType": { "$ref": "#/$defs/ascii" }
       }
     },

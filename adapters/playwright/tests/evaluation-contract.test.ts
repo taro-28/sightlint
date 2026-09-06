@@ -199,9 +199,17 @@ test("holdout foundation schemas separate private evidence from sanitized public
   exposedProtectedBundle["dataClassification"] = "protectedHoldout";
   assertInvalid(validateBundle, exposedProtectedBundle, "protected bundle visible to tuning");
 
+  const privatePublicFixture = clone(bundle);
+  object(privatePublicFixture["privacy"], "bundle privacy")["containsPersonalData"] = true;
+  assertInvalid(validateBundle, privatePublicFixture, "public conformance bundle containing personal data");
+
   const mixedOracle = clone(oracle);
   mixedOracle["implementationOutput"] = { acceptedAsTruth: true };
   assertInvalid(validateOracle, mixedOracle, "oracle containing implementation output");
+
+  const unreviewedProtectedOracle = clone(oracle);
+  unreviewedProtectedOracle["dataClassification"] = "protectedHoldout";
+  assertInvalid(validateOracle, unreviewedProtectedOracle, "protected oracle without independent review");
 
   const shellInvocation = clone(invocation);
   object(shellInvocation["commands"], "invocation commands")["shellInterpolation"] = true;
@@ -230,6 +238,17 @@ test("holdout foundation schemas separate private evidence from sanitized public
   assertValid(validateAttestation, futureEvidenceShape, "future operational evidence shape");
   object(futureEvidenceShape["admission"], "future evidence admission")["status"] = "notOperational";
   assertInvalid(validateAttestation, futureEvidenceShape, "evidence claim without operational admission");
+
+  const invalidatedEvidenceShape = clone(futureEvidenceShape);
+  object(invalidatedEvidenceShape["admission"], "invalidated evidence admission")["status"] = "operational";
+  invalidatedEvidenceShape["lifecycle"] = "invalidated";
+  invalidatedEvidenceShape["evidenceEligible"] = false;
+  invalidatedEvidenceShape["invalidation"] = {
+    invalidatedAt: "2026-09-06T00:20:00Z",
+    reason: "Conformance-only lifecycle shape test.",
+    authorityId: "conformance-authority",
+  };
+  assertValid(validateAttestation, invalidatedEvidenceShape, "future invalidated evidence shape");
 
   const incompleteInvalidation = clone(publicConformance);
   incompleteInvalidation["lifecycle"] = "invalidated";

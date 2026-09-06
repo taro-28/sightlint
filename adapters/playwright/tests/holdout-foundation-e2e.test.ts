@@ -121,6 +121,31 @@ test("public holdout checker rejects digest, path, command, metric, disclosure, 
       },
     },
     {
+      file: "bundle-manifest.json",
+      category: "privacy",
+      detail: "public conformance data must remain reviewed, fictional, credential-free, and local",
+      mutate: (document) => {
+        object(document["privacy"], "privacy")["containsCustomerData"] = true;
+      },
+    },
+    {
+      file: "bundle-manifest.json",
+      category: "oracle",
+      detail: "implementation output must not be used as bundle truth",
+      mutate: (document) => {
+        object(document["bundle"], "bundle")["implementationOutputUsedAsOracle"] = true;
+      },
+    },
+    {
+      file: "oracle-manifest.json",
+      category: "oracle",
+      detail: "acquisition and rule truth must use distinct documents",
+      mutate: (document) => {
+        const acquisitionDocument = array(document["acquisitionDocuments"], "acquisition documents")[0]!;
+        array(document["ruleDocuments"], "rule documents")[0]!["path"] = acquisitionDocument["path"];
+      },
+    },
+    {
       file: "invocation-manifest.json",
       category: "digest",
       detail: "commandDigest does not match its canonical projection",
@@ -182,6 +207,7 @@ test("public holdout checker rejects digest, path, command, metric, disclosure, 
 
 test("public holdout checker rejects admission drift and one-byte-over manifest input", async () => {
   const directory = await mkdtemp(join(tmpdir(), "sightlint-holdout-status-"));
+  const conformanceDirectory = await temporaryConformance();
   try {
     const driftedRecord = await json(currentRecord);
     object(driftedRecord["admission"], "record admission")["recordDigest"] = `sha256:${"0".repeat(64)}`;
@@ -207,7 +233,17 @@ test("public holdout checker rejects admission drift and one-byte-over manifest 
       oversized.stderr.toString("utf8"),
       "web-holdout-foundation: input-budget: current holdout record exceeds the 1048576-byte manifest limit\n",
     );
+
+    await writeFile(join(conformanceDirectory, "payloads/request-001.json"), Buffer.alloc(1_048_577, 32));
+    const oversizedPayload = await run(["--conformance-dir", conformanceDirectory]);
+    assert.equal(oversizedPayload.code, 2);
+    assert.equal(oversizedPayload.stdout.byteLength, 0);
+    assert.equal(
+      oversizedPayload.stderr.toString("utf8"),
+      "web-holdout-foundation: input-budget: bundle file exceeds the 1048576-byte file limit\n",
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
+    await rm(conformanceDirectory, { recursive: true, force: true });
   }
 });

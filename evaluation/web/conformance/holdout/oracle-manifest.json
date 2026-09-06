@@ -2,12 +2,12 @@
   "$schema": "urn:sightlint:schema:protected-holdout-oracle:1.0.0",
   "schemaVersion": "1.0.0",
   "documentType": "protectedHoldoutOracleManifest",
-  "manifestDigest": "sha256:117901b69db2412c93d6ec45da11c9878bcda87be9f6a4e73726dd32690808b2",
+  "manifestDigest": "sha256:29ca6f55050cd7381c9ae0d3596581da3d8eec9d4185119851980d905de9494c",
   "dataClassification": "publicConformanceOnly",
   "bundleBinding": {
     "id": "conformance-web-holdout",
     "version": "1.0.0",
-    "manifestDigest": "sha256:f829b82ff4ea1646b0e7c96227f1daf466ca8ac5385e698219737cc73a43f63f"
+    "manifestDigest": "sha256:f1c0bb8843a26e80000b407e2ca0aede983e3b7f5a184c0de6de1f14cde4f342"
   },
   "oracle": {
     "id": "conformance-web-oracle",
