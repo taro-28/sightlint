@@ -1,0 +1,172 @@
+{
+  "$schema": "./corpus.schema.json",
+  "schemaVersion": "0.1.0",
+  "corpus": "sightlint-github-actions-public-v0",
+  "provenance": {
+    "authoringBasis": "humanReviewedFixtureRuleAndProjectionContracts",
+    "implementationOutputUsedAsOracle": false,
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "redistribution": "Redistribution is permitted under MIT OR Apache-2.0.",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "externalProcessing": false,
+    "sourceIds": [
+      "atlas-dashboard-repository-fixture-v0",
+      "atlas-interaction-repository-fixture-v0"
+    ]
+  },
+  "splitPolicy": {
+    "visibility": "public",
+    "holdoutStatus": "notHoldout",
+    "leakageRisk": "All fixture code, defects, source locations, labels, and expected projections are public and visible to implementers, so this corpus measures deterministic regression only and cannot estimate generalization or real-world accuracy.",
+    "allowedSplits": ["development", "smoke"]
+  },
+  "metricContract": "evaluation/github-actions/metric-contract.json",
+  "projectionOracle": "evaluation/github-actions/annotations/projection.json",
+  "cases": [
+    {
+      "caseId": "atlas-dashboard-intentional-grouping-hard-negative",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "split": "smoke",
+      "classification": "hardNegative",
+      "input": "evaluation/web/inputs/dashboard-intentional-grouping.json",
+      "profile": "recommended",
+      "sourceMap": null,
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-dashboard-intentional-grouping-hard-negative"
+      },
+      "pairedCleanCase": null,
+      "falsePositiveRisk": "Annotating the adjacent promotion card as a third metric would turn intentional grouping into a false failure; the existing declared two-member relation is authoritative for this case.",
+      "nonClaim": "One fictional intentional grouping does not establish precision for arbitrary dashboard composition."
+    },
+    {
+      "caseId": "atlas-dashboard-peer-spacing-clean",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "split": "smoke",
+      "classification": "clean",
+      "input": "evaluation/web/inputs/dashboard-peer-spacing-clean.json",
+      "profile": "recommended",
+      "sourceMap": null,
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-dashboard-peer-spacing-clean"
+      },
+      "pairedCleanCase": null,
+      "falsePositiveRisk": "A projection bug could annotate a passed or inapplicable base result even though neither is actionable.",
+      "nonClaim": "A clean result for one reviewed relation is not whole-page or general UI/UX correctness."
+    },
+    {
+      "caseId": "atlas-dashboard-peer-spacing-mutant",
+      "sourceId": "atlas-dashboard-repository-fixture-v0",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "input": "evaluation/web/inputs/dashboard-peer-spacing-mutant.json",
+      "profile": "recommended",
+      "sourceMap": "evaluation/github-actions/source-maps/dashboard-peer-spacing-mutant.json",
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-dashboard-peer-spacing-mutant"
+      },
+      "pairedCleanCase": "atlas-dashboard-peer-spacing-clean",
+      "falsePositiveRisk": "The exact CSS block is valid only because the fixture contract declares that block as the targeted mutation; a DOM selector or source bundle alone would not prove this causality.",
+      "nonClaim": "Killing this public mutation does not establish spacing inference or representative UI accuracy."
+    },
+    {
+      "caseId": "atlas-settings-missing-pending-mutant",
+      "sourceId": "atlas-interaction-repository-fixture-v0",
+      "split": "development",
+      "classification": "targetedMutation",
+      "input": "fixtures/e2e/m6-fail-async-feedback.json",
+      "profile": "base",
+      "sourceMap": "evaluation/github-actions/source-maps/settings-missing-pending-mutant.json",
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-settings-missing-pending-mutant"
+      },
+      "pairedCleanCase": "atlas-settings-slow-success-clean",
+      "falsePositiveRisk": "Pending feedback outside the declared interaction state channel would be missed; this source annotation applies only to the reviewed fixture contract.",
+      "nonClaim": "An advisory warning does not prove arbitrary users failed to perceive feedback and must not block by default."
+    },
+    {
+      "caseId": "atlas-settings-native-declaration-conflict",
+      "sourceId": "atlas-interaction-repository-fixture-v0",
+      "split": "development",
+      "classification": "cantTell",
+      "input": "fixtures/e2e/m6-cant-tell-conflict.json",
+      "profile": "base",
+      "sourceMap": null,
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-settings-native-declaration-conflict"
+      },
+      "pairedCleanCase": null,
+      "falsePositiveRisk": "Selecting either app-declared state or native DOM state as secretly authoritative would erase conflict evidence and create a false pass or failure.",
+      "nonClaim": "Summary-only cantTell results identify unresolved evidence, not a UI defect."
+    },
+    {
+      "caseId": "atlas-settings-save-draft-hard-negative",
+      "sourceId": "atlas-interaction-repository-fixture-v0",
+      "split": "development",
+      "classification": "hardNegative",
+      "input": "fixtures/e2e/m6-pass-save-draft-hard-negative.json",
+      "profile": "base",
+      "sourceMap": null,
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-settings-save-draft-hard-negative"
+      },
+      "pairedCleanCase": null,
+      "falsePositiveRisk": "Requiring retry specifically would reject the declared valid save-draft recovery alternative.",
+      "nonClaim": "The controlled visible success does not prove durable storage or absence of duplicated server effects."
+    },
+    {
+      "caseId": "atlas-settings-slow-success-clean",
+      "sourceId": "atlas-interaction-repository-fixture-v0",
+      "split": "development",
+      "classification": "clean",
+      "input": "fixtures/e2e/m6-pass-async-feedback.json",
+      "profile": "base",
+      "sourceMap": null,
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-settings-slow-success-clean"
+      },
+      "pairedCleanCase": null,
+      "falsePositiveRisk": "A projector that treats an advisory pass or inapplicable recovery obligation as actionable would create noise.",
+      "nonClaim": "One controlled slow-success trace does not establish perceived feedback quality in arbitrary applications."
+    },
+    {
+      "caseId": "atlas-settings-trace-untested",
+      "sourceId": "atlas-interaction-repository-fixture-v0",
+      "split": "development",
+      "classification": "untested",
+      "input": "fixtures/e2e/m6-untested.json",
+      "profile": "base",
+      "sourceMap": null,
+      "ruleOracle": {
+        "document": "evaluation/github-actions/annotations/rules.json",
+        "collection": "cases",
+        "caseId": "atlas-settings-trace-untested"
+      },
+      "pairedCleanCase": null,
+      "falsePositiveRisk": "Coercing missing controlled execution to pass hides coverage; coercing it to failure claims an unobserved defect.",
+      "nonClaim": "Untested is a coverage state and supplies no evidence of pass or failure."
+    }
+  ],
+  "limitations": [
+    "The corpus contains two fictional repository-owned application families and no independent review.",
+    "All cases and labels are public smoke/development data and are not a protected holdout.",
+    "Stored Artifact IR projections do not rerun native/browser acquisition in this integration suite.",
+    "Exact source mappings cover only two reviewed targeted mutations.",
+    "The suite does not evaluate a GitHub App, REST publishing, screenshot upload, user response, or real-world UI/UX accuracy."
+  ]
+}

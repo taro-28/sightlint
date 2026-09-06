@@ -1,0 +1,30 @@
+{
+  "sourceMapSchemaVersion": "0.1.0",
+  "artifactId": "artifact-m6-fail-async-feedback",
+  "provenance": {
+    "authoringBasis": "declaredExactSource",
+    "implementationOutputUsedAsOracle": false,
+    "externalProcessing": false
+  },
+  "entries": [
+    {
+      "finding": {
+        "ruleId": "interaction.async-feedback",
+        "ruleVersion": "0.1.0",
+        "target": {
+          "kind": "artifact",
+          "id": "artifact-m6-fail-async-feedback",
+          "aspect": "interaction.action:save-settings"
+        }
+      },
+      "location": {
+        "attribution": "declaredExactSourceLine",
+        "path": "evaluation/interaction/fixture-app/app.js",
+        "startLine": 42,
+        "endLine": 44,
+        "anchorLine": 42,
+        "anchorText": "    } else if (scenario === \"missing-pending-mutant\") {"
+      }
+    }
+  ]
+}

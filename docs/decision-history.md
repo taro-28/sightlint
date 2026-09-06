@@ -483,7 +483,9 @@ Important historical detail:
 - ADR 0048 defines opt-in managed loopback Web capture, server lifecycle ownership, browser-side
   same-origin enforcement, digest/redaction rules, and unavailable source attribution;
 - ADR 0049 defines separate managed-loopback acquisition and rule evaluation authorities;
-- new ADRs should continue at 0050 or later rather than silently reusing historical numbers.
+- ADR 0050 defines the local, deterministic GitHub Actions projection, exact declared source-line
+  boundary, outcome-to-annotation mapping, and no-token/no-upload job-check integration;
+- new ADRs should continue at 0051 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -500,7 +502,8 @@ inside an unmerged branch and does not make them accepted repository decisions.
   the issue #28 protocol foundation;
 - representative/broader PPTX, PDF, Android, and iOS coverage after the bounded issue #29 slices;
 - broader interaction scenarios beyond the bounded issue #30 slice;
-- MCP/GitHub/editor/local UI and later package channels: issue #31;
+- MCP/editor/local UI, REST check publishing, and later package channels beyond the local GitHub
+  Actions projection: issue #31;
 - signing/attestation identity and any future registry or prebuilt-binary channel after the
   source-only ADR 0037 alpha.
 

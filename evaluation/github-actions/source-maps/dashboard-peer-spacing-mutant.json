@@ -1,0 +1,30 @@
+{
+  "sourceMapSchemaVersion": "0.1.0",
+  "artifactId": "web-dashboard-peer-spacing-mutant",
+  "provenance": {
+    "authoringBasis": "declaredExactSource",
+    "implementationOutputUsedAsOracle": false,
+    "externalProcessing": false
+  },
+  "entries": [
+    {
+      "finding": {
+        "ruleId": "visual.spacing.peer-consistency",
+        "ruleVersion": "0.1.0",
+        "target": {
+          "kind": "relation",
+          "id": "relation-metrics",
+          "aspect": "horizontal:renderBox"
+        }
+      },
+      "location": {
+        "attribution": "declaredExactSourceLine",
+        "path": "evaluation/web/fixture-app/styles.css",
+        "startLine": 233,
+        "endLine": 235,
+        "anchorLine": 233,
+        "anchorText": "body[data-case=\"peer-spacing-mutant\"] .metric-card-third {"
+      }
+    }
+  ]
+}

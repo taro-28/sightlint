@@ -1,0 +1,234 @@
+{
+  "$defs": {
+    "FindingIdentity": {
+      "additionalProperties": false,
+      "description": "Stable identity of a rule result, excluding its outcome and enforcement.",
+      "properties": {
+        "ruleId": {
+          "description": "Stable rule identifier.",
+          "type": "string"
+        },
+        "ruleVersion": {
+          "description": "Semantic rule version.",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/Target",
+          "description": "Exact target and optional aspect evaluated by the rule."
+        }
+      },
+      "required": [
+        "ruleId",
+        "ruleVersion",
+        "target"
+      ],
+      "type": "object"
+    },
+    "Identifier": {
+      "description": "A stable identifier within one artifact document.",
+      "type": "string"
+    },
+    "SourceAttribution": {
+      "description": "Source attribution grade supported by the first GitHub Actions contract.",
+      "oneOf": [
+        {
+          "const": "declaredExactSourceLine",
+          "description": "A reviewed repository path and line range with a stable exact line anchor.",
+          "type": "string"
+        }
+      ]
+    },
+    "SourceLocation": {
+      "additionalProperties": false,
+      "description": "Exact repository source range used for a GitHub annotation.",
+      "properties": {
+        "anchorLine": {
+          "description": "One-based line inside the annotated range used to detect location drift.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "anchorText": {
+          "description": "Exact UTF-8 text expected at `anchorLine`, excluding its line terminator.",
+          "type": "string"
+        },
+        "attribution": {
+          "$ref": "#/$defs/SourceAttribution",
+          "description": "Attribution grade; version `0.1.0` accepts only declared exact source lines."
+        },
+        "endLine": {
+          "description": "One-based final annotated line, inclusive.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "description": "Repository-relative path using `/` separators.",
+          "type": "string"
+        },
+        "startLine": {
+          "description": "One-based first annotated line.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "attribution",
+        "path",
+        "startLine",
+        "endLine",
+        "anchorLine",
+        "anchorText"
+      ],
+      "type": "object"
+    },
+    "SourceMapAuthoringBasis": {
+      "description": "How exact source locations were authored.",
+      "oneOf": [
+        {
+          "const": "declaredExactSource",
+          "description": "A repository owner declared and reviewed the source relation independently of rule output.",
+          "type": "string"
+        }
+      ]
+    },
+    "SourceMapEntry": {
+      "additionalProperties": false,
+      "description": "One independently declared rule-result-to-source relation.",
+      "properties": {
+        "finding": {
+          "$ref": "#/$defs/FindingIdentity",
+          "description": "Result identity to which the source range applies."
+        },
+        "location": {
+          "$ref": "#/$defs/SourceLocation",
+          "description": "Independently declared exact source location."
+        }
+      },
+      "required": [
+        "finding",
+        "location"
+      ],
+      "type": "object"
+    },
+    "SourceMapProvenance": {
+      "additionalProperties": false,
+      "description": "Provenance and trust boundary of one source-location declaration.",
+      "properties": {
+        "authoringBasis": {
+          "$ref": "#/$defs/SourceMapAuthoringBasis",
+          "description": "Authority used to establish the source relation."
+        },
+        "externalProcessing": {
+          "description": "Whether artifact or source content was sent to an external processor while authoring.",
+          "type": "boolean"
+        },
+        "implementationOutputUsedAsOracle": {
+          "description": "Must remain false: current implementation output is not an annotation oracle.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "authoringBasis",
+        "implementationOutputUsedAsOracle",
+        "externalProcessing"
+      ],
+      "type": "object"
+    },
+    "SourceMapSchemaVersion": {
+      "description": "Serialized source-map version discriminator.",
+      "oneOf": [
+        {
+          "const": "0.1.0",
+          "description": "Source map contract `0.1.0`.",
+          "type": "string"
+        }
+      ]
+    },
+    "Target": {
+      "additionalProperties": false,
+      "description": "Stable reference to one evaluated target.",
+      "properties": {
+        "aspect": {
+          "description": "Optional aspect such as `renderBox` or a node pair.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/Identifier",
+          "description": "Stable target identifier."
+        },
+        "kind": {
+          "$ref": "#/$defs/TargetKind",
+          "description": "Target category."
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "type": "object"
+    },
+    "TargetKind": {
+      "description": "Stable kind of target evaluated by a rule.",
+      "oneOf": [
+        {
+          "const": "artifact",
+          "description": "Whole artifact.",
+          "type": "string"
+        },
+        {
+          "const": "canvas",
+          "description": "Canvas, page, screen, or viewport.",
+          "type": "string"
+        },
+        {
+          "const": "node",
+          "description": "Visual or semantic node.",
+          "type": "string"
+        },
+        {
+          "const": "relation",
+          "description": "Explicit source or inferred relation.",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$id": "urn:sightlint:schema:github-source-map:0.1.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Strict, artifact-specific source-location declaration.",
+  "properties": {
+    "artifactId": {
+      "$ref": "#/$defs/Identifier",
+      "description": "Artifact identifier that must match the trusted report."
+    },
+    "entries": {
+      "description": "Sorted, semantically unique source relations.",
+      "items": {
+        "$ref": "#/$defs/SourceMapEntry"
+      },
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/SourceMapProvenance",
+      "description": "Authority, oracle, and processing provenance."
+    },
+    "sourceMapSchemaVersion": {
+      "$ref": "#/$defs/SourceMapSchemaVersion",
+      "description": "Source-map schema version."
+    }
+  },
+  "required": [
+    "sourceMapSchemaVersion",
+    "artifactId",
+    "provenance",
+    "entries"
+  ],
+  "title": "SightLint GitHub source map 0.1.0",
+  "type": "object"
+}

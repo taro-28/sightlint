@@ -114,6 +114,8 @@ enum SchemaKind {
     ArtifactIr,
     Visual,
     Interaction,
+    GithubSourceMap,
+    GithubActionsReport,
 }
 
 fn main() -> ExitCode {
@@ -143,6 +145,12 @@ fn run(cli: Cli) -> ExitCode {
                 SchemaKind::ArtifactIr => sightlint_ir::artifact_ir_schema_json(),
                 SchemaKind::Visual => sightlint_ir::visual_extension_schema_json(),
                 SchemaKind::Interaction => sightlint_ir::interaction_extension_schema_json(),
+                SchemaKind::GithubSourceMap => {
+                    sightlint_github_actions::github_source_map_schema_json()
+                }
+                SchemaKind::GithubActionsReport => {
+                    sightlint_github_actions::github_actions_report_schema_json()
+                }
             };
             match schema {
                 Ok(schema) => write_success(&schema),
@@ -159,6 +167,11 @@ fn run(cli: Cli) -> ExitCode {
                 sightlint_engine::supported_interaction_extension_version(),
                 sightlint_engine::REPORT_SCHEMA_VERSION,
                 env!("CARGO_PKG_VERSION")
+            );
+            let output = format!(
+                "{output}GitHub source map {}\nGitHub Actions report {}\n",
+                sightlint_github_actions::GITHUB_SOURCE_MAP_SCHEMA_VERSION,
+                sightlint_github_actions::GITHUB_ACTIONS_REPORT_SCHEMA_VERSION
             );
             write_success(&output)
         }

@@ -283,6 +283,7 @@ dependencies = [
  "serde_json",
  "sightlint-adapter-png",
  "sightlint-engine",
+ "sightlint-github-actions",
  "sightlint-ir",
 ]
 
@@ -293,6 +294,17 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "sightlint-ir",
+]
+
+[[package]]
+name = "sightlint-github-actions"
+version = "0.1.0-alpha.2"
+dependencies = [
+ "schemars",
+ "serde",
+ "serde_json",
+ "sightlint-engine",
  "sightlint-ir",
 ]
 
