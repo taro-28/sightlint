@@ -88,7 +88,7 @@
         "allowedPlaceholders": {
           "type": "array",
           "minItems": 1,
-          "maxItems": 16,
+          "maxItems": 4,
           "uniqueItems": true,
           "items": { "enum": ["{request}", "{repositoryRoot}", "{artifactIr}", "{screenshot}"] }
         },

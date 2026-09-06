@@ -230,6 +230,19 @@ test("public holdout checker rejects admission drift and one-byte-over manifest 
       "web-holdout-foundation: binding: current holdout record does not match holdout admission\n",
     );
 
+    const currentBytes = await readFile(currentRecord);
+    const exactBoundaryPath = join(directory, "exact-boundary.json");
+    await writeFile(
+      exactBoundaryPath,
+      Buffer.concat([currentBytes, Buffer.alloc(1_048_576 - currentBytes.byteLength, 32)]),
+    );
+    const exactBoundary = await run(["--record", exactBoundaryPath, "--admission", admission]);
+    assert.equal(exactBoundary.code, 0, exactBoundary.stderr.toString("utf8"));
+    assert.equal(
+      exactBoundary.stdout.toString("utf8"),
+      "web holdout foundation: lifecycle=notRun, admission=notOperational, evidence_eligible=false\n",
+    );
+
     const oversizedPath = join(directory, "oversized.json");
     await writeFile(oversizedPath, Buffer.alloc(1_048_577, 32));
     const oversized = await run(["--record", oversizedPath, "--admission", admission]);

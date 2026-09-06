@@ -73,8 +73,9 @@ Paths in private manifests are normalized relative POSIX paths with no empty, do
 drive, URL, or backslash forms. Public attestations contain no artifact paths or URLs.
 
 The first version bounds each input file to 1 MiB, families to 128, cases to 4,096, files per case
-to 64, aggregate metric cells to 512, command arguments to 128, environment entries to 128, and
-individual printable strings to 512 bytes unless a smaller schema limit applies. The verifier
+to 64, aggregate metric cells to 512, command arguments and rule bindings to 128, and individual
+printable strings to 512 bytes unless a smaller schema limit applies. Environment fields use a
+closed schema rather than an arbitrary entry map. The verifier
 rejects the exact one-over boundary before retaining partial output.
 
 ## Authority and separation
