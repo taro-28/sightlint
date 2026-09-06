@@ -355,9 +355,9 @@ Guardrails:
 
 ## Image-only structure
 
-The long-term image path may combine:
+The image path now starts with exact encoded source-alpha geometry under ADR 0040. Longer-term
+structure acquisition may combine it with:
 
-- exact alpha geometry;
 - deterministic region/edge/color primitives;
 - OCR;
 - component detectors;

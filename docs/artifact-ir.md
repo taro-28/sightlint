@@ -268,6 +268,11 @@ CheckReport. Its exact-color candidates and connected regions remain evaluation-
 observations with `cantTell` semantic applicability and `untested` rule outcome; they do not create
 nodes, relations, findings, or blocking policy in the medium-neutral core.
 
+ADR 0040 uses the existing medium-neutral `inkBox` for exact PNG source-alpha bounds. Its
+dedicated evidence and `alphaGeometry@0.1.0` extension preserve the predicate, coordinate space,
+unit, counts, and source/display boundary. It does not add a PNG-specific mandatory core field or
+turn the observation into a rule verdict.
+
 For an IR or official-extension change:
 
 - write an ADR when architecture/semantics change;
@@ -279,5 +284,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0040 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0041 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

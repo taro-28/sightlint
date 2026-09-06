@@ -75,7 +75,7 @@ explicit replacement links:
 
 - #12: duplicate filter work already integrated through #10/#18;
 - #13: optional broader PNG normalization preserved in issue #27;
-- #14: alpha-visible geometry preserved in issue #26;
+- #14: alpha-visible geometry superseded by the clean ADR 0040 / issue #26 implementation;
 - #15 and #17: background/segmentation alternatives preserved in issue #25;
 - #16: evaluation intent superseded by current corpora and realistic-data gate #22.
 

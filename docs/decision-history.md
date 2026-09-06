@@ -238,8 +238,9 @@ Issue #27 captures optional format expansion and the decoder strategy decision.
 ### Alpha-visible geometry
 
 Alpha provides exact visible-source bounds for transparent assets but does not identify whitespace
-inside opaque screenshots. The old implementation branch was not integrated; issue #26 preserves
-the valid scope for a clean reimplementation.
+inside opaque screenshots. The old implementation branch was not integrated. ADR 0040 implements
+the bounded observation from current `main`: exact encoded-alpha geometry and evidence, without
+compositing, semantic padding judgment, or a rule.
 
 ### Background candidates and components
 
@@ -397,7 +398,7 @@ the PR template:
 | #11 | staged common RGBA raster experiment merged into the then-current line; later recovered/current path is defined by #18/#20 |
 | #12 | superseded duplicate filter branch, closed |
 | #13 | superseded broad PNG normalization, remaining idea in #27 |
-| #14 | superseded alpha geometry branch, remaining idea in #26 |
+| #14 | superseded alpha geometry branch; current implementation is ADR 0040 / #26 |
 | #15 | superseded background candidate branch, research in #25 |
 | #16 | superseded image corpus branch, real evaluation in #22 |
 | #17 | superseded component branch, current slice #21 and research #25 |
@@ -433,7 +434,9 @@ Important historical detail:
   alpha.1 workflow-transport failure;
 - ADR 0039 compares broader exact-color segmentation hypotheses without replacing the strict
   default after the realistic corpus exposes unsafe selection and false grouping;
-- new ADRs should continue at 0040 or later rather than silently reusing historical numbers.
+- ADR 0040 defines exact source-alpha geometry, its PNG extension/evidence contract, and the
+  separate acquisition-versus-rule evaluation boundary;
+- new ADRs should continue at 0041 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -443,7 +446,6 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - representative corpus expansion and protected holdout operation beyond the public #22 slice;
 - arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
-- alpha geometry implementation details on current raster: issue #26;
 - custom versus library decoding for broader formats: issue #27;
 - perception-worker protocol/calibration: issue #28;
 - adapter ordering after web: issue #29;

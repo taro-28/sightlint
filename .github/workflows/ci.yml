@@ -46,6 +46,11 @@ jobs:
       - name: Verify committed PNG pixel corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_raster_corpus.py --check
+      - name: Verify committed source-alpha assets and evaluation contract
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: |
+          python3 tools/generate_alpha_assets.py --check
+          python3 tools/check_alpha_evaluation.py
       - name: Verify committed image inspection corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/generate_inspection_corpus.py --check
@@ -76,6 +81,9 @@ jobs:
       - name: Run PNG pixel-oracle corpus explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+      - name: Run realistic source-alpha evaluation explicitly
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
       - name: Run native image inspection E2E explicitly
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture

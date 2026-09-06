@@ -51,7 +51,7 @@ Issue #34's bounded execution sequence is complete:
 5. #33 — license, packaging, compatibility, and alpha release (complete).
 
 Issue #25 is complete as an evaluation-only benchmark and did not admit a broader default. The
-earliest remaining implementation gate is #26. Other work remains available in #27–#31, but
+earliest remaining implementation gate is #27. Other work remains available in #28–#31, but
 historical branch code does not change priority. Explain any deviation in the issue and PR.
 
 ## Planning before implementation
@@ -119,7 +119,9 @@ The complete current gate is:
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
+python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
+python3 tools/check_alpha_evaluation.py
 python3 tools/check_web_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
@@ -135,6 +137,7 @@ cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
@@ -264,7 +267,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0040 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0041 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

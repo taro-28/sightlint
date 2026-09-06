@@ -159,7 +159,9 @@ jobs:
         run: |
           python3 tools/generate_e2e_fixtures.py --check
           python3 tools/generate_raster_corpus.py --check
+          python3 tools/generate_alpha_assets.py --check
           python3 tools/generate_inspection_corpus.py --check
+          python3 tools/check_alpha_evaluation.py
           python3 tools/check_web_evaluation.py
           python3 tools/check_dependency_licenses.py
           python3 -m unittest tools/test_release.py

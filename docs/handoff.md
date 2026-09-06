@@ -11,13 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #25 started from this verified green `main` baseline:
+The branch for issue #26 started from this verified green `main` baseline:
 
-- commit: `8a358b753648fd72db84097b66496bbeeb9923ba`
-- tree: `d100f164083b04050c4259daccf8ebceb3e6e296`
-- merged PR: #48
-- main CI: run 34000753514, all six jobs successful
-- main CodeQL: run 34000753417, Rust and JavaScript/TypeScript successful
+- commit: `a23fc2fe663e52f61d179d90e2f319f37c92ba06`
+- tree: `c076f28989385c5db29c4a40383f5aee3481081a`
+- merged PR: #49
+- main CI: run 34003163077, all six jobs successful
+- main CodeQL: run 34003162804, Rust and JavaScript/TypeScript successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -48,7 +48,7 @@ Do not reopen or merge them:
 |---|---|---|
 | #12 | alternative PNG filter reconstruction | already implemented and verified through #10/#18; no remaining task |
 | #13 | full PNG sample/palette/`tRNS` normalization | optional remaining scope is issue #27 |
-| #14 | exact alpha-visible geometry | reimplement from current main under issue #26 |
+| #14 | exact alpha-visible geometry | superseded; current implementation is ADR 0040 / issue #26 |
 | #15 | ranked opaque border/background candidates | research candidate under issue #25 |
 | #16 | layered image evaluation corpus | replaced by current corpora; real-data work is issue #22 |
 | #17 | scalable background-relative components | current slice is #21; alternative algorithm is issue #25 |
@@ -129,7 +129,7 @@ The Rust workspace contains:
   canonicalization;
 - `sightlint-engine`: deterministic geometry queries, atomic rules, result/report construction;
 - `sightlint-adapter-png`: bounded PNG parsing, raster acquisition, advisory image inspection, and
-  an evaluation-only segmentation comparison;
+  exact source-alpha geometry plus an evaluation-only segmentation comparison;
 - `sightlint-cli`: public command surface and exit-code behavior.
 
 The trusted kernel can consume structured Artifact IR and emit deterministic, evidence-linked
@@ -173,6 +173,7 @@ PNG signature and IHDR validation
   -> all five scanline-filter reconstructions
   -> non-interlaced or Adam7 pass handling
   -> staged row-major PNG-encoded RGBA8 for supported inputs
+  -> exact encoded source-alpha geometry for supported rasters
 ```
 
 The supported raster subset is eight-bit grayscale, RGB, grayscale-alpha, and RGBA without
@@ -183,6 +184,14 @@ bounded metadata, evidence, and a regression checksum rather than the raw raster
 The samples are PNG-encoded channel values, not color-managed display values. No gamma/ICC/
 chromaticity transformation or alpha compositing is applied. They are insufficient by themselves
 for a trusted contrast/colorimetric verdict.
+
+ADR 0040 versions the PNG extension as `0.2.0` and adds `alphaGeometry@0.1.0`. One bounded pass
+records half-open visible (`alpha > 0`) and opaque (`alpha == 255`) bounds, exact alpha-class
+counts, transparent insets, and visible edge occupancy. A dedicated exact-source evidence item
+links nonempty visible bounds to the image node's device-pixel `inkBox`; entirely transparent
+images omit the box, and unsupported rasters repeat their explicit unavailable reason without
+alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blocking result is
+implemented.
 
 ### Advisory image inspection
 
@@ -367,9 +376,12 @@ SightLint treats tests as part of the product specification.
 
 ### Image fixtures
 
-- 38-case PNG raster corpus with exact input bytes and independent expected pixels,
+- 43-case PNG raster corpus with exact input bytes and independent expected pixels/alpha geometry,
   explicit unavailable cases, malformed inputs, filters, Adam7, alpha values, and a future
   semantic spacing pair;
+- five-case repository-owned source-alpha evaluation with separate acquisition/rule annotations,
+  one targeted mutation, hidden-RGB metamorphism, two hard negatives, public splits, and explicit
+  provenance/license/privacy/abstention/non-holdout declarations;
 - 30-case image-inspection corpus with independently declared region/gap oracles,
   19 observed cases, nine explicit unavailable cases, and two malformed inputs;
 - nine-case realistic segmentation benchmark with separate acquisition/rule oracles, three named
@@ -485,7 +497,7 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 
 - **#25 (complete):** compared strict/current background policy with ranked-border and
   95%-qualified row-run candidates; neither broader policy was admitted.
-- **#26:** exact alpha-visible geometry for transparent assets.
+- **#26 (complete):** exact source-alpha geometry for transparent assets; no rule admitted.
 - **#27:** optional PNG palette/sub-byte/16-bit/`tRNS` support, only if product evidence justifies
   more codec maintenance and after an explicit library-versus-custom decision.
 - **#28:** isolated OCR/CV/VLM perception-worker protocol and calibration.
@@ -493,7 +505,7 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The earliest remaining implementation gate is #26. Later issues remain demand- and evidence-gated;
+The earliest remaining implementation gate is #27. Later issues remain demand- and evidence-gated;
 the completed alpha and benchmark do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
@@ -573,7 +585,9 @@ At minimum, from repository root:
 ```bash
 python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
+python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
+python3 tools/check_alpha_evaluation.py
 python3 tools/check_web_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
@@ -589,6 +603,7 @@ cargo test --locked --workspace --all-features
 cargo test --locked -p sightlint-cli --test e2e
 cargo test --locked -p sightlint-cli --test png_filter_e2e
 cargo test --locked -p sightlint-cli --test png_raster_corpus -- --nocapture
+cargo test --locked -p sightlint-cli --test alpha_geometry_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_inspection_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test image_segmentation_benchmark_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test evaluation_corpus
@@ -667,7 +682,8 @@ A local Codex session is continuing SightLint correctly when it can explain, bef
 - why native structure and pixels are reconciled rather than one replacing the other;
 - why uncertainty is a result rather than an error to hide;
 - why issue #25 retained the strict baseline after broader background hypotheses failed realistic
-  hard-negative and false-grouping evidence, and why issue #26 is next;
+  hard-negative and false-grouping evidence, why source-alpha geometry does not establish a UX
+  defect, and why issue #27 is next;
 - why stale Draft branches are not a shortcut;
 - which exact E2E proves the public claim;
 - what remains unimplemented and what the PR must not claim.

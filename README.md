@@ -43,8 +43,9 @@ The bounded first-alpha execution epic,
 5. [#33](https://github.com/taro-28/sightlint/issues/33) — license, compatibility, packaging, and
    first alpha release (complete).
 
-The #25 benchmark is complete without changing the strict image-inspection default. The earliest
-remaining implementation gate is [#26](https://github.com/taro-28/sightlint/issues/26).
+The #25 benchmark is complete without changing the strict image-inspection default. Issue #26 adds
+exact source-alpha geometry without introducing a padding rule. The earliest remaining
+implementation gate is [#27](https://github.com/taro-28/sightlint/issues/27).
 
 ## Why
 
@@ -179,6 +180,13 @@ The bytes are unassociated PNG-encoded samples, not display-corrected sRGB or li
 No gamma/ICC/chromaticity transform or alpha compositing is applied, so these values alone cannot
 support a trusted colorimetric or contrast verdict. Raw pixels remain inside the adapter API;
 serialized IR contains bounded metadata, checksum, and provenance.
+
+For supported rasters, `alphaGeometry@0.1.0` makes one deterministic source-sample pass and records
+half-open bounds for `alpha > 0` and `alpha == 255`, exact alpha-class counts, transparent insets,
+and visible edge occupancy. A dedicated exact-source evidence item links nonempty visible bounds
+to the image node's device-pixel `inkBox`; entirely transparent images omit that box. These facts
+do not establish composited display visibility, semantic whitespace, clipping, alignment intent,
+or a UI/UX defect, and no alpha-based rule or blocking result exists.
 
 ### Advisory image-region inspection
 
@@ -374,7 +382,7 @@ Read:
 | #23 | Playwright web adapter and reconciliation |
 | #24 | zero-setup recommended rule packs |
 | #25 | completed background/segmentation benchmark research; no production admission |
-| #26 | exact alpha-visible transparent-asset geometry |
+| #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | optional broader PNG coverage and decoder strategy |
 | #28 | isolated OCR/CV/VLM worker protocol |
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
@@ -384,7 +392,7 @@ Read:
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0040 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0041 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.
