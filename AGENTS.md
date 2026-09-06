@@ -202,7 +202,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0051 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0052 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -234,6 +234,7 @@ python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
+python3 tools/check_web_evaluation_v1.py
 python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py

@@ -289,6 +289,15 @@ contract coverage, failure precision, reviewed abstention, mutation kill rate, a
 failures. Broader representative Web applications and future OCR/CV/VLM outputs still require
 comparison with independent reviewed annotations.
 
+ADR 0051 adds an additive two-family registry without changing that historical corpus. Its Harbor
+support-inbox family keeps acquisition truth and rule truth in separate documents and exercises a
+clean state, a name-only mutation, a visually identical valid-name hard negative, and an ambiguous
+focusable surface through the Playwright process and built binary. The governance check recomputes
+fixture-source digests and rejects mixed oracle authority, unsupported independent-review claims,
+or an operational holdout missing its freeze, access, leakage, evaluator, execution, correction,
+and reporting controls. Both families remain public, maintainer-authored development evidence;
+the committed holdout record is deliberately `notOperational`.
+
 ADR 0048 adds a separate managed-loopback suite rather than rewriting that 23-case oracle. ADR
 0049 gives its three clean/mutation/hard-negative cases independent strict acquisition and rule
 oracles. They execute a repository-owned Node server, redirect and same-origin API through
@@ -352,6 +361,11 @@ canonical and human byte stability, exact node-to-native-locator joining, a huma
 an isolated fixture copy, named-finding removal, no new failure, and retained ambiguous/dialog
 `cantTell` controls. Because the edit and oracle are visible, it does not estimate autonomous
 agent selection or real-world success.
+
+ADR 0051 adds family- and split-scoped counts for the second Web family: selected acquisition
+coverage, reviewed rule coverage and abstention, failure precision, false positives, mutation kill,
+and hard-negative failures. These public counts must not be combined into a universal quality
+score or reported as representative, independently reviewed, or protected-holdout accuracy.
 
 ADR 0050 adds a downstream GitHub Actions integration corpus without redefining rule truth. Eight
 public Atlas dashboard/settings cases join the existing independently reviewed rule expectations

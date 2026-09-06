@@ -37,9 +37,16 @@ control mutation, and the intentional-overlay hard negative through a real start
 redirect, same-origin API request, `sightlint-web-check`, and built Rust binary. This adds lifecycle
 and public-path evidence; it does not increase the diversity of the Web accuracy corpus.
 
-This corpus is realistic in structure, not representative in sampling. It contains one application
-family, one language, one theme, and a small set of explicitly reviewed rule paths. It does not
-establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
+ADR 0051 and issue #72 add the additive `evaluation-v1.json` registry and a second repository-owned
+Harbor support-inbox family. Four cases preserve a clean named send action, a name-only targeted
+mutation, an `aria-labelledby` hard negative with identical rendered pixels, and a focusable
+generic surface that must remain `cantTell`. They execute synchronized native structure,
+screenshot/viewport evidence, and the built Rust binary through the existing process boundary.
+
+The registry is realistic in structure, not representative in sampling. It contains two fictional
+English-language application families, maintainer-only review, visible labels, and a small set of
+explicit rule paths. It does not establish real-world UI/UX accuracy, independent-review
+agreement, WCAG conformance, blocking maturity, or protected-holdout performance.
 
 ## Files and authority
 
@@ -65,6 +72,14 @@ establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
   rule verdicts, false-positive risks, non-claims, and metric definitions for the same case IDs.
 - `managed-loopback.schema.json`: retained strict schema for the superseded combined `0.1.0`
   annotation shape; it is not the current oracle authority.
+- `evaluation-v1.schema.json` and `evaluation-v1.json`: the additive multi-family registry,
+  exposure/review contract, oracle joins, split inventory, metrics, and non-claims.
+- `holdout-admission.schema.json` and `holdout-admission.json`: machine-checkable admission
+  controls for a separately governed protected bundle. Current status is `notOperational`.
+- `annotation-guide-v1.md`: family, review, oracle, leakage, holdout, and reporting guidance.
+- `support-inbox-app/`, `annotations/support-inbox-acquisition.json`, and
+  `annotations/support-inbox-rules.json`: the second realistic family and its separate public
+  acquisition/rule truth.
 - `requests/`: versioned deterministic capture requests for the Playwright adapter.
 - `managed-requests/`: protocol `0.2.0` requests for the repository-owned Node server fixture.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
@@ -101,15 +116,17 @@ rule oracle.
 
 ## Data governance
 
-- All visible names and values are fictional.
-- The fixture makes no network requests and contains no third-party images, fonts, brands, or code.
+- All visible names and values in both families are fictional.
+- The fixtures make no network requests and contain no third-party images, fonts, brands, or code.
 - No customer data, credentials, personal data, or private screenshots are allowed.
 - `externalProcessing` remains false.
 - Repository-authored fixture source and annotations are redistributed under `MIT OR Apache-2.0`.
 - Public smoke, development, and challenge cases are visible to implementers and are not holdout.
 
 Before holdout data is used, document its freeze commit, access policy, evaluator, leakage controls,
-and oracle-correction process. Public CI must not require private raw artifacts.
+and oracle-correction process under `holdout-admission.schema.json`. Public CI must not require
+private raw artifacts. The current `notOperational` record is an admission contract, not holdout
+evidence.
 
 ## Evaluation command
 
@@ -136,6 +153,13 @@ mutations killed, 6/6 matched emitted failures, zero unexpected failures, and ze
 failures. Each recommended rule records 5/5 contracted outcome-category entries, 1/1 matched
 failure, 2/2 reviewed abstentions, 1/1 killed mutation, and zero hard-negative failures. Those
 small public-fixture counts are not a quality score or a real-world accuracy estimate.
+
+The issue #72 companion reports 4/4 second-family cases, 4/4 selected acquisition expectations,
+9/9 reviewed rule results, 6/6 reviewed abstention results, 1/1 matched failure, zero false-positive
+or hard-negative failures, and a 1/1 mutation kill. Every capture response, Artifact IR,
+screenshot, report, diagnostic stream, and exit code is repeated byte-for-byte within the declared
+environment. The mutation and `aria-labelledby` hard negative have the same PNG bytes as clean.
+These are public maintainer-authored regression counts, not representative or holdout metrics.
 
 The agent-workflow E2E additionally reports 1/1 initial named finding, 1/1 source-target join, 1/1
 reviewed fix verified, zero new failures, 2/2 repeated JSON and human byte checks, and 2/2 reviewed

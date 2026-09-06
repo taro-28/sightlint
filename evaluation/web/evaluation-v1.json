@@ -1,0 +1,221 @@
+{
+  "$schema": "./evaluation-v1.schema.json",
+  "schemaVersion": "1.0.0",
+  "registry": {
+    "id": "sightlint-web-multi-family-evaluation",
+    "version": "1.0.0",
+    "purpose": "Index independently versioned Web acquisition and rule datasets by realistic fixture family without combining their authorities.",
+    "limitations": [
+      "Two fictional repository-owned families do not represent the diversity of real Web products, frameworks, locales, tasks, or users.",
+      "Public cases and labels are visible to implementation authors and are not protected holdout evidence.",
+      "Current review is maintainer-only for both families and does not measure independent reviewer agreement.",
+      "The registry does not establish representative sampling, WCAG conformance, blocking maturity, or general Web UI and UX accuracy."
+    ]
+  },
+  "annotationGuide": {
+    "version": "1.0.0",
+    "path": "evaluation/web/annotation-guide-v1.md"
+  },
+  "families": [
+    {
+      "id": "atlas-dashboard-settings-v1",
+      "version": "1.0.0",
+      "name": "Atlas dashboard and settings",
+      "productContext": "A fictional account dashboard and settings application with metrics, notifications, controls, and responsive states.",
+      "reviewedTasks": [
+        "Review account metrics and notices.",
+        "Operate named settings controls in static captured states."
+      ],
+      "sourceRoot": "evaluation/web/fixture-app",
+      "sourceFiles": [
+        "evaluation/web/fixture-app/app.js",
+        "evaluation/web/fixture-app/index.html",
+        "evaluation/web/fixture-app/styles.css"
+      ],
+      "sourceDigest": "sha256:43b5f30f03b5942ea593971a7357f83041c2fad455e56caf9e0f70b1d8e52d58",
+      "sourceRevisionBasis": "Exact source files and source digest recorded by the existing browser acquisition oracle and capture response.",
+      "governance": {
+        "kind": "repositoryOwnedFixture",
+        "ownership": "sightlintRepository",
+        "license": "MIT OR Apache-2.0",
+        "redistribution": "Redistribution is permitted under MIT OR Apache-2.0.",
+        "privacyReview": "syntheticNoPersonalData",
+        "personalOrCustomerData": false,
+        "externalAssets": false,
+        "externalNetwork": false,
+        "externalProcessing": false
+      },
+      "exposure": {
+        "classification": "publicDevelopmentData",
+        "tuningVisible": true,
+        "implementationOutputUsedAsOracle": false
+      },
+      "review": {
+        "status": "maintainerOnly",
+        "reviewers": [
+          {
+            "id": "repository-maintainer-product-review",
+            "role": "annotationAuthor",
+            "qualification": "Repository maintainer product and fixture review.",
+            "independentFromAnnotationAuthor": false
+          }
+        ],
+        "agreement": "notMeasured",
+        "adjudication": "notPerformed",
+        "rationale": "The public Atlas annotations were authored and reviewed within the repository project; no independent human annotation pass has occurred."
+      },
+      "samplingLimitations": [
+        "One fictional English-language product family cannot represent framework, locale, visual-system, or task diversity.",
+        "The cases are intentionally selected regression states rather than a probability sample of real applications."
+      ]
+    },
+    {
+      "id": "harbor-support-inbox-v1",
+      "version": "1.0.0",
+      "name": "Harbor support inbox",
+      "productContext": "A fictional customer-support workspace with queue navigation, conversation detail, customer context, and a reply composer.",
+      "reviewedTasks": [
+        "Review a selected customer conversation and its account context.",
+        "Compose and send a reply using the selected native action."
+      ],
+      "sourceRoot": "evaluation/web/support-inbox-app",
+      "sourceFiles": [
+        "evaluation/web/support-inbox-app/app.js",
+        "evaluation/web/support-inbox-app/index.html",
+        "evaluation/web/support-inbox-app/styles.css"
+      ],
+      "sourceDigest": "sha256:11cf4e9551ce42797cdad99d1271211b8163be6de1bcb69e9834dabc10f60373",
+      "sourceRevisionBasis": "Exact repository source files are digest-bound in every capture response; case annotations describe authored state independently from captured output.",
+      "governance": {
+        "kind": "repositoryOwnedFixture",
+        "ownership": "sightlintRepository",
+        "license": "MIT OR Apache-2.0",
+        "redistribution": "Redistribution is permitted under MIT OR Apache-2.0.",
+        "privacyReview": "syntheticNoPersonalData",
+        "personalOrCustomerData": false,
+        "externalAssets": false,
+        "externalNetwork": false,
+        "externalProcessing": false
+      },
+      "exposure": {
+        "classification": "publicDevelopmentData",
+        "tuningVisible": true,
+        "implementationOutputUsedAsOracle": false
+      },
+      "review": {
+        "status": "maintainerOnly",
+        "reviewers": [
+          {
+            "id": "repository-maintainer-product-review",
+            "role": "annotationAuthor",
+            "qualification": "Repository maintainer product and fixture review.",
+            "independentFromAnnotationAuthor": false
+          }
+        ],
+        "agreement": "notMeasured",
+        "adjudication": "notPerformed",
+        "rationale": "The support-inbox source and labels are maintainer-authored public data; no independent human annotation pass has occurred."
+      },
+      "samplingLimitations": [
+        "The first slice covers one English desktop state and one selected programmatic-name obligation.",
+        "The support workflow is static and does not evaluate sending, loading, failure, recovery, focus navigation, or mobile interaction."
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "id": "atlas-browser-evaluation-v0",
+      "version": "1.0.0",
+      "familyId": "atlas-dashboard-settings-v1",
+      "commandSurface": "sightlint-web capture followed by sightlint check --profile recommended --format json",
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/browser-acquisition.json",
+        "schema": "evaluation/web/browser-acquisition.schema.json",
+        "documentType": "browserAcquisitionOracle"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/browser-rules.json",
+        "schema": "evaluation/web/browser-rule.schema.json",
+        "documentType": "browserRuleOracle"
+      },
+      "cases": [
+        { "caseId": "dashboard-browser-ambiguous", "request": "evaluation/web/requests/dashboard-browser-ambiguous.json", "split": "development", "classification": "ambiguous" },
+        { "caseId": "dashboard-browser-ambiguous-control", "request": "evaluation/web/requests/dashboard-browser-ambiguous-control.json", "split": "development", "classification": "ambiguous" },
+        { "caseId": "dashboard-browser-clean", "request": "evaluation/web/requests/dashboard-browser-clean.json", "split": "smoke", "classification": "clean" },
+        { "caseId": "dashboard-browser-clipping", "request": "evaluation/web/requests/dashboard-browser-clipping.json", "split": "smoke", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-control-boundaries", "request": "evaluation/web/requests/dashboard-browser-control-boundaries.json", "split": "development", "classification": "clean" },
+        { "caseId": "dashboard-browser-control-clip", "request": "evaluation/web/requests/dashboard-browser-control-clip.json", "split": "smoke", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-control-offscreen", "request": "evaluation/web/requests/dashboard-browser-control-offscreen.json", "split": "development", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-intentional-grouping", "request": "evaluation/web/requests/dashboard-browser-intentional-grouping.json", "split": "challenge", "classification": "hardNegative" },
+        { "caseId": "dashboard-browser-intentional-overlay", "request": "evaluation/web/requests/dashboard-browser-intentional-overlay.json", "split": "challenge", "classification": "hardNegative" },
+        { "caseId": "dashboard-browser-mobile", "request": "evaluation/web/requests/dashboard-browser-mobile.json", "split": "development", "classification": "clean" },
+        { "caseId": "dashboard-browser-notification-clean", "request": "evaluation/web/requests/dashboard-browser-notification-clean.json", "split": "smoke", "classification": "clean" },
+        { "caseId": "dashboard-browser-occlusion", "request": "evaluation/web/requests/dashboard-browser-occlusion.json", "split": "smoke", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-occlusion-clean", "request": "evaluation/web/requests/dashboard-browser-occlusion-clean.json", "split": "development", "classification": "clean" },
+        { "caseId": "dashboard-browser-out-of-viewport", "request": "evaluation/web/requests/dashboard-browser-out-of-viewport.json", "split": "smoke", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-overflow", "request": "evaluation/web/requests/dashboard-browser-overflow.json", "split": "smoke", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-peer-dimension", "request": "evaluation/web/requests/dashboard-browser-peer-dimension.json", "split": "development", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-responsive-mobile-mutant", "request": "evaluation/web/requests/dashboard-browser-responsive-mobile-mutant.json", "split": "development", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-rtl-vertical", "request": "evaluation/web/requests/dashboard-browser-rtl-vertical.json", "split": "development", "classification": "clean" },
+        { "caseId": "dashboard-browser-scrollable-control", "request": "evaluation/web/requests/dashboard-browser-scrollable-control.json", "split": "challenge", "classification": "hardNegative" },
+        { "caseId": "dashboard-browser-spacing-mutant", "request": "evaluation/web/requests/dashboard-browser-spacing-mutant.json", "split": "development", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-text-scale", "request": "evaluation/web/requests/dashboard-browser-text-scale.json", "split": "development", "classification": "clean" },
+        { "caseId": "dashboard-browser-transformed-text", "request": "evaluation/web/requests/dashboard-browser-transformed-text.json", "split": "smoke", "classification": "targetedMutation" },
+        { "caseId": "dashboard-browser-unnamed-control", "request": "evaluation/web/requests/dashboard-browser-unnamed-control.json", "split": "smoke", "classification": "targetedMutation" }
+      ]
+    },
+    {
+      "id": "harbor-support-browser-v1",
+      "version": "1.0.0",
+      "familyId": "harbor-support-inbox-v1",
+      "commandSurface": "sightlint-web capture followed by sightlint check --profile recommended --format json",
+      "acquisitionOracle": {
+        "document": "evaluation/web/annotations/support-inbox-acquisition.json",
+        "schema": "evaluation/web/browser-acquisition.schema.json",
+        "documentType": "browserAcquisitionOracle"
+      },
+      "ruleOracle": {
+        "document": "evaluation/web/annotations/support-inbox-rules.json",
+        "schema": "evaluation/web/browser-rule.schema.json",
+        "documentType": "browserRuleOracle"
+      },
+      "cases": [
+        { "caseId": "support-inbox-ambiguous-control", "request": "evaluation/web/requests/support-inbox-ambiguous-control.json", "split": "development", "classification": "ambiguous" },
+        { "caseId": "support-inbox-clean", "request": "evaluation/web/requests/support-inbox-clean.json", "split": "smoke", "classification": "clean" },
+        { "caseId": "support-inbox-labelledby-hard-negative", "request": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json", "split": "challenge", "classification": "hardNegative" },
+        { "caseId": "support-inbox-unnamed-control", "request": "evaluation/web/requests/support-inbox-unnamed-control.json", "split": "smoke", "classification": "targetedMutation" }
+      ]
+    }
+  ],
+  "splitPolicy": {
+    "smoke": "Public deterministic cases required in ordinary CI; labels are visible and tuning-visible.",
+    "development": "Public cases available for implementation design, debugging, and tuning.",
+    "challenge": "Public hard negatives and unusual valid alternatives; challenge does not mean secret or protected.",
+    "holdout": "Only an external frozen bundle admitted by holdout-admission.json may be reported as protected holdout."
+  },
+  "holdoutAdmission": {
+    "version": "1.0.0",
+    "path": "evaluation/web/holdout-admission.json",
+    "status": "notOperational"
+  },
+  "metricContract": {
+    "groupBy": ["fixtureFamily", "split", "ruleId", "evidenceClass"],
+    "measures": [
+      "caseCoverage",
+      "acquisitionExpectationCoverage",
+      "failurePrecision",
+      "falsePositiveFailures",
+      "reviewedAbstentionAgreement",
+      "mutationKillRate",
+      "nativePixelConflictCategories"
+    ],
+    "zeroDenominator": "reportIntegerCountsWithoutPercentage",
+    "universalScore": false
+  },
+  "nonClaims": [
+    "The public registry is not a protected holdout.",
+    "Maintainer-authored labels are not independently reviewed labels.",
+    "Two public fixture families do not establish representative or protected-holdout accuracy.",
+    "A green evaluation does not establish WCAG conformance, broad UI or UX quality, or blocking maturity."
+  ]
+}

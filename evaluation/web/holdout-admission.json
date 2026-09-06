@@ -1,0 +1,28 @@
+{
+  "$schema": "./holdout-admission.schema.json",
+  "schemaVersion": "1.0.0",
+  "status": "notOperational",
+  "publicRepositoryRole": "admissionMetadataOnly",
+  "implementationOutputUsedAsOracle": false,
+  "publicCasesEligible": false,
+  "requiredControls": {
+    "freeze": "Bind an opaque external artifact-and-oracle bundle to an exact pre-tuning Git commit, version, and SHA-256 digest.",
+    "access": "Keep raw artifacts and labels outside the public repository under a separately administered, least-privilege access policy.",
+    "evaluator": "Name a qualified evaluator who is independent from implementation tuning and whose conflicts of interest have been reviewed.",
+    "leakage": "Record every artifact, label, membership, and result exposure; exposed cases cannot silently remain protected evidence.",
+    "execution": "Pin the public command, product revision, adapter/browser/runtime environment, resource limits, and deterministic output checks.",
+    "oracleCorrection": "Require a reasoned correction, independent review, new bundle version and digest, and impact analysis before changing frozen truth.",
+    "reporting": "Publish split-, family-, rule-, and evidence-specific integer numerators and denominators with exclusions, uncertainty, and non-claims."
+  },
+  "blockers": [
+    "No separately controlled external artifact-and-oracle bundle has been frozen.",
+    "No qualified evaluator independent from implementation tuning has accepted responsibility.",
+    "No access authority or exposure log exists for protected artifacts and labels."
+  ],
+  "forbiddenClaims": [
+    "Public repository fixtures are protected holdout data.",
+    "A protected-holdout result exists while status is notOperational.",
+    "Current public results establish representative real-world Web UI or UX accuracy.",
+    "Current public results justify blocking maturity for a recommended Web rule."
+  ]
+}

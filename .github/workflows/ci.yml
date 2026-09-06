@@ -64,7 +64,9 @@ jobs:
         run: python3 tools/generate_inspection_corpus.py --check
       - name: Verify realistic Web evaluation corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
-        run: python3 tools/check_web_evaluation.py
+        run: |
+          python3 tools/check_web_evaluation.py
+          python3 tools/check_web_evaluation_v1.py
       - name: Verify perception evaluation governance
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/check_perception_evaluation.py

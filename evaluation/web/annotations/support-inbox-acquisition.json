@@ -1,0 +1,266 @@
+{
+  "$schema": "../browser-acquisition.schema.json",
+  "schemaVersion": "0.3.0",
+  "documentType": "browserAcquisitionOracle",
+  "provenance": {
+    "authoringBasis": "humanReviewedFixtureContract",
+    "implementationOutputUsedAsOracle": false,
+    "sourceId": "harbor-support-inbox-repository-fixture-v1",
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "externalProcessing": false,
+    "holdoutStatus": "publicDevelopmentData"
+  },
+  "cases": [
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "request": "evaluation/web/requests/support-inbox-ambiguous-control.json",
+      "split": "development",
+      "classification": "ambiguous",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/support-inbox-app/app.js",
+          "evaluation/web/support-inbox-app/index.html",
+          "evaluation/web/support-inbox-app/styles.css"
+        ],
+        "viewport": { "width": 1366, "height": 900, "unit": "cssPixel" },
+        "minimumDocumentHeight": 900,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 25,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-reply-send",
+            "parentId": "web-reply-composer",
+            "accessibilityStatus": "cantTell",
+            "role": null,
+            "name": null,
+            "display": "grid",
+            "layoutSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "renderSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": { "outcome": "hit", "hitLocator": "testid:reply-send" },
+            "ancestorClipStatus": "notClipped",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "interactiveRoleAndName",
+          "outcome": "cantTell",
+          "rationale": "The focusable generic surface is interactive, but the platform snapshot does not expose a supported control role or name."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The synchronized screenshot is not segmented or matched to the native send surface."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source replaces only the native button semantics with a focusable generic surface; uncertainty is retained rather than inferring a role."
+      }
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "request": "evaluation/web/requests/support-inbox-clean.json",
+      "split": "smoke",
+      "classification": "clean",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/support-inbox-app/app.js",
+          "evaluation/web/support-inbox-app/index.html",
+          "evaluation/web/support-inbox-app/styles.css"
+        ],
+        "viewport": { "width": 1366, "height": 900, "unit": "cssPixel" },
+        "minimumDocumentHeight": 900,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 25,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-reply-send",
+            "parentId": "web-reply-composer",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Send reply",
+            "display": "grid",
+            "layoutSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "renderSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": { "outcome": "hit", "hitLocator": "testid:reply-send" },
+            "ancestorClipStatus": "notClipped",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "completeHitRegion",
+          "outcome": "cantTell",
+          "rationale": "One render-box-center sample does not establish the complete activation region."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The synchronized screenshot extent agrees with the viewport, but pixels are not matched to the native control."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source declares a native button and an explicit aria-label while its fixed CSS dimensions and parent are independently reviewable."
+      }
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "request": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/support-inbox-app/app.js",
+          "evaluation/web/support-inbox-app/index.html",
+          "evaluation/web/support-inbox-app/styles.css"
+        ],
+        "viewport": { "width": 1366, "height": 900, "unit": "cssPixel" },
+        "minimumDocumentHeight": 900,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 25,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-reply-send",
+            "parentId": "web-reply-composer",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": "Send reply",
+            "display": "grid",
+            "layoutSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "renderSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": { "outcome": "hit", "hitLocator": "testid:reply-send" },
+            "ancestorClipStatus": "notClipped",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "visualLabelPresence",
+          "outcome": "untested",
+          "rationale": "The current rule evaluates a programmatic name and does not require visible text for this icon action."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The visually unchanged icon pixels are synchronized but not matched to the native control."
+        }
+      ],
+      "hardNegative": {
+        "category": "alternativeAccessibleNameSource",
+        "rationale": "The icon-only control intentionally omits aria-label but receives the same programmatic name from aria-labelledby."
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "A supported alternative name source is valid and must not become a missing-name failure merely because aria-label is absent."
+      }
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "request": "evaluation/web/requests/support-inbox-unnamed-control.json",
+      "split": "smoke",
+      "classification": "targetedMutation",
+      "expectations": {
+        "sourceFiles": [
+          "evaluation/web/support-inbox-app/app.js",
+          "evaluation/web/support-inbox-app/index.html",
+          "evaluation/web/support-inbox-app/styles.css"
+        ],
+        "viewport": { "width": 1366, "height": 900, "unit": "cssPixel" },
+        "minimumDocumentHeight": 900,
+        "documentDirection": "ltr",
+        "frameCount": 1,
+        "minimumNodeCount": 25,
+        "coreRelationCount": 0,
+        "screenshotViewport": "agreement",
+        "pixelContentComparison": "cantTell",
+        "nodes": [
+          {
+            "id": "web-reply-send",
+            "parentId": "web-reply-composer",
+            "accessibilityStatus": "observed",
+            "role": "button",
+            "name": null,
+            "display": "grid",
+            "layoutSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "renderSize": { "width": 46, "height": 46, "tolerance": 0.5, "unit": "cssPixel" },
+            "interactive": true,
+            "disabled": false,
+            "centerHitSample": { "outcome": "hit", "hitLocator": "testid:reply-send" },
+            "ancestorClipStatus": "notClipped",
+            "layoutRenderStatus": "agreement",
+            "screenshotGeometryCoverage": "insideScreenshotExtent"
+          }
+        ],
+        "gaps": []
+      },
+      "abstentions": [
+        {
+          "aspect": "intendedAccessibleNameText",
+          "outcome": "cantTell",
+          "rationale": "The platform snapshot can prove absence but acquisition does not invent the intended replacement text."
+        },
+        {
+          "aspect": "pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The unchanged icon pixels are synchronized but not matched to the native control."
+        }
+      ],
+      "mutation": {
+        "baselineRequest": "evaluation/web/requests/support-inbox-clean.json",
+        "target": "web-reply-send",
+        "changedProperty": "aria-label changes from Send reply to absent while no other name source is referenced",
+        "preservedProperties": [
+          "visible icon and rendered pixels",
+          "native button role and CSS geometry",
+          "composer content and viewport",
+          "center hit sample, network policy, and privacy policy"
+        ],
+        "evidenceExpectations": ["accessibilityName"]
+      },
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The targeted state removes only the accessible-name declaration from the same native icon button."
+      }
+    }
+  ]
+}

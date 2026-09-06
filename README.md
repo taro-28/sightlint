@@ -518,8 +518,10 @@ exact final PR head and the merged `main` commit both pass.
 
 Synthetic and repository-owned regression data does not establish real-world precision. The
 #22–#24 slices define a reviewed Web evaluation contract, one controlled local browser path, and
-three advisory rules, but representative sampling, independent review, semantic peer inference,
-complete hit regions, pixel-content identity, and a protected holdout process remain future work.
+three advisory rules. ADR 0051/#72 add a second repository-owned support-inbox fixture family and
+a machine-checkable holdout-admission contract. The two public families remain maintainer-authored
+tuning data; representative sampling, independent review, semantic peer inference, complete hit
+regions, pixel-content identity, and an operational protected holdout remain future work.
 
 ## Architecture
 
@@ -570,11 +572,13 @@ Read:
 | #30 | completed bounded interaction trace, async-feedback, and declared recovery slice |
 | #31 | completed M7 exit criteria through local agent and GitHub job-check surfaces; MCP/editor/local UI remain demand-led |
 | #62 | completed managed loopback Web capture and `/entries/new` dogfood slice of #31 |
+| #71 | post-alpha evidence-first product maturity epic |
+| #72 | second realistic Web fixture family and protected-holdout admission contract |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0051 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0052 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

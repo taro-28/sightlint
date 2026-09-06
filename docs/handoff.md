@@ -11,13 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #67, the final focused M7 integration slice, started from this verified green
-`main` baseline:
+The branch for issue #72, the first focused child of the post-alpha evidence epic #71, started from
+this verified green `main` baseline:
 
-- commit: `85ac8882201a25b2faae246de4b63e2379e9cf4f`
-- tree: `834bc8182238fd5c5f01a5556ed9f5fe103eae10`
-- merged PR: #66
-- main CI: run 34029573773, all six jobs successful
+- commit: `b4d9a2e4af06ddb080337617395903aba8e25ef5`
+- tree: `fcfa85984b843025db2f6d317bde81e3df87dd57`
+- merged PR: #70
+- main CI: run 34036003552, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -381,6 +381,29 @@ not establish acquisition accuracy. Their browser fields remain `untested` rathe
 rewritten from implementation output. Metrics are small-corpus regression counts, not general
 UI/UX accuracy.
 
+### Multi-family Web evaluation and holdout admission
+
+ADR 0051 and issue #72 add `evaluation/web/evaluation-v1.json` as an additive registry over the
+existing Atlas browser oracle and a second repository-owned Harbor support-inbox family. It records
+family context, public exposure/tuning status, provenance, dual license, privacy, reviewer roles,
+agreement/adjudication state, oracle joins, split inventory, metric dimensions, and non-claims.
+The historical Web corpus and browser schemas remain unchanged compatibility surfaces.
+
+Harbor has four public cases: a clean named send control, an `aria-label` removal mutation, a
+visually identical `aria-labelledby` hard negative, and a focusable generic send surface whose
+role/name remain `cantTell`. Separate acquisition and rule documents are authored independently
+from output. The existing local Playwright process and built Rust binary repeat capture response,
+Artifact IR, screenshot, CheckReport, diagnostics, and exit bytes. Current results are 4/4 selected
+acquisition expectations, 9/9 reviewed rule results, 6/6 reviewed abstention results, 1/1 failure
+precision, 1/1 mutation kill, and zero false-positive or hard-negative failures.
+
+`holdout-admission.json` is public admission metadata only. It rejects an operational claim
+without an exact freeze/digest, separately administered access, independent evaluator, exposure
+log, tuning exclusion, pinned execution, correction procedure, and reporting plan. Its current
+status is `notOperational`; both families remain public maintainer-authored tuning data. No
+independent-review agreement, representative accuracy, holdout performance, WCAG conformance, or
+blocking maturity is claimed.
+
 ### Playwright Web acquisition and evidence matrix
 
 ADRs 0033–0035 and `adapters/playwright/` add an untrusted TypeScript/Node process with locked
@@ -404,7 +427,7 @@ and compares repeated response, IR, screenshot, and report bytes on Linux. Acces
 root parsing uses disjoint escaped/unescaped name branches and includes an adversarial repeated-
 escape regression so untrusted names do not induce regex backtracking growth.
 
-Current development-corpus metrics are 23/23 cases, 76 reviewed acquisition expectations, 45
+Current Atlas development-corpus metrics are 23/23 cases, 76 reviewed acquisition expectations, 45
 reviewed acquisition abstentions, 11/11 acquisition mutations observed, 6/6 rule-eligible
 mutations killed, 6/6 emitted failures matched, zero unexpected failures, and zero hard-negative
 failures. These are single-family public regression counts, not real-world accuracy.
@@ -698,10 +721,16 @@ SightLint treats tests as part of the product specification.
   viewport screenshot metadata;
 - six rule-eligible mutation kills, 11 acquisition mutations, per-rule policy/profile/enforcement
   assertions, hard negatives, and explicit semantic/pixel/hit-region abstentions;
+- one additive two-family registry plus strict review/exposure/holdout-admission contracts;
+- four Harbor support-inbox captures with separate acquisition/rule oracles, clean/mutation/
+  hard-negative/ambiguity coverage, 4/4 selected acquisition expectations, 9/9 rule results, 6/6
+  reviewed abstentions, 1/1 failure precision and mutation kill, and byte-stable local reruns;
+- semantic-only mutation and valid alternative-name states whose screenshot bytes equal clean;
 - one public reviewed agent workflow oracle covering the combined command, native source-target
   join, temporary fix/rerun, no-new-failure postcondition, JSON/human byte stability, and
   ambiguity/intentional-overlay controls;
-- no representative screenshot corpus, private holdout, or general accuracy claim.
+- no representative screenshot corpus, independent review, operational protected holdout, or
+  general accuracy claim.
 
 ### GitHub Actions integration fixtures
 
@@ -872,6 +901,7 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - broad PPTX coverage beyond direct unrotated shapes/groups, or a PPTX-specific recommended rule;
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
+- independent Web annotation review or an operational, externally controlled protected holdout;
 - broad interaction support beyond the controlled Atlas slice, including offline, permission,
   stale-data, partial success, destructive safeguards, undo, focus/navigation, and mobile traces;
 - MCP, an independent REST-published GitHub App check, editor extension, browser extension, or
@@ -895,8 +925,9 @@ The largest risks are now product/evidence risks rather than basic kernel feasib
    variation into a false positive.
 3. **Policy quality** — supplying useful defaults with no user prompt while distinguishing
    project policy, platform policy, inferred norms, and conservative baselines.
-4. **Evaluation quality** — avoiding synthetic self-confirmation, benchmark leakage, weak labels,
-   and unrepresentative examples.
+4. **Evaluation quality** — expanding beyond two public maintainer-authored families, obtaining
+   independent review, operating a leakage-controlled holdout, and avoiding synthetic
+   self-confirmation or weak labels.
 5. **Cross-source reconciliation** — preserving conflicts between native structure and rendered
    pixels rather than normalizing them away.
 6. **Scope drift** — spending the project on codecs, generic computer vision, GUI, MCP, or release
@@ -904,7 +935,22 @@ The largest risks are now product/evidence risks rather than basic kernel feasib
 
 ## Canonical next sequence
 
-Issue #34's bounded execution sequence is complete:
+Issue #71 is now the canonical post-alpha execution epic. Its evidence-first order begins with
+fixture-family diversity, independent review, and protected-holdout operation before admitting
+broader recommended rules, Web acquisition breadth, interaction breadth, perception models,
+additional-medium breadth, or more distribution surfaces.
+
+1. **#72 — second Web family and holdout admission (implemented in this change).** ADR 0051 adds
+   the additive registry, Harbor support-inbox clean/mutation/hard-negative/ambiguity slice,
+   separate acquisition/rule truth, split/family metrics, and strict admission metadata. The
+   protected holdout remains honestly `notOperational` and independent review remains absent.
+2. **Next #71 child — independent review and protected holdout operation.** Use a separately
+   controlled, digest-bound bundle and evaluator; do not relabel public fixtures as holdout.
+3. **Later focused children — rule and adapter expansion.** Select one evidence-backed candidate
+   at a time only after the earlier evaluation gate supplies its applicability and false-positive
+   evidence.
+
+The completed issue #34 sequence remains the verified bounded alpha baseline:
 
 1. **#22 — human-reviewed realistic evaluation corpus (complete).** The
    ADR/schema/dashboard/oracle foundation and synchronized browser companion are present.
@@ -923,10 +969,10 @@ Issue #34's bounded execution sequence is complete:
 6. **#62 — managed loopback Web capture (complete).** Protocol `0.2.0` adds explicit server-command
    authorization, one target-repository page, loopback-only browser traffic, bounded HTTP evidence,
    unavailable source attribution, and owned process-tree cleanup without changing `0.1.0`.
-7. **#65 — managed-loopback evaluation authority split (complete in this change).** Strict,
+7. **#65 — managed-loopback evaluation authority split (complete).** Strict,
    independently versioned acquisition and rule oracles replace the combined current annotation;
    metrics are derived from reviewed expectations and preserve explicit abstention and non-claims.
-8. **#67 — deterministic GitHub Actions job check (complete in this change).** The public Rust
+8. **#67 — deterministic GitHub Actions job check (complete).** The public Rust
    command projects the same authoritative report into escaped job annotations and an explicit
    bounded summary, using independently reviewed exact-source declarations and preserving
    unavailable source, abstention, evidence, enforcement, and exit semantics.
@@ -952,10 +998,9 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
   capture, independent evaluation authority, and a same-kernel GitHub job-check surface. MCP,
   editor/browser/local UI, and later package channels remain demand-led non-goals.
 
-The bounded first slices inside #29 and #30 are implemented. No further product issue is implied by
-these completed slices; later expansion requires a newly scoped, evidence-gated issue. The
-completed alpha, benchmark, adapter, and integration slices do not make stale branches
-authoritative.
+The bounded first slices inside #29 and #30 are implemented. Issue #71 now owns later expansion,
+which still requires newly scoped, evidence-gated child issues in dependency order. The completed
+alpha, benchmark, adapter, and integration slices do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
