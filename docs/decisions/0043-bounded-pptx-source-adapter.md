@@ -108,6 +108,7 @@ Before decompression, the adapter validates every central-directory member and e
 limits no larger than:
 
 - source archive: 64 MiB;
+- each caller-selected rendered PNG: 64 MiB;
 - archive members: 2,048;
 - declared total uncompressed bytes: 128 MiB;
 - one selected XML part: 8 MiB;
@@ -124,7 +125,9 @@ integers, duplicate object IDs, and resource overflow are stable errors. The ada
 the required presentation, relationship, and slide XML members plus caller-selected local render
 files. It never extracts the archive to disk.
 
-These checks bound the process input and output but are not an operating-system sandbox or memory
+The request, source archive, and rendered PNGs are size-checked before streaming their digest;
+archive members are inventoried before selected XML is decompressed. These checks bound the
+process input and output but are not an operating-system sandbox or memory
 ceiling. A malicious Python runtime or library is outside this contract. The standard-library ZIP
 and XML parsers remain untrusted sensor implementation, not trusted kernel code.
 

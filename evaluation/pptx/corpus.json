@@ -16,7 +16,7 @@
       },
       "request": {
         "path": "evaluation/pptx/requests/atlas-clean.json",
-        "sha256": "sha256:343abb2c085abc35a3cea2ea0d1f01eb6df329242ad58b775aeaa2338e6101aa"
+        "sha256": "sha256:1c35df1d862ecf6397009a70136f402d9f3085c040ab07be99b6c1286b727971"
       },
       "ruleAnnotationId": "atlas-clean-rules",
       "split": "smoke"
@@ -39,7 +39,7 @@
       },
       "request": {
         "path": "evaluation/pptx/requests/atlas-off-slide-mutant.json",
-        "sha256": "sha256:f558f8b9c4af7b1e2bac23b0acb77fe35e0f53d8af2d9c8f2550d239b449242c"
+        "sha256": "sha256:73b4780137f31ccf8ee422e368341803b20eb39a5a7f0af2f3c85316fb8f4fb9"
       },
       "ruleAnnotationId": "atlas-off-slide-mutant-rules",
       "split": "development"
@@ -62,7 +62,7 @@
       },
       "request": {
         "path": "evaluation/pptx/requests/atlas-asymmetric-hard-negative.json",
-        "sha256": "sha256:6ce5b0b4beaffb0c8b442bfd51eb9bcd5ff8d94316406758cf5423d5b849a361"
+        "sha256": "sha256:b95b395709dc1ac79d3373bc2ca4728cce01d993343ccf0b5dd12a34cc6050ac"
       },
       "ruleAnnotationId": "atlas-asymmetric-hard-negative-rules",
       "split": "challenge"

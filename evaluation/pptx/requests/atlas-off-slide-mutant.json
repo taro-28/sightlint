@@ -11,6 +11,7 @@
     "maxGroupDepth": 8,
     "maxNodes": 64,
     "maxOutputBytes": 1048576,
+    "maxRenderBytes": 1048576,
     "maxSlides": 4,
     "maxXmlBytes": 262144
   },

@@ -192,6 +192,7 @@ def request(case: str, pptx_path: Path, pptx_reference: Path, render_path: Path)
         "privacy": {"externalProcessing": False, "retention": "none", "textPolicy": "digestOnly"},
         "execution": {
             "maxArchiveBytes": 1_048_576,
+            "maxRenderBytes": 1_048_576,
             "maxEntries": 64,
             "maxExpandedBytes": 2_097_152,
             "maxXmlBytes": 262_144,
