@@ -891,10 +891,14 @@ def main() -> int:
         sys.stdout.buffer.write(response)
         return 0
     except AdapterError as error:
-        sys.stderr.write(f"sightlint-pptx: {error.code}: {error.message}\n")
+        sys.stderr.buffer.write(
+            f"sightlint-pptx: {error.code}: {error.message}\n".encode("utf-8")
+        )
         return 2
     except Exception:
-        sys.stderr.write("sightlint-pptx: execution-error: adapter execution failed\n")
+        sys.stderr.buffer.write(
+            b"sightlint-pptx: execution-error: adapter execution failed\n"
+        )
         return 2
 
 
