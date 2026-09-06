@@ -138,7 +138,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0047 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0048 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
