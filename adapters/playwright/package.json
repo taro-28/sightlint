@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.json",
     "check": "npm run build && node --test dist/tests/unit.test.js",
     "install:browser": "playwright install chromium",
-    "test:e2e": "npm run build && node --test dist/tests/e2e.test.js dist/tests/segmentation-evaluation.test.js dist/tests/workflow-e2e.test.js",
+    "test:e2e": "npm run build && node --test dist/tests/e2e.test.js dist/tests/perception-evaluation.test.js dist/tests/segmentation-evaluation.test.js dist/tests/workflow-e2e.test.js",
     "test:segmentation-evaluation": "npm run build && node --test dist/tests/segmentation-evaluation.test.js"
   },
   "dependencies": {

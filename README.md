@@ -46,8 +46,9 @@ The bounded first-alpha execution epic,
 The #25 benchmark is complete without changing the strict image-inspection default. Issue #26 adds
 exact source-alpha geometry without introducing a padding rule. Issue #27 is complete through ADR
 0041 without broadening PNG coverage because current product evidence did not establish a format
-gap. The earliest remaining implementation gate is
-[#28](https://github.com/taro-28/sightlint/issues/28).
+gap. Issue #28 adds the first local perception protocol foundation without OCR/model accuracy or
+blocking claims. The earliest remaining roadmap gate is
+[#29](https://github.com/taro-28/sightlint/issues/29).
 
 ## Why
 
@@ -227,6 +228,24 @@ the 95% policy narrowly recovers edge contamination, while realistic shadows sti
 surfaces and the ranked policy selects both unsafe hard negatives. No policy is admitted as the
 product default; see [`evaluation/image-segmentation/results.md`](evaluation/image-segmentation/results.md).
 
+### Isolated perception protocol foundation
+
+ADR 0042 adds a local process protocol and public Node wrapper for untrusted perception workers.
+Strict `0.1.0` requests/responses represent region, text, role, hierarchy, and peer-group
+observations, including model/runtime/source identity, exact input digest, preprocessing, resource
+and privacy declarations, confidence availability, alternatives, uncertainty, and repeated-run
+agreement. Model-free measured regions may map to core `other` nodes; inferred semantics remain in
+the separate canonical response and cannot create core roles, relations, rule outcomes, or
+blocking authority.
+
+The dependency-free reference worker exposes one caller-selected
+`benchmark-image-segmentation` policy. Three repository-owned Atlas states exercise the public
+Playwright capture, Rust segmentation/normalization, and worker processes with byte stability,
+retained native/pixel conflict, a targeted acquisition mutation, and an intentional-grouping hard
+negative. The selected ranked background remains explicitly unconfirmed. OCR, model calibration,
+semantic role/hierarchy/peer accuracy, and downstream rule quality are still `untested`; see
+[`adapters/perception/README.md`](adapters/perception/README.md).
+
 ## Install and current commands
 
 The first alpha is a source-only GitHub prerelease with a deterministic archive and SHA-256
@@ -328,6 +347,8 @@ Current committed assets include:
 - **30 image-inspection cases** with independent region/gap, abstention, and malformed outcomes;
 - a nine-case realistic image-segmentation benchmark with separate acquisition/rule oracles,
   hard negatives, abstention, targeted mutation, metamorphic relations, and bounded refusal;
+- a three-case perception-protocol differential corpus with separate acquisition/rule annotations,
+  one targeted mutation, one hard negative, explicit non-holdout status, and zero semantic claims;
 - a repository-owned realistic Web fixture foundation with six separately annotated acquisition
   and rule cases, including one targeted mutation and one intentional-grouping hard negative;
 - a 23-case Playwright companion that captures selected DOM/accessibility structure, computed
@@ -392,7 +413,7 @@ Read:
 | #25 | completed background/segmentation benchmark research; no production admission |
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand/decoder strategy decision; broader coverage not admitted |
-| #28 | isolated OCR/CV/VLM worker protocol |
+| #28 | completed local OCR/CV/VLM protocol foundation; real model evaluation remains untested |
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states, effects, traces, and recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
@@ -400,7 +421,7 @@ Read:
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0042 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0043 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

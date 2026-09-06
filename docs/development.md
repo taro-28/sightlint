@@ -52,8 +52,9 @@ Issue #34's bounded execution sequence is complete:
 
 Issue #25 is complete as an evaluation-only benchmark and did not admit a broader default. Issue
 #27 is complete through ADR 0041 without decoder expansion because current product evidence did
-not establish a format gap. The earliest remaining implementation gate is #28. Other work remains
-available in #29–#31, but historical branch code does not change priority. Explain any deviation
+not establish a format gap. Issue #28 is complete for protocol v0 through ADR 0042; real OCR/model
+quality remains `untested`. The earliest remaining roadmap gate is #29. Other work remains
+available in #30–#31, but historical branch code does not change priority. Explain any deviation
 in the issue and PR.
 
 ## Planning before implementation
@@ -126,13 +127,17 @@ python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
+python3 tools/check_perception_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run check
+npm --prefix adapters/perception ci --ignore-scripts
+npm --prefix adapters/perception run check
 cargo build --locked -p sightlint-cli
+npm --prefix adapters/perception run test:e2e
 npm --prefix adapters/playwright run test:e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
@@ -271,7 +276,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0042 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0043 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

@@ -277,6 +277,14 @@ ADR 0041 changes no IR or extension surface. Its format-demand assessment retain
 unavailability for unsupported source encodings; caller-selected conversion is evidence about the
 converted bytes and must not be represented as exact facts about the original encoding.
 
+ADR 0042 adds optional `org.sightlint.perception@0.1.0`. The extension records the canonical
+worker-response digest, worker/model/runtime identity, acquisition-family statuses, observation
+IDs, mapped versus unmapped counts, and reconciliation status. The complete typed response is a
+separate canonical output. Protocol v0 maps only model-free `visionMeasured` pixel-component
+regions into core `other` nodes with device-pixel `renderBox` evidence. Inferred regions, text,
+roles, hierarchy, and peer groups are not promoted into core fields or relations; their response
+records preserve source links, confidence availability, alternatives, and uncertainty.
+
 For an IR or official-extension change:
 
 - write an ADR when architecture/semantics change;
@@ -288,5 +296,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0042 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0043 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.

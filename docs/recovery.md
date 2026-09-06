@@ -120,5 +120,6 @@ screenshot UI/UX accuracy. A heuristic observation is not a blocking rule result
 The incident is closed as an implementation recovery. Issue #34's sequence—realistic evaluation
 (#22), Playwright native/pixel acquisition (#23), evaluated recommended rules (#24), the local
 Codex fix-and-rerun workflow (#42), and the source-only release gate (#33)—is complete. Issues #25
-and #26 are complete, and ADR 0041 closes #27 without admitting broader decoding. The earliest
-remaining implementation gate is #28.
+and #26 are complete, ADR 0041 closes #27 without admitting broader decoding, and ADR 0042
+completes the local protocol-v0 perception boundary for #28 without claiming model quality. The
+earliest remaining roadmap gate is #29.

@@ -5,6 +5,16 @@ independent compatibility surfaces changed by the release.
 
 ## Unreleased
 
+- Accepted ADR 0042 and added local perception process protocol `0.1.0` with strict typed
+  region/text/role/hierarchy/peer observations, bounded resources, explicit confidence and
+  alternatives, worker/model/runtime/input provenance, and nonblocking `untested` rule status.
+- Added a dependency-free reference region worker and public Node wrapper that validates,
+  canonicalizes, hashes worker provenance, and maps only model-free measured regions through the
+  public Rust normalizer; inferred semantics remain outside core IR.
+- Added conformance/resource/error fixtures and a three-state Atlas differential evaluation with
+  separate acquisition/rule oracles, native/pixel conflict retention, acquisition mutation, hard
+  negative, abstention, license/privacy/non-holdout governance, and byte-stability gates. No OCR,
+  model-calibration, semantic-rule, blocking, or real-world UI/UX accuracy claim is introduced.
 - Accepted ADR 0041 after a versioned PNG format-demand assessment found no current product gap:
   retained explicit unavailability for indexed, sub-byte, 16-bit, `tRNS`, and animated inputs,
   added no decoder dependency, and made no format-prevalence or broader product-accuracy claim.

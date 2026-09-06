@@ -1,0 +1,17 @@
+{
+  "benchmarkSchemaVersion": "0.1.0",
+  "blocking": false,
+  "ruleOutcome": "untested",
+  "canvas": { "id": "canvas", "width": 64, "height": 48, "unit": "devicePixel", "origin": "topLeft" },
+  "policies": [
+    {
+      "policyId": "qualified-corner-95-row-runs-v1",
+      "status": "observed",
+      "reason": null,
+      "regions": [
+        { "id": "region:1", "bounds": [32, 8, 20, 16], "pixelCount": 280, "hypothesisId": "candidate:f6f8ffff" },
+        { "id": "region:0", "bounds": [4, 8, 20, 16], "pixelCount": 280, "hypothesisId": "candidate:f6f8ffff" }
+      ]
+    }
+  ]
+}

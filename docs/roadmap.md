@@ -16,7 +16,7 @@ the product model behind this sequence. Issue #34 is the canonical near-term exe
 | M2 — Visual geometry rules | substantially implemented | explicit containment, overlap, spacing, alignment, extent, typography, minimum-size policy | acquisition of reliable applicability/evidence; contrast and semantic baseline work |
 | M3 — Deterministic image adapter | active | bounded PNG path, exact common RGBA/source-alpha geometry, 43-case pixel corpus, five-case transparent-asset evaluation, narrow advisory region/gap inspection with 30 cases, first realistic Web evaluation foundation | representative realistic evaluation, an evaluated image/asset rule or reconciliation use case, evidence-gated broader acquisition |
 | M4 — Structured adapters | active | process-isolated Playwright capture plus 23-case evidence/rule matrix and first advisory recommended Web pack | portability characterization, broader representative evaluation, then other media by demand |
-| M5 — Optional perception | not started | isolation principles only | versioned OCR/CV/VLM worker protocol and calibration |
+| M5 — Optional perception | active | local protocol `0.1.0`, bounded wrapper/reference worker, typed family schema, three-state differential regression | real OCR/model acquisition, calibration, representative evaluation, downstream rule evidence |
 | M6 — Interaction contracts | not started | conceptual rule model only | actions, effects, states, traces, recovery, controlled E2E |
 | M7 — Ecosystem and release | active | local CLI, bounded one-command Web agent workflow, dual license, source-only alpha release | MCP/GitHub/editor surfaces and demand-led package channels |
 
@@ -112,8 +112,9 @@ advisory. The scripted edit is not a claim about autonomous agent quality or arb
 repositories. Issue #25 provides the bounded comparison without admitting a broader segmentation
 default. ADR 0040 and issue #26 add exact source-alpha geometry without admitting a padding rule.
 ADR 0041 and issue #27 retain explicit unavailability for broader PNG formats because current
-product evidence does not establish a coverage gap. The earliest remaining implementation gate is
-#28.
+product evidence does not establish a coverage gap. ADR 0042 and issue #28 add the local
+perception protocol foundation without semantic promotion or model-accuracy claims. The earliest
+remaining roadmap gate is #29.
 
 ## Scope-selection rules
 
@@ -350,6 +351,24 @@ without moving model authority into the kernel.
 Issue #28 owns the protocol for OCR, deterministic CV, component/hierarchy detection, and optional
 VLM workers.
 
+### Protocol foundation — #28 (complete)
+
+ADR 0042 defines strict request, response, run-report, and perception-extension `0.1.0` surfaces.
+A dependency-free Node wrapper runs a caller-selected local worker without a shell, bounds time,
+standard streams, input, observations, text, hierarchy, and geometry, validates worker/model/input
+identity, canonicalizes results, and asks the public Rust normalizer to validate mapped IR. Typed
+family records cover regions, text, roles, hierarchy, and peer groups, but only model-free
+`visionMeasured` regions may become core `other` nodes; inferred semantics remain outside core IR
+and no worker can create a trusted verdict.
+
+The reference worker exposes one request-selected image-segmentation benchmark policy. Three
+public Atlas states preserve synchronized native and pixel outputs, a reviewed 16±1 CSS-pixel
+layout/render conflict, an independently measured mutation, and an intentional-grouping hard
+negative. Qualified and strict policies abstain on Atlas's two edge surfaces; the evaluation names
+ranked only to exercise mapping while retaining the unconfirmed hypothesis. OCR, role, hierarchy,
+peer, calibration, backend sensitivity, latency distributions, downstream rule accuracy, and
+protected-holdout evidence remain `untested`.
+
 ### Required boundary
 
 - isolated process with versioned request/response schema;
@@ -364,8 +383,9 @@ VLM workers.
 
 ### M5 exit criteria
 
-- one reference local worker and conformance suite;
-- differential evaluation against native/annotated data from #22/#23;
+- one reference local worker and conformance suite (complete for protocol v0);
+- differential evaluation against native/annotated data from #22/#23 (complete for the measured
+  region boundary);
 - measured acquisition precision, coverage, abstention, and downstream rule impact;
 - no model-only blocking verdict;
 - model updates cannot hide behind unchanged evidence versions.
@@ -474,7 +494,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0042 or later.
+- New architecture decision numbers continue at 0043 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -496,7 +516,7 @@ Every public behavior must satisfy the applicable matrix:
 | #25 | completed background/segmentation benchmark research; strict default retained |
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand and decoder strategy decision; broader coverage not admitted |
-| #28 | OCR/CV/VLM perception-worker protocol |
+| #28 | completed local OCR/CV/VLM perception protocol foundation; model quality remains untested |
 | #29 | PPTX, PDF/document, Android, and iOS adapter roadmap |
 | #30 | interaction states/effects/traces/recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |

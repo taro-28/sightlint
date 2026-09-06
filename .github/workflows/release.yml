@@ -125,6 +125,8 @@ jobs:
       - name: Check extracted private Node package
         shell: bash
         run: |
+          npm ci --ignore-scripts --prefix "release-unpacked/sightlint-$RELEASE_TAG/adapters/perception"
+          npm run check --prefix "release-unpacked/sightlint-$RELEASE_TAG/adapters/perception"
           npm ci --ignore-scripts --prefix "release-unpacked/sightlint-$RELEASE_TAG/adapters/playwright"
           npm run check --prefix "release-unpacked/sightlint-$RELEASE_TAG/adapters/playwright"
 
@@ -164,8 +166,14 @@ jobs:
           python3 tools/check_alpha_evaluation.py
           python3 tools/check_png_format_demand.py
           python3 tools/check_web_evaluation.py
+          python3 tools/check_perception_evaluation.py
           python3 tools/check_dependency_licenses.py
           python3 -m unittest tools/test_release.py
+      - name: Install the locked perception wrapper
+        working-directory: release-unpacked/sightlint-${{ github.ref_name }}/adapters/perception
+        run: |
+          npm ci --ignore-scripts
+          npm run check
       - name: Install the locked browser companion
         working-directory: release-unpacked/sightlint-${{ github.ref_name }}/adapters/playwright
         run: |
@@ -176,6 +184,7 @@ jobs:
         working-directory: release-unpacked/sightlint-${{ github.ref_name }}
         run: |
           cargo build --locked -p sightlint-cli --bin sightlint
+          npm run test:e2e --prefix adapters/perception
           npm run test:e2e --prefix adapters/playwright
 
   publish:
