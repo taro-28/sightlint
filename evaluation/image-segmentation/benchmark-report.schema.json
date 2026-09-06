@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:image-segmentation-benchmark-report:0.1.0",
+  "title": "SightLint image segmentation benchmark report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["benchmarkSchemaVersion", "mode", "blocking", "ruleOutcome", "canvas", "source", "limits", "policies", "limitations"],
+  "properties": {
+    "benchmarkSchemaVersion": { "const": "0.1.0" },
+    "mode": { "const": "evaluationOnly" },
+    "blocking": { "const": false },
+    "ruleOutcome": { "const": "untested" },
+    "canvas": { "$ref": "#/$defs/canvas" },
+    "source": { "$ref": "#/$defs/source" },
+    "limits": { "$ref": "#/$defs/limits" },
+    "policies": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/policy" }
+    },
+    "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "policyId": {
+      "enum": [
+        "qualified-corner-95-row-runs-v1",
+        "ranked-exact-border-flood-v1",
+        "strict-uniform-perimeter-flood-v1"
+      ]
+    },
+    "rgba": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 0, "maximum": 255 },
+        { "type": "integer", "minimum": 0, "maximum": 255 },
+        { "type": "integer", "minimum": 0, "maximum": 255 },
+        { "type": "integer", "minimum": 0, "maximum": 255 }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "width", "height", "unit", "origin"],
+      "properties": {
+        "id": { "const": "canvas" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "unit": { "const": "devicePixel" },
+        "origin": { "const": "topLeft" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "version", "externalProcessing", "byteCrc32", "checksumPurpose"],
+      "properties": {
+        "adapter": { "const": "sightlint-adapter-png" },
+        "version": { "$ref": "#/$defs/text" },
+        "externalProcessing": { "const": false },
+        "byteCrc32": { "type": "string", "pattern": "^[0-9a-f]{8}$" },
+        "checksumPurpose": { "const": "regression-only-not-cryptographic" }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pixels", "regions", "rowRuns"],
+      "properties": {
+        "pixels": { "const": 4194304 },
+        "regions": { "const": 1024 },
+        "rowRuns": { "const": 250000 }
+      }
+    },
+    "count": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "denominator"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "encodedRgba8", "cornerPixels", "perimeterPixels", "imagePixels", "selectionEligibility", "rejectionReason"],
+      "properties": {
+        "candidateId": { "type": "string", "pattern": "^candidate:[0-9a-f]{8}$" },
+        "encodedRgba8": { "$ref": "#/$defs/rgba" },
+        "cornerPixels": { "$ref": "#/$defs/count" },
+        "perimeterPixels": { "$ref": "#/$defs/count" },
+        "imagePixels": { "$ref": "#/$defs/count" },
+        "selectionEligibility": { "enum": ["eligible", "rejected"] },
+        "rejectionReason": { "type": ["string", "null"] }
+      }
+    },
+    "backgroundSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "selectedCandidateId", "confirmed", "semanticConfidence", "calibration", "candidates"],
+      "properties": {
+        "status": { "enum": ["selected", "unavailable"] },
+        "selectedCandidateId": { "type": ["string", "null"], "pattern": "^candidate:[0-9a-f]{8}$" },
+        "confirmed": { "const": false },
+        "semanticConfidence": { "type": "null" },
+        "calibration": { "const": "notCalibrated" },
+        "candidates": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/candidate" } }
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "bounds", "boundsFormat", "coordinateSpaceId", "unit", "pixelCount", "singleColorRectangle", "evidenceId", "hypothesisId"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^region:[0-9]+$" },
+        "bounds": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 1 },
+            { "type": "integer", "minimum": 1 }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "boundsFormat": { "const": "xywh-half-open" },
+        "coordinateSpaceId": { "const": "canvas" },
+        "unit": { "const": "devicePixel" },
+        "pixelCount": { "type": "integer", "minimum": 1 },
+        "singleColorRectangle": { "type": "boolean" },
+        "evidenceId": { "const": "raster" },
+        "hypothesisId": { "type": "string", "pattern": "^candidate:[0-9a-f]{8}$" }
+      }
+    },
+    "segmentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "connectivity", "inputPixelCount", "foregroundPixelCount", "rowRunCount"],
+      "properties": {
+        "method": { "enum": ["fourConnectedFloodFill", "horizontalRowRunsUnionFind", "notRun"] },
+        "connectivity": { "const": "four" },
+        "inputPixelCount": { "type": "integer", "minimum": 1 },
+        "foregroundPixelCount": { "type": ["integer", "null"], "minimum": 0 },
+        "rowRunCount": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateCount", "regionCount"],
+      "properties": {
+        "candidateCount": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "regionCount": { "type": "integer", "minimum": 0, "maximum": 1024 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policyId", "status", "reason", "semanticApplicability", "ruleOutcome", "backgroundSelection", "segmentation", "regions", "summary"],
+      "properties": {
+        "policyId": { "$ref": "#/$defs/policyId" },
+        "status": { "enum": ["observed", "unavailable"] },
+        "reason": { "type": ["string", "null"] },
+        "semanticApplicability": { "const": "cantTell" },
+        "ruleOutcome": { "const": "untested" },
+        "backgroundSelection": { "$ref": "#/$defs/backgroundSelection" },
+        "segmentation": { "$ref": "#/$defs/segmentation" },
+        "regions": { "type": "array", "maxItems": 1024, "items": { "$ref": "#/$defs/region" } },
+        "summary": { "$ref": "#/$defs/summary" }
+      }
+    }
+  }
+}

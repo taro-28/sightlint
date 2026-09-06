@@ -69,6 +69,7 @@
   "annotations": {
     "guide": "evaluation/image-segmentation/annotation-guide.md",
     "schema": "evaluation/image-segmentation/annotation.schema.json",
+    "reportSchema": "evaluation/image-segmentation/benchmark-report.schema.json",
     "acquisition": "evaluation/image-segmentation/annotations/acquisition.json",
     "rules": "evaluation/image-segmentation/annotations/rules.json"
   },

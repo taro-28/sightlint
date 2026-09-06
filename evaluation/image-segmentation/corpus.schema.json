@@ -88,10 +88,11 @@
     "annotations": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["guide", "schema", "acquisition", "rules"],
+      "required": ["guide", "schema", "reportSchema", "acquisition", "rules"],
       "properties": {
         "guide": { "$ref": "#/$defs/path" },
         "schema": { "$ref": "#/$defs/path" },
+        "reportSchema": { "$ref": "#/$defs/path" },
         "acquisition": { "$ref": "#/$defs/path" },
         "rules": { "$ref": "#/$defs/path" }
       }
