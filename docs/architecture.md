@@ -159,8 +159,10 @@ and connected pixels remain untrusted acquisition hypotheses. The report is not 
 CheckReport, contains no executable rule result, and cannot block. Its realistic fixture shows
 unsafe ranked selection and shadow-connected false grouping, so no broader policy is admitted.
 
-Broader format work is evidence-gated by issue #27. Do not merge historical branch
-implementations.
+ADR 0041 records that current repository and pinned-browser product evidence does not establish a
+broader-format gap. Indexed, sub-byte, 16-bit, `tRNS`, and animated inputs therefore remain
+explicitly unavailable; no decoder dependency or automatic conversion is admitted. A future
+observed gap requires a new issue and ADR. Do not merge historical branch implementations.
 
 ## Perception workers
 

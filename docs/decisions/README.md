@@ -55,10 +55,11 @@ background, alternatives, and disposition of historical experiments.
 - [0038 — Workflow-artifact verification and immutable release-tag recovery](0038-release-artifact-transport-and-tag-recovery.md)
 - [0039 — Evaluate broader background hypotheses without changing the strict default](0039-background-segmentation-benchmark.md)
 - [0040 — Exact source-alpha geometry for supported PNG assets](0040-exact-source-alpha-geometry.md)
+- [0041 — Retain bounded PNG coverage until product evidence shows a format gap](0041-retain-bounded-png-coverage.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0041** or later.
+continue at **0042** or later.
 
 ## Historical branch decisions 0025–0029
 
@@ -68,7 +69,7 @@ has been transferred as follows:
 
 | Historical ADR | Subject | Current disposition |
 |---|---|---|
-| 0025 | broad PNG-encoded RGBA8 normalization, palette, sub-byte, 16-bit, `tRNS` | optional strategy and requirements in issue #27 |
+| 0025 | broad PNG-encoded RGBA8 normalization, palette, sub-byte, 16-bit, `tRNS` | not admitted by ADR 0041; future evidence requires a new issue/ADR |
 | 0026 | exact alpha-visible bounds, insets, edge counts, `inkBox` | clean current-main implementation contract in issue #26 |
 | 0027 | ranked exact corner/edge background candidates | benchmark candidate in issue #25 |
 | 0028 | layered image bytes/current assertions/future ground truth corpus | current raster/inspection corpora plus real evaluation gate #22 |
@@ -94,4 +95,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0041.
+Use [the template](template.md) and the next unused number at or after 0042.

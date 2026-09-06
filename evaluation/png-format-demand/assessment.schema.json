@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:png-format-demand-assessment:0.1.0",
+  "title": "SightLint PNG format demand assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "assessment", "governance", "committedAssets", "ephemeralProductCapture", "unsupportedConformanceControls", "libraryCandidateReview", "decision"],
+  "properties": {
+    "$schema": { "const": "./assessment.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "adr", "scope", "limitations"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "adr": { "$ref": "#/$defs/path" },
+        "scope": { "$ref": "#/$defs/text" },
+        "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewBasis", "implementationOutputIsGroundTruth", "telemetryCollected", "artifactContentLeavesRepository", "privacyReview", "license", "holdoutStatus"],
+      "properties": {
+        "reviewBasis": { "const": "repositoryInventoryAndPublicProductE2E" },
+        "implementationOutputIsGroundTruth": { "const": false },
+        "telemetryCollected": { "const": false },
+        "artifactContentLeavesRepository": { "const": false },
+        "privacyReview": { "const": "repositoryOwnedSyntheticInputsOnly" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "holdoutStatus": { "const": "notEstablished" }
+      }
+    },
+    "committedAssets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceManifest", "cases"],
+      "properties": {
+        "sourceManifest": { "const": "evaluation/image-alpha/corpus.json" },
+        "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/asset" } }
+      }
+    },
+    "ephemeralProductCapture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "corpus", "caseCount", "producer", "verification", "publicCommand", "platformScope", "expectedEncoding"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "corpus": { "const": "evaluation/image-segmentation/corpus.json" },
+        "caseCount": { "type": "integer", "minimum": 1 },
+        "producer": { "$ref": "#/$defs/text" },
+        "verification": { "$ref": "#/$defs/path" },
+        "publicCommand": { "const": "benchmark-image-segmentation" },
+        "platformScope": { "const": "github-hosted-ubuntu-pinned-chromium" },
+        "expectedEncoding": { "$ref": "#/$defs/encoding" }
+      }
+    },
+    "unsupportedConformanceControls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["caseId", "reason", "productDemandEvidence"],
+        "properties": {
+          "caseId": { "$ref": "#/$defs/token" },
+          "reason": { "enum": ["indexedColor", "unsupportedBitDepth", "transparencyChunk", "animationChunks", "bufferTooLarge"] },
+          "productDemandEvidence": { "const": false }
+        }
+      }
+    },
+    "libraryCandidateReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "versionObserved", "source", "license", "rustVersion", "defaultUnsafeClaim", "fuzzingClaim", "limits", "transformationRisk", "dependencyAdmitted"],
+      "properties": {
+        "name": { "const": "png" },
+        "versionObserved": { "const": "0.18.1" },
+        "source": { "const": "https://github.com/image-rs/image-png" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "rustVersion": { "const": "1.73" },
+        "defaultUnsafeClaim": { "const": "upstreamStatesNoUnsafeCode" },
+        "fuzzingClaim": { "const": "upstreamStatesOssFuzz" },
+        "limits": { "const": "bestEffortDecoderLimitsPlusCallerOwnedOutputBuffer" },
+        "transformationRisk": { "const": "libraryTransformationsNeedSightLintSemanticAndDifferentialReview" },
+        "dependencyAdmitted": { "const": false }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selectedStrategy", "productCoverageGap", "broaderDecodingOutcome", "newDecoderDependency", "currentExtensionChanged", "nextIssue", "reconsiderationTriggers"],
+      "properties": {
+        "selectedStrategy": { "const": "retainExplicitUnavailability" },
+        "productCoverageGap": { "const": "notEstablished" },
+        "broaderDecodingOutcome": { "const": "untested" },
+        "newDecoderDependency": { "const": false },
+        "currentExtensionChanged": { "const": false },
+        "nextIssue": { "const": 28 },
+        "reconsiderationTriggers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+    "path": { "type": "string", "pattern": "^[A-Za-z0-9._/-]+$" },
+    "encoding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bitDepth", "colorType", "interlaceMethod", "currentRasterStatus"],
+      "properties": {
+        "bitDepth": { "type": "integer", "minimum": 1, "maximum": 16 },
+        "colorType": { "enum": [0, 2, 3, 4, 6] },
+        "interlaceMethod": { "enum": [0, 1] },
+        "currentRasterStatus": { "const": "available" }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "path", "byteSha256", "width", "height", "bitDepth", "colorType", "interlaceMethod", "currentRasterStatus"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" },
+        "path": { "$ref": "#/$defs/path" },
+        "byteSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "bitDepth": { "type": "integer", "minimum": 1, "maximum": 16 },
+        "colorType": { "enum": [0, 2, 3, 4, 6] },
+        "interlaceMethod": { "enum": [0, 1] },
+        "currentRasterStatus": { "const": "available" }
+      }
+    }
+  }
+}

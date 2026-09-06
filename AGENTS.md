@@ -98,10 +98,12 @@ Its bounded sequence is complete:
 5. #33 — licensing, compatibility, packaging, and first alpha release (complete).
 
 Issue #25 is complete as an evaluation-only benchmark; it did not replace the strict image
-inspection policy. Issue #26 adds exact source-alpha geometry without introducing a rule. The
-earliest remaining implementation gate is #27. Other work is preserved in #28–#31; later milestones
-do not automatically outrank it because historical code once existed on a stale branch. Explain
-any deviation from the remaining sequence in the issue and PR.
+inspection policy. Issue #26 adds exact source-alpha geometry without introducing a rule. Issue
+#27 is complete through ADR 0041: current product evidence does not admit broader PNG decoding, so
+unsupported formats remain explicitly unavailable and no decoder dependency was added. The
+earliest remaining implementation gate is #28. Other work is preserved in #29–#31; later
+milestones do not automatically outrank it because historical code once existed on a stale branch.
+Explain any deviation from the remaining sequence in the issue and PR.
 
 ## Before editing
 
@@ -134,7 +136,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0041 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0042 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.
@@ -162,6 +164,7 @@ python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
+python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py

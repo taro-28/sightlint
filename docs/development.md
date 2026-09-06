@@ -50,9 +50,11 @@ Issue #34's bounded execution sequence is complete:
 4. the local agent edit/check/fix/rerun demo in #34 (complete);
 5. #33 — license, packaging, compatibility, and alpha release (complete).
 
-Issue #25 is complete as an evaluation-only benchmark and did not admit a broader default. The
-earliest remaining implementation gate is #27. Other work remains available in #28–#31, but
-historical branch code does not change priority. Explain any deviation in the issue and PR.
+Issue #25 is complete as an evaluation-only benchmark and did not admit a broader default. Issue
+#27 is complete through ADR 0041 without decoder expansion because current product evidence did
+not establish a format gap. The earliest remaining implementation gate is #28. Other work remains
+available in #29–#31, but historical branch code does not change priority. Explain any deviation
+in the issue and PR.
 
 ## Planning before implementation
 
@@ -122,6 +124,7 @@ python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_alpha_assets.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
+python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
@@ -229,8 +232,9 @@ from them. Explain:
 - why a dependency is safer or more maintainable than custom code.
 
 The lesson from the PNG phase is not “never use dependencies.” It is to avoid spending SightLint's
-product effort on custom codec breadth without evidence. Issue #27 requires an explicit
-library-versus-custom decision before broad PNG support.
+product effort on custom codec breadth without evidence. ADR 0041 retains explicit unavailability
+after comparing custom, library, and isolated strategies; a future demonstrated gap requires a
+new issue and ADR before broad PNG support.
 
 No hosted service, database, model runtime, GUI, MCP server, or plugin framework should be added
 before its roadmap issue requires it.
@@ -267,7 +271,7 @@ A serialized change must define compatibility separately for:
 A rule semantics change must state whether it is a bug fix, a new rule version, or a policy change.
 Stable IDs must never silently change meaning.
 
-New ADR numbers continue at 0041 or later. Branch-only ADRs 0025–0029 are historical references,
+New ADR numbers continue at 0042 or later. Branch-only ADRs 0025–0029 are historical references,
 not accepted decisions.
 
 ## Privacy and untrusted inputs

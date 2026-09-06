@@ -163,6 +163,21 @@ the task, locator, edit, and labels are public and visible to the implementation
 
 It proves the current source-pixel path, not screenshot UI understanding.
 
+### PNG format-demand assessment
+
+`evaluation/png-format-demand/` is a versioned scope-admission assessment, not a decoder
+conformance corpus or prevalence study. It inventories every repository PNG and links the nine
+ephemeral pinned-browser screenshots that product evaluation passes through the public image
+command. The assessment keeps five unsupported synthetic raster controls explicitly separate from
+product-demand evidence.
+
+All reviewed product inputs use the current eight-bit RGB/RGBA subset. That is evidence for
+retaining the present boundary under ADR 0041, not evidence that users never have other PNG
+formats. The labels are public development data, no customer telemetry or artifact content is
+collected, no protected holdout or representative sample exists, and broader decoding remains
+`untested`. A drift checker requires review when a repository PNG, capture contract, unsupported
+control, or decoder dependency changes.
+
 ### Source-alpha acquisition evaluation
 
 `evaluation/image-alpha/` contains five repository-owned Northstar transparent UI assets with

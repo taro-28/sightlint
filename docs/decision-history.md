@@ -233,7 +233,9 @@ branches. The project advantage is not a custom PNG decoder. The current decisio
   code is always safer;
 - move effort toward realistic evaluation, structured adapters, semantics, policy, and rules.
 
-Issue #27 captures optional format expansion and the decoder strategy decision.
+ADR 0041 resolves issue #27 for current evidence by retaining explicit unavailability and adding
+no decoder dependency. A future product case may reopen exact formats through a new issue and ADR;
+absence of a current signal is not a prevalence claim.
 
 ### Alpha-visible geometry
 
@@ -397,7 +399,7 @@ the PR template:
 | #10 | verified filter reconstruction merged |
 | #11 | staged common RGBA raster experiment merged into the then-current line; later recovered/current path is defined by #18/#20 |
 | #12 | superseded duplicate filter branch, closed |
-| #13 | superseded broad PNG normalization, remaining idea in #27 |
+| #13 | superseded broad PNG normalization; ADR 0041 did not admit it without product need |
 | #14 | superseded alpha geometry branch; current implementation is ADR 0040 / #26 |
 | #15 | superseded background candidate branch, research in #25 |
 | #16 | superseded image corpus branch, real evaluation in #22 |
@@ -436,7 +438,9 @@ Important historical detail:
   default after the realistic corpus exposes unsafe selection and false grouping;
 - ADR 0040 defines exact source-alpha geometry, its PNG extension/evidence contract, and the
   separate acquisition-versus-rule evaluation boundary;
-- new ADRs should continue at 0041 or later rather than silently reusing historical numbers.
+- ADR 0041 compares PNG decoder strategies and retains the bounded subset until product evidence
+  establishes a gap;
+- new ADRs should continue at 0042 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -446,7 +450,8 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - representative corpus expansion and protected holdout operation beyond the public #22 slice;
 - arbitrary-project and cross-platform Playwright compatibility beyond the bounded #23 slice;
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
-- custom versus library decoding for broader formats: issue #27;
+- exact unsupported PNG formats and decoder admission if future product evidence establishes a
+  gap after ADR 0041;
 - perception-worker protocol/calibration: issue #28;
 - adapter ordering after web: issue #29;
 - interaction trace/effect schema: issue #30;

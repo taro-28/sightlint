@@ -273,6 +273,10 @@ dedicated evidence and `alphaGeometry@0.1.0` extension preserve the predicate, c
 unit, counts, and source/display boundary. It does not add a PNG-specific mandatory core field or
 turn the observation into a rule verdict.
 
+ADR 0041 changes no IR or extension surface. Its format-demand assessment retains explicit
+unavailability for unsupported source encodings; caller-selected conversion is evidence about the
+converted bytes and must not be represented as exact facts about the original encoding.
+
 For an IR or official-extension change:
 
 - write an ADR when architecture/semantics change;
@@ -284,5 +288,5 @@ For an IR or official-extension change:
 - update public-binary E2E, handoff, roadmap, and docs;
 - never change an existing stable field's meaning without a versioned transition.
 
-New ADR numbers continue at 0041 or later. Historical branch-only ADRs 0025–0029 are references,
+New ADR numbers continue at 0042 or later. Historical branch-only ADRs 0025–0029 are references,
 not accepted current schema decisions.
