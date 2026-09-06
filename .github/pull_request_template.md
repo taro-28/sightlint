@@ -67,7 +67,9 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/generate_pptx_fixtures.py --check`
 - [ ] `python3 tools/check_pptx_evaluation.py`
 - [ ] `python3 -m unittest adapters/pptx/tests/test_adapter.py`
-- [ ] `python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt`
+- [ ] `python3 -m venv .venv-sightlint-pdf`
+- [ ] `.venv-sightlint-pdf/bin/python -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt`
+- [ ] `export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"`
 - [ ] `python3 tools/generate_pdf_fixtures.py --check`
 - [ ] `python3 tools/check_pdf_evaluation.py`
 - [ ] `python3 -m unittest adapters/pdf/tests/test_adapter.py`

@@ -8,7 +8,9 @@ behavior.
 Install the reviewed pure-Python parser into an isolated Python 3.9+ environment:
 
 ```bash
-python3 -m pip install --require-hashes -r adapters/pdf/requirements.txt
+python3 -m venv .venv-sightlint-pdf
+.venv-sightlint-pdf/bin/python -m pip install --require-hashes -r adapters/pdf/requirements.txt
+export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
 cargo build --locked -p sightlint-cli
 ```
 

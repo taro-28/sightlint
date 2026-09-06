@@ -36,7 +36,8 @@ object graphs in the adapter process and is not a sandbox or memory ceiling.
 
 Add `adapters/pdf/` as a local Python 3.9+ process adapter with request, response, and
 `org.sightlint.pdf` extension version `0.1.0`. Pin the universal `pypdf==6.17.0` wheel by SHA-256,
-record its license and Python compatibility, and install it with `pip --require-hashes` in CI.
+record its license and Python compatibility, and install it with `pip --require-hashes` in an
+ephemeral virtual environment in CI.
 The adapter verifies the imported version at runtime and records the Python and parser versions in
 provenance.
 

@@ -72,10 +72,12 @@ jobs:
       - name: Install and verify the locked PDF adapter dependency and evaluation
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
-          python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
-          python3 tools/generate_pdf_fixtures.py --check
-          python3 tools/check_pdf_evaluation.py
-          python3 -m unittest adapters/pdf/tests/test_adapter.py
+          python3 -m venv .venv-sightlint-pdf
+          .venv-sightlint-pdf/bin/python -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+          .venv-sightlint-pdf/bin/python -c 'import os,sys; print(os.path.dirname(sys.executable))' >> "$GITHUB_PATH"
+          .venv-sightlint-pdf/bin/python tools/generate_pdf_fixtures.py --check
+          .venv-sightlint-pdf/bin/python tools/check_pdf_evaluation.py
+          .venv-sightlint-pdf/bin/python -m unittest adapters/pdf/tests/test_adapter.py
       - name: Verify release and dependency-license contracts
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
@@ -191,10 +193,13 @@ jobs:
         include:
           - os: ubuntu-latest
             python: python3
+            pdf_python: .venv-sightlint-pdf/bin/python
           - os: macos-latest
             python: python3
+            pdf_python: .venv-sightlint-pdf/bin/python
           - os: windows-latest
             python: python
+            pdf_python: .venv-sightlint-pdf/Scripts/python.exe
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -214,17 +219,22 @@ jobs:
       - name: Build the public SightLint binary
         run: cargo build --locked -p sightlint-cli
       - name: Install locked PDF parser dependency
-        run: ${{ matrix.python }} -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+        shell: bash
+        run: |
+          ${{ matrix.python }} -m venv .venv-sightlint-pdf
+          "${{ matrix.pdf_python }}" -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+          "${{ matrix.pdf_python }}" -c 'import os,sys; print(os.path.dirname(sys.executable))' >> "$GITHUB_PATH"
       - name: Verify PPTX fixture and evaluation contracts
         run: |
           ${{ matrix.python }} tools/generate_pptx_fixtures.py --check
           ${{ matrix.python }} tools/check_pptx_evaluation.py
           ${{ matrix.python }} -m unittest adapters/pptx/tests/test_adapter.py
       - name: Verify PDF fixture and evaluation contracts
+        shell: bash
         run: |
-          ${{ matrix.python }} tools/generate_pdf_fixtures.py --check
-          ${{ matrix.python }} tools/check_pdf_evaluation.py
-          ${{ matrix.python }} -m unittest adapters/pdf/tests/test_adapter.py
+          "${{ matrix.pdf_python }}" tools/generate_pdf_fixtures.py --check
+          "${{ matrix.pdf_python }}" tools/check_pdf_evaluation.py
+          "${{ matrix.pdf_python }}" -m unittest adapters/pdf/tests/test_adapter.py
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E

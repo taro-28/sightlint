@@ -323,7 +323,9 @@ python3 adapters/pptx/sightlint_pptx.py \
 target/debug/sightlint check /tmp/atlas-clean.ir.json --profile base --format json
 
 # Install the exact PDF parser, acquire bounded PDF geometry, and run the public rule engine.
-python3 -m pip install --require-hashes -r adapters/pdf/requirements.txt
+python3 -m venv .venv-sightlint-pdf
+.venv-sightlint-pdf/bin/python -m pip install --require-hashes -r adapters/pdf/requirements.txt
+export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
 python3 adapters/pdf/sightlint_pdf.py \
   --request evaluation/pdf/requests/atlas-clean.json \
   --repository-root . \

@@ -479,7 +479,9 @@ The bounded PDF adapter is also a separate local Python process and requires the
 parser first:
 
 ```bash
-python3 -m pip install --require-hashes -r adapters/pdf/requirements.txt
+python3 -m venv .venv-sightlint-pdf
+.venv-sightlint-pdf/bin/python -m pip install --require-hashes -r adapters/pdf/requirements.txt
+export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
 python3 adapters/pdf/sightlint_pdf.py \
   --request evaluation/pdf/requests/atlas-clean.json \
   --repository-root . \
@@ -782,7 +784,9 @@ python3 tools/check_perception_evaluation.py
 python3 tools/generate_pptx_fixtures.py --check
 python3 tools/check_pptx_evaluation.py
 python3 -m unittest adapters/pptx/tests/test_adapter.py
-python3 -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+python3 -m venv .venv-sightlint-pdf
+.venv-sightlint-pdf/bin/python -m pip install --disable-pip-version-check --require-hashes -r adapters/pdf/requirements.txt
+export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
 python3 tools/generate_pdf_fixtures.py --check
 python3 tools/check_pdf_evaluation.py
 python3 -m unittest adapters/pdf/tests/test_adapter.py
