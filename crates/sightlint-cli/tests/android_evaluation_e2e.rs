@@ -104,6 +104,81 @@ fn item_by<'a>(items: &'a Value, field: &str, expected: &Value) -> &'a Value {
         .unwrap_or_else(|| panic!("missing item with {field}={expected}"))
 }
 
+fn acquisition_node_facts(document: &Value, extension: &Value, expected: &Value) -> u32 {
+    let resource_id = &expected["resourceId"];
+    let actual = item_by(&extension["nodes"], "resourceId", resource_id);
+    for field in ["className", "mappingStatus", "layoutBoundsDevicePixels"] {
+        assert_eq!(
+            actual[field], expected[field],
+            "node {resource_id} field {field}"
+        );
+    }
+    assert_eq!(
+        actual["globalVisible"]["value"], expected["globalVisible"],
+        "node {resource_id} global visibility"
+    );
+    assert_eq!(
+        actual["accessibility"]["geometryStatus"],
+        expected["accessibilityGeometryStatus"]
+    );
+    assert_eq!(
+        actual["accessibility"]["boundsDevicePixels"],
+        expected["accessibilityBoundsDevicePixels"]
+    );
+    if let Some(raw) = expected.get("rawAccessibilityBoundsDevicePixels") {
+        assert_eq!(actual["accessibility"]["rawBoundsDevicePixels"], *raw);
+    }
+    for field in ["text", "contentDescription"] {
+        if let Some(value) = expected.get(field) {
+            assert_eq!(actual[field], *value, "node {resource_id} field {field}");
+        }
+    }
+
+    let core_id = json!(format!("android:view:{}", resource_id.as_str().unwrap()));
+    let core_node = document["nodes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|node| node["id"] == core_id);
+    if expected["mappingStatus"] == "mappedExactLayout" {
+        let core_node = core_node.expect("mapped acquisition node has a core node");
+        assert_eq!(core_node["kind"]["value"], expected["coreKind"]);
+        for coordinate in ["x", "y", "width", "height"] {
+            assert_eq!(
+                core_node["geometry"]["layoutBox"]["rect"][coordinate].as_f64(),
+                expected["layoutBoundsDevicePixels"][coordinate].as_f64(),
+                "node {resource_id} core layout coordinate {coordinate}"
+            );
+        }
+        assert!(core_node["geometry"].get("hitBox").is_none());
+        assert!(core_node["geometry"].get("renderBox").is_none());
+        assert!(core_node["geometry"].get("inkBox").is_none());
+        let evidence = item_by(&document["evidence"], "id", &actual["viewEvidenceId"]);
+        assert_eq!(evidence["class"], "exactSource");
+        assert_eq!(evidence["selector"]["nativeId"], core_id);
+    } else {
+        assert!(
+            core_node.is_none(),
+            "excluded acquisition node became a core node"
+        );
+    }
+    let accessibility_evidence = item_by(
+        &document["evidence"],
+        "id",
+        &actual["accessibilityEvidenceId"],
+    );
+    assert_eq!(accessibility_evidence["class"], "platformSemantics");
+    assert_eq!(
+        accessibility_evidence["selector"]["nativeId"],
+        json!(format!(
+            "android:accessibility:{}",
+            resource_id.as_str().unwrap()
+        ))
+    );
+    7 + u32::from(expected.get("text").is_some())
+        + u32::from(expected.get("contentDescription").is_some())
+}
+
 fn acquisition_facts(document: &Value, oracle: &Value) -> u32 {
     let extension = &document["extensions"]["org.sightlint.android"];
     for field in [
@@ -130,11 +205,11 @@ fn acquisition_facts(document: &Value, oracle: &Value) -> u32 {
     }
     assert_eq!(
         extension["nodes"].as_array().unwrap().len(),
-        oracle["counts"]["capturedNodes"].as_u64().unwrap() as usize
+        usize::try_from(oracle["counts"]["capturedNodes"].as_u64().unwrap()).unwrap()
     );
     assert_eq!(
         document["nodes"].as_array().unwrap().len(),
-        oracle["counts"]["mappedCoreNodes"].as_u64().unwrap() as usize
+        usize::try_from(oracle["counts"]["mappedCoreNodes"].as_u64().unwrap()).unwrap()
     );
     assert_eq!(
         extension["unsupported"]["unidentifiedNodeCount"],
@@ -143,79 +218,7 @@ fn acquisition_facts(document: &Value, oracle: &Value) -> u32 {
 
     let mut facts = 8_u32;
     for expected in oracle["nodes"].as_array().expect("annotated nodes") {
-        let resource_id = &expected["resourceId"];
-        let actual = item_by(&extension["nodes"], "resourceId", resource_id);
-        for field in ["className", "mappingStatus", "layoutBoundsDevicePixels"] {
-            assert_eq!(
-                actual[field], expected[field],
-                "node {resource_id} field {field}"
-            );
-        }
-        assert_eq!(
-            actual["globalVisible"]["value"], expected["globalVisible"],
-            "node {resource_id} global visibility"
-        );
-        assert_eq!(
-            actual["accessibility"]["geometryStatus"],
-            expected["accessibilityGeometryStatus"]
-        );
-        assert_eq!(
-            actual["accessibility"]["boundsDevicePixels"],
-            expected["accessibilityBoundsDevicePixels"]
-        );
-        if let Some(raw) = expected.get("rawAccessibilityBoundsDevicePixels") {
-            assert_eq!(actual["accessibility"]["rawBoundsDevicePixels"], *raw);
-        }
-        for field in ["text", "contentDescription"] {
-            if let Some(value) = expected.get(field) {
-                assert_eq!(actual[field], *value, "node {resource_id} field {field}");
-            }
-        }
-
-        let core_id = json!(format!("android:view:{}", resource_id.as_str().unwrap()));
-        let core_node = document["nodes"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|node| node["id"] == core_id);
-        if expected["mappingStatus"] == "mappedExactLayout" {
-            let core_node = core_node.expect("mapped acquisition node has a core node");
-            assert_eq!(core_node["kind"]["value"], expected["coreKind"]);
-            for coordinate in ["x", "y", "width", "height"] {
-                assert_eq!(
-                    core_node["geometry"]["layoutBox"]["rect"][coordinate].as_f64(),
-                    expected["layoutBoundsDevicePixels"][coordinate].as_f64(),
-                    "node {resource_id} core layout coordinate {coordinate}"
-                );
-            }
-            assert!(core_node["geometry"].get("hitBox").is_none());
-            assert!(core_node["geometry"].get("renderBox").is_none());
-            assert!(core_node["geometry"].get("inkBox").is_none());
-            let evidence = item_by(&document["evidence"], "id", &actual["viewEvidenceId"]);
-            assert_eq!(evidence["class"], "exactSource");
-            assert_eq!(evidence["selector"]["nativeId"], core_id);
-        } else {
-            assert!(
-                core_node.is_none(),
-                "excluded acquisition node became a core node"
-            );
-        }
-        let accessibility_evidence = item_by(
-            &document["evidence"],
-            "id",
-            &actual["accessibilityEvidenceId"],
-        );
-        assert_eq!(accessibility_evidence["class"], "platformSemantics");
-        assert_eq!(
-            accessibility_evidence["selector"]["nativeId"],
-            json!(format!(
-                "android:accessibility:{}",
-                resource_id.as_str().unwrap()
-            ))
-        );
-        facts += 7
-            + u32::from(expected.get("text").is_some())
-            + u32::from(expected.get("contentDescription").is_some());
+        facts += acquisition_node_facts(document, extension, expected);
     }
     facts
 }
@@ -229,7 +232,7 @@ fn rule_observation(report: &Value, oracle: &Value) -> (u32, u32) {
         .collect::<Vec<_>>();
     assert_eq!(
         rule_results.len(),
-        oracle["expectedResultCount"].as_u64().unwrap() as usize
+        usize::try_from(oracle["expectedResultCount"].as_u64().unwrap()).unwrap()
     );
     for target in oracle["expectedAbsentTargets"].as_array().unwrap() {
         assert!(
@@ -582,6 +585,11 @@ fn public_android_adapter_has_stable_fail_closed_boundaries() {
         "input-invalid",
         &path_ir,
     );
+}
+
+#[test]
+fn public_android_adapter_rejects_malformed_incompatible_and_conflicting_captures() {
+    let root = repository_root();
 
     let duplicate_temp = TempDirectory::new();
     let original =
