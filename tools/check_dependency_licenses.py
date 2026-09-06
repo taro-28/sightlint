@@ -61,28 +61,36 @@ def cargo_licenses() -> int:
     return external
 
 
-def npm_licenses() -> int:
-    """Validate the private package and every locked npm dependency."""
-    lock_path = ROOT / "adapters" / "playwright" / "package-lock.json"
-    lock = json.loads(lock_path.read_text(encoding="utf-8"))
-    root_package = lock["packages"].get("")
-    if not isinstance(root_package, dict) or root_package.get("license") != PROJECT_LICENSE:
-        raise SystemExit(f"npm root package does not declare {PROJECT_LICENSE}")
+def npm_licenses() -> tuple[int, int]:
+    """Validate every private npm package root and locked external dependency."""
+    lock_paths = [
+        ROOT / "adapters" / "perception" / "package-lock.json",
+        ROOT / "adapters" / "playwright" / "package-lock.json",
+    ]
     external = 0
-    for path, package in lock["packages"].items():
-        if path == "":
-            continue
-        name = package.get("name") or path.removeprefix("node_modules/")
-        validate_license(package.get("license"), f"npm {name}@{package.get('version', '?')}")
-        external += 1
-    return external
+    for lock_path in lock_paths:
+        lock = json.loads(lock_path.read_text(encoding="utf-8"))
+        root_package = lock["packages"].get("")
+        label = lock_path.parent.relative_to(ROOT)
+        if not isinstance(root_package, dict) or root_package.get("license") != PROJECT_LICENSE:
+            raise SystemExit(f"npm root package {label} does not declare {PROJECT_LICENSE}")
+        for path, package in lock["packages"].items():
+            if path == "":
+                continue
+            name = package.get("name") or path.removeprefix("node_modules/")
+            validate_license(package.get("license"), f"npm {name}@{package.get('version', '?')}")
+            external += 1
+    return len(lock_paths), external
 
 
 def main() -> None:
     """Validate both locked ecosystems."""
     cargo_count = cargo_licenses()
-    npm_count = npm_licenses()
-    print(f"dependency licenses: {cargo_count} Cargo and {npm_count} npm packages verified")
+    npm_roots, npm_count = npm_licenses()
+    print(
+        f"dependency licenses: {cargo_count} Cargo and {npm_count} external npm packages "
+        f"across {npm_roots} private roots verified"
+    )
 
 
 if __name__ == "__main__":

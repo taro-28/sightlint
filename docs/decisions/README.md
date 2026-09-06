@@ -56,10 +56,11 @@ background, alternatives, and disposition of historical experiments.
 - [0039 — Evaluate broader background hypotheses without changing the strict default](0039-background-segmentation-benchmark.md)
 - [0040 — Exact source-alpha geometry for supported PNG assets](0040-exact-source-alpha-geometry.md)
 - [0041 — Retain bounded PNG coverage until product evidence shows a format gap](0041-retain-bounded-png-coverage.md)
+- [0042 — Isolate perception workers behind a bounded observation protocol](0042-isolated-perception-worker-protocol.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0042** or later.
+continue at **0043** or later.
 
 ## Historical branch decisions 0025–0029
 
@@ -95,4 +96,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0042.
+Use [the template](template.md) and the next unused number at or after 0043.

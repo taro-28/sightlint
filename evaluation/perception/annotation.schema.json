@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:perception-evaluation-annotation:0.1.0",
+  "title": "SightLint perception evaluation annotation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "documentType", "annotationMethod", "cases"],
+  "properties": {
+    "$schema": { "const": "../annotation.schema.json" },
+    "schemaVersion": { "const": "0.1.0" },
+    "documentType": { "enum": ["acquisitionOracle", "ruleOracle"] },
+    "annotationMethod": { "$ref": "#/$defs/text" },
+    "cases": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/case" } }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-zA-Z0-9.-]*$" },
+    "familyExpectation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["family", "expectedStatus", "groundTruthRole", "rationale"],
+      "properties": {
+        "family": { "enum": ["region", "text", "role", "hierarchy", "peerGroup"] },
+        "expectedStatus": { "enum": ["observed", "partial", "unsupported", "ambiguous", "untested"] },
+        "groundTruthRole": { "enum": ["acquisition", "notAnnotated"] }, "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "acquisition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["caseId", "familyExpectations", "nativePixelComparison", "requiredPreservedFacts", "abstentions"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" },
+        "familyExpectations": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/familyExpectation" } },
+        "nativePixelComparison": { "enum": ["recordSeparately", "conflictRequired"] },
+        "requiredPreservedFacts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "abstentions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "rule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["caseId", "executableRule", "semanticQuestion", "applicabilityGroundTruth", "expectedOutcome", "blockingAllowed", "rationale"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/token" }, "executableRule": { "type": "null" },
+        "semanticQuestion": { "$ref": "#/$defs/text" }, "applicabilityGroundTruth": { "enum": ["cantTell", "inapplicable"] },
+        "expectedOutcome": { "const": "untested" }, "blockingAllowed": { "const": false },
+        "rationale": { "$ref": "#/$defs/text" }
+      }
+    },
+    "case": { "oneOf": [{ "$ref": "#/$defs/acquisition" }, { "$ref": "#/$defs/rule" }] }
+  },
+  "allOf": [
+    { "if": { "properties": { "documentType": { "const": "acquisitionOracle" } } }, "then": { "properties": { "cases": { "type": "array", "items": { "$ref": "#/$defs/acquisition" } } } } },
+    { "if": { "properties": { "documentType": { "const": "ruleOracle" } } }, "then": { "properties": { "cases": { "type": "array", "items": { "$ref": "#/$defs/rule" } } } } }
+  ]
+}

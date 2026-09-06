@@ -1,0 +1,13 @@
+{
+  "name": "@sightlint/adapter-perception",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT OR Apache-2.0",
+  "engines": { "node": ">=20 <25" },
+  "bin": { "sightlint-perception": "src/cli.mjs" },
+  "scripts": {
+    "check": "node --test tests/unit.test.mjs",
+    "test:e2e": "node --test tests/e2e.test.mjs"
+  }
+}

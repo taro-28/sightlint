@@ -5,8 +5,9 @@ external tools retain their own terms.
 
 ## Current locked review
 
-The `v0.1.0-alpha.2` release candidate contains 36 external Cargo packages and 30 npm lockfile
-package entries. `tools/check_dependency_licenses.py` reads the complete locked graphs and rejects
+The current source tree contains 36 external Cargo packages and 30 external npm lockfile package
+entries across two private Node package roots. `tools/check_dependency_licenses.py` reads the
+complete locked graphs and rejects
 missing declarations or identifiers outside this reviewed permissive set:
 
 - `0BSD`;
@@ -23,6 +24,10 @@ Apache-2.0`). The private Node package directly uses Playwright (`Apache-2.0`) a
 TypeScript (`Apache-2.0`), Node type declarations (`MIT`), and Ajv (`MIT`). The complete transitive
 expressions, including `BSD-3-Clause`, `0BSD`, `Unlicense`, and `Unicode-3.0`, are checked from the
 lockfiles rather than inferred from this summary.
+
+The private perception package has no npm dependencies, model weights, native modules, or bundled
+runtime. Its lockfile still participates in the root-license check so future additions cannot
+bypass review.
 
 Adding a package with an allowed license still requires ordinary ownership, maintenance,
 security, MSRV/runtime, determinism, privacy, and resource review. Updating the allowed set is a

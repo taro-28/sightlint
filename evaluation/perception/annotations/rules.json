@@ -1,0 +1,11 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "ruleOracle",
+  "annotationMethod": "Rule truth was reviewed independently from worker output; no executable rule consumes perception protocol v0 regions.",
+  "cases": [
+    { "caseId": "dashboard-browser-clean", "executableRule": null, "semanticQuestion": "Do measured pixel components prove correct UI semantics or spacing?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "No role, hierarchy, peer relation, or policy is established." },
+    { "caseId": "dashboard-browser-intentional-grouping", "executableRule": null, "semanticQuestion": "Should the adjacent complementary promotion be treated as a metric peer defect?", "applicabilityGroundTruth": "inapplicable", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "Native role and hierarchy establish valid asymmetry; pixel adjacency must not override them." },
+    { "caseId": "dashboard-browser-spacing-mutant", "executableRule": null, "semanticQuestion": "Does a changed pixel component prove a peer-spacing defect?", "applicabilityGroundTruth": "cantTell", "expectedOutcome": "untested", "blockingAllowed": false, "rationale": "The render mutation is measurable, but semantic peer applicability is unavailable." }
+  ]
+}

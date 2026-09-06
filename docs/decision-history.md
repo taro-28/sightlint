@@ -237,6 +237,14 @@ ADR 0041 resolves issue #27 for current evidence by retaining explicit unavailab
 no decoder dependency. A future product case may reopen exact formats through a new issue and ADR;
 absence of a current signal is not a prevalence claim.
 
+ADR 0042 resolves the protocol-v0 boundary in issue #28. A strict local process contract carries
+typed region, text, role, hierarchy, and peer observations with explicit provenance, confidence
+availability, alternatives, uncertainty, family coverage, preprocessing, and resource/privacy
+declarations. Only model-free measured regions map into core IR; inferred semantics remain outside
+the trusted kernel and cannot create a verdict. The reference worker uses an existing deterministic
+segmentation report and the Atlas differential corpus, so real OCR/model quality and calibration
+remain untested rather than being inferred from protocol conformance.
+
 ### Alpha-visible geometry
 
 Alpha provides exact visible-source bounds for transparent assets but does not identify whitespace
@@ -321,11 +329,13 @@ The sequence is:
 - build realistic evaluation;
 - add Playwright as the first rich adapter;
 - establish recommended rules;
+- establish the optional perception process/provenance boundary;
 - then add PPTX/PDF/mobile adapters according to demand and fixture quality;
-- add optional perception and interaction traces only through isolated protocols;
+- add interaction traces only through isolated protocols;
 - add MCP/GitHub/editor/UI surfaces after the core produces useful evidence.
 
-Issues #29, #28, #30, and #31 preserve those later stages.
+ADR 0042 completes the protocol-v0 perception boundary. Issues #29, #30, and #31 preserve the
+remaining later stages.
 
 ## Local-first and privacy
 
@@ -440,7 +450,9 @@ Important historical detail:
   separate acquisition-versus-rule evaluation boundary;
 - ADR 0041 compares PNG decoder strategies and retains the bounded subset until product evidence
   establishes a gap;
-- new ADRs should continue at 0042 or later rather than silently reusing historical numbers.
+- ADR 0042 defines the local perception-worker protocol, typed observation families, and
+  non-promotion boundary;
+- new ADRs should continue at 0043 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -452,7 +464,8 @@ inside an unmerged branch and does not make them accepted repository decisions.
 - project/profile override syntax and future rule-promotion thresholds beyond ADR 0035;
 - exact unsupported PNG formats and decoder admission if future product evidence establishes a
   gap after ADR 0041;
-- perception-worker protocol/calibration: issue #28;
+- real OCR/CV/VLM model selection, calibration, and representative perception evaluation after
+  the issue #28 protocol foundation;
 - adapter ordering after web: issue #29;
 - interaction trace/effect schema: issue #30;
 - MCP/GitHub/editor/local UI and later package channels: issue #31;

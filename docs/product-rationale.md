@@ -371,8 +371,9 @@ controlled proof of the data-flow idea, not the planned general algorithm.
 
 Issue #25 preserves broader background/segmentation experiments. ADR 0041 retains explicit
 unavailability for broader PNG formats because current product inputs establish no coverage gap;
-future format work requires new evidence and a new issue. Issue #28 preserves the
-perception-worker protocol. Issue #22 is required before promoting broad heuristics.
+future format work requires new evidence and a new issue. ADR 0042 implements issue #28's local
+perception protocol foundation while leaving real OCR/model accuracy and calibration untested.
+Issue #22 remains the evaluation basis before promoting broad heuristics.
 
 ## Interaction quality
 

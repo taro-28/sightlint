@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:perception-worker-response:0.1.0",
+  "title": "SightLint perception worker response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "protocolVersion", "requestId", "status", "worker", "inputSha256", "familyStatus", "observations", "repeatedRunAgreement", "limitations"],
+  "properties": {
+    "$schema": { "const": "../schemas/response.schema.json" },
+    "protocolVersion": { "const": "0.1.0" }, "requestId": { "$ref": "#/$defs/token" },
+    "status": { "enum": ["complete", "partial", "unsupported", "ambiguous"] },
+    "worker": { "$ref": "#/$defs/worker" }, "inputSha256": { "$ref": "#/$defs/sha256" },
+    "familyStatus": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/familyStatus" } },
+    "observations": { "type": "array", "maxItems": 1024, "items": { "$ref": "#/$defs/observation" } },
+    "repeatedRunAgreement": { "$ref": "#/$defs/agreement" },
+    "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "family": { "enum": ["hierarchy", "peerGroup", "region", "role", "text"] },
+    "coverageStatus": { "enum": ["observed", "partial", "unsupported", "ambiguous", "untested"] },
+    "model": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["status"], "properties": { "status": { "const": "notApplicable" } } },
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "name", "version", "sha256"],
+          "properties": { "status": { "const": "selected" }, "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/text" }, "sha256": { "$ref": "#/$defs/sha256" } }
+        }
+      ]
+    },
+    "worker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version", "sourceSha256", "runtime", "backend", "model"],
+      "properties": {
+        "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/version" }, "sourceSha256": { "$ref": "#/$defs/sha256" },
+        "runtime": {
+          "type": "object", "additionalProperties": false, "required": ["name", "version"],
+          "properties": { "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/text" } }
+        },
+        "backend": { "$ref": "#/$defs/token" }, "model": { "$ref": "#/$defs/model" }
+      }
+    },
+    "familyStatus": {
+      "type": "object", "additionalProperties": false, "required": ["family", "status", "reason"],
+      "properties": { "family": { "$ref": "#/$defs/family" }, "status": { "$ref": "#/$defs/coverageStatus" }, "reason": { "$ref": "#/$defs/text" } }
+    },
+    "confidence": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "value", "calibrationId"],
+          "properties": { "status": { "const": "calibratedProbability" }, "value": { "type": "number", "minimum": 0, "maximum": 1 }, "calibrationId": { "$ref": "#/$defs/token" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "reason"],
+          "properties": { "status": { "enum": ["notProvided", "notApplicable"] }, "reason": { "$ref": "#/$defs/text" } }
+        }
+      ]
+    },
+    "alternative": {
+      "type": "object", "additionalProperties": false, "required": ["value", "probability"],
+      "properties": { "value": { "$ref": "#/$defs/text" }, "probability": { "type": ["number", "null"], "minimum": 0, "maximum": 1 } }
+    },
+    "bounds": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x", "y", "width", "height", "coordinateSpaceId", "unit", "format"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0 }, "y": { "type": "integer", "minimum": 0 },
+        "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 },
+        "coordinateSpaceId": { "$ref": "#/$defs/token" }, "unit": { "const": "devicePixel" }, "format": { "const": "xywh-half-open" }
+      }
+    },
+    "observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "family", "status", "value", "confidence", "alternatives", "uncertaintyReasons", "sourceEvidence"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" }, "family": { "$ref": "#/$defs/family" }, "status": { "const": "observed" },
+        "value": { "oneOf": [{ "$ref": "#/$defs/regionValue" }, { "$ref": "#/$defs/textValue" }, { "$ref": "#/$defs/roleValue" }, { "$ref": "#/$defs/hierarchyValue" }, { "$ref": "#/$defs/peerGroupValue" }] },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "alternatives": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/alternative" } },
+        "uncertaintyReasons": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "sourceEvidence": { "$ref": "#/$defs/sourceEvidence" }
+      },
+      "allOf": [
+        { "if": { "type": "object", "properties": { "family": { "const": "region" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/regionValue" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "text" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/textValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "role" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/roleValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "hierarchy" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/hierarchyValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "peerGroup" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/peerGroupValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } }
+      ]
+    },
+    "regionValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "bounds", "pixelCount"],
+      "properties": { "kind": { "const": "pixelComponent" }, "bounds": { "$ref": "#/$defs/bounds" }, "pixelCount": { "type": "integer", "minimum": 1 } }
+    },
+    "textValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "text", "bounds"],
+      "properties": { "kind": { "const": "text" }, "text": { "$ref": "#/$defs/text" }, "bounds": { "$ref": "#/$defs/bounds" } }
+    },
+    "roleValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "targetObservationId", "role"],
+      "properties": { "kind": { "const": "role" }, "targetObservationId": { "$ref": "#/$defs/token" }, "role": { "$ref": "#/$defs/token" } }
+    },
+    "hierarchyValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "parentObservationId", "childObservationId"],
+      "properties": { "kind": { "const": "hierarchy" }, "parentObservationId": { "$ref": "#/$defs/token" }, "childObservationId": { "$ref": "#/$defs/token" } }
+    },
+    "peerGroupValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "memberObservationIds", "axis"],
+      "properties": {
+        "kind": { "const": "peerGroup" }, "memberObservationIds": { "type": "array", "minItems": 2, "maxItems": 1024, "uniqueItems": true, "items": { "$ref": "#/$defs/token" } },
+        "axis": { "enum": ["horizontal", "vertical", "unordered", "unknown"] }
+      }
+    },
+    "sourceEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["class", "selector", "sourceObservationIds", "hypothesisId", "hypothesisConfirmed", "semanticApplicability"],
+      "properties": {
+        "class": { "enum": ["visionMeasured", "visionInferred"] }, "selector": { "$ref": "#/$defs/text" },
+        "sourceObservationIds": { "type": "array", "maxItems": 1024, "uniqueItems": true, "items": { "$ref": "#/$defs/token" } },
+        "hypothesisId": { "$ref": "#/$defs/text" }, "hypothesisConfirmed": { "const": false },
+        "semanticApplicability": { "const": "cantTell" }
+      }
+    },
+    "inferredSourceEvidence": {
+      "allOf": [{ "$ref": "#/$defs/sourceEvidence" }, { "type": "object", "properties": { "class": { "const": "visionInferred" } } }]
+    },
+    "inferredConfidence": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "value", "calibrationId"],
+          "properties": { "status": { "const": "calibratedProbability" }, "value": { "type": "number", "minimum": 0, "maximum": 1 }, "calibrationId": { "$ref": "#/$defs/token" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "reason"],
+          "properties": { "status": { "const": "notProvided" }, "reason": { "$ref": "#/$defs/text" } }
+        }
+      ]
+    },
+    "agreement": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "reason"],
+          "properties": { "status": { "const": "notMeasured" }, "reason": { "$ref": "#/$defs/text" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "runs", "identicalRuns"],
+          "properties": { "status": { "const": "measured" }, "runs": { "type": "integer", "minimum": 2 }, "identicalRuns": { "type": "integer", "minimum": 0 } }
+        }
+      ]
+    }
+  }
+}

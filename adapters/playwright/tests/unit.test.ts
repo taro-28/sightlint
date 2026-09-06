@@ -102,12 +102,26 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/acquisition.json"],
     ["evaluation/image-alpha/annotation.schema.json", "evaluation/image-alpha/annotations/rules.json"],
     ["evaluation/png-format-demand/assessment.schema.json", "evaluation/png-format-demand/assessment.json"],
+    ["evaluation/perception/corpus.schema.json", "evaluation/perception/corpus.json"],
+    ["evaluation/perception/annotation.schema.json", "evaluation/perception/annotations/acquisition.json"],
+    ["evaluation/perception/annotation.schema.json", "evaluation/perception/annotations/rules.json"],
+    ["adapters/perception/schemas/response.schema.json", "fixtures/perception/inferred-response.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {
     const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
     const validate = ajv.compile(await json(schemaPath) as AnySchema);
     assert.equal(validate(await json(documentPath)), true, `${documentPath}: ${ajv.errorsText(validate.errors)}`);
+  }
+
+  for (const schemaPath of [
+    "adapters/perception/schemas/request.schema.json",
+    "adapters/perception/schemas/response.schema.json",
+    "adapters/perception/schemas/run-report.schema.json",
+    "adapters/perception/schemas/perception-extension.schema.json",
+  ]) {
+    const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+    ajv.compile(await json(schemaPath) as AnySchema);
   }
 });
 

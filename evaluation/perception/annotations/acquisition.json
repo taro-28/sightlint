@@ -1,0 +1,47 @@
+{
+  "$schema": "../annotation.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "acquisitionOracle",
+  "annotationMethod": "Family coverage and native/render facts were reviewed from the existing fixture source and browser-acquisition oracle; worker output is not ground truth.",
+  "cases": [
+    {
+      "caseId": "dashboard-browser-clean",
+      "familyExpectations": [
+        { "family": "hierarchy", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Exact-color components do not establish parentage." },
+        { "family": "peerGroup", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Repeated-looking surfaces do not establish semantic peers." },
+        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The explicitly selected ranked policy emits bounded components while its two-edge-surface background remains unconfirmed." },
+        { "family": "role", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The worker has no semantic classifier." },
+        { "family": "text", "expectedStatus": "unsupported", "groundTruthRole": "notAnnotated", "rationale": "The worker performs no OCR." }
+      ],
+      "nativePixelComparison": "recordSeparately",
+      "requiredPreservedFacts": ["Native DOM/accessibility roles remain authoritative for their source.", "Pixel regions retain the unconfirmed-background hypothesis and cantTell semantics."],
+      "abstentions": ["No region is promoted to a card, control, peer, or hierarchy node."]
+    },
+    {
+      "caseId": "dashboard-browser-intentional-grouping",
+      "familyExpectations": [
+        { "family": "hierarchy", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The pixel worker cannot recover the source hierarchy that separates the promotion." },
+        { "family": "peerGroup", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The adjacent promotion is a hard negative for visual peer inference." },
+        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The explicitly selected ranked policy may measure components without a semantic grouping claim." },
+        { "family": "role", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Complementary versus metric semantics require native or evaluated inferred evidence." },
+        { "family": "text", "expectedStatus": "unsupported", "groundTruthRole": "notAnnotated", "rationale": "The worker performs no OCR." }
+      ],
+      "nativePixelComparison": "recordSeparately",
+      "requiredPreservedFacts": ["The native promotion role and parent remain separate from pixel components.", "No visual adjacency becomes an exact peer relation."],
+      "abstentions": ["Semantic grouping and spacing applicability remain untested."]
+    },
+    {
+      "caseId": "dashboard-browser-spacing-mutant",
+      "familyExpectations": [
+        { "family": "hierarchy", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The worker does not infer hierarchy." },
+        { "family": "peerGroup", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Killing a spacing mutation would require a peer relation the worker cannot establish." },
+        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The transformed raster is independently measured by the explicitly selected ranked policy." },
+        { "family": "role", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The worker has no semantic classifier." },
+        { "family": "text", "expectedStatus": "unsupported", "groundTruthRole": "notAnnotated", "rationale": "The worker performs no OCR." }
+      ],
+      "nativePixelComparison": "conflictRequired",
+      "requiredPreservedFacts": ["Playwright retains the 16 CSS-pixel layout/render conflict.", "The pixel worker emits an independent changed input digest and never overwrites native geometry."],
+      "abstentions": ["The acquisition mutation may be observed, but rule mutation kill rate remains untested."]
+    }
+  ]
+}

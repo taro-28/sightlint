@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:perception-extension:0.1.0",
+  "title": "SightLint perception Artifact IR extension",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "protocolVersion", "status", "responseSha256", "worker", "familyStatus", "observationIds", "mapping", "limitations"],
+  "properties": {
+    "version": { "const": "0.1.0" }, "protocolVersion": { "const": "0.1.0" },
+    "status": { "enum": ["complete", "partial", "unsupported", "ambiguous"] }, "responseSha256": { "$ref": "#/$defs/sha256" },
+    "worker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version", "sourceSha256", "runtime", "backend", "model"],
+      "properties": {
+        "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/version" }, "sourceSha256": { "$ref": "#/$defs/sha256" },
+        "runtime": { "$ref": "#/$defs/runtime" }, "backend": { "$ref": "#/$defs/token" }, "model": { "$ref": "#/$defs/model" }
+      }
+    },
+    "familyStatus": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/familyStatus" } },
+    "observationIds": { "type": "array", "uniqueItems": true, "maxItems": 1024, "items": { "$ref": "#/$defs/token" } },
+    "mapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mappedRegionCount", "unmappedObservationCount", "coreSemanticPromotionCount", "unmappedFamilies", "reconciliationStatus"],
+      "properties": {
+        "mappedRegionCount": { "type": "integer", "minimum": 0, "maximum": 1024 },
+        "unmappedObservationCount": { "type": "integer", "minimum": 0, "maximum": 1024 },
+        "coreSemanticPromotionCount": { "const": 0 },
+        "unmappedFamilies": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "enum": ["hierarchy", "peerGroup", "role", "text"] } },
+        "reconciliationStatus": { "const": "sourcesRetainedSeparately" }
+      }
+    },
+    "limitations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "runtime": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": { "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/text" } }
+    },
+    "model": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["status"], "properties": { "status": { "const": "notApplicable" } } },
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "name", "version", "sha256"],
+          "properties": { "status": { "const": "selected" }, "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/text" }, "sha256": { "$ref": "#/$defs/sha256" } }
+        }
+      ]
+    },
+    "familyStatus": {
+      "type": "object", "additionalProperties": false, "required": ["family", "status", "reason"],
+      "properties": {
+        "family": { "enum": ["hierarchy", "peerGroup", "region", "role", "text"] },
+        "status": { "enum": ["observed", "partial", "unsupported", "ambiguous", "untested"] },
+        "reason": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

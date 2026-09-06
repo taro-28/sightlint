@@ -373,6 +373,16 @@ A perception worker must be evaluated by exact model/runtime/preprocessing versi
 
 A model update is a new evidence version even if its API name is unchanged.
 
+ADR 0042's protocol-v0 evaluation deliberately stops before model-quality claims. Three public
+Atlas states exercise a local deterministic region worker against synchronized native and pixel
+evidence. They require byte stability, explicit unavailable/untested families, retained
+layout/render conflict, one acquisition mutation observation, no semantic promotion, no blocking,
+and no hard-negative failure. Atlas has two edge surfaces, so qualified and strict exact-color
+policies abstain; the evaluation names the ranked policy only to exercise mapping and keeps its
+background hypothesis unconfirmed. OCR/text/role/hierarchy/peer precision and recall, probability
+calibration, latency distributions, backend sensitivity, and downstream rule metrics remain
+`untested`. The public maintainer-authored cases are not a protected holdout.
+
 ## Rule maturity and blocking
 
 A rule begins experimental or advisory. Eligibility to block should require documented thresholds

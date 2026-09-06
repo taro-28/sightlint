@@ -63,13 +63,17 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/check_alpha_evaluation.py`
 - [ ] `python3 tools/check_png_format_demand.py`
 - [ ] `python3 tools/check_web_evaluation.py`
+- [ ] `python3 tools/check_perception_evaluation.py`
 - [ ] `python3 tools/release.py validate-tag --tag v0.1.0-alpha.2`
 - [ ] `python3 tools/check_dependency_licenses.py`
 - [ ] `python3 -m unittest tools/test_release.py`
 - [ ] `npm --prefix adapters/playwright ci --ignore-scripts`
 - [ ] `npm --prefix adapters/playwright run install:browser`
 - [ ] `npm --prefix adapters/playwright run check`
+- [ ] `npm --prefix adapters/perception ci --ignore-scripts`
+- [ ] `npm --prefix adapters/perception run check`
 - [ ] `cargo build --locked -p sightlint-cli`
+- [ ] `npm --prefix adapters/perception run test:e2e`
 - [ ] `npm --prefix adapters/playwright run test:e2e`
 - [ ] `cargo fmt --all -- --check`
 - [ ] `cargo clippy --locked --workspace --all-targets --all-features -- -D warnings`

@@ -277,6 +277,15 @@ contract coverage, failure precision, reviewed abstention, mutation kill rate, a
 failures. Broader representative Web applications and future OCR/CV/VLM outputs still require
 comparison with independent reviewed annotations.
 
+The perception protocol adds process conformance for exact canonical requests/responses, all five
+typed observation families, model/source identity, unavailable acquisition, inferred-family
+non-promotion, timeout, stdout overflow, malformed output, and identity mismatch. Its differential
+product E2E uses three Atlas browser states and the built `benchmark-image-segmentation`,
+`normalize`, and `check` commands. It requires repeated bytes, one retained native layout/render
+conflict, one observed acquisition mutation, zero semantic claims, zero hard-negative failures,
+and `untested` downstream rule accuracy. These checks validate the protocol boundary, not OCR or
+model accuracy.
+
 Required acquisition controls include:
 
 - positive coverage;
@@ -387,10 +396,14 @@ python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
+python3 tools/check_perception_evaluation.py
+npm --prefix adapters/perception ci --ignore-scripts
+npm --prefix adapters/perception run check
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run check
 cargo build --locked -p sightlint-cli
+npm --prefix adapters/perception run test:e2e
 npm --prefix adapters/playwright run test:e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings

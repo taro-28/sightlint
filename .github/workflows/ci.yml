@@ -60,6 +60,9 @@ jobs:
       - name: Verify realistic Web evaluation corpus
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: python3 tools/check_web_evaluation.py
+      - name: Verify perception evaluation governance
+        if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
+        run: python3 tools/check_perception_evaluation.py
       - name: Verify release and dependency-license contracts
         if: ${{ !cancelled() && steps.toolchain.outcome == 'success' }}
         run: |
@@ -122,6 +125,12 @@ jobs:
       - name: Install locked adapter dependencies
         run: npm ci --ignore-scripts
         working-directory: adapters/playwright
+      - name: Install locked perception wrapper
+        run: npm ci --ignore-scripts
+        working-directory: adapters/perception
+      - name: Validate perception protocol and unit behavior
+        run: npm run check
+        working-directory: adapters/perception
       - name: Validate adapter contracts and unit behavior
         run: npm run check
         working-directory: adapters/playwright
@@ -134,6 +143,9 @@ jobs:
           rustup default stable
       - name: Build the public SightLint binary
         run: cargo build --locked -p sightlint-cli
+      - name: Run perception process and binary E2E
+        run: npm run test:e2e
+        working-directory: adapters/perception
       - name: Run browser acquisition and binary E2E
         run: npm run test:e2e
         working-directory: adapters/playwright
@@ -172,5 +184,17 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal
           rustup default stable
+      - name: Verify hosted Node compatibility
+        run: node -e 'const major = Number(process.versions.node.split(".")[0]); if (major < 20 || major > 24) process.exit(1)'
+      - name: Install locked perception wrapper
+        run: npm ci --ignore-scripts
+        working-directory: adapters/perception
+      - name: Build the public SightLint binary
+        run: cargo build --locked -p sightlint-cli
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
+      - name: Run perception protocol and public-process E2E
+        run: |
+          npm run check
+          npm run test:e2e
+        working-directory: adapters/perception

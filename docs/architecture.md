@@ -182,7 +182,20 @@ Its output must include, where applicable:
 
 Do not fabricate a numeric confidence for a model that does not provide one. Canonicalize output
 before it reaches the kernel. A worker supplies observations; the deterministic engine supplies
-outcomes. Issue #28 defines the future protocol work.
+outcomes.
+
+ADR 0042 implements protocol `0.1.0` as a dependency-free local Node wrapper/reference worker.
+The strict family records cover region, text, role, hierarchy, and peer candidates, with bounded
+references and hierarchy depth. The reference implementation currently supplies only deterministic
+exact-color regions from a named image-segmentation benchmark policy. Only model-free
+`visionMeasured` regions map to core `other` nodes; inferred families stay in the canonical worker
+response and perception extension summary. The public Rust normalizer validates the candidate IR,
+and no perception record creates a rule result or blocking authority.
+
+The v0 process limit is not an operating-system sandbox or memory ceiling. It rejects remote
+execution and bounds standard-stream bytes, time, observations, text, hierarchy, geometry, and
+input size. A third-party worker still requires an independently reviewed sandbox and deployment
+policy.
 
 ## Native and pixel reconciliation
 

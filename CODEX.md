@@ -51,8 +51,10 @@ Issue #25 is complete as an evaluation-only benchmark and did not admit a broade
 policy. Issue #26 adds exact source-alpha geometry without admitting an alpha-padding rule. Issue
 #27 is complete through ADR 0041 without broadening PNG decoding: current product evidence did not
 establish a format gap, unsupported formats remain explicit, and no decoder dependency was added.
-The earliest remaining implementation gate is #28. Other preserved work is tracked in #29–#31.
-Existing stale code does not change priority.
+#28 is complete for protocol v0 through ADR 0042: the local bounded worker boundary and typed
+perception records are implemented, while real OCR/model quality remains `untested`. The earliest
+remaining roadmap gate is #29; other preserved work is tracked in #30–#31. Existing stale code
+does not change priority.
 
 ## Non-negotiable workflow
 

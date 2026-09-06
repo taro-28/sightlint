@@ -26,7 +26,7 @@ surface. ADR 0038 makes alpha.2 the first published bundle rather than moving th
 | Browser acquisition oracle | `0.3.0` | Strict current schema; prior `0.1.0`/`0.2.0` schemas are retained for rejection/compatibility tests. |
 | Browser rule oracle | `0.2.0` | Strict current schema; `0.1.0` remains a compatibility fixture. |
 | Agent workflow oracle | `0.1.0` | Public smoke regression only, not a holdout or generalization estimate. |
-| Perception-worker protocol | not implemented | `untested`; no compatibility promise exists until issue #28 accepts a versioned protocol. |
+| Perception-worker protocol | not part of alpha.2 | Added after the published tag; see the unreleased surface table. |
 
 ## Unreleased current-`main` additions after alpha.2
 
@@ -43,6 +43,11 @@ alpha.2 archive and therefore do not retroactively change that release.
 | PNG alpha geometry | `0.1.0` | Exact encoded source-alpha predicates and device-pixel bounds; incompatible fields or semantics require a new nested version. |
 | Source-alpha evaluation corpus | `0.1.0` | Acquisition and rule annotations remain separate; all labels are public development data and no holdout is claimed. |
 | PNG format-demand assessment | `0.1.0` | Scope-admission evidence only. It adds no decoder, command, extension, report, or exit-code behavior; incompatible assessment fields require a new schema version. |
+| Perception request/response protocol | `0.1.0` | Strict local process fields and typed region/text/role/hierarchy/peer records; incompatible fields or semantics require a new version. |
+| Perception run report | `0.1.0` | Canonical nonblocking acquisition envelope; rule outcome is always `untested`, and the command never exits `1`. |
+| Perception extension | `org.sightlint.perception@0.1.0` | Digest/identity/status/mapping summary; inferred semantics are not promoted into core IR. |
+| Private perception Node package | `0.1.0` | Not published to npm; requires Node `>=20 <25` and has no package dependencies. |
+| Perception evaluation corpus | `0.1.0` | Public three-state development data with separate acquisition/rule annotations and no protected holdout. |
 
 The three candidate policies are versioned inside the report. None is a supported semantic UI
 segmentation guarantee or a replacement for `inspect-image`.
@@ -63,7 +68,7 @@ machine surface: consumers must check its own schema/version fields and must not
 from package version alone. Ordering and repeated output are byte-stable only within the declared
 normalized inputs and compatibility environment documented by the applicable adapter/report.
 
-`sightlint-web` and `sightlint-web-check` require Node `>=20 <25`. The evaluated browser path uses
+`sightlint-web`, `sightlint-web-check`, and `sightlint-perception` require Node `>=20 <25`. The evaluated browser path uses
 the lockfile's Playwright/Chromium build on Linux. The private Node package can build on the hosted
 macOS arm64 and Windows x64 runners, but cross-platform screenshot byte identity and browser E2E
 support are not claimed.

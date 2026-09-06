@@ -233,6 +233,39 @@ merge multiple dashboard surfaces under all three exact-color policies. The corp
 not admit a new default, downstream rule, blocking result, holdout claim, or real-world accuracy
 claim.
 
+### Isolated perception process protocol
+
+ADR 0042 and `adapters/perception/` add strict request, response, run-report, and
+`org.sightlint.perception` extension `0.1.0` surfaces. The dependency-free Node wrapper runs one
+caller-selected local worker without a shell, validates input/worker/model/backend identity,
+canonicalizes results, bounds time, standard streams, input, observations, text, hierarchy, and
+geometry, and sends mapped IR through the public Rust `normalize` command. Remote execution,
+external processing, transmitted fields, telemetry, and retention are rejected in v0.
+
+Typed observation families represent regions, text, roles, hierarchy, and peer groups with source
+links, confidence availability, alternatives, uncertainty, and run-agreement metadata. Only
+model-free `visionMeasured` region observations map into core `other` nodes. Inferred regions and
+all semantic families remain in the separately written canonical response and extension summary;
+they create no core role, name, parent, relation, rule result, or blocking authority. Conformance
+fixtures cover the five family shapes, calibrated and unavailable confidence, explicit acquisition
+unavailability, byte stability, timeout, output overflow, malformed output, identity mismatch,
+and inferred-family non-promotion.
+
+The local reference worker exposes regions from one request-selected
+`benchmark-image-segmentation` policy and never falls back. Three Atlas Web states run the actual
+Playwright capture, Rust segmentation, perception wrapper, Rust normalization, and check paths.
+They preserve a reviewed 16±1 CSS-pixel native layout/render conflict, observe one pixel
+acquisition mutation, and produce zero semantic claims and zero hard-negative failures. Because
+Atlas has dark and light top-level edge surfaces, qualified and strict policies abstain; the corpus
+selects ranked only to exercise mapping and keeps its background hypothesis unconfirmed.
+
+This is a protocol/process/evidence-boundary result, not OCR or model evaluation. The public cases
+are one fictional maintainer-authored application family with no independent review or protected
+holdout. OCR/text/role/hierarchy/peer precision/recall, calibration, backend sensitivity, latency
+distributions, downstream rule accuracy, and real-world UI/UX accuracy remain `untested`. Process
+isolation is not an OS sandbox or generic memory ceiling; third-party workers remain able to use
+the caller's local privileges unless separately sandboxed.
+
 ### Realistic Web evaluation foundation
 
 ADR 0032 and `evaluation/web/` provide the first issue #22 foundation. The committed
@@ -366,6 +399,23 @@ node adapters/playwright/dist/src/check-cli.js \
 Omit `--format json` for human output. It performs capture plus the Rust check without persisting
 temporary artifacts or moving verdict policy into Node.
 
+The perception wrapper is a separate local public process:
+
+```bash
+node adapters/perception/src/cli.mjs \
+  --request REQUEST.json \
+  --worker-program "$(command -v node)" \
+  --worker-argument adapters/perception/src/reference-worker.mjs \
+  --worker-source adapters/perception/src/reference-worker.mjs \
+  --sightlint-binary target/debug/sightlint \
+  --response-out RESPONSE.json \
+  --artifact-ir-out ARTIFACT-IR.json
+```
+
+Success and explicit partial/unsupported/ambiguous acquisition exit 0 with a canonical nonblocking
+run report whose rule outcome is `untested`; operational/protocol/resource/mapping failures exit 2.
+The wrapper never exits 1.
+
 For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
 `cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
 failures remain visible with exit 0. `inspect-image` never exits 1 for a heuristic; observations or
@@ -416,6 +466,19 @@ SightLint treats tests as part of the product specification.
   ambiguity/intentional-overlay controls;
 - no representative screenshot corpus, private holdout, or general accuracy claim.
 
+### Perception protocol fixtures
+
+- strict JSON Schemas for request, response, run report, extension, corpus, and annotations;
+- small hand-authored protocol inputs plus full typed-family conformance data, separate from
+  product ground truth;
+- four public-process E2E cases for repeated bytes, explicit unavailable acquisition, inferred
+  family non-promotion, timeout, output overflow, malformed output, and identity mismatch;
+- three realistic Atlas states with synchronized Playwright native IR and screenshots, Rust pixel
+  benchmark input, separate acquisition/rule oracles, one mutation, one hard negative, and retained
+  native/pixel conflict;
+- public non-holdout development data, no committed captures/implementation output as oracle, no
+  semantic/model-accuracy or blocking claim.
+
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
 ### Required normal CI
@@ -442,7 +505,7 @@ Do not infer these capabilities from the architecture or closed experimental bra
 
 - general screenshot-only UI/UX review;
 - rounded-card, shadow, gradient, photo, text, hierarchy, or semantic component understanding;
-- OCR, CV-model, or VLM workers;
+- real OCR, learned CV, or VLM worker implementations and their model-quality evaluation;
 - automatic peer-role or design-intent inference;
 - trusted spacing failures derived only from image grouping;
 - color management, compositing, or trusted contrast from PNG samples;
@@ -508,12 +571,14 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#26 (complete):** exact source-alpha geometry for transparent assets; no rule admitted.
 - **#27 (complete):** PNG format-demand and decoder strategy decision; ADR 0041 retains the
   explicit unavailable boundary and adds no decoder dependency.
-- **#28:** isolated OCR/CV/VLM perception-worker protocol and calibration.
+- **#28 (complete for protocol v0):** isolated local perception process, typed OCR/CV/VLM
+  observation families, bounded deterministic reference wrapper, non-promotion boundary, and
+  three-state differential regression. Real model calibration/accuracy remains `untested`.
 - **#29:** structured PPTX, PDF/document, Android, and iOS adapter roadmap.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The earliest remaining implementation gate is #28. Later issues remain demand- and evidence-gated;
+The earliest remaining roadmap gate is #29. Later issues remain demand- and evidence-gated;
 the completed alpha and benchmark do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
@@ -598,13 +663,17 @@ python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_alpha_evaluation.py
 python3 tools/check_png_format_demand.py
 python3 tools/check_web_evaluation.py
+python3 tools/check_perception_evaluation.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
 npm --prefix adapters/playwright ci --ignore-scripts
 npm --prefix adapters/playwright run install:browser
 npm --prefix adapters/playwright run check
+npm --prefix adapters/perception ci --ignore-scripts
+npm --prefix adapters/perception run check
 cargo build --locked -p sightlint-cli
+npm --prefix adapters/perception run test:e2e
 npm --prefix adapters/playwright run test:e2e
 cargo fmt --all -- --check
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings

@@ -1,0 +1,14 @@
+{
+  "benchmarkSchemaVersion": "0.1.0",
+  "blocking": false,
+  "ruleOutcome": "untested",
+  "canvas": { "id": "canvas", "width": 64, "height": 48, "unit": "devicePixel", "origin": "topLeft" },
+  "policies": [
+    {
+      "policyId": "qualified-corner-95-row-runs-v1",
+      "status": "unavailable",
+      "reason": "noQualifiedBackgroundCandidate",
+      "regions": []
+    }
+  ]
+}
