@@ -1,0 +1,82 @@
+{
+  "$schema": "./corpus.schema.json",
+  "schemaVersion": "0.1.0",
+  "corpus": {
+    "id": "sightlint-perception-protocol-v0",
+    "scope": "Differentially evaluate the local measured-region reference worker against synchronized native and pixel evidence without promoting semantic claims.",
+    "limitations": [
+      "The corpus has three public states from one fictional Web application family.",
+      "Maintainer-authored development labels are not independent review or a protected holdout.",
+      "The reference worker performs no OCR, role classification, hierarchy reconstruction, peer grouping, or learned inference.",
+      "Region measurements do not establish semantic objects, applicability, or UI/UX defects."
+    ]
+  },
+  "source": {
+    "kind": "repositoryOwnedWebFixture",
+    "origin": "evaluation/web/fixture-app",
+    "license": "MIT OR Apache-2.0",
+    "privacyReview": "syntheticNoPersonalData",
+    "externalAssets": false,
+    "fictionalData": true
+  },
+  "governance": {
+    "annotationAuthor": "maintainerSourceReview",
+    "implementationOutputIsGroundTruth": false,
+    "capturedArtifactsCommitted": false,
+    "externalProcessing": false,
+    "telemetryCollected": false,
+    "holdoutStatus": "notEstablished"
+  },
+  "protocol": {
+    "requestSchema": "adapters/perception/schemas/request.schema.json",
+    "responseSchema": "adapters/perception/schemas/response.schema.json",
+    "runReportSchema": "adapters/perception/schemas/run-report.schema.json",
+    "extensionSchema": "adapters/perception/schemas/perception-extension.schema.json",
+    "version": "0.1.0",
+    "referenceWorker": "sightlint-reference-region-worker@0.1.0"
+  },
+  "annotations": {
+    "schema": "evaluation/perception/annotation.schema.json",
+    "acquisition": "evaluation/perception/annotations/acquisition.json",
+    "rules": "evaluation/perception/annotations/rules.json",
+    "nativeAcquisitionSource": "evaluation/web/annotations/browser-acquisition.json",
+    "nativeRuleSource": "evaluation/web/annotations/browser-rules.json"
+  },
+  "splitPolicy": {
+    "smoke": "Required clean path and public process contract.",
+    "development": "Targeted render-offset mutation visible during implementation.",
+    "challenge": "Intentional grouping hard negative visible during implementation.",
+    "holdout": {
+      "status": "notEstablished",
+      "reason": "All fixtures and labels are public and available to the implementation."
+    }
+  },
+  "gates": {
+    "determinismRuns": 2,
+    "maximumBlockingFindings": 0,
+    "maximumSemanticClaims": 0,
+    "requiredAcquisitionMutationObservations": 1,
+    "requiredHardNegativeFailures": 0
+  },
+  "cases": [
+    {
+      "id": "dashboard-browser-clean",
+      "split": "smoke",
+      "classification": "clean",
+      "request": "evaluation/web/requests/dashboard-browser-clean.json"
+    },
+    {
+      "id": "dashboard-browser-intentional-grouping",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "request": "evaluation/web/requests/dashboard-browser-intentional-grouping.json"
+    },
+    {
+      "id": "dashboard-browser-spacing-mutant",
+      "split": "development",
+      "classification": "targetedMutation",
+      "request": "evaluation/web/requests/dashboard-browser-spacing-mutant.json",
+      "baselineCaseId": "dashboard-browser-clean"
+    }
+  ]
+}

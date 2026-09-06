@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:perception-worker-request:0.1.0",
+  "title": "SightLint perception worker request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "protocolVersion", "requestId", "artifact", "input", "preprocessing", "worker", "execution", "privacy", "output"],
+  "properties": {
+    "$schema": { "const": "../schemas/request.schema.json" },
+    "protocolVersion": { "const": "0.1.0" },
+    "requestId": { "$ref": "#/$defs/token" },
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["id", "kind", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" }, "kind": { "enum": ["web", "mobile", "slide", "document", "pdf", "image", "other"] },
+        "title": { "$ref": "#/$defs/text" }
+      }
+    },
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reference", "mediaType", "sha256", "byteLength", "content", "canvas"],
+      "properties": {
+        "reference": { "$ref": "#/$defs/text" },
+        "mediaType": { "const": "application/vnd.sightlint.image-segmentation-benchmark+json" },
+        "sha256": { "$ref": "#/$defs/sha256" }, "byteLength": { "type": "integer", "minimum": 2, "maximum": 16777216 },
+        "content": { "type": "object" },
+        "canvas": { "$ref": "#/$defs/canvas" }
+      }
+    },
+    "preprocessing": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pipeline", "version", "crop", "scale", "tile", "randomSeed"],
+      "properties": {
+        "pipeline": { "const": "sightlint-image-segmentation-report" }, "version": { "const": "0.1.0" },
+        "crop": { "type": "null" },
+        "scale": {
+          "type": "object", "additionalProperties": false, "required": ["x", "y"],
+          "properties": { "x": { "const": 1 }, "y": { "const": 1 } }
+        },
+        "tile": { "$ref": "#/$defs/notApplied" }, "randomSeed": { "$ref": "#/$defs/notApplicable" }
+      }
+    },
+    "worker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["expectedName", "expectedVersion", "backend", "model"],
+      "properties": {
+        "expectedName": { "$ref": "#/$defs/token" }, "expectedVersion": { "$ref": "#/$defs/version" },
+        "backend": { "$ref": "#/$defs/token" }, "model": { "$ref": "#/$defs/modelRequest" }
+      }
+    },
+    "execution": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "timeoutMs", "maxOutputBytes", "maxStderrBytes", "maxObservations"],
+      "properties": {
+        "mode": { "const": "local" }, "timeoutMs": { "type": "integer", "minimum": 50, "maximum": 30000 },
+        "maxOutputBytes": { "type": "integer", "minimum": 1024, "maximum": 4194304 },
+        "maxStderrBytes": { "type": "integer", "minimum": 0, "maximum": 65536 },
+        "maxObservations": { "type": "integer", "minimum": 1, "maximum": 1024 }
+      }
+    },
+    "privacy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["externalProcessing", "remoteTransmittedFields", "retention", "redaction"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "remoteTransmittedFields": { "type": "array", "maxItems": 0 },
+        "retention": { "const": "none" }, "redaction": { "$ref": "#/$defs/notApplied" }
+      }
+    },
+    "output": {
+      "type": "object", "additionalProperties": false, "required": ["artifactIrReference", "responseReference"],
+      "properties": { "artifactIrReference": { "$ref": "#/$defs/text" }, "responseReference": { "$ref": "#/$defs/text" } }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "token": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{0,127}$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "canvas": {
+      "type": "object", "additionalProperties": false, "required": ["id", "width", "height", "unit", "origin"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" }, "width": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 100000 }, "unit": { "const": "devicePixel" },
+        "origin": { "const": "topLeft" }
+      }
+    },
+    "notApplied": {
+      "type": "object", "additionalProperties": false, "required": ["status"],
+      "properties": { "status": { "const": "notApplied" } }
+    },
+    "notApplicable": {
+      "type": "object", "additionalProperties": false, "required": ["status"],
+      "properties": { "status": { "const": "notApplicable" } }
+    },
+    "modelRequest": {
+      "oneOf": [
+        { "$ref": "#/$defs/notApplicable" },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["status", "name", "version", "sha256"],
+          "properties": { "status": { "const": "selected" }, "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/text" }, "sha256": { "$ref": "#/$defs/sha256" } }
+        }
+      ]
+    }
+  }
+}
