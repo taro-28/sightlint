@@ -100,6 +100,9 @@ ADR 0037 and accepted ADR 0007 complete the release gate with dual `MIT OR Apach
 surface-specific alpha compatibility, dependency-license checks, and a deterministic source
 archive verified on the supported hosted systems. The first release deliberately publishes no
 prebuilt binary, Cargo crate, npm package, installer, container, signature, or attestation.
+ADR 0038 keeps the cross-platform verification jobs read-only by carrying the exact unpublished
+bytes through a short-retention workflow artifact and comparing them with draft assets before
+publication. The immutable alpha.1 attempt was not published; alpha.2 is the first supported tag.
 
 This completes the bounded #22–#24, #42, and #33 sequence, but it is not evidence of general Web
 accuracy. The corpus has one fictional application family, maintainer-only review, visible
@@ -408,7 +411,7 @@ contracts justify them.
 
 ### First alpha release
 
-- `v0.1.0-alpha.1` is a source-only GitHub prerelease under `MIT OR Apache-2.0`;
+- `v0.1.0-alpha.2` is a source-only GitHub prerelease under `MIT OR Apache-2.0`;
 - a deterministic tracked-source archive and canonical SHA-256 record are verified before
   publication;
 - the extracted Rust workspace is tested on Ubuntu x64, macOS arm64, and Windows x64;
@@ -416,6 +419,8 @@ contracts justify them.
   Chromium;
 - checksums detect corruption but do not authenticate the publisher; signing, attestations,
   registries, installers, and prebuilt binaries remain deferred and unclaimed.
+- the immutable `v0.1.0-alpha.1` attempt remains unpublished; ADR 0038 records its draft-download
+  failure and the verified alpha.2 recovery without moving the old tag.
 
 ### Sequencing rule
 
@@ -453,7 +458,7 @@ Every public behavior must satisfy the applicable matrix:
 
 ## Repository and decision hygiene
 
-- New architecture decision numbers continue at 0038 or later.
+- New architecture decision numbers continue at 0039 or later.
 - Historical branch-only ADRs 0025–0029 are design references, not accepted decisions.
 - Closed PRs #12–#17 are superseded and must not be reopened as implementation shortcuts.
 - Start every task from current green `main`.
@@ -482,6 +487,7 @@ Every public behavior must satisfy the applicable matrix:
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha execution epic |
+| #47 | completed read-only release-artifact transport and immutable-tag recovery |
 
 Issues define work and evidence requirements. They do not make proposed capabilities current until
 an accepted ADR, tested implementation, and successful merge establish them.

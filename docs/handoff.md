@@ -11,13 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-At the start of the alpha-release slice, the latest verified baseline was:
+At the start of the release-transport repair, the latest verified baseline was:
 
-- commit: `2448a44273d6703d7555283ca5d1f76adb07cd43`
-- tree: `66a1ea1523c8cbf07f08a46113f296b8354abbee`
-- merged PR: #45
-- main CI: run 33998665657, all six jobs successful
-- main CodeQL: run 33998665271, Rust and JavaScript/TypeScript successful
+- commit: `4bb5c3aebf602f2aec467d6e2f07d22b6de4ceb9`
+- tree: `5c51c27f4f728f119de48b1948037455be01dc29`
+- merged PR: #46
+- main CI: run 33999994040, all six jobs successful
+- main CodeQL: run 33999993971, Rust and JavaScript/TypeScript successful
 
 The release PR and tag workflow supersede that hash once merged and published. Never hard-code the
 recorded baseline as a branch base; verify the latest `main`, its exact CI, and the release page.
@@ -83,7 +83,8 @@ The required contexts are exactly:
 Private vulnerability reporting, the dependency graph, Dependabot alerts/security updates, and
 advisory Rust CodeQL default setup are enabled. Actions default to read-only repository access,
 cannot create or approve pull requests, require full-length action SHAs, and permit only the owner
-plus the explicitly selected `actions/checkout` and `github/codeql-action` families. Secret
+plus the explicitly selected `actions/checkout`, `actions/upload-artifact`,
+`actions/download-artifact`, and `github/codeql-action` families. Secret
 Protection and Push Protection remain enabled. GitHub Apps access is limited to the Codex
 Connector for this repository. No self-hosted runner, webhook, deploy key, Pages site, or
 Environment is configured. Discussions remains disabled and no committed issue-template link
@@ -98,12 +99,19 @@ definitions exceed the accepted Node 20–24 alpha compatibility range.
 
 - repository: public;
 - project status: narrow source-only alpha;
-- workspace version: `0.1.0-alpha.1`;
-- first release: GitHub prerelease tag `v0.1.0-alpha.1`;
+- workspace version: `0.1.0-alpha.2`;
+- first published release: GitHub prerelease tag `v0.1.0-alpha.2`;
 - artifact: deterministic tracked-source archive plus canonical SHA-256 record;
 - license: `MIT OR Apache-2.0` for repository-owned source, documentation, schemas, and fixtures;
 - Cargo crate publication: disabled; Node package: private;
 - no prebuilt binary, registry package, installer, container, signature, or attestation.
+
+The immutable `v0.1.0-alpha.1` tag is an unpublished failed release candidate, not a supported
+release. Run 34000128047 created its draft assets but the read-only matrix could not access a draft
+release. ADR 0038 keeps verification jobs read-only by using a short-retention workflow artifact,
+requires the final write-enabled job to compare that artifact with the draft assets byte-for-byte,
+and moves the first publishable version to alpha.2. The stale alpha.1 draft is removed only after
+the failure evidence and successful replacement release are recorded; its tag is retained.
 
 Accepted ADR 0007 defines the license boundary. ADR 0037 and `docs/release.md` define the first
 release, supported environments, verification procedure, and explicit non-claims. Checksums detect
@@ -548,7 +556,7 @@ python3 tools/generate_e2e_fixtures.py --check
 python3 tools/generate_raster_corpus.py --check
 python3 tools/generate_inspection_corpus.py --check
 python3 tools/check_web_evaluation.py
-python3 tools/release.py validate-tag --tag v0.1.0-alpha.1
+python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
 npm --prefix adapters/playwright ci --ignore-scripts

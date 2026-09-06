@@ -5,7 +5,7 @@ adapters. Treat every input and adapter as hostile.
 
 ## Supported versions
 
-Security fixes are best-effort for the current `0.1.0-alpha.1` source release and the default
+Security fixes are best-effort for the current `0.1.0-alpha.2` source release and the default
 branch. Alpha compatibility is documented in `docs/compatibility.md`; no long-term support window
 or stable-API guarantee exists yet.
 

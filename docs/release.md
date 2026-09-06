@@ -5,18 +5,18 @@ Homebrew, containers, and prebuilt binaries are intentionally not release channe
 
 ## Verify the release
 
-Download both assets from the `v0.1.0-alpha.1` GitHub release:
+Download both assets from the `v0.1.0-alpha.2` GitHub release:
 
-- `sightlint-v0.1.0-alpha.1-source.tar.gz`;
-- `sightlint-v0.1.0-alpha.1-source.tar.gz.sha256`.
+- `sightlint-v0.1.0-alpha.2-source.tar.gz`;
+- `sightlint-v0.1.0-alpha.2-source.tar.gz.sha256`.
 
 First compare the archive with the downloaded checksum record. On Linux use
-`sha256sum -c sightlint-v0.1.0-alpha.1-source.tar.gz.sha256`; on macOS use
-`shasum -a 256 -c sightlint-v0.1.0-alpha.1-source.tar.gz.sha256`. On Windows PowerShell:
+`sha256sum -c sightlint-v0.1.0-alpha.2-source.tar.gz.sha256`; on macOS use
+`shasum -a 256 -c sightlint-v0.1.0-alpha.2-source.tar.gz.sha256`. On Windows PowerShell:
 
 ```powershell
-$expected = (Get-Content sightlint-v0.1.0-alpha.1-source.tar.gz.sha256).Split()[0]
-$actual = (Get-FileHash sightlint-v0.1.0-alpha.1-source.tar.gz -Algorithm SHA256).Hash.ToLowerInvariant()
+$expected = (Get-Content sightlint-v0.1.0-alpha.2-source.tar.gz.sha256).Split()[0]
+$actual = (Get-FileHash sightlint-v0.1.0-alpha.2-source.tar.gz -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($actual -ne $expected) { throw "SightLint source archive checksum mismatch" }
 ```
 
@@ -25,9 +25,9 @@ handling:
 
 ```bash
 python3 tools/release.py verify-archive \
-  --tag v0.1.0-alpha.1 \
-  --archive sightlint-v0.1.0-alpha.1-source.tar.gz \
-  --checksum sightlint-v0.1.0-alpha.1-source.tar.gz.sha256 \
+  --tag v0.1.0-alpha.2 \
+  --archive sightlint-v0.1.0-alpha.2-source.tar.gz \
+  --checksum sightlint-v0.1.0-alpha.2-source.tar.gz.sha256 \
   --extract-dir unpacked
 ```
 
@@ -94,13 +94,18 @@ one-command workflow.
 2. Verify the resulting `main` commit/tree and its six CI jobs.
 3. Create the annotated version tag on that exact `main` commit and push only the tag.
 4. The tag-only Release workflow validates the tag/version and current `origin/main`, creates a
-   draft source archive/checksum, and verifies the extracted artifact on all three supported
-   runner pairs.
+   draft source archive/checksum, and transports the exact bytes through a one-day workflow
+   artifact to all three supported runner pairs.
 5. The workflow publishes the prerelease only after the Linux product E2E and cross-platform
-   source tests succeed. A failure leaves a draft for inspection.
+   source tests succeed and the final job byte-compares the verified workflow artifact with the
+   draft release assets. A failure leaves a draft for inspection.
 6. Verify the release tag, commit, assets, digests, workflow, install instructions, and open
    security alerts through the GitHub API before closing the release issue.
 
 The Release workflow has no pull-request trigger and never changes repository source. Only the
 package and publish jobs receive ephemeral `contents: write` permission for release metadata and
 assets; verification jobs and ordinary CI remain read-only.
+
+`v0.1.0-alpha.1` is an immutable, unpublished failed release-candidate tag. Its workflow could not
+read draft assets from read-only verification jobs. ADR 0038 records the failure and why the tag
+was not moved; it is not a supported release.
