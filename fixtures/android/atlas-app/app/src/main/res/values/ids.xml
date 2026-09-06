@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="atlas_root" type="id" />
+    <item name="screen_title" type="id" />
+    <item name="screen_subtitle" type="id" />
+    <item name="account_card" type="id" />
+    <item name="avatar" type="id" />
+    <item name="account_name" type="id" />
+    <item name="account_plan" type="id" />
+    <item name="settings_section" type="id" />
+    <item name="notification_row" type="id" />
+    <item name="notification_label" type="id" />
+    <item name="notification_switch" type="id" />
+    <item name="privacy_row" type="id" />
+    <item name="privacy_label" type="id" />
+    <item name="privacy_value" type="id" />
+    <item name="action_region" type="id" />
+    <item name="save_button" type="id" />
+    <item name="archive_spacer" type="id" />
+    <item name="archived_section" type="id" />
+    <item name="archived_label" type="id" />
+</resources>

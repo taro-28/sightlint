@@ -1,0 +1,251 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "abstentions": [
+        "touchHitRegions",
+        "renderedNodeIdentity",
+        "occlusionAndInkGeometry",
+        "composeSemantics",
+        "dynamicBehavior"
+      ],
+      "caseId": "android-atlas-clean",
+      "counts": {
+        "capturedNodes": 18,
+        "mappedCoreNodes": 17,
+        "unidentifiedNodes": 5
+      },
+      "display": {
+        "densityDpi": 420,
+        "heightPixels": 2400,
+        "rotationDegrees": 0,
+        "widthPixels": 1080
+      },
+      "id": "android-atlas-clean-acquisition",
+      "nodes": [
+        {
+          "accessibilityBoundsDevicePixels": { "height": 2400, "width": 1080, "x": 0, "y": 0 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.ScrollView",
+          "coreKind": "container",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 2400, "width": 1080, "x": 0, "y": 0 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/atlas_root"
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 273, "width": 954, "x": 63, "y": 309 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.LinearLayout",
+          "coreKind": "container",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 273, "width": 954, "x": 63, "y": 309 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/account_card"
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 126, "width": 168, "x": 802, "y": 676 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.Switch",
+          "contentDescription": {
+            "sha256": "sha256:ce57845e252776bed2990cdc67e7257a05c1c41835bdf6f55e7a237ce877dc59",
+            "utf8ByteLength": 21
+          },
+          "coreKind": "control",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 126, "width": 168, "x": 802, "y": 676 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/notification_switch"
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 147, "width": 578, "x": 63, "y": 1105 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.Button",
+          "coreKind": "control",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 147, "width": 578, "x": 63, "y": 1105 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/save_button",
+          "text": {
+            "sha256": "sha256:dd0ae7a5cbcf233968657563dce34639e681861e2df6d3f845c08d49981c0999",
+            "utf8ByteLength": 12
+          }
+        }
+      ],
+      "screenshot": {
+        "extentReconciliation": "agreement",
+        "heightPixels": 2400,
+        "nodeIdentity": "cantTell",
+        "widthPixels": 1080
+      }
+    },
+    {
+      "abstentions": [
+        "touchHitRegions",
+        "renderedNodeIdentity",
+        "occlusionAndInkGeometry",
+        "composeSemantics",
+        "dynamicBehavior"
+      ],
+      "caseId": "android-atlas-off-canvas-control-mutant",
+      "counts": {
+        "capturedNodes": 18,
+        "mappedCoreNodes": 17,
+        "unidentifiedNodes": 5
+      },
+      "display": {
+        "densityDpi": 420,
+        "heightPixels": 2400,
+        "rotationDegrees": 0,
+        "widthPixels": 1080
+      },
+      "id": "android-atlas-off-canvas-control-mutant-acquisition",
+      "nodes": [
+        {
+          "accessibilityBoundsDevicePixels": { "height": 2400, "width": 1080, "x": 0, "y": 0 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.ScrollView",
+          "coreKind": "container",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 2400, "width": 1080, "x": 0, "y": 0 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/atlas_root"
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 126, "width": 168, "x": 802, "y": 676 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.Switch",
+          "contentDescription": {
+            "sha256": "sha256:ce57845e252776bed2990cdc67e7257a05c1c41835bdf6f55e7a237ce877dc59",
+            "utf8ByteLength": 21
+          },
+          "coreKind": "control",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 126, "width": 168, "x": 802, "y": 676 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/notification_switch"
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 147, "width": 219, "x": 798, "y": 1105 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.Button",
+          "coreKind": "control",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 147, "width": 578, "x": 798, "y": 1105 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/save_button",
+          "text": {
+            "sha256": "sha256:dd0ae7a5cbcf233968657563dce34639e681861e2df6d3f845c08d49981c0999",
+            "utf8ByteLength": 12
+          }
+        }
+      ],
+      "screenshot": {
+        "extentReconciliation": "agreement",
+        "heightPixels": 2400,
+        "nodeIdentity": "cantTell",
+        "widthPixels": 1080
+      }
+    },
+    {
+      "abstentions": [
+        "touchHitRegions",
+        "renderedNodeIdentity",
+        "occlusionAndInkGeometry",
+        "invalidPlatformBoundsNormalization",
+        "offscreenScrollContentApplicability",
+        "composeSemantics",
+        "dynamicBehavior"
+      ],
+      "caseId": "android-atlas-scroll-offscreen-hard-negative",
+      "counts": {
+        "capturedNodes": 21,
+        "mappedCoreNodes": 17,
+        "unidentifiedNodes": 5
+      },
+      "display": {
+        "densityDpi": 420,
+        "heightPixels": 2400,
+        "rotationDegrees": 0,
+        "widthPixels": 1080
+      },
+      "id": "android-atlas-scroll-offscreen-hard-negative-acquisition",
+      "nodes": [
+        {
+          "accessibilityBoundsDevicePixels": { "height": 2400, "width": 1080, "x": 0, "y": 0 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.ScrollView",
+          "coreKind": "container",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 2400, "width": 1080, "x": 0, "y": 0 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/atlas_root"
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 147, "width": 578, "x": 63, "y": 1105 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.Button",
+          "coreKind": "control",
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 147, "width": 578, "x": 63, "y": 1105 },
+          "mappingStatus": "mappedExactLayout",
+          "resourceId": "org.sightlint.fixtures.atlas:id/save_button",
+          "text": {
+            "sha256": "sha256:dd0ae7a5cbcf233968657563dce34639e681861e2df6d3f845c08d49981c0999",
+            "utf8ByteLength": 12
+          }
+        },
+        {
+          "accessibilityBoundsDevicePixels": { "height": 1148, "width": 954, "x": 63, "y": 1252 },
+          "accessibilityGeometryStatus": "exact",
+          "className": "android.widget.Space",
+          "coreKind": null,
+          "globalVisible": true,
+          "layoutBoundsDevicePixels": { "height": 2048, "width": 954, "x": 63, "y": 1252 },
+          "mappingStatus": "notMappedNotShown",
+          "resourceId": "org.sightlint.fixtures.atlas:id/archive_spacer"
+        },
+        {
+          "accessibilityBoundsDevicePixels": null,
+          "accessibilityGeometryStatus": "invalidPlatformBounds",
+          "className": "android.widget.LinearLayout",
+          "coreKind": null,
+          "globalVisible": false,
+          "layoutBoundsDevicePixels": { "height": 231, "width": 954, "x": 63, "y": 3300 },
+          "mappingStatus": "notMappedNotGloballyVisible",
+          "rawAccessibilityBoundsDevicePixels": { "bottom": 2400, "left": 63, "right": 1017, "top": 3300 },
+          "resourceId": "org.sightlint.fixtures.atlas:id/archived_section"
+        },
+        {
+          "accessibilityBoundsDevicePixels": null,
+          "accessibilityGeometryStatus": "invalidPlatformBounds",
+          "className": "android.widget.TextView",
+          "coreKind": null,
+          "globalVisible": false,
+          "layoutBoundsDevicePixels": { "height": 57, "width": 860, "x": 110, "y": 3347 },
+          "mappingStatus": "notMappedNotGloballyVisible",
+          "rawAccessibilityBoundsDevicePixels": { "bottom": 2400, "left": 110, "right": 970, "top": 3347 },
+          "resourceId": "org.sightlint.fixtures.atlas:id/archived_label",
+          "text": {
+            "sha256": "sha256:02642b5089160de030d7625b12ff34c6efb2fd69f5dd827691b3398c18945f76",
+            "utf8ByteLength": 20
+          }
+        }
+      ],
+      "screenshot": {
+        "extentReconciliation": "agreement",
+        "heightPixels": 2400,
+        "nodeIdentity": "cantTell",
+        "widthPixels": 1080
+      }
+    }
+  ],
+  "kind": "acquisitionGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureSourcePlatformCaptureAndHumanVisualReview",
+    "captureIsAdapterOutput": false,
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

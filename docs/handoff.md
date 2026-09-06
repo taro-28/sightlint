@@ -11,13 +11,12 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #54, a focused child of #29, started from this verified green `main` baseline:
+The branch for issue #56, a focused child of #29, started from this verified green `main` baseline:
 
-- commit: `3b28c5c0f7c25d6d4eba34b217e63e8351e2c208`
-- tree: `64efb067cc640bd28af73f87b9c5b6b24198b72e`
-- merged PR: #53
-- main CI: run 34011301947, all six jobs successful
-- main CodeQL: run 34011301644, Rust and JavaScript/TypeScript successful
+- commit: `29fd63177ba465f2f90baf5693d03415ec02354c`
+- tree: `e6ac14006ac1a915791d5e11c41064121884848e`
+- merged PR: #58
+- main CI: run 34016009257, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -196,8 +195,9 @@ alpha evidence. No compositing, semantic whitespace judgment, alpha rule, or blo
 implemented.
 
 ADR 0041 resolves the optional broader-format decision without expanding the decoder. A versioned
-assessment inventories five source-alpha assets plus three PPTX and three PDF renders and verifies the
-nine pinned-browser product captures as current-subset inputs; indexed, packed, 16-bit, `tRNS`,
+assessment inventories five source-alpha assets plus three PPTX, three PDF, and three Android
+renders and verifies the nine pinned-browser product captures as current-subset inputs; indexed,
+packed, 16-bit, `tRNS`,
 and animation cases remain
 synthetic unavailable controls rather than product-demand evidence. No decoder dependency,
 automatic conversion, telemetry, protected holdout, prevalence claim, command/schema change, or
@@ -312,6 +312,30 @@ output is not an oracle, provenance/license/privacy/public split/no-holdout stat
 and perfect regression metrics do not establish representative PDF, accessibility, interaction,
 or document-quality accuracy. Text, paint, tags, viewer hit testing, broader annotation/actions,
 and PDF-specific rules remain unimplemented or untested.
+
+### Bounded Android capture adapter
+
+ADR 0045 and `adapters/android/` add the third non-Web structured process slice. Strict `0.1.0`
+request/response, capture, and `org.sightlint.android@0.1.0` extension surfaces bind a local
+instrumentation manifest and paired PNG by repository-contained paths and SHA-256 identity. The
+dependency-free Python 3.9+ adapter does not operate `adb`, boot or mutate a device, install an
+APK, perform accessibility actions, or use the network.
+
+The repository-owned Atlas API-35 fixture application records classic View hierarchy/allocation
+and `AccessibilityNodeInfo` facts separately before a sequential `UiAutomation` screenshot. Only
+shown, globally visible, identity-transform Views with unique resource IDs and nonempty allocation
+become exact-source device-pixel `layoutBox` nodes. Accessibility rectangles remain
+`platformSemantics`, the PNG stays on a separate exact-render canvas, and reconciliation is limited
+to display extent. Clipped accessibility geometry does not repair source allocation, while
+offscreen and invalid platform bounds remain extension evidence without core geometry.
+
+The three public cases match 114 reviewed acquisition facts, kill one Save-allocation mutation,
+retain one offscreen-scroll hard-negative abstention, and emit no clean/hard-negative failure.
+Acquisition and rule truth remain separate, implementation output is not an oracle, and
+provenance/license/privacy/public split/no-holdout status are explicit. This proves regression
+behavior only. Live capture, Compose, arbitrary applications/devices, touch regions, dynamic
+behavior, occlusion/ink, rendered node identity, Android-specific rules, and representative
+mobile/UI/UX accuracy remain unimplemented, `untested`, or `cantTell`.
 
 ### Realistic Web evaluation foundation
 
@@ -497,6 +521,23 @@ path, digest, parser, encryption, resource, Rust-validation, or output errors. T
 trusted check owns exit 1. The adapter never follows PDF destinations/actions or performs external
 processing.
 
+The bounded Android adapter is a dependency-free local file process over a previously captured
+manifest and PNG:
+
+```bash
+python3 adapters/android/sightlint_android.py \
+  --request evaluation/android/requests/android-atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-android-clean.ir.json
+target/debug/sightlint check /tmp/atlas-android-clean.ir.json --profile base --format json
+```
+
+It exits 0 with a canonical partial response and normalized IR, or 2 for request, capture, path,
+digest, resource, extent, Rust-validation, or output errors. The subsequent trusted check owns
+exit 1. Device acquisition is an explicit maintainer fixture operation, not part of this adapter
+command.
+
 For checks, exit codes are 0 for no blocking failure, 1 for a blocking failure or explicitly denied
 `cantTell`, and 2 for usage/input/execution/recognized-extension validation errors. Advisory Web
 failures remain visible with exit 0. `inspect-image` never exits 1 for a heuristic; observations or
@@ -594,6 +635,25 @@ SightLint treats tests as part of the product specification.
 - page/link coverage remains `partial`; text, tags, paint/ink, reading order, actions, forms,
   viewer behavior, and rendered annotation identity are not claimed.
 
+### Android capture-adapter fixtures
+
+- ADR 0045 plus strict request, response, capture, `org.sightlint.android@0.1.0`, corpus,
+  acquisition-annotation, rule-annotation, and metric schemas;
+- one realistic repository-owned classic-View account/settings fixture application and a
+  dependency-free instrumentation capture runner pinned to API 35, Pixel_8, Gradle 8.13, Android
+  Gradle Plugin 8.10.1, and Java 17;
+- three committed native manifests and RGB screenshots with exact source/request/render digests,
+  fictional-data ownership, dual-license/privacy provenance, and tool/device/build provenance;
+- separate acquisition and rule truth for clean, targeted off-canvas mutation, and offscreen
+  scroll hard-negative cases across public smoke/development/challenge splits with no protected
+  holdout;
+- public-process E2E through `adapt-image`, `normalize`, and `check`, including 114 acquisition
+  facts, repeated bytes, digest/node/output/path/schema/extent/output-collision boundaries,
+  mutation kill, false-positive, non-leakage, and abstention assertions;
+- coverage remains `partial`; accessibility bounds do not become hit/render geometry, and live
+  device capture, Compose, dynamic behavior, arbitrary apps/devices, or general UI/UX accuracy are
+  not claimed.
+
 Synthetic success is regression evidence, not real-world accuracy evidence.
 
 ### Required normal CI
@@ -627,7 +687,10 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - arbitrary-URL, iframe, shadow-DOM, full accessibility-tree, or interaction capture;
 - automatic semantic peer inference from Playwright output;
 - broad PDF/document parsing beyond explicit page boxes and rectangular internal Link annotations,
-  including text/tags/paint/actions/forms/viewer behavior, plus Android or iOS adapters;
+  including text/tags/paint/actions/forms/viewer behavior;
+- broad Android support beyond the repository-owned classic-View capture, including live-device
+  acquisition, Compose, multiple windows, touch regions, dynamic behavior, and representative
+  device/application evaluation; any iOS adapter;
 - broad PPTX coverage beyond direct unrotated shapes/groups, or a PPTX-specific recommended rule;
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
@@ -691,14 +754,14 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
 - **#28 (complete for protocol v0):** isolated local perception process, typed OCR/CV/VLM
   observation families, bounded deterministic reference wrapper, non-promotion boundary, and
   three-state differential regression. Real model calibration/accuracy remains `untested`.
-- **#29 (PPTX and PDF slices implemented):** ADRs 0043–0044 provide bounded local source-geometry
-  adapters and separate regression corpora; Android is the next candidate, with iOS later.
+- **#29 (PPTX, PDF, and Android slices implemented):** ADRs 0043–0045 provide bounded local
+  source/capture adapters and separate regression corpora; iOS is next.
 - **#30:** interaction actions/effects/states/traces and recovery contracts.
 - **#31:** CLI packaging, Codex/MCP/GitHub/editor/local-UI ecosystem.
 
-The remaining work inside #29 starts with a focused Android native-semantics/screenshot evidence
-and adapter decision. Later issues remain demand- and evidence-gated; the completed alpha,
-benchmark, and bounded PPTX/PDF slices do not make stale branches authoritative.
+The remaining work inside #29 starts with a focused iOS XCUI/accessibility/screenshot evidence and
+adapter decision. Later issues remain demand- and evidence-gated; the completed alpha, benchmark,
+and bounded PPTX/PDF/Android slices do not make stale branches authoritative.
 
 Issues express future work, not implemented behavior. An issue body may contain design hypotheses;
 accepted ADR plus tested code on `main` is required to make one normative.
@@ -792,6 +855,9 @@ export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
 python3 tools/generate_pdf_fixtures.py --check
 python3 tools/check_pdf_evaluation.py
 python3 -m unittest adapters/pdf/tests/test_adapter.py
+python3 tools/generate_android_fixtures.py --check
+python3 tools/check_android_evaluation.py
+python3 -m py_compile adapters/android/sightlint_android.py
 python3 tools/release.py validate-tag --tag v0.1.0-alpha.2
 python3 tools/check_dependency_licenses.py
 python3 -m unittest tools/test_release.py
@@ -816,6 +882,7 @@ cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```

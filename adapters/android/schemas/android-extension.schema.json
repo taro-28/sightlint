@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:ir-extension:org.sightlint.android:0.1.0",
+  "title": "SightLint Android IR extension 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["extensionVersion", "capture", "screen", "nodes", "coverage", "unsupported", "privacy"],
+  "properties": {
+    "extensionVersion": { "const": "0.1.0" },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scenario", "sha256", "fixtureSourceSha256", "application", "runner", "build", "device", "sequence", "atomic", "animationsDisabled", "instrumentationCommand", "limitations", "rootResourceId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "scenario": { "enum": ["clean", "off-canvas-control-mutant", "scroll-offscreen-hard-negative"] },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "fixtureSourceSha256": { "$ref": "#/$defs/digest" },
+        "application": { "$ref": "#/$defs/application" },
+        "runner": { "$ref": "#/$defs/runner" },
+        "build": { "$ref": "#/$defs/build" },
+        "device": { "$ref": "#/$defs/device" },
+        "sequence": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "waitForIdle" },
+            { "const": "viewAndAccessibilityHierarchy" },
+            { "const": "screenshot" }
+          ],
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "atomic": { "const": false },
+        "animationsDisabled": { "const": true },
+        "instrumentationCommand": { "$ref": "#/$defs/nonEmptyString" },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "rootResourceId": { "$ref": "#/$defs/resourceId" }
+      }
+    },
+    "screen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coordinateSpaceId", "display", "systemBarInsetsDevicePixels", "displayEvidenceId", "screenshot"],
+      "properties": {
+        "coordinateSpaceId": { "const": "android:screen:display-0" },
+        "display": { "$ref": "#/$defs/display" },
+        "systemBarInsetsDevicePixels": { "$ref": "#/$defs/insets" },
+        "displayEvidenceId": { "$ref": "#/$defs/nonEmptyString" },
+        "screenshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reference", "sha256", "widthPixels", "heightPixels", "canvasId", "evidenceId", "extentReconciliation", "nodeIdentity"],
+          "properties": {
+            "reference": { "type": "string", "minLength": 1, "maxLength": 1024 },
+            "sha256": { "$ref": "#/$defs/digest" },
+            "widthPixels": { "type": "integer", "minimum": 1, "maximum": 32768 },
+            "heightPixels": { "type": "integer", "minimum": 1, "maximum": 32768 },
+            "canvasId": { "const": "android:render:display-0" },
+            "evidenceId": { "$ref": "#/$defs/nonEmptyString" },
+            "extentReconciliation": { "const": "agreement" },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "resourceId", "parentResourceId", "depth", "className", "mappingStatus", "layoutBoundsDevicePixels", "identityTransform", "globalVisible", "viewState", "text", "contentDescription", "viewEvidenceId", "accessibilityEvidenceId", "accessibility"],
+        "properties": {
+          "id": { "$ref": "#/$defs/nonEmptyString" },
+          "resourceId": { "$ref": "#/$defs/resourceId" },
+          "parentResourceId": { "anyOf": [{ "$ref": "#/$defs/resourceId" }, { "type": "null" }] },
+          "depth": { "type": "integer", "minimum": 0, "maximum": 64 },
+          "className": { "$ref": "#/$defs/nonEmptyString" },
+          "mappingStatus": { "enum": ["mappedExactLayout", "notMappedNotShown", "notMappedNotGloballyVisible", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
+          "layoutBoundsDevicePixels": { "$ref": "#/$defs/rect" },
+          "identityTransform": { "type": "boolean" },
+          "globalVisible": { "$ref": "#/$defs/globalVisible" },
+          "viewState": { "$ref": "#/$defs/viewState" },
+          "text": { "$ref": "#/$defs/nullableStringFact" },
+          "contentDescription": { "$ref": "#/$defs/nullableStringFact" },
+          "viewEvidenceId": { "$ref": "#/$defs/nonEmptyString" },
+          "accessibilityEvidenceId": { "$ref": "#/$defs/nonEmptyString" },
+          "accessibility": { "$ref": "#/$defs/accessibility" }
+        }
+      }
+    },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "unsupported": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unidentifiedNodeCount", "features"],
+      "properties": {
+        "unidentifiedNodeCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "features": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "contentPolicy", "transmittedFields"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "contentPolicy": { "const": "digestsAndGeometry" },
+        "transmittedFields": { "type": "array", "maxItems": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "resourceId": { "type": "string", "pattern": "^[A-Za-z0-9_.]+:id/[A-Za-z0-9_]+$", "maxLength": 256 },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packageName", "versionName", "versionCode"],
+      "properties": {
+        "packageName": { "const": "org.sightlint.fixtures.atlas" },
+        "versionName": { "const": "0.1.0" },
+        "versionCode": { "const": 1 }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "captureApi", "adbVersion", "emulatorVersion", "avdName"],
+      "properties": {
+        "name": { "const": "sightlint-atlas-android-capture" },
+        "version": { "const": "0.1.0" },
+        "captureApi": { "const": "instrumentation-view-accessibility" },
+        "adbVersion": { "const": "1.0.41" },
+        "emulatorVersion": { "const": "36.4.10.0" },
+        "avdName": { "const": "Pixel_8" }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gradleVersion", "androidGradlePluginVersion", "javaLanguageVersion", "compileSdk"],
+      "properties": {
+        "gradleVersion": { "const": "8.13" },
+        "androidGradlePluginVersion": { "const": "8.10.1" },
+        "javaLanguageVersion": { "const": 17 },
+        "compileSdk": { "const": 35 }
+      }
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["widthPixels", "heightPixels", "densityDpi", "rotationDegrees"],
+      "properties": {
+        "widthPixels": { "const": 1080 },
+        "heightPixels": { "const": 2400 },
+        "densityDpi": { "const": 420 },
+        "rotationDegrees": { "const": 0 }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fontScale", "locale", "layoutDirection", "nightMode"],
+      "properties": {
+        "fontScale": { "const": 1.0 },
+        "locale": { "const": "en-US" },
+        "layoutDirection": { "const": "ltr" },
+        "nightMode": { "const": "light" }
+      }
+    },
+    "insets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom"],
+      "properties": {
+        "left": { "const": 0 },
+        "top": { "const": 0 },
+        "right": { "const": 0 },
+        "bottom": { "const": 0 }
+      }
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiLevel", "buildFingerprint", "manufacturer", "model", "device", "display", "configuration", "systemBarInsetsDevicePixels"],
+      "properties": {
+        "apiLevel": { "const": 35 },
+        "buildFingerprint": { "const": "google/sdk_gphone64_arm64/emu64a:15/AE3A.240806.043/12960925:userdebug/dev-keys" },
+        "manufacturer": { "const": "Google" },
+        "model": { "const": "sdk_gphone64_arm64" },
+        "device": { "const": "emu64a" },
+        "display": { "$ref": "#/$defs/display" },
+        "configuration": { "$ref": "#/$defs/configuration" },
+        "systemBarInsetsDevicePixels": { "$ref": "#/$defs/insets" }
+      }
+    },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "y": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "width": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+        "height": { "type": "integer", "minimum": 0, "maximum": 1048576 }
+      }
+    },
+    "rawBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom"],
+      "properties": {
+        "left": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "top": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "right": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "bottom": { "type": "integer", "minimum": -1048576, "maximum": 1048576 }
+      }
+    },
+    "globalVisible": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "boundsDevicePixels"],
+      "properties": {
+        "value": { "type": "boolean" },
+        "boundsDevicePixels": { "anyOf": [{ "$ref": "#/$defs/rect" }, { "type": "null" }] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "value": { "const": true } }, "required": ["value"] },
+          "then": { "properties": { "boundsDevicePixels": { "$ref": "#/$defs/rect" } } },
+          "else": { "properties": { "boundsDevicePixels": { "type": "null" } } }
+        }
+      ]
+    },
+    "viewState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shown", "enabled", "clickable", "focusable", "focused", "selected", "checkable", "checked", "scrollable", "longClickable"],
+      "properties": {
+        "shown": { "type": "boolean" },
+        "enabled": { "type": "boolean" },
+        "clickable": { "type": "boolean" },
+        "focusable": { "type": "boolean" },
+        "focused": { "type": "boolean" },
+        "selected": { "type": "boolean" },
+        "checkable": { "type": "boolean" },
+        "checked": { "type": "boolean" },
+        "scrollable": { "type": "boolean" },
+        "longClickable": { "type": "boolean" }
+      }
+    },
+    "stringFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["utf8ByteLength", "sha256"],
+      "properties": {
+        "utf8ByteLength": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "nullableStringFact": { "anyOf": [{ "$ref": "#/$defs/stringFact" }, { "type": "null" }] },
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["className", "packageName", "viewIdResourceName", "geometryStatus", "rawBoundsDevicePixels", "boundsDevicePixels", "actionIds", "enabled", "clickable", "focusable", "focused", "selected", "checkable", "checked", "scrollable", "longClickable", "visibleToUser"],
+      "properties": {
+        "className": { "anyOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }] },
+        "packageName": { "anyOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }] },
+        "viewIdResourceName": { "anyOf": [{ "$ref": "#/$defs/nonEmptyString" }, { "type": "null" }] },
+        "geometryStatus": { "enum": ["exact", "invalidPlatformBounds", "unavailable"] },
+        "rawBoundsDevicePixels": { "anyOf": [{ "$ref": "#/$defs/rawBounds" }, { "type": "null" }] },
+        "boundsDevicePixels": { "anyOf": [{ "$ref": "#/$defs/rect" }, { "type": "null" }] },
+        "actionIds": { "type": "array", "maxItems": 128, "uniqueItems": true, "items": { "type": "integer", "minimum": 0, "maximum": 2147483647 } },
+        "enabled": { "type": "boolean" },
+        "clickable": { "type": "boolean" },
+        "focusable": { "type": "boolean" },
+        "focused": { "type": "boolean" },
+        "selected": { "type": "boolean" },
+        "checkable": { "type": "boolean" },
+        "checked": { "type": "boolean" },
+        "scrollable": { "type": "boolean" },
+        "longClickable": { "type": "boolean" },
+        "visibleToUser": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "geometryStatus": { "const": "exact" } }, "required": ["geometryStatus"] },
+          "then": {
+            "properties": {
+              "rawBoundsDevicePixels": { "$ref": "#/$defs/rawBounds" },
+              "boundsDevicePixels": { "$ref": "#/$defs/rect" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "geometryStatus": { "const": "invalidPlatformBounds" } }, "required": ["geometryStatus"] },
+          "then": {
+            "properties": {
+              "rawBoundsDevicePixels": { "$ref": "#/$defs/rawBounds" },
+              "boundsDevicePixels": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "geometryStatus": { "const": "unavailable" } }, "required": ["geometryStatus"] },
+          "then": {
+            "properties": {
+              "rawBoundsDevicePixels": { "type": "null" },
+              "boundsDevicePixels": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["viewHierarchy", "viewLayout", "accessibilitySemantics", "touchHitRegions", "renderedExtent", "renderedNodeIdentity", "composeSemantics", "dynamicBehavior"],
+      "properties": {
+        "viewHierarchy": { "const": "partial" },
+        "viewLayout": { "const": "partial" },
+        "accessibilitySemantics": { "const": "partial" },
+        "touchHitRegions": { "const": "cantTell" },
+        "renderedExtent": { "const": "observed" },
+        "renderedNodeIdentity": { "const": "cantTell" },
+        "composeSemantics": { "const": "untested" },
+        "dynamicBehavior": { "const": "untested" }
+      }
+    }
+  }
+}

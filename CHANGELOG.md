@@ -5,6 +5,18 @@ independent compatibility surfaces changed by the release.
 
 ## Unreleased
 
+- Accepted ADR 0045 and added strict Android capture/request/response and
+  `org.sightlint.android@0.1.0` surfaces with a dependency-free untrusted local file adapter that
+  keeps exact View allocation, platform accessibility, and PNG render evidence separate.
+- Added a realistic repository-owned API-35 account/settings fixture application, instrumentation
+  capture runner, and three digest-pinned native/PNG cases with separate acquisition/rule truth,
+  one targeted off-canvas mutation, one offscreen hard negative, explicit provenance/license/
+  privacy/non-holdout records, and public-process E2E through `adapt-image`, `normalize`, and
+  `check` on supported CI systems.
+- Kept Android coverage explicitly partial: live device acquisition, Compose, arbitrary apps and
+  devices, touch regions, dynamic behavior, occlusion/ink, rendered node identity, protected
+  holdout evidence, Android-specific rules, and general mobile/UI/UX accuracy remain
+  unimplemented, `untested`, or `cantTell`.
 - Accepted ADR 0044 and added bounded PDF request/response and `org.sightlint.pdf` extension
   `0.1.0` surfaces backed by exactly hash-locked `pypdf==6.17.0` in an untrusted local process.
 - Added deterministic repository-owned PDF pages and reviewed page renders with separate

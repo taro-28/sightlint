@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:protocol:android-request:0.1.0",
+  "title": "SightLint Android adapter request 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "requestId", "artifact", "capture", "screenshot", "privacy", "execution"],
+  "properties": {
+    "protocolVersion": { "const": "0.1.0" },
+    "requestId": { "$ref": "#/$defs/token" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 256 }
+      }
+    },
+    "capture": { "$ref": "#/$defs/input" },
+    "screenshot": { "$ref": "#/$defs/input" },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["externalProcessing", "retention", "contentPolicy"],
+      "properties": {
+        "externalProcessing": { "const": false },
+        "retention": { "const": "none" },
+        "contentPolicy": { "const": "digestsAndGeometry" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxCaptureBytes", "maxScreenshotBytes", "maxNodes", "maxDepth", "maxAttributesPerNode", "maxStringBytes", "maxOutputBytes"],
+      "properties": {
+        "maxCaptureBytes": { "type": "integer", "minimum": 1024, "maximum": 8388608 },
+        "maxScreenshotBytes": { "type": "integer", "minimum": 1024, "maximum": 67108864 },
+        "maxNodes": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "maxDepth": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "maxAttributesPerNode": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "maxStringBytes": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "maxOutputBytes": { "type": "integer", "minimum": 1024, "maximum": 16777216 }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "reference": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\\\/].*" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference", "sha256"],
+      "properties": {
+        "reference": { "$ref": "#/$defs/reference" },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}

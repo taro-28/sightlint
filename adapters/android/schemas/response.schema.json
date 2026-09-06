@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:protocol:android-response:0.1.0",
+  "title": "SightLint Android adapter response 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "requestId", "status", "adapter", "captureSha256", "screenshotSha256", "nodeCount", "mappedNodeCount", "excludedNodeCount", "coverage", "externalProcessing", "limitations"],
+  "properties": {
+    "protocolVersion": { "const": "0.1.0" },
+    "requestId": { "$ref": "#/$defs/token" },
+    "status": { "const": "partial" },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "runtime"],
+      "properties": {
+        "name": { "const": "sightlint-android" },
+        "version": { "const": "0.1.0" },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": {
+            "name": { "const": "python" },
+            "version": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        }
+      }
+    },
+    "captureSha256": { "$ref": "#/$defs/digest" },
+    "screenshotSha256": { "$ref": "#/$defs/digest" },
+    "nodeCount": { "type": "integer", "minimum": 1, "maximum": 10000 },
+    "mappedNodeCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+    "excludedNodeCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["viewHierarchy", "viewLayout", "accessibilitySemantics", "touchHitRegions", "renderedExtent", "renderedNodeIdentity", "composeSemantics", "dynamicBehavior"],
+      "properties": {
+        "viewHierarchy": { "const": "partial" },
+        "viewLayout": { "const": "partial" },
+        "accessibilitySemantics": { "const": "partial" },
+        "touchHitRegions": { "const": "cantTell" },
+        "renderedExtent": { "const": "observed" },
+        "renderedNodeIdentity": { "const": "cantTell" },
+        "composeSemantics": { "const": "untested" },
+        "dynamicBehavior": { "const": "untested" }
+      }
+    },
+    "externalProcessing": { "const": false },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 512 }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

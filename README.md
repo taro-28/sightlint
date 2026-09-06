@@ -48,7 +48,7 @@ exact source-alpha geometry without introducing a padding rule. Issue #27 is com
 0041 without broadening PNG coverage because current product evidence did not establish a format
 gap. Issue #28 adds the first local perception protocol foundation without OCR/model accuracy or
 blocking claims. [Issue #29](https://github.com/taro-28/sightlint/issues/29) now includes bounded
-PPTX and PDF source-geometry slices; Android is the next candidate in that umbrella.
+PPTX, PDF, and instrumented Android capture slices; iOS is next in that umbrella.
 
 ## Why
 
@@ -180,8 +180,8 @@ Palette/indexed, sub-byte, 16-bit, `tRNS`, animation, and over-budget cases are 
 unavailable instead of guessed.
 
 ADR 0041 keeps that boundary after a versioned format-demand assessment found that all five
-source-alpha assets, all three PPTX differential renders, all three PDF page renders, and the nine
-pinned-browser product captures use the supported subset.
+source-alpha assets, all three PPTX differential renders, all three PDF page renders, all three
+Android screenshots, and the nine pinned-browser product captures use the supported subset.
 Unsupported formats remain conformance controls rather than product-demand evidence; no decoder
 dependency, automatic conversion, compatibility change, prevalence claim, or protected holdout is
 introduced. A future observed gap requires a new issue and ADR.
@@ -276,6 +276,21 @@ paint, reading order, viewer hit testing, and rendered node identity are not gue
 three-case public corpus is maintainer-authored regression evidence with no protected holdout or
 general PDF/document-quality claim; see [`adapters/pdf/README.md`](adapters/pdf/README.md).
 
+### Bounded Android capture acquisition
+
+ADR 0045 adds a dependency-free Python 3.9+ file adapter over digest-pinned output from a
+repository-owned Android instrumentation fixture. Exact classic-View screen allocations may
+become device-pixel `layoutBox` observations; separately captured accessibility rectangles remain
+`platformSemantics` extension facts and never become touch or render geometry. The paired
+`UiAutomation` PNG passes public `adapt-image` and stays on a separate canvas with extent-only
+reconciliation.
+
+The three public cases cover a clean settings screen, one off-canvas control mutation, and an
+offscreen-scroll hard negative with invalid platform bounds. They establish regression behavior,
+not representative Android, device, accessibility, or UI/UX accuracy. Live-device orchestration,
+Compose, dynamic behavior, touch regions, and rendered node identity remain unimplemented or
+`untested`; see [`adapters/android/README.md`](adapters/android/README.md).
+
 ## Install and current commands
 
 The first alpha is a source-only GitHub prerelease with a deterministic archive and SHA-256
@@ -332,6 +347,14 @@ python3 adapters/pdf/sightlint_pdf.py \
   --sightlint-binary target/debug/sightlint \
   --artifact-ir-out /tmp/atlas-clean-pdf.ir.json
 target/debug/sightlint check /tmp/atlas-clean-pdf.ir.json --profile base --format json
+
+# Convert one reviewed Android capture and run the existing source-bounds rule.
+python3 adapters/android/sightlint_android.py \
+  --request evaluation/android/requests/android-atlas-clean.json \
+  --repository-root . \
+  --sightlint-binary target/debug/sightlint \
+  --artifact-ir-out /tmp/atlas-android-clean.ir.json
+target/debug/sightlint check /tmp/atlas-android-clean.ir.json --profile base --format json
 
 # Binary stdin is supported.
 cat screenshot.png | cargo run --locked -p sightlint-cli -- adapt-image -
@@ -410,6 +433,9 @@ Current committed assets include:
 - three deterministic PDF pages/renders with separate acquisition/rule oracles, one source-only
   off-page mutation, one `QuadPoints` abstention hard negative, explicit provenance/license/
   privacy/non-holdout records, and public-process byte-stability/fail-closed checks;
+- three API-35 Android instrumented captures from a repository-owned settings application with
+  separate acquisition/rule truth, one targeted View-allocation mutation, one offscreen hard
+  negative, retained native/accessibility conflict evidence, and no protected holdout;
 - targeted mutations, hard negatives, budget boundaries, file/stdin/API comparisons, and repeated
   byte-identical results.
 
@@ -466,14 +492,14 @@ Read:
 | #26 | completed exact source-alpha transparent-asset geometry; no rule admitted |
 | #27 | completed PNG format-demand/decoder strategy decision; broader coverage not admitted |
 | #28 | completed local OCR/CV/VLM protocol foundation; real model evaluation remains untested |
-| #29 | PPTX and PDF first slices implemented; Android/iOS adapters remain |
+| #29 | PPTX, PDF, and Android first slices implemented; iOS remains |
 | #30 | interaction states, effects, traces, and recovery |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0045 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0046 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.

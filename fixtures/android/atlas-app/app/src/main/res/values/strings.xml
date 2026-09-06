@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Atlas Fixture</string>
+    <string name="screen_title">Account settings</string>
+    <string name="screen_subtitle">Manage notifications, privacy, and plan details.</string>
+    <string name="account_name">Alex Morgan</string>
+    <string name="account_plan">Workspace plan · Trial</string>
+    <string name="notifications">Product notifications</string>
+    <string name="privacy">Profile visibility</string>
+    <string name="privacy_value">Team only</string>
+    <string name="save_changes">Save changes</string>
+    <string name="archived_label">Archived preferences</string>
+    <string name="avatar_description">Account avatar for Alex Morgan</string>
+</resources>

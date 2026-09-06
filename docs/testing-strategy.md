@@ -227,6 +227,12 @@ the test pass.
 
 Differential tests can produce `cantTell`; that is often the correct result.
 
+The ADR 0045 Android suite exercises this boundary with platform View allocation,
+`AccessibilityNodeInfo`, and screenshot evidence from the same named fixture state. It requires
+extent agreement but does not invent native-to-pixel identity. The offscreen-scroll hard negative
+must retain invalid raw platform bounds while producing no core box or rule verdict for those
+nodes.
+
 ## Layer 8 — Public-binary and process E2E
 
 End-to-end tests invoke the actual built `sightlint` binary and any real adapter process.
@@ -406,6 +412,9 @@ export PATH="$PWD/.venv-sightlint-pdf/bin:$PATH"
 python3 tools/generate_pdf_fixtures.py --check
 python3 tools/check_pdf_evaluation.py
 python3 -m unittest adapters/pdf/tests/test_adapter.py
+python3 tools/generate_android_fixtures.py --check
+python3 tools/check_android_evaluation.py
+python3 -m py_compile adapters/android/sightlint_android.py
 npm --prefix adapters/perception ci --ignore-scripts
 npm --prefix adapters/perception run check
 npm --prefix adapters/playwright ci --ignore-scripts
@@ -427,6 +436,7 @@ cargo test --locked -p sightlint-cli --test evaluation_corpus
 cargo test --locked -p sightlint-cli --test web_evaluation_corpus -- --nocapture
 cargo test --locked -p sightlint-cli --test pptx_evaluation_e2e -- --nocapture
 cargo test --locked -p sightlint-cli --test pdf_evaluation_e2e -- --nocapture
+cargo test --locked -p sightlint-cli --test android_evaluation_e2e -- --nocapture
 RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --all-features --no-deps
 cargo +1.85.0 check --workspace --all-targets --all-features --locked
 ```
