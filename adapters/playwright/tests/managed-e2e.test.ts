@@ -25,17 +25,43 @@ interface ExpectedResult {
   ruleId: string;
   ruleVersion: string;
   outcome: string;
+  maturity: string;
   enforcement: string;
   targetKind: string;
   targetId: string;
+  targetAspect: string | null;
 }
 
-interface ManagedCase {
+interface AcquisitionExpectation {
+  aspect: string;
+  operator: "equals" | "atLeast" | "includesAll" | "excludesAll";
+  value: unknown;
+}
+
+interface AcquisitionAbstention {
+  aspect: string;
+  outcome: "cantTell" | "untested";
+  rationale: string;
+}
+
+interface AcquisitionCase {
   caseId: string;
   request: string;
+  split: string;
   classification: string;
+  expectations: AcquisitionExpectation[];
+  abstentions: AcquisitionAbstention[];
+}
+
+interface RuleCase {
+  caseId: string;
+  request: string;
+  split: string;
+  classification: string;
+  expectedExitCode: number;
   expectedFailureCount: number;
-  expectedResult: ExpectedResult | null;
+  expectedBlockingFailureCount: number;
+  expectedResults: ExpectedResult[];
 }
 
 function run(program: string, args: string[], cwd = repositoryRoot): Promise<ProcessResult> {
@@ -145,9 +171,65 @@ function resultMatches(result: Record<string, unknown>, expected: ExpectedResult
   return result["ruleId"] === expected.ruleId &&
     result["ruleVersion"] === expected.ruleVersion &&
     result["outcome"] === expected.outcome &&
+    result["maturity"] === expected.maturity &&
     result["enforcement"] === expected.enforcement &&
     target["kind"] === expected.targetKind &&
-    target["id"] === expected.targetId;
+    target["id"] === expected.targetId &&
+    (target["aspect"] ?? null) === expected.targetAspect;
+}
+
+function assertAcquisitionExpectation(
+  actual: Map<string, unknown>,
+  expectation: AcquisitionExpectation,
+  caseId: string,
+): void {
+  assert.ok(actual.has(expectation.aspect), `${caseId}: unsupported acquisition aspect ${expectation.aspect}`);
+  const observed = actual.get(expectation.aspect);
+  switch (expectation.operator) {
+    case "equals":
+      assert.deepEqual(observed, expectation.value, `${caseId}: ${expectation.aspect}`);
+      return;
+    case "atLeast":
+      if (typeof observed !== "number") assert.fail(`${caseId}: ${expectation.aspect} must be numeric`);
+      if (typeof expectation.value !== "number") assert.fail(`${caseId}: ${expectation.aspect} minimum must be numeric`);
+      assert.ok(observed >= expectation.value, `${caseId}: ${expectation.aspect} must be at least ${String(expectation.value)}`);
+      return;
+    case "includesAll": {
+      assert.ok(Array.isArray(observed), `${caseId}: ${expectation.aspect} must be an array`);
+      assert.ok(Array.isArray(expectation.value), `${caseId}: ${expectation.aspect} expected value must be an array`);
+      const observedValues = new Set(observed as unknown[]);
+      for (const value of expectation.value) {
+        assert.ok(observedValues.has(value), `${caseId}: ${expectation.aspect} is missing ${String(value)}`);
+      }
+      return;
+    }
+    case "excludesAll":
+      if (typeof observed !== "string") assert.fail(`${caseId}: ${expectation.aspect} must be UTF-8 text`);
+      assert.ok(Array.isArray(expectation.value), `${caseId}: ${expectation.aspect} exclusions must be an array`);
+      for (const value of expectation.value) {
+        assert.equal(typeof value, "string");
+        assert.equal(observed.includes(value), false, `${caseId}: ${expectation.aspect} disclosed ${value}`);
+      }
+  }
+}
+
+function assertAcquisitionAbstention(
+  abstention: AcquisitionAbstention,
+  captureLimitations: string[],
+  sourceAttributionUnavailable: boolean,
+  caseId: string,
+): void {
+  assert.ok(abstention.rationale.length > 0);
+  assert.ok(abstention.outcome === "cantTell" || abstention.outcome === "untested");
+  if (abstention.aspect === "screenshot.pixelContentIdentity") {
+    assert.ok(captureLimitations.some((value) => value.includes("pixel-content matching is cantTell")), `${caseId}: pixel-content abstention missing`);
+  } else if (abstention.aspect === "web.completeHitRegions") {
+    assert.ok(captureLimitations.some((value) => value.includes("complete hit regions are cantTell")), `${caseId}: hit-region abstention missing`);
+  } else if (abstention.aspect === "source.fileCausality") {
+    assert.equal(sourceAttributionUnavailable, true, `${caseId}: source causality must remain unavailable`);
+  } else {
+    assert.fail(`${caseId}: unsupported acquisition abstention ${abstention.aspect}`);
+  }
 }
 
 async function listen(port: number): Promise<Server> {
@@ -162,51 +244,127 @@ async function close(server: Server): Promise<void> {
   await new Promise<void>((resolveClose, reject) => server.close((error) => error === undefined ? resolveClose() : reject(error)));
 }
 
+test("managed evaluation schemas keep acquisition and rule truth separate", async () => {
+  const acquisitionSchema = await json("evaluation/web/managed-loopback-acquisition.schema.json") as AnySchema;
+  const ruleSchema = await json("evaluation/web/managed-loopback-rule.schema.json") as AnySchema;
+  const acquisitionOracle = await json("evaluation/web/annotations/managed-loopback-acquisition.json") as Record<string, unknown>;
+  const ruleOracle = await json("evaluation/web/annotations/managed-loopback-rules.json") as Record<string, unknown>;
+  const acquisitionAjv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  const ruleAjv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
+  const validateAcquisition = acquisitionAjv.compile(acquisitionSchema);
+  const validateRules = ruleAjv.compile(ruleSchema);
+  assert.equal(validateAcquisition(acquisitionOracle), true, acquisitionAjv.errorsText(validateAcquisition.errors));
+  assert.equal(validateRules(ruleOracle), true, ruleAjv.errorsText(validateRules.errors));
+  assert.equal(validateAcquisition(ruleOracle), false, "rule truth must not validate as acquisition truth");
+  assert.equal(validateRules(acquisitionOracle), false, "acquisition truth must not validate as rule truth");
+
+  const mixedAcquisition = structuredClone(acquisitionOracle);
+  array(mixedAcquisition["cases"], "acquisition cases")[0]!["expectedFailureCount"] = 0;
+  assert.equal(validateAcquisition(mixedAcquisition), false, "rule fields must be rejected from acquisition cases");
+  const mixedRules = structuredClone(ruleOracle);
+  array(mixedRules["cases"], "rule cases")[0]!["expectations"] = [];
+  assert.equal(validateRules(mixedRules), false, "acquisition fields must be rejected from rule cases");
+
+  for (const oracle of [acquisitionOracle, ruleOracle]) {
+    const sourceFiles = object(oracle["provenance"], "oracle provenance")["sourceFiles"];
+    assert.ok(Array.isArray(sourceFiles));
+    for (const sourceFile of sourceFiles) {
+      assert.equal(typeof sourceFile, "string");
+      assert.ok((await readFile(resolve(repositoryRoot, sourceFile))).byteLength > 0, `${sourceFile} must exist and be nonempty`);
+    }
+  }
+});
+
 test("managed loopback workflow exercises redirect, same-origin API, rules, attribution, and cleanup", { timeout: 300_000 }, async () => {
-  const oracle = await json("evaluation/web/annotations/managed-loopback.json") as { cases: ManagedCase[] };
+  const acquisitionOracle = await json("evaluation/web/annotations/managed-loopback-acquisition.json") as { cases: AcquisitionCase[] };
+  const ruleOracle = await json("evaluation/web/annotations/managed-loopback-rules.json") as { cases: RuleCase[] };
   const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
   ajv.addSchema(await json("adapters/playwright/schemas/capture-response-0.2.schema.json") as AnySchema);
   const validateWorkflow = ajv.compile(await json("adapters/playwright/schemas/web-workflow-report-0.2.schema.json") as AnySchema);
   const validateExtension = new Ajv2020({ allErrors: true, strict: true, validateFormats: false })
     .compile(await json("adapters/playwright/schemas/web-extension.schema.json") as AnySchema);
+  const acquisitionByCase = new Map(acquisitionOracle.cases.map((oracleCase) => [oracleCase.caseId, oracleCase]));
+  const ruleCaseIds = new Set(ruleOracle.cases.map((oracleCase) => oracleCase.caseId));
+  assert.equal(acquisitionByCase.size, acquisitionOracle.cases.length, "acquisition case identifiers must be unique");
+  assert.equal(ruleCaseIds.size, ruleOracle.cases.length, "rule case identifiers must be unique");
+  assert.equal(ruleOracle.cases.length, acquisitionOracle.cases.length, "acquisition and rule case counts must match");
+  assert.deepEqual([...ruleCaseIds].sort(), [...acquisitionByCase.keys()].sort(), "acquisition and rule case identifiers must match");
+  let executedCases = 0;
+  let matchedAcquisitionExpectations = 0;
+  const acquisitionExpectationCount = acquisitionOracle.cases.reduce((total, oracleCase) => total + oracleCase.expectations.length, 0);
+  let matchedAcquisitionAbstentions = 0;
+  const acquisitionAbstentionCount = acquisitionOracle.cases.reduce((total, oracleCase) => total + oracleCase.abstentions.length, 0);
+  let emittedFailures = 0;
+  let matchedReviewedFailures = 0;
+  let unexpectedFailures = 0;
+  let matchedRuleAbstentions = 0;
+  const reviewedRuleAbstentions = ruleOracle.cases.reduce(
+    (total, oracleCase) => total + oracleCase.expectedResults.filter((result) => ["cantTell", "inapplicable", "untested"].includes(result.outcome)).length,
+    0,
+  );
+  let reviewedMutations = 0;
+  let killedMutations = 0;
+  let reviewedHardNegatives = 0;
+  let hardNegativeFailures = 0;
   const directory = await mkdtemp(join(tmpdir(), "sightlint-managed-product-"));
   try {
-    for (const oracleCase of oracle.cases) {
+    for (const ruleCase of ruleOracle.cases) {
+      const acquisitionCase = acquisitionByCase.get(ruleCase.caseId);
+      assert.ok(acquisitionCase !== undefined, `${ruleCase.caseId}: missing acquisition oracle`);
+      assert.equal(acquisitionCase.request, ruleCase.request, `${ruleCase.caseId}: request authorities disagree`);
+      assert.equal(acquisitionCase.split, ruleCase.split, `${ruleCase.caseId}: split authorities disagree`);
+      assert.equal(acquisitionCase.classification, ruleCase.classification, `${ruleCase.caseId}: classification authorities disagree`);
+      assert.equal(new Set(acquisitionCase.expectations.map((expectation) => expectation.aspect)).size, acquisitionCase.expectations.length, `${ruleCase.caseId}: acquisition aspects must be unique`);
+      assert.equal(new Set(acquisitionCase.abstentions.map((abstention) => abstention.aspect)).size, acquisitionCase.abstentions.length, `${ruleCase.caseId}: acquisition abstention aspects must be unique`);
       const port = await freePort();
-      const requestPath = await materializeRequest(directory, oracleCase.request, port);
+      const requestPath = await materializeRequest(directory, ruleCase.request, port);
       const first = await run(process.execPath, workflowArguments(requestPath));
       const second = await run(process.execPath, workflowArguments(requestPath));
-      assert.equal(first.code, 0, first.stderr.toString("utf8"));
+      assert.equal(first.code, ruleCase.expectedExitCode, first.stderr.toString("utf8"));
       assert.equal(first.stderr.byteLength, 0);
-      assert.deepEqual(second, first, `${oracleCase.caseId} deterministic workflow bytes`);
+      assert.deepEqual(second, first, `${ruleCase.caseId} deterministic workflow bytes`);
       const report = JSON.parse(first.stdout.toString("utf8")) as Record<string, unknown>;
       assert.equal(validateWorkflow(report), true, ajv.errorsText(validateWorkflow.errors));
-      assert.equal(report["schemaVersion"], "0.2.0");
       const capture = object(report["capture"], "capture");
-      assert.equal(capture["protocolVersion"], "0.2.0");
-      assert.equal(object(capture["adapter"], "adapter")["version"], "0.4.0");
       const captureDetails = object(capture["capture"], "capture details");
       const loopback = object(captureDetails["loopbackResponses"], "loopback responses");
-      assert.equal(capture["sourceDigest"], loopback["digest"]);
-      assert.equal(loopback["routePath"], "/redirect");
-      assert.ok(Number(loopback["requestCount"]) >= 4);
-      assert.equal(typeof loopback["targetDigest"], "string");
-      assert.equal(first.stdout.includes(Buffer.from("private=not-serialized")), false);
-      assert.equal(first.stdout.includes(Buffer.from("bounded request body")), false);
-      for (const sourceTarget of array(report["sourceTargets"], "source targets")) {
-        assert.equal(sourceTarget["sourceAttribution"], "unavailable");
-        assert.deepEqual(sourceTarget["sourceFiles"], []);
-      }
+      const sourceTargets = array(report["sourceTargets"], "source targets");
+      const sourceAttributionUnavailable = sourceTargets.length > 0 && sourceTargets.every(
+        (sourceTarget) => sourceTarget["sourceAttribution"] === "unavailable" &&
+          Array.isArray(sourceTarget["sourceFiles"]) && sourceTarget["sourceFiles"].length === 0,
+      );
       const checkReport = object(report["checkReport"], "check report");
-      assert.equal(object(checkReport["extensionVersions"], "extension versions")["org.sightlint.web"], "0.4.0");
       const results = array(checkReport["results"], "check results");
-      assert.equal(results.filter((result) => result["outcome"] === "failed").length, oracleCase.expectedFailureCount);
-      if (oracleCase.expectedResult !== null) {
-        assert.ok(results.some((result) => resultMatches(result, oracleCase.expectedResult!)));
+      const failures = results.filter((result) => result["outcome"] === "failed");
+      const blockingFailures = failures.filter((result) => result["enforcement"] === "blocking");
+      assert.equal(failures.length, ruleCase.expectedFailureCount, `${ruleCase.caseId}: failure count`);
+      assert.equal(blockingFailures.length, ruleCase.expectedBlockingFailureCount, `${ruleCase.caseId}: blocking failure count`);
+      for (const expectedResult of ruleCase.expectedResults) {
+        const matched = results.some((result) => resultMatches(result, expectedResult));
+        assert.ok(matched, `${ruleCase.caseId}: missing reviewed ${expectedResult.ruleId} ${expectedResult.outcome}`);
+        if (["cantTell", "inapplicable", "untested"].includes(expectedResult.outcome)) {
+          matchedRuleAbstentions += 1;
+        }
+      }
+      const reviewedFailedResults = ruleCase.expectedResults.filter((result) => result.outcome === "failed");
+      for (const failure of failures) {
+        if (reviewedFailedResults.some((expected) => resultMatches(failure, expected))) matchedReviewedFailures += 1;
+        else unexpectedFailures += 1;
+      }
+      emittedFailures += failures.length;
+      if (ruleCase.classification === "targetedMutation") {
+        reviewedMutations += 1;
+        if (reviewedFailedResults.length > 0 && reviewedFailedResults.every((expected) => results.some((result) => resultMatches(result, expected)))) {
+          killedMutations += 1;
+        }
+      }
+      if (ruleCase.classification === "hardNegative") {
+        reviewedHardNegatives += 1;
+        hardNegativeFailures += failures.length;
       }
       await waitForConnection(port, false);
 
-      const artifactOutput = join(directory, `direct-${oracleCase.caseId}`);
+      const artifactOutput = join(directory, `direct-${ruleCase.caseId}`);
       const direct = await run(process.execPath, adapterArguments(requestPath, artifactOutput));
       assert.equal(direct.code, 0, direct.stderr.toString("utf8"));
       const directResponse = JSON.parse(direct.stdout.toString("utf8")) as Record<string, unknown>;
@@ -219,10 +377,43 @@ test("managed loopback workflow exercises redirect, same-origin API, rules, attr
         object(extensionCapture["loopbackResponses"], "Web loopback responses")["digest"],
         directResponse["sourceDigest"],
       );
+      await waitForConnection(port, false);
+      const targetDigest = loopback["targetDigest"];
+      const screenshot = object(capture["screenshot"], "capture screenshot");
+      const nodeIds = array(artifactIr["nodes"], "Artifact IR nodes").map((node) => node["id"]);
+      const actualAcquisition = new Map<string, unknown>([
+        ["capture.protocolVersion", capture["protocolVersion"]],
+        ["capture.adapterVersion", object(capture["adapter"], "adapter")["version"]],
+        ["workflow.schemaVersion", report["schemaVersion"]],
+        ["kernel.webExtensionVersion", object(checkReport["extensionVersions"], "extension versions")["org.sightlint.web"]],
+        ["capture.loopback.routePath", loopback["routePath"]],
+        ["capture.loopback.requestCount", loopback["requestCount"]],
+        ["capture.loopback.targetDigestFormat", typeof targetDigest === "string" && /^sha256:[0-9a-f]{64}$/u.test(targetDigest) ? "sha256" : "invalid"],
+        ["capture.sourceDigestMatchesLoopback", capture["sourceDigest"] === loopback["digest"]],
+        ["screenshot.pixelSize", screenshot["pixelSize"]],
+        ["workflow.sourceAttribution", sourceAttributionUnavailable ? "unavailable" : "mixedOrMissing"],
+        ["workflow.sourceFiles", sourceAttributionUnavailable ? [] : sourceTargets.flatMap((target) => target["sourceFiles"] as unknown[])],
+        ["workflow.outputUtf8", first.stdout.toString("utf8")],
+        ["lifecycle.workflowPortReleased", true],
+        ["artifact.id", object(artifactIr["artifact"], "Artifact IR artifact")["id"]],
+        ["web.document.state", object(webExtension["document"], "Web document")["state"]],
+        ["web.nodeIds", nodeIds],
+        ["web.capture.sourceDigestMatchesResponse", extensionCapture["sourceDigest"] === directResponse["sourceDigest"]],
+        ["lifecycle.directPortReleased", true],
+      ]);
+      for (const expectation of acquisitionCase.expectations) {
+        assertAcquisitionExpectation(actualAcquisition, expectation, acquisitionCase.caseId);
+        matchedAcquisitionExpectations += 1;
+      }
+      const captureLimitations = (capture["limitations"] as unknown[]).map(String);
+      for (const abstention of acquisitionCase.abstentions) {
+        assertAcquisitionAbstention(abstention, captureLimitations, sourceAttributionUnavailable, acquisitionCase.caseId);
+        matchedAcquisitionAbstentions += 1;
+      }
       const firstKernel = await run(sightlintBinary, ["check", join(artifactOutput, "artifact-ir.json"), "--format", "json"]);
       const secondKernel = await run(sightlintBinary, ["check", join(artifactOutput, "artifact-ir.json"), "--format", "json"]);
       assert.deepEqual(secondKernel, firstKernel, "one fixed Artifact IR must produce deterministic kernel bytes");
-      if (oracleCase.caseId === "managed-clean") {
+      if (ruleCase.caseId === "managed-clean") {
         const malformed = structuredClone(artifactIr);
         const malformedLoopback = object(
           object(object(malformed["extensions"], "extensions")["org.sightlint.web"], "Web extension")["capture"],
@@ -236,9 +427,21 @@ test("managed loopback workflow exercises redirect, same-origin API, rules, attr
         assert.equal(rejected.stdout.byteLength, 0);
         assert.match(rejected.stderr.toString("utf8"), /Web extension 0\.4 requires bounded same-origin loopback response evidence/u);
       }
-      await waitForConnection(port, false);
+      executedCases += 1;
     }
-    process.stdout.write("managed loopback product: cases=3/3, mutation_kills=1/1, hard_negative_failures=0, cleanup=6/6\n");
+    assert.equal(executedCases, ruleOracle.cases.length);
+    assert.equal(matchedAcquisitionExpectations, acquisitionExpectationCount);
+    assert.equal(matchedAcquisitionAbstentions, acquisitionAbstentionCount);
+    assert.equal(matchedRuleAbstentions, reviewedRuleAbstentions);
+    assert.equal(unexpectedFailures, 0);
+    assert.equal(killedMutations, reviewedMutations);
+    assert.equal(hardNegativeFailures, 0);
+    process.stdout.write(
+      `managed loopback acquisition: cases=${executedCases}/${acquisitionOracle.cases.length}, exact=${matchedAcquisitionExpectations}/${acquisitionExpectationCount}, abstention=${matchedAcquisitionAbstentions}/${acquisitionAbstentionCount}\n`,
+    );
+    process.stdout.write(
+      `managed loopback rules: cases=${executedCases}/${ruleOracle.cases.length}, precision=${matchedReviewedFailures}/${emittedFailures}, abstention=${matchedRuleAbstentions}/${reviewedRuleAbstentions}, false_positives=${unexpectedFailures}/${emittedFailures}, mutation_kills=${killedMutations}/${reviewedMutations}, hard_negative_failures=${hardNegativeFailures}/${reviewedHardNegatives}, cleanup=6/6\n`,
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

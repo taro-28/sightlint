@@ -103,11 +103,12 @@ inspection policy. Issue #26 adds exact source-alpha geometry without introducin
 unsupported formats remain explicitly unavailable and no decoder dependency was added. #28 is
 complete for protocol v0 through ADR 0042: a bounded local wrapper and typed perception records
 exist, but real OCR/model quality remains `untested`. Issue #29 now has focused PPTX, PDF, Android,
-and iOS slices through ADRs 0043–0046. Issue #62 is the explicitly selected focused #31 slice for
-managed loopback Web capture through ADR 0048; it does not broaden the remaining ecosystem
-backlog. Other work is preserved in #30–#31; later milestones do not automatically outrank it
-because historical code once existed on a stale branch. Explain any deviation from the remaining
-sequence in the issue and PR.
+and iOS slices through ADRs 0043–0046. Issue #30's bounded interaction slice is complete. Issue #62
+completes managed loopback Web capture through ADR 0048; issue #65 and ADR 0049 separate that
+slice's acquisition and rule evaluation authorities without broadening the remaining #31
+ecosystem backlog. Later milestones do not automatically outrank current evidence needs because
+historical code once existed on a stale branch. Explain any deviation from the remaining sequence
+in the issue and PR.
 
 ## Before editing
 
@@ -140,7 +141,7 @@ implementation-ready. Prefer an ADR, benchmark, or corpus change over speculativ
   `refactor/`, `test/`, or `chore/`.
 - Link one primary issue and the roadmap milestone in the PR.
 - Architectural, schema, trust-boundary, compatibility, policy-precedence, or public protocol
-  changes start with an ADR. New ADR numbers continue at 0049 or later unless the index says
+  changes start with an ADR. New ADR numbers continue at 0050 or later unless the index says
   otherwise.
 - Implement the smallest user-visible path that reaches the real command and can be tested end to
   end.

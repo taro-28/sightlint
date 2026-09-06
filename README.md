@@ -481,9 +481,9 @@ Current committed assets include:
 - a versioned one-command agent report and one reviewed temporary source-edit/fix/rerun case with
   byte-stable JSON/human output, native source navigation, and retained ambiguity/hard-negative
   controls;
-- a three-case managed-loopback capture/check corpus plus startup, redirect, network/resource,
-  redaction, and signal-cleanup E2E on Linux, with process-tree/port cleanup additionally exercised
-  on every supported CI operating system;
+- a three-case managed-loopback capture/check corpus with separate acquisition/rule oracles plus
+  startup, redirect, network/resource, redaction, and signal-cleanup E2E on Linux, with process-
+  tree/port cleanup additionally exercised on every supported CI operating system;
 - three deterministic PDF pages/renders with separate acquisition/rule oracles, one source-only
   off-page mutation, one `QuadPoints` abstention hard negative, explicit provenance/license/
   privacy/non-holdout records, and public-process byte-stability/fail-closed checks;

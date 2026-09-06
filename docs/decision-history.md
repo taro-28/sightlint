@@ -204,6 +204,11 @@ only browser interception, bounded response identity, and process-tree cleanup. 
 legacy file protocol and does not move process launch, source attribution, or verdict ownership
 into Rust.
 
+ADR 0049 corrects the managed evaluation-data boundary after #62: exact acquisition expectations
+and abstentions now live in a strict acquisition oracle, while deterministic outcomes and false-
+positive metrics live in a separate strict rule oracle. Public implementation output is never the
+oracle, and the three visible Atlas cases remain non-holdout regression data.
+
 ## Image path decisions
 
 ### Initial question
@@ -477,7 +482,8 @@ Important historical detail:
   separate acquisition/rule evidence;
 - ADR 0048 defines opt-in managed loopback Web capture, server lifecycle ownership, browser-side
   same-origin enforcement, digest/redaction rules, and unavailable source attribution;
-- new ADRs should continue at 0049 or later rather than silently reusing historical numbers.
+- ADR 0049 defines separate managed-loopback acquisition and rule evaluation authorities;
+- new ADRs should continue at 0050 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.

@@ -53,10 +53,10 @@ policy. Issue #26 adds exact source-alpha geometry without admitting an alpha-pa
 establish a format gap, unsupported formats remain explicit, and no decoder dependency was added.
 #28 is complete for protocol v0 through ADR 0042: the local bounded worker boundary and typed
 perception records are implemented, while real OCR/model quality remains `untested`. Issue #29's
-PPTX, PDF, and Android focused slices are implemented through ADRs 0043–0045. The Android slice
-uses a bounded local file adapter over a repository-owned instrumented fixture, keeps View,
-accessibility, and PNG evidence distinct, and makes no general mobile-quality claim. iOS is next
-inside #29, followed by #30–#31. Existing stale code does not change priority.
+PPTX, PDF, Android, and iOS focused slices are implemented through ADRs 0043–0046. Issue #30's
+bounded interaction slice and issue #62's managed-loopback #31 slice are complete through ADRs
+0047–0048. Issue #65 and ADR 0049 separate the managed acquisition and rule evaluation authorities;
+the remaining ecosystem work stays under #31. Existing stale code does not change priority.
 
 ## Non-negotiable workflow
 
