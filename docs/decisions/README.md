@@ -67,10 +67,11 @@ background, alternatives, and disposition of historical experiments.
 - [0050 — Deterministic GitHub Actions report projection](0050-deterministic-github-actions-report-projection.md)
 - [0051 — Multi-family Web evaluation and protected-holdout admission](0051-multi-family-web-evaluation-and-holdout-admission.md)
 - [0052 — External holdout manifests and sanitized run attestations](0052-external-holdout-manifests-and-run-attestations.md)
+- [0053 — Source-only Web review packets and immutable comparison](0053-source-only-web-review-operations.md)
 
 Two different files received number 0024 during the remote-development phase. Their full paths are
 stable and both are accepted. Do not silently rename or renumber historical links. New decisions
-continue at **0053** or later.
+continue at **0054** or later.
 
 ## Historical branch decisions 0025–0029
 
