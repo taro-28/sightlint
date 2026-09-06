@@ -136,4 +136,3 @@ keys, `cantTell`, `inapplicable`, `untested`, passing/failing outcomes, and a ha
 declares full public-label exposure and no independence. It must never be copied into a real
 submission or cited as independent review, product accuracy, WCAG conformance, protected-holdout
 performance, or blocking maturity.
-

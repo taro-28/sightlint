@@ -71,9 +71,6 @@ observation/advisory report is not a trusted CheckReport failure. -->
 - [ ] `python3 tools/prepare_web_review.py --check`
 - [ ] `python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json`
 - [ ] `python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json`
-- [ ] `python3 tools/prepare_web_review.py --check`
-- [ ] `python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json`
-- [ ] `python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json`
 - [ ] `python3 tools/check_perception_evaluation.py`
 - [ ] `python3 tools/generate_pptx_fixtures.py --check`
 - [ ] `python3 tools/check_pptx_evaluation.py`
