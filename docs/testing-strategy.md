@@ -289,9 +289,11 @@ contract coverage, failure precision, reviewed abstention, mutation kill rate, a
 failures. Broader representative Web applications and future OCR/CV/VLM outputs still require
 comparison with independent reviewed annotations.
 
-ADR 0048 adds a separate managed-loopback suite rather than rewriting that 23-case oracle. Three
-independently annotated clean/mutation/hard-negative cases execute a repository-owned Node server,
-redirect and same-origin API through `sightlint-web-check` and the built kernel. Lifecycle
+ADR 0048 adds a separate managed-loopback suite rather than rewriting that 23-case oracle. ADR
+0049 gives its three clean/mutation/hard-negative cases independent strict acquisition and rule
+oracles. They execute a repository-owned Node server, redirect and same-origin API through
+`sightlint-web-check` and the built kernel, and derive acquisition coverage, rule coverage,
+precision, abstention, false-positive, and mutation-kill counts from reviewed data. Lifecycle
 conformance separately exercises authorization-before-spawn, delayed listen, early exit, startup
 timeout, port conflict, combined-log overflow, external requests, request/response bounds,
 WebSocket/service-worker blocking, missing-kernel cleanup, normal cleanup, and signal-driven

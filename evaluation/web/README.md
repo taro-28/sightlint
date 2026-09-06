@@ -31,8 +31,8 @@ control clipping, and intentional-asymmetry/overlay cases.
 binary. Captured Artifact IR and screenshots remain temporary review/test artifacts and are never
 copied into either oracle.
 
-ADR 0048 adds a three-case managed-loopback product slice over the same fixture family. Its
-independent `annotations/managed-loopback.json` oracle covers a clean page, the existing unnamed-
+ADR 0048 adds a three-case managed-loopback product slice over the same fixture family. ADR 0049
+separates its current acquisition and rule oracles. They cover a clean page, the existing unnamed-
 control mutation, and the intentional-overlay hard negative through a real started HTTP server,
 redirect, same-origin API request, `sightlint-web-check`, and built Rust binary. This adds lifecycle
 and public-path evidence; it does not increase the diversity of the Web accuracy corpus.
@@ -58,8 +58,13 @@ establish real-world UI/UX accuracy, WCAG conformance, or blocking maturity.
 - `agent-workflow.schema.json` and `annotations/agent-workflow.json`: the independent reviewed
   source-navigation, fix/rerun, abstention, hard-negative, governance, and non-claim contract for
   the one-command issue #42 path. It is public smoke data, not generated output or a holdout.
-- `managed-loopback.schema.json` and `annotations/managed-loopback.json`: the independent
-  three-case managed-server product oracle, provenance, split, and explicit non-claims.
+- `managed-loopback-acquisition.schema.json` and
+  `annotations/managed-loopback-acquisition.json`: reviewed transport, native-structure,
+  screenshot-extent, redaction, source-attribution, lifecycle, and acquisition-abstention truth.
+- `managed-loopback-rule.schema.json` and `annotations/managed-loopback-rules.json`: independent
+  rule verdicts, false-positive risks, non-claims, and metric definitions for the same case IDs.
+- `managed-loopback.schema.json`: retained strict schema for the superseded combined `0.1.0`
+  annotation shape; it is not the current oracle authority.
 - `requests/`: versioned deterministic capture requests for the Playwright adapter.
 - `managed-requests/`: protocol `0.2.0` requests for the repository-owned Node server fixture.
 - `fixture-app/`: repository-owned HTML, CSS, and JavaScript with no external assets or requests.
@@ -137,9 +142,11 @@ reviewed fix verified, zero new failures, 2/2 repeated JSON and human byte check
 `cantTell` controls with zero false-positive failures. The task, edit, and labels are public, so
 these are workflow regression counts rather than agent-generalization metrics.
 
-The managed E2E reports 3/3 product cases, 1/1 mutation kill, zero hard-negative failures, 6/6
-normal product port cleanups, and stable authorization/lifecycle/network/resource failure counts.
-It also verifies direct capture, Rust `0.4.0` extension dispatch, repeated bytes within one
-environment, signal-driven descendant cleanup, query/body/log redaction, and unavailable source
-attribution. The lifecycle and networking fixture tests are conformance evidence, not an oracle
-for arbitrary-application quality.
+The managed E2E reports 3/3 acquisition and rule cases, 54/54 reviewed exact acquisition
+expectations, 9/9 acquisition abstentions, 1/1 failure precision, 4/4 reviewed rule abstentions,
+zero unexpected failures, 1/1 mutation kill, zero hard-negative failures, and 6/6 normal product
+port cleanups. It also verifies direct capture, Rust `0.4.0` extension dispatch, repeated bytes
+within one environment, signal-driven descendant cleanup, query/body/log redaction, and
+unavailable source attribution. These public single-family counts are regression evidence, not a
+representative accuracy estimate. The lifecycle and networking fixture tests are conformance
+evidence, not an oracle for arbitrary-application quality.

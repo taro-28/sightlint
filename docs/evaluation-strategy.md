@@ -183,13 +183,16 @@ interaction, accessibility, or UI/UX accuracy.
 
 ### Managed loopback Web evaluation
 
-ADR 0048 adds a separate managed-loopback oracle with three public cases: clean, one named
-unnamed-control mutation, and an intentional-overlay hard negative. The adapter must start the
-repository-owned server, traverse a redirect and same-origin API call, run the built kernel, and
-release its process tree and port. A separate lifecycle matrix evaluates failures and resource
-boundaries. This establishes the opt-in startup/capture/check/cleanup path and its redaction
-contract; because it reuses the same Atlas family and public labels, it does not add a holdout,
-representative sampling, or evidence for changing rule maturity or enforcement.
+ADR 0048 adds a managed-loopback evaluation with three public cases: clean, one named unnamed-
+control mutation, and an intentional-overlay hard negative. ADR 0049 separates its current exact
+acquisition expectations and acquisition abstentions from its rule-verdict oracle. The adapter
+must start the repository-owned server, traverse a redirect and same-origin API call, run the built
+kernel, and release its process tree and port. A separate lifecycle matrix evaluates failures and
+resource boundaries. The product E2E derives coverage, failure precision, abstention, unexpected-
+failure, mutation-kill, and hard-negative counts from the reviewed documents rather than from a
+combined test constant. This establishes the opt-in startup/capture/check/cleanup path and its
+redaction contract; because it reuses the same Atlas family and public labels, it does not add a
+holdout, representative sampling, or evidence for changing rule maturity or enforcement.
 
 ### PDF source-adapter evaluation
 

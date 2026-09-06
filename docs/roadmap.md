@@ -512,10 +512,12 @@ contracts justify them.
 - temporary artifacts stay local and are removed; no hosted processor or automatic source editor
   is introduced.
 
-The next focused #31 slice is issue #62: managed loopback protocol `0.2.0` lets the same commands
-own one target-repository development-server lifecycle behind explicit command authorization. It
-adds no MCP, hosted processing, source edit, existing-server attachment, remote URL, or package
-channel.
+Issue #62 completes managed loopback protocol `0.2.0`, letting the same commands own one target-
+repository development-server lifecycle behind explicit command authorization. Issue #65 and ADR
+0049 make its acquisition and rule oracles independently reviewable and derive precision,
+coverage, abstention, false-positive, and mutation-kill counts from those documents. Neither slice
+adds MCP, hosted processing, source edit, existing-server attachment, remote URL, or package
+channel. The next #31 slice must remain focused on one evidence-preserving ecosystem surface.
 
 ### First alpha release
 
@@ -595,6 +597,7 @@ Every public behavior must satisfy the applicable matrix:
 | #30 | completed bounded interaction extension/trace/async-feedback/recovery slice; broader M6 scenarios remain evidence-gated |
 | #31 | Codex, MCP, GitHub Checks, editor/local UI ecosystem |
 | #62 | managed loopback target-repository Web capture and `/entries/new` dogfood |
+| #65 | separate managed-loopback acquisition and rule evaluation oracles |
 | #32 | completed legacy branch and repository-setting cleanup |
 | #33 | completed license, compatibility, source packaging, and alpha release gate |
 | #34 | completed first evidence-backed zero-setup web UI alpha execution epic |

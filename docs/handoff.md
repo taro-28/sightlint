@@ -11,12 +11,13 @@ Last handoff preparation: 2026-09-06.
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #62, a focused child of #31, started from this verified green `main` baseline:
+The branch for issue #65, an evaluation-contract follow-up to #62, started from this verified
+green `main` baseline:
 
-- commit: `9bd568d6073c323bfe4f0e13c90d31d4cf875054`
-- tree: `3c276d9737292cae2cb97eaac429e1d3ac8c435b`
-- merged PR: #63
-- main CI: run 34024953532, all six jobs successful
+- commit: `31b9518e5d8675bf6681cbc5f3a27bab213d500e`
+- tree: `da83a61c28988c64e52afcdb834f8921d047886b`
+- merged PR: #64
+- main CI: run 34026961741, all six jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -484,13 +485,17 @@ Runtime locators do not prove source locations, so managed source targets declar
 `0.3.0` and `0.4.0`; Artifact IR `0.1.0`, CheckReport `0.3.0`, the three advisory rule versions,
 maturity, enforcement, and the legacy capture/workflow bytes remain unchanged.
 
-The committed three-case managed Atlas oracle covers clean, unnamed-control mutation, and
-intentional-overlay hard-negative behavior. The public E2E also covers redirect, same-origin POST,
-authorization, lifecycle/network/resource failures, redaction, repeated bytes, direct capture,
-kernel dispatch, and process-tree cleanup. This is public single-family regression evidence, not
-general UI/UX accuracy, WCAG conformance, whole-application coverage, source causality, or blocking
-maturity. The tabisaifu `/test/login?next=%2Fentries%2Fnew` run is dogfood only and does not become
-committed oracle data or modify that target repository.
+ADR 0049 and issue #65 separate the committed three-case managed Atlas acquisition oracle from its
+rule oracle. The clean, unnamed-control mutation, and intentional-overlay hard-negative cases now
+report 54/54 exact acquisition expectations, 9/9 acquisition abstentions, 1/1 failure precision,
+4/4 reviewed rule abstentions, zero unexpected failures, 1/1 mutation kill, and zero hard-negative
+failures. Those denominators come from reviewed data rather than duplicated E2E constants. The
+public E2E also covers redirect, same-origin POST, authorization, lifecycle/network/resource
+failures, redaction, repeated bytes, direct capture, kernel dispatch, and process-tree cleanup.
+This is public single-family regression evidence, not general UI/UX accuracy, WCAG conformance,
+whole-application coverage, source causality, or blocking maturity. The tabisaifu
+`/test/login?next=%2Fentries%2Fnew` run is dogfood only and does not become committed oracle data or
+modify that target repository.
 
 The 2026-09-06 dogfood used tabisaifu commit
 `94269ee4452ea4b96ea27c7499eea8375303c8f5` with explicit Wrangler test vars and no `.dev.vars`
@@ -877,6 +882,9 @@ Issue #34's bounded execution sequence is complete:
 6. **#62 — managed loopback Web capture (complete).** Protocol `0.2.0` adds explicit server-command
    authorization, one target-repository page, loopback-only browser traffic, bounded HTTP evidence,
    unavailable source attribution, and owned process-tree cleanup without changing `0.1.0`.
+7. **#65 — managed-loopback evaluation authority split (complete in this change).** Strict,
+   independently versioned acquisition and rule oracles replace the combined current annotation;
+   metrics are derived from reviewed expectations and preserve explicit abstention and non-claims.
 
 Do not skip #22 to tune a broad screenshot heuristic. Do not skip #23 by placing browser/model
 logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete product.
@@ -895,8 +903,8 @@ logic in the Rust kernel. Do not skip #24 by calling raw measurements a complete
   source/capture adapters and separate regression corpora.
 - **#30 (complete for the bounded first slice):** medium-neutral actions/effects/states,
   deterministic controlled traces, async feedback, and declared recovery alternatives.
-- **#31:** managed-loopback child #62 is complete; Codex/MCP/GitHub/editor/local-UI ecosystem and
-  later package surfaces remain open.
+- **#31:** managed-loopback child #62 and evaluation follow-up #65 are complete; Codex/MCP/GitHub/
+  editor/local-UI ecosystem and later package surfaces remain open.
 
 The bounded first slices inside #29 and #30 are implemented. The next preserved product issue is
 #31 for ecosystem surfaces. Later expansion remains demand- and evidence-gated; the completed

@@ -1,0 +1,470 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:managed-loopback-acquisition-oracle:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "provenance",
+    "split",
+    "metrics",
+    "cases",
+    "nonClaims"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../managed-loopback-acquisition.schema.json"
+    },
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "documentType": {
+      "const": "managedLoopbackAcquisitionOracle"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "split": {
+      "$ref": "#/$defs/split"
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caseCoverage",
+        "exactExpectationCoverage",
+        "abstentionCoverage"
+      ],
+      "properties": {
+        "caseCoverage": {
+          "$ref": "#/$defs/metric"
+        },
+        "exactExpectationCoverage": {
+          "$ref": "#/$defs/metric"
+        },
+        "abstentionCoverage": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "nonClaims": {
+      "$ref": "#/$defs/nonClaims"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authoringBasis",
+        "implementationOutputUsedAsOracle",
+        "sourceId",
+        "sourceFiles",
+        "ownership",
+        "license",
+        "privacyReview",
+        "externalAssets",
+        "externalProcessing"
+      ],
+      "properties": {
+        "authoringBasis": {
+          "const": "humanReviewedFixtureAndAcquisitionContract"
+        },
+        "implementationOutputUsedAsOracle": {
+          "const": false
+        },
+        "sourceId": {
+          "const": "atlas-dashboard-managed-loopback-v1"
+        },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(adapters/playwright/tests/fixtures|evaluation/web/fixture-app)/"
+          }
+        },
+        "ownership": {
+          "const": "sightlintRepository"
+        },
+        "license": {
+          "const": "MIT OR Apache-2.0"
+        },
+        "privacyReview": {
+          "const": "fictionalNoPersonalDataNoSecrets"
+        },
+        "externalAssets": {
+          "const": false
+        },
+        "externalProcessing": {
+          "const": false
+        }
+      }
+    },
+    "split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "holdoutStatus",
+        "reviewer",
+        "independentReview",
+        "leakageControls"
+      ],
+      "properties": {
+        "kind": {
+          "const": "publicSmokeDevelopmentChallenge"
+        },
+        "holdoutStatus": {
+          "const": "notHoldout"
+        },
+        "reviewer": {
+          "const": "maintainer"
+        },
+        "independentReview": {
+          "const": false
+        },
+        "leakageControls": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "denominator": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caseId",
+        "request",
+        "split",
+        "classification",
+        "expectations",
+        "abstentions",
+        "review"
+      ],
+      "properties": {
+        "caseId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "request": {
+          "type": "string",
+          "pattern": "^evaluation/web/managed-requests/"
+        },
+        "split": {
+          "enum": [
+            "smoke",
+            "development",
+            "challenge"
+          ]
+        },
+        "classification": {
+          "enum": [
+            "clean",
+            "targetedMutation",
+            "hardNegative"
+          ]
+        },
+        "expectations": {
+          "type": "array",
+          "minItems": 15,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/expectation"
+          }
+        },
+        "abstentions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/abstention"
+          }
+        },
+        "review": {
+          "$ref": "#/$defs/review"
+        }
+      }
+    },
+    "expectation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "enum": [
+                "capture.protocolVersion",
+                "capture.adapterVersion",
+                "workflow.schemaVersion",
+                "kernel.webExtensionVersion",
+                "capture.loopback.routePath",
+                "capture.loopback.targetDigestFormat",
+                "workflow.sourceAttribution",
+                "artifact.id",
+                "web.document.state"
+              ]
+            },
+            "operator": {
+              "const": "equals"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "enum": [
+                "capture.sourceDigestMatchesLoopback",
+                "web.capture.sourceDigestMatchesResponse",
+                "lifecycle.workflowPortReleased",
+                "lifecycle.directPortReleased"
+              ]
+            },
+            "operator": {
+              "const": "equals"
+            },
+            "value": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "const": "capture.loopback.requestCount"
+            },
+            "operator": {
+              "const": "atLeast"
+            },
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 512
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "const": "screenshot.pixelSize"
+            },
+            "operator": {
+              "const": "equals"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "const": "workflow.sourceFiles"
+            },
+            "operator": {
+              "const": "equals"
+            },
+            "value": {
+              "type": "array",
+              "maxItems": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "const": "web.nodeIds"
+            },
+            "operator": {
+              "const": "includesAll"
+            },
+            "value": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "aspect",
+            "operator",
+            "value"
+          ],
+          "properties": {
+            "aspect": {
+              "const": "workflow.outputUtf8"
+            },
+            "operator": {
+              "const": "excludesAll"
+            },
+            "value": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "abstention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aspect",
+        "outcome",
+        "rationale"
+      ],
+      "properties": {
+        "aspect": {
+          "enum": [
+            "screenshot.pixelContentIdentity",
+            "web.completeHitRegions",
+            "source.fileCausality"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "cantTell",
+            "untested"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewedAt",
+        "qualification",
+        "rationale"
+      ],
+      "properties": {
+        "status": {
+          "const": "maintainerReviewed"
+        },
+        "reviewedAt": {
+          "const": "2026-09-06"
+        },
+        "qualification": {
+          "const": "repository maintainer product review"
+        },
+        "rationale": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "nonClaims": {
+      "type": "array",
+      "minItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    }
+  }
+}

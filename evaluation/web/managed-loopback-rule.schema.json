@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:managed-loopback-rule-oracle:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "commandSurface",
+    "provenance",
+    "split",
+    "metrics",
+    "cases",
+    "nonClaims"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../managed-loopback-rule.schema.json"
+    },
+    "schemaVersion": {
+      "const": "0.1.0"
+    },
+    "documentType": {
+      "const": "managedLoopbackRuleOracle"
+    },
+    "commandSurface": {
+      "const": "sightlint-web-check --format json --allow-server-command"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "split": {
+      "$ref": "#/$defs/split"
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "failurePrecision",
+        "caseCoverage",
+        "abstentionCoverage",
+        "falsePositives",
+        "mutationKillRate",
+        "hardNegativeFailures"
+      ],
+      "properties": {
+        "failurePrecision": {
+          "$ref": "#/$defs/metric"
+        },
+        "caseCoverage": {
+          "$ref": "#/$defs/metric"
+        },
+        "abstentionCoverage": {
+          "$ref": "#/$defs/metric"
+        },
+        "falsePositives": {
+          "$ref": "#/$defs/metric"
+        },
+        "mutationKillRate": {
+          "$ref": "#/$defs/metric"
+        },
+        "hardNegativeFailures": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "nonClaims": {
+      "$ref": "#/$defs/nonClaims"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authoringBasis",
+        "implementationOutputUsedAsOracle",
+        "sourceId",
+        "sourceFiles",
+        "ownership",
+        "license",
+        "privacyReview",
+        "externalAssets",
+        "externalProcessing"
+      ],
+      "properties": {
+        "authoringBasis": {
+          "const": "humanReviewedFixtureAndRuleContracts"
+        },
+        "implementationOutputUsedAsOracle": {
+          "const": false
+        },
+        "sourceId": {
+          "const": "atlas-dashboard-managed-loopback-v1"
+        },
+        "sourceFiles": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(adapters/playwright/tests/fixtures|evaluation/web/fixture-app)/"
+          }
+        },
+        "ownership": {
+          "const": "sightlintRepository"
+        },
+        "license": {
+          "const": "MIT OR Apache-2.0"
+        },
+        "privacyReview": {
+          "const": "fictionalNoPersonalDataNoSecrets"
+        },
+        "externalAssets": {
+          "const": false
+        },
+        "externalProcessing": {
+          "const": false
+        }
+      }
+    },
+    "split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "holdoutStatus",
+        "reviewer",
+        "independentReview",
+        "leakageControls"
+      ],
+      "properties": {
+        "kind": {
+          "const": "publicSmokeDevelopmentChallenge"
+        },
+        "holdoutStatus": {
+          "const": "notHoldout"
+        },
+        "reviewer": {
+          "const": "maintainer"
+        },
+        "independentReview": {
+          "const": false
+        },
+        "leakageControls": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "denominator": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caseId",
+        "request",
+        "split",
+        "classification",
+        "expectedExitCode",
+        "expectedFailureCount",
+        "expectedBlockingFailureCount",
+        "expectedResults",
+        "falsePositiveRisk",
+        "nonClaim",
+        "review"
+      ],
+      "properties": {
+        "caseId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "request": {
+          "type": "string",
+          "pattern": "^evaluation/web/managed-requests/"
+        },
+        "split": {
+          "enum": [
+            "smoke",
+            "development",
+            "challenge"
+          ]
+        },
+        "classification": {
+          "enum": [
+            "clean",
+            "targetedMutation",
+            "hardNegative"
+          ]
+        },
+        "expectedExitCode": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "expectedFailureCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedBlockingFailureCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expectedResults": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/result"
+          }
+        },
+        "falsePositiveRisk": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "nonClaim": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "review": {
+          "$ref": "#/$defs/review"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "ruleVersion",
+        "outcome",
+        "maturity",
+        "enforcement",
+        "targetKind",
+        "targetId",
+        "targetAspect"
+      ],
+      "properties": {
+        "ruleId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "ruleVersion": {
+          "const": "0.1.0"
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "failed",
+            "cantTell",
+            "inapplicable",
+            "untested"
+          ]
+        },
+        "maturity": {
+          "enum": [
+            "experimental",
+            "advisory",
+            "blocking"
+          ]
+        },
+        "enforcement": {
+          "enum": [
+            "advisory",
+            "blocking"
+          ]
+        },
+        "targetKind": {
+          "enum": [
+            "artifact",
+            "canvas",
+            "node",
+            "relation"
+          ]
+        },
+        "targetId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "targetAspect": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewedAt",
+        "qualification",
+        "rationale"
+      ],
+      "properties": {
+        "status": {
+          "const": "maintainerReviewed"
+        },
+        "reviewedAt": {
+          "const": "2026-09-06"
+        },
+        "qualification": {
+          "const": "repository maintainer product review"
+        },
+        "rationale": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "nonClaims": {
+      "type": "array",
+      "minItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    }
+  }
+}
