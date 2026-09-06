@@ -4,7 +4,7 @@
   "title": "SightLint image segmentation benchmark report",
   "type": "object",
   "additionalProperties": false,
-  "required": ["benchmarkSchemaVersion", "mode", "blocking", "ruleOutcome", "canvas", "source", "limits", "policies", "limitations"],
+  "required": ["benchmarkSchemaVersion", "mode", "blocking", "ruleOutcome", "canvas", "source", "evidence", "limits", "policies", "limitations"],
   "properties": {
     "benchmarkSchemaVersion": { "const": "0.1.0" },
     "mode": { "const": "evaluationOnly" },
@@ -12,6 +12,12 @@
     "ruleOutcome": { "const": "untested" },
     "canvas": { "$ref": "#/$defs/canvas" },
     "source": { "$ref": "#/$defs/source" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
     "limits": { "$ref": "#/$defs/limits" },
     "policies": {
       "type": "array",
@@ -63,6 +69,18 @@
         "externalProcessing": { "const": false },
         "byteCrc32": { "type": "string", "pattern": "^[0-9a-f]{8}$" },
         "checksumPurpose": { "const": "regression-only-not-cryptographic" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "class", "selector", "byteCrc32", "interpretation"],
+      "properties": {
+        "id": { "const": "raster" },
+        "class": { "const": "exactSource" },
+        "selector": { "const": "IDAT/encoded-rgba8-v1" },
+        "byteCrc32": { "type": "string", "pattern": "^[0-9a-f]{8}$" },
+        "interpretation": { "const": "PNG encoded channels; no display-color, compositing, or semantic claim" }
       }
     },
     "limits": {
