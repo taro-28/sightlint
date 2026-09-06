@@ -1,0 +1,201 @@
+{
+  "$schema": "../managed-loopback-acquisition.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "managedLoopbackAcquisitionOracle",
+  "provenance": {
+    "authoringBasis": "humanReviewedFixtureAndAcquisitionContract",
+    "implementationOutputUsedAsOracle": false,
+    "sourceId": "atlas-dashboard-managed-loopback-v1",
+    "sourceFiles": [
+      "adapters/playwright/tests/fixtures/managed-server.mjs",
+      "evaluation/web/fixture-app/app.js",
+      "evaluation/web/fixture-app/index.html",
+      "evaluation/web/fixture-app/styles.css"
+    ],
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "privacyReview": "fictionalNoPersonalDataNoSecrets",
+    "externalAssets": false,
+    "externalProcessing": false
+  },
+  "split": {
+    "kind": "publicSmokeDevelopmentChallenge",
+    "holdoutStatus": "notHoldout",
+    "reviewer": "maintainer",
+    "independentReview": false,
+    "leakageControls": [
+      "All labels are public and must not be reported as protected-holdout evidence.",
+      "Captured Artifact IR, screenshots, reports, and implementation output are not copied into this oracle.",
+      "Expectation changes require fixture-contract review and are not made only to satisfy current output."
+    ]
+  },
+  "metrics": {
+    "caseCoverage": {
+      "numerator": "managed cases executed through the public workflow and direct adapter",
+      "denominator": "all reviewed managed acquisition cases"
+    },
+    "exactExpectationCoverage": {
+      "numerator": "reviewed exact acquisition expectations matched",
+      "denominator": "all reviewed exact acquisition expectations"
+    },
+    "abstentionCoverage": {
+      "numerator": "reviewed acquisition cantTell or untested limitations preserved",
+      "denominator": "all reviewed acquisition abstentions"
+    }
+  },
+  "cases": [
+    {
+      "caseId": "managed-clean",
+      "request": "evaluation/web/managed-requests/dashboard-managed-clean.json",
+      "split": "smoke",
+      "classification": "clean",
+      "expectations": [
+        { "aspect": "capture.protocolVersion", "operator": "equals", "value": "0.2.0" },
+        { "aspect": "capture.adapterVersion", "operator": "equals", "value": "0.4.0" },
+        { "aspect": "workflow.schemaVersion", "operator": "equals", "value": "0.2.0" },
+        { "aspect": "kernel.webExtensionVersion", "operator": "equals", "value": "0.4.0" },
+        { "aspect": "capture.loopback.routePath", "operator": "equals", "value": "/redirect" },
+        { "aspect": "capture.loopback.requestCount", "operator": "atLeast", "value": 4 },
+        { "aspect": "capture.loopback.targetDigestFormat", "operator": "equals", "value": "sha256" },
+        { "aspect": "capture.sourceDigestMatchesLoopback", "operator": "equals", "value": true },
+        { "aspect": "screenshot.pixelSize", "operator": "equals", "value": { "width": 1280, "height": 800 } },
+        { "aspect": "workflow.sourceAttribution", "operator": "equals", "value": "unavailable" },
+        { "aspect": "workflow.sourceFiles", "operator": "equals", "value": [] },
+        { "aspect": "workflow.outputUtf8", "operator": "excludesAll", "value": ["private=not-serialized", "bounded request body"] },
+        { "aspect": "lifecycle.workflowPortReleased", "operator": "equals", "value": true },
+        { "aspect": "artifact.id", "operator": "equals", "value": "web-dashboard-managed-clean" },
+        { "aspect": "web.document.state", "operator": "equals", "value": "peer-spacing-clean" },
+        { "aspect": "web.nodeIds", "operator": "includesAll", "value": ["web-metric-peer-group"] },
+        { "aspect": "web.capture.sourceDigestMatchesResponse", "operator": "equals", "value": true },
+        { "aspect": "lifecycle.directPortReleased", "operator": "equals", "value": true }
+      ],
+      "abstentions": [
+        {
+          "aspect": "screenshot.pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The synchronized screenshot records extent and bytes but protocol 0.2.0 performs no pixel-content identity comparison."
+        },
+        {
+          "aspect": "web.completeHitRegions",
+          "outcome": "cantTell",
+          "rationale": "Center hit samples are exact observations but are not complete hit rectangles."
+        },
+        {
+          "aspect": "source.fileCausality",
+          "outcome": "cantTell",
+          "rationale": "A loopback response and runtime locator do not prove which repository file caused the rendered state."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source-owned clean state exercises redirect, same-origin POST, native structure, screenshot extent, redaction, and cleanup without a targeted defect."
+      }
+    },
+    {
+      "caseId": "managed-unnamed-control-mutant",
+      "request": "evaluation/web/managed-requests/dashboard-managed-unnamed-control.json",
+      "split": "development",
+      "classification": "targetedMutation",
+      "expectations": [
+        { "aspect": "capture.protocolVersion", "operator": "equals", "value": "0.2.0" },
+        { "aspect": "capture.adapterVersion", "operator": "equals", "value": "0.4.0" },
+        { "aspect": "workflow.schemaVersion", "operator": "equals", "value": "0.2.0" },
+        { "aspect": "kernel.webExtensionVersion", "operator": "equals", "value": "0.4.0" },
+        { "aspect": "capture.loopback.routePath", "operator": "equals", "value": "/redirect" },
+        { "aspect": "capture.loopback.requestCount", "operator": "atLeast", "value": 4 },
+        { "aspect": "capture.loopback.targetDigestFormat", "operator": "equals", "value": "sha256" },
+        { "aspect": "capture.sourceDigestMatchesLoopback", "operator": "equals", "value": true },
+        { "aspect": "screenshot.pixelSize", "operator": "equals", "value": { "width": 1280, "height": 800 } },
+        { "aspect": "workflow.sourceAttribution", "operator": "equals", "value": "unavailable" },
+        { "aspect": "workflow.sourceFiles", "operator": "equals", "value": [] },
+        { "aspect": "workflow.outputUtf8", "operator": "excludesAll", "value": ["private=not-serialized", "bounded request body"] },
+        { "aspect": "lifecycle.workflowPortReleased", "operator": "equals", "value": true },
+        { "aspect": "artifact.id", "operator": "equals", "value": "web-dashboard-managed-unnamed-control" },
+        { "aspect": "web.document.state", "operator": "equals", "value": "unnamed-control-mutant" },
+        { "aspect": "web.nodeIds", "operator": "includesAll", "value": ["web-help-action"] },
+        { "aspect": "web.capture.sourceDigestMatchesResponse", "operator": "equals", "value": true },
+        { "aspect": "lifecycle.directPortReleased", "operator": "equals", "value": true }
+      ],
+      "abstentions": [
+        {
+          "aspect": "screenshot.pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The synchronized screenshot records extent and bytes but protocol 0.2.0 performs no pixel-content identity comparison."
+        },
+        {
+          "aspect": "web.completeHitRegions",
+          "outcome": "cantTell",
+          "rationale": "Center hit samples are exact observations but are not complete hit rectangles."
+        },
+        {
+          "aspect": "source.fileCausality",
+          "outcome": "cantTell",
+          "rationale": "A loopback response and runtime locator do not prove which repository file caused the rendered state."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The targeted source mutation removes only the help control aria-label while the native node remains captured."
+      }
+    },
+    {
+      "caseId": "managed-intentional-overlay-hard-negative",
+      "request": "evaluation/web/managed-requests/dashboard-managed-intentional-overlay.json",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "expectations": [
+        { "aspect": "capture.protocolVersion", "operator": "equals", "value": "0.2.0" },
+        { "aspect": "capture.adapterVersion", "operator": "equals", "value": "0.4.0" },
+        { "aspect": "workflow.schemaVersion", "operator": "equals", "value": "0.2.0" },
+        { "aspect": "kernel.webExtensionVersion", "operator": "equals", "value": "0.4.0" },
+        { "aspect": "capture.loopback.routePath", "operator": "equals", "value": "/redirect" },
+        { "aspect": "capture.loopback.requestCount", "operator": "atLeast", "value": 4 },
+        { "aspect": "capture.loopback.targetDigestFormat", "operator": "equals", "value": "sha256" },
+        { "aspect": "capture.sourceDigestMatchesLoopback", "operator": "equals", "value": true },
+        { "aspect": "screenshot.pixelSize", "operator": "equals", "value": { "width": 1280, "height": 800 } },
+        { "aspect": "workflow.sourceAttribution", "operator": "equals", "value": "unavailable" },
+        { "aspect": "workflow.sourceFiles", "operator": "equals", "value": [] },
+        { "aspect": "workflow.outputUtf8", "operator": "excludesAll", "value": ["private=not-serialized", "bounded request body"] },
+        { "aspect": "lifecycle.workflowPortReleased", "operator": "equals", "value": true },
+        { "aspect": "artifact.id", "operator": "equals", "value": "web-dashboard-managed-intentional-overlay" },
+        { "aspect": "web.document.state", "operator": "equals", "value": "intentional-overlay" },
+        { "aspect": "web.nodeIds", "operator": "includesAll", "value": ["web-review-action"] },
+        { "aspect": "web.capture.sourceDigestMatchesResponse", "operator": "equals", "value": true },
+        { "aspect": "lifecycle.directPortReleased", "operator": "equals", "value": true }
+      ],
+      "abstentions": [
+        {
+          "aspect": "screenshot.pixelContentIdentity",
+          "outcome": "cantTell",
+          "rationale": "The synchronized screenshot records extent and bytes but protocol 0.2.0 performs no pixel-content identity comparison."
+        },
+        {
+          "aspect": "web.completeHitRegions",
+          "outcome": "cantTell",
+          "rationale": "Center hit samples are exact observations but are not complete hit rectangles."
+        },
+        {
+          "aspect": "source.fileCausality",
+          "outcome": "cantTell",
+          "rationale": "A loopback response and runtime locator do not prove which repository file caused the rendered state."
+        }
+      ],
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The source declares the dialog overlay intentional; acquisition preserves the native control and dialog state without converting intent into a pixel fact."
+      }
+    }
+  ],
+  "nonClaims": [
+    "These three public cases do not establish representative browser-acquisition accuracy.",
+    "Screenshot extent and bytes do not establish pixel-content identity or complete hit regions.",
+    "Loopback responses and runtime locators do not establish source-file causality.",
+    "The public labels are visible to implementers and are not protected-holdout evidence."
+  ]
+}

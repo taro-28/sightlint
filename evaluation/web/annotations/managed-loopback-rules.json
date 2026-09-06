@@ -1,0 +1,174 @@
+{
+  "$schema": "../managed-loopback-rule.schema.json",
+  "schemaVersion": "0.1.0",
+  "documentType": "managedLoopbackRuleOracle",
+  "commandSurface": "sightlint-web-check --format json --allow-server-command",
+  "provenance": {
+    "authoringBasis": "humanReviewedFixtureAndRuleContracts",
+    "implementationOutputUsedAsOracle": false,
+    "sourceId": "atlas-dashboard-managed-loopback-v1",
+    "sourceFiles": [
+      "adapters/playwright/tests/fixtures/managed-server.mjs",
+      "evaluation/web/fixture-app/app.js",
+      "evaluation/web/fixture-app/index.html",
+      "evaluation/web/fixture-app/styles.css"
+    ],
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "privacyReview": "fictionalNoPersonalDataNoSecrets",
+    "externalAssets": false,
+    "externalProcessing": false
+  },
+  "split": {
+    "kind": "publicSmokeDevelopmentChallenge",
+    "holdoutStatus": "notHoldout",
+    "reviewer": "maintainer",
+    "independentReview": false,
+    "leakageControls": [
+      "All labels are public and must not be reported as protected-holdout evidence.",
+      "Captured reports and implementation output are not copied into this oracle.",
+      "Outcome changes require fixture and rule-contract review and are not made only to satisfy current output."
+    ]
+  },
+  "metrics": {
+    "failurePrecision": {
+      "numerator": "emitted failures matching reviewed failed results",
+      "denominator": "all emitted failed results"
+    },
+    "caseCoverage": {
+      "numerator": "managed cases executed through the public workflow",
+      "denominator": "all reviewed managed rule cases"
+    },
+    "abstentionCoverage": {
+      "numerator": "reviewed cantTell, inapplicable, or untested results matched",
+      "denominator": "all reviewed cantTell, inapplicable, or untested results"
+    },
+    "falsePositives": {
+      "numerator": "emitted failed results absent from the corresponding reviewed oracle",
+      "denominator": "all emitted failed results"
+    },
+    "mutationKillRate": {
+      "numerator": "reviewed targeted mutations producing their named failed result",
+      "denominator": "all reviewed rule-eligible targeted mutations"
+    },
+    "hardNegativeFailures": {
+      "numerator": "emitted failures in reviewed hard-negative cases",
+      "denominator": "all reviewed hard-negative cases"
+    }
+  },
+  "cases": [
+    {
+      "caseId": "managed-clean",
+      "request": "evaluation/web/managed-requests/dashboard-managed-clean.json",
+      "split": "smoke",
+      "classification": "clean",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-managed-clean",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Using viewport bounds as document bounds or inferring peer membership from repeated visual cards would create unsupported failures.",
+      "nonClaim": "Zero failures means no current rule has sufficient evidence to fail this case; it is not a general UI or UX pass.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The managed clean state has no declared peer relation and no reviewed defect for the current rules."
+      }
+    },
+    {
+      "caseId": "managed-unnamed-control-mutant",
+      "request": "evaluation/web/managed-requests/dashboard-managed-unnamed-control.json",
+      "split": "development",
+      "classification": "targetedMutation",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 1,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-managed-unnamed-control",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.accessibility.interactive-name",
+          "ruleVersion": "0.1.0",
+          "outcome": "failed",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "targetKind": "node",
+          "targetId": "web-help-action",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "An absent inferred name is not enough; this case fails only because the observed native accessibility button has no programmatic name.",
+      "nonClaim": "The advisory result checks one selected control and is not a complete accessibility or WCAG audit.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "The targeted source mutation removes only the help button aria-label while preserving its observed native role and interaction evidence."
+      }
+    },
+    {
+      "caseId": "managed-intentional-overlay-hard-negative",
+      "request": "evaluation/web/managed-requests/dashboard-managed-intentional-overlay.json",
+      "split": "challenge",
+      "classification": "hardNegative",
+      "expectedExitCode": 0,
+      "expectedFailureCount": 0,
+      "expectedBlockingFailureCount": 0,
+      "expectedResults": [
+        {
+          "ruleId": "visual.spacing.peer-consistency",
+          "ruleVersion": "0.1.0",
+          "outcome": "inapplicable",
+          "maturity": "experimental",
+          "enforcement": "blocking",
+          "targetKind": "artifact",
+          "targetId": "web-dashboard-managed-intentional-overlay",
+          "targetAspect": null
+        },
+        {
+          "ruleId": "web.interaction.center-hit",
+          "ruleVersion": "0.1.0",
+          "outcome": "cantTell",
+          "maturity": "advisory",
+          "enforcement": "advisory",
+          "targetKind": "node",
+          "targetId": "web-review-action",
+          "targetAspect": null
+        }
+      ],
+      "falsePositiveRisk": "Treating every center-point obstruction as a defect would falsely fail valid dialogs, popovers, and other intentional overlays.",
+      "nonClaim": "The hard negative protects one declared overlay and does not establish broad overlay precision.",
+      "review": {
+        "status": "maintainerReviewed",
+        "reviewedAt": "2026-09-06",
+        "qualification": "repository maintainer product review",
+        "rationale": "Native dialog semantics and source-reviewed intent make failure unsupported, while the exact center sample remains conflicting evidence and therefore cantTell."
+      }
+    }
+  ],
+  "nonClaims": [
+    "One public targeted failure is too small a denominator for a representative precision estimate.",
+    "The corpus is one fictional application family and is not protected holdout data.",
+    "Successful current-rule outcomes do not establish general UI quality, UX quality, or WCAG conformance.",
+    "No result in this oracle changes advisory enforcement or blocking maturity."
+  ]
+}
