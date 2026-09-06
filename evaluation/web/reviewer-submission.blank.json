@@ -1,0 +1,332 @@
+{
+  "$schema": "./reviewer-submission.schema.json",
+  "schemaVersion": "1.0.0",
+  "documentType": "webReviewerSubmission",
+  "submissionId": "replace-with-stable-submission-id",
+  "submissionDigest": null,
+  "lifecycle": "draft",
+  "recordPurpose": "humanReviewCandidate",
+  "evidenceStatus": "requiresGovernanceReview",
+  "packetBinding": {
+    "packetId": "sightlint-atlas-harbor-source-review-v1",
+    "packetDigest": "sha256:1a3d68b377ab30681d71e0cb0b3634a341c8d0b899fae70079c6f935e02652a3"
+  },
+  "reviewScope": {
+    "familyIds": [
+      "atlas-dashboard-settings-v1",
+      "harbor-support-inbox-v1"
+    ],
+    "caseIds": [
+      "dashboard-browser-ambiguous",
+      "dashboard-browser-ambiguous-control",
+      "dashboard-browser-clean",
+      "dashboard-browser-clipping",
+      "dashboard-browser-control-boundaries",
+      "dashboard-browser-control-clip",
+      "dashboard-browser-control-offscreen",
+      "dashboard-browser-intentional-grouping",
+      "dashboard-browser-intentional-overlay",
+      "dashboard-browser-mobile",
+      "dashboard-browser-notification-clean",
+      "dashboard-browser-occlusion",
+      "dashboard-browser-occlusion-clean",
+      "dashboard-browser-out-of-viewport",
+      "dashboard-browser-overflow",
+      "dashboard-browser-peer-dimension",
+      "dashboard-browser-responsive-mobile-mutant",
+      "dashboard-browser-rtl-vertical",
+      "dashboard-browser-scrollable-control",
+      "dashboard-browser-spacing-mutant",
+      "dashboard-browser-text-scale",
+      "dashboard-browser-transformed-text",
+      "dashboard-browser-unnamed-control",
+      "support-inbox-ambiguous-control",
+      "support-inbox-clean",
+      "support-inbox-labelledby-hard-negative",
+      "support-inbox-unnamed-control"
+    ],
+    "completeForDeclaredScope": false
+  },
+  "reviewer": {
+    "stableProjectId": "replace-with-stable-project-id",
+    "qualification": {
+      "category": "other",
+      "rationale": "Replace with relevant Web UI, accessibility, or product-review qualification."
+    },
+    "independentFromAnnotationAuthors": "undeclared",
+    "independenceRationale": "Replace with the factual relationship to annotation authors.",
+    "priorExpectedLabelExposure": {
+      "status": "undeclared",
+      "caseIds": [],
+      "rationale": "Replace with known prior exposure; do not conceal seen labels."
+    },
+    "conflictOfInterest": {
+      "status": "undeclared",
+      "rationale": "Replace with known conflicts or a factual none declaration."
+    },
+    "reviewedOn": "0000-00-00"
+  },
+  "declarations": {
+    "sourceFirstNotBlind": true,
+    "sightlintOutputUsedBeforeFinalization": false,
+    "existingOracleViewedBeforeFinalization": false,
+    "generatedCaptureOrReportUsedAsAnswer": false,
+    "implementationOutputUsedAsAnswer": false,
+    "containsProtectedOrPrivateData": false,
+    "containsCredentials": false,
+    "externalProcessingUsed": false,
+    "identityOrQualificationVerifiedBySightLint": false,
+    "signatureVerifiedBySightLint": false
+  },
+  "cases": [
+    {
+      "caseId": "dashboard-browser-ambiguous",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-ambiguous-control",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-clean",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-clipping",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-control-boundaries",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-control-clip",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-control-offscreen",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-intentional-grouping",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-intentional-overlay",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-mobile",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-notification-clean",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-occlusion",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-occlusion-clean",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-out-of-viewport",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-overflow",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-peer-dimension",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-responsive-mobile-mutant",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-rtl-vertical",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-scrollable-control",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-spacing-mutant",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-text-scale",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-transformed-text",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "dashboard-browser-unnamed-control",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "caseContext": {
+        "reviewedAs": "other",
+        "rationale": "Replace with a source-based classification rationale."
+      },
+      "acquisitionJudgments": [],
+      "ruleJudgments": []
+    }
+  ],
+  "submissionLimitations": [
+    "This draft contains no human judgment until a reviewer replaces the placeholders and fills the declared scope.",
+    "Tooling validates structure and declarations but does not prove identity, qualification, independence, conflicts, or signature validity.",
+    "A humanReviewCandidate requires project governance review before it can support issue 77.",
+    "This public review cannot establish protected-holdout performance or representative UI and UX accuracy."
+  ]
+}

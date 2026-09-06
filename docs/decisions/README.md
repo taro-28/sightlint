@@ -107,4 +107,4 @@ policy-precedence, resource-model, or public-report change:
 7. implement only after the decision is reviewable;
 8. update the handoff and roadmap when the accepted decision changes current work.
 
-Use [the template](template.md) and the next unused number at or after 0053.
+Use [the template](template.md) and the next unused number at or after 0054.

@@ -139,12 +139,16 @@ Version `1.0.0` enforces:
 
 - 1,048,576 bytes per source, request, schema, submission, registry, or oracle input file;
 - 8,388,608 bytes for a generated or validated packet and comparison output;
-- at most 64 embedded files, 128 cases, and 4,096 total judgments/comparison rows;
+- exactly the current 33 allowlisted packet files and 27 packet cases, at most 27 submitted cases,
+  and 512 total judgments/comparison rows; the 512 bound keeps a minimally populated exact-count
+  submission below the independent 1 MiB input limit;
 - at most 4,096 UTF-8 bytes for an ordinary submitted string, with smaller identifier/path limits;
 - finite JSON numbers and no byte-order mark, duplicate key, absolute/backslash/parent path, URL
   input, symlink, or repository escape.
 
-Every maximum is accepted and the exact one-over value is rejected in process E2E. The public
+Every independently controllable maximum is accepted and the exact one-over value is rejected in
+process E2E; fixed repository-owned file sizes and inventory counts are checked for exact drift.
+The public
 fixtures remain fictional, repository-owned, local, and free of customer data, personal data,
 credentials, third-party assets, and external processing. Review submissions must not contain
 private paths, URLs, credentials, protected membership, private labels, or private artifact bytes.
@@ -206,4 +210,3 @@ belong to deterministic product policy or the medium-neutral IR.
   and before/after hashes prove comparison does not mutate inputs.
 - Existing public Web evaluation and all CLI, PNG, image, interaction, perception, medium-adapter,
   release, documentation, MSRV, and cross-platform gates remain green.
-

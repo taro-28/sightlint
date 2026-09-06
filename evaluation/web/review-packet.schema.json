@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:web-review-packet:1.0.0",
+  "title": "SightLint source-only Web review packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "packetId",
+    "packetDigest",
+    "recordPurpose",
+    "evidenceEligible",
+    "protocol",
+    "governance",
+    "reviewFields",
+    "families",
+    "files",
+    "cases",
+    "nonClaims"
+  ],
+  "properties": {
+    "$schema": { "const": "./review-packet.schema.json" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "webReviewPacket" },
+    "packetId": { "const": "sightlint-atlas-harbor-source-review-v1" },
+    "packetDigest": { "$ref": "#/$defs/sha256" },
+    "recordPurpose": { "const": "publicSourceOnlyReviewInput" },
+    "evidenceEligible": { "const": false },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceFirstNotBlind",
+        "oracleExposure",
+        "allowedInputKinds",
+        "prohibitedInputKinds",
+        "acquisitionAndRuleAuthoritySeparated",
+        "implementationOutputMaySupplyJudgment",
+        "unavailableMeasurementMayBeGuessed"
+      ],
+      "properties": {
+        "sourceFirstNotBlind": { "const": true },
+        "oracleExposure": { "const": "forbiddenUntilFinalizedSubmission" },
+        "allowedInputKinds": {
+          "const": ["captureRequest", "fixtureSource"]
+        },
+        "prohibitedInputKinds": {
+          "const": [
+            "capturedArtifactIr",
+            "diagnostic",
+            "existingAcquisitionOracle",
+            "existingRuleOracle",
+            "expectedVerdict",
+            "generatedScreenshot",
+            "implementationOutput",
+            "sightlintReport"
+          ]
+        },
+        "acquisitionAndRuleAuthoritySeparated": { "const": true },
+        "implementationOutputMaySupplyJudgment": { "const": false },
+        "unavailableMeasurementMayBeGuessed": { "const": false }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ownership",
+        "license",
+        "redistribution",
+        "privacyReview",
+        "containsPersonalOrCustomerData",
+        "containsCredentials",
+        "externalAssets",
+        "externalNetwork",
+        "externalProcessing",
+        "exposure"
+      ],
+      "properties": {
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "redistribution": { "const": "permittedUnderRepositoryLicense" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "containsPersonalOrCustomerData": { "const": false },
+        "containsCredentials": { "const": false },
+        "externalAssets": { "const": false },
+        "externalNetwork": { "const": false },
+        "externalProcessing": { "const": false },
+        "exposure": { "const": "publicTuningVisible" }
+      }
+    },
+    "reviewFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acquisition", "rule"],
+      "properties": {
+        "acquisition": { "$ref": "#/$defs/textList" },
+        "rule": { "$ref": "#/$defs/textList" }
+      }
+    },
+    "families": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "#/$defs/family" }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 33,
+      "maxItems": 33,
+      "items": { "$ref": "#/$defs/file" }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 27,
+      "maxItems": 27,
+      "items": { "$ref": "#/$defs/case" }
+    },
+    "nonClaims": { "$ref": "#/$defs/textList" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?/)(?!.*\\\\)(?!.*:)[A-Za-z0-9._/-]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "textList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["familyId", "name", "sourcePaths", "caseIds"],
+      "properties": {
+        "familyId": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/text" },
+        "sourcePaths": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "caseIds": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "byteLength", "sha256", "contentUtf8"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "kind": { "enum": ["captureRequest", "fixtureSource"] },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "contentUtf8": { "type": "string", "maxLength": 1048576 }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caseId", "familyId", "requestPath", "requestDigest", "fixtureState"],
+      "properties": {
+        "caseId": { "$ref": "#/$defs/id" },
+        "familyId": { "$ref": "#/$defs/id" },
+        "requestPath": { "$ref": "#/$defs/path" },
+        "requestDigest": { "$ref": "#/$defs/sha256" },
+        "fixtureState": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}
