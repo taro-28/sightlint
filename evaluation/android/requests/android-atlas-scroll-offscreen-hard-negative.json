@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "id": "android-atlas-scroll-offscreen-hard-negative",
+    "title": "Atlas Android account settings scroll hard negative"
+  },
+  "capture": {
+    "reference": "evaluation/android/captures/scroll-offscreen-hard-negative.capture.json",
+    "sha256": "sha256:c98fe9ff92dbeb6b4e9a3da580ce3e2a48a872265b50fef96dcb5a24cf0efdaa"
+  },
+  "execution": {
+    "maxAttributesPerNode": 32,
+    "maxCaptureBytes": 1048576,
+    "maxDepth": 16,
+    "maxNodes": 64,
+    "maxOutputBytes": 2097152,
+    "maxScreenshotBytes": 4194304,
+    "maxStringBytes": 1024
+  },
+  "privacy": {
+    "contentPolicy": "digestsAndGeometry",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "requestId": "android-atlas-scroll-offscreen-hard-negative",
+  "screenshot": {
+    "reference": "evaluation/android/captures/scroll-offscreen-hard-negative.png",
+    "sha256": "sha256:afe150689f40cbd2e7fdd5cd5e32e7d1bd61a29943228b3fb9a5b744e529d332"
+  }
+}

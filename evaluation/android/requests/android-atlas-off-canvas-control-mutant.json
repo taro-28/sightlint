@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "id": "android-atlas-off-canvas-control-mutant",
+    "title": "Atlas Android account settings off-canvas control mutant"
+  },
+  "capture": {
+    "reference": "evaluation/android/captures/off-canvas-control-mutant.capture.json",
+    "sha256": "sha256:0d21e9057760d6c523efd13d198607f8309d657f8001cfdc3657311d0c3291ec"
+  },
+  "execution": {
+    "maxAttributesPerNode": 32,
+    "maxCaptureBytes": 1048576,
+    "maxDepth": 16,
+    "maxNodes": 64,
+    "maxOutputBytes": 2097152,
+    "maxScreenshotBytes": 4194304,
+    "maxStringBytes": 1024
+  },
+  "privacy": {
+    "contentPolicy": "digestsAndGeometry",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "requestId": "android-atlas-off-canvas-control-mutant",
+  "screenshot": {
+    "reference": "evaluation/android/captures/off-canvas-control-mutant.png",
+    "sha256": "sha256:d2274785a84c71f80af9e7e9815cf3dc9ff0d9937f68d7b5a40e3b0f03486767"
+  }
+}

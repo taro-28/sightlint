@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:android-acquisition-annotations:0.1.0",
+  "title": "SightLint Android acquisition annotations 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "kind", "provenance", "annotations"],
+  "properties": {
+    "annotationVersion": { "const": "0.1.0" },
+    "kind": { "const": "acquisitionGroundTruth" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringMethod", "captureIsAdapterOutput", "guideVersion", "implementationOutputUsed", "reviewer"],
+      "properties": {
+        "authoringMethod": { "const": "fixtureSourcePlatformCaptureAndHumanVisualReview" },
+        "captureIsAdapterOutput": { "const": false },
+        "guideVersion": { "const": "0.1.0" },
+        "implementationOutputUsed": { "const": false },
+        "reviewer": { "const": "maintainerOnly" }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/annotation" }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "y": { "type": "integer", "minimum": -1048576, "maximum": 1048576 },
+        "width": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+        "height": { "type": "integer", "minimum": 0, "maximum": 1048576 }
+      }
+    },
+    "rawBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom"],
+      "properties": {
+        "left": { "type": "integer" },
+        "top": { "type": "integer" },
+        "right": { "type": "integer" },
+        "bottom": { "type": "integer" }
+      }
+    },
+    "stringFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["utf8ByteLength", "sha256"],
+      "properties": {
+        "utf8ByteLength": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resourceId", "className", "mappingStatus", "coreKind", "layoutBoundsDevicePixels", "globalVisible", "accessibilityGeometryStatus", "accessibilityBoundsDevicePixels"],
+      "properties": {
+        "resourceId": { "$ref": "#/$defs/nonEmptyString" },
+        "className": { "$ref": "#/$defs/nonEmptyString" },
+        "mappingStatus": { "enum": ["mappedExactLayout", "notMappedNotShown", "notMappedNotGloballyVisible", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
+        "coreKind": { "enum": ["container", "control", "text", "other", null] },
+        "layoutBoundsDevicePixels": { "$ref": "#/$defs/rect" },
+        "globalVisible": { "type": "boolean" },
+        "accessibilityGeometryStatus": { "enum": ["exact", "invalidPlatformBounds", "unavailable"] },
+        "accessibilityBoundsDevicePixels": { "anyOf": [{ "$ref": "#/$defs/rect" }, { "type": "null" }] },
+        "rawAccessibilityBoundsDevicePixels": { "$ref": "#/$defs/rawBounds" },
+        "text": { "$ref": "#/$defs/stringFact" },
+        "contentDescription": { "$ref": "#/$defs/stringFact" }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "caseId", "display", "counts", "screenshot", "abstentions", "nodes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/token" },
+        "caseId": { "$ref": "#/$defs/token" },
+        "display": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["widthPixels", "heightPixels", "densityDpi", "rotationDegrees"],
+          "properties": {
+            "widthPixels": { "type": "integer", "minimum": 1 },
+            "heightPixels": { "type": "integer", "minimum": 1 },
+            "densityDpi": { "type": "integer", "minimum": 1 },
+            "rotationDegrees": { "enum": [0, 90, 180, 270] }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capturedNodes", "mappedCoreNodes", "unidentifiedNodes"],
+          "properties": {
+            "capturedNodes": { "type": "integer", "minimum": 1 },
+            "mappedCoreNodes": { "type": "integer", "minimum": 0 },
+            "unidentifiedNodes": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "screenshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["widthPixels", "heightPixels", "extentReconciliation", "nodeIdentity"],
+          "properties": {
+            "widthPixels": { "type": "integer", "minimum": 1 },
+            "heightPixels": { "type": "integer", "minimum": 1 },
+            "extentReconciliation": { "const": "agreement" },
+            "nodeIdentity": { "const": "cantTell" }
+          }
+        },
+        "abstentions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": { "$ref": "#/$defs/node" }
+        }
+      }
+    }
+  }
+}

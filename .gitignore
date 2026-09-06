@@ -15,5 +15,9 @@ artifacts/
 /playwright-report/
 /test-results/
 /.venv-sightlint-pdf/
+/fixtures/android/atlas-app/.gradle/
+/fixtures/android/atlas-app/build/
+/fixtures/android/atlas-app/app/build/
+/fixtures/android/atlas-app/local.properties
 __pycache__/
 *.pyc

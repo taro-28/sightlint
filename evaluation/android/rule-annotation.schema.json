@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:evaluation:android-rule-annotations:0.1.0",
+  "title": "SightLint Android rule annotations 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["annotationVersion", "kind", "provenance", "annotations"],
+  "properties": {
+    "annotationVersion": { "const": "0.1.0" },
+    "kind": { "const": "ruleGroundTruth" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoringMethod", "guideVersion", "implementationOutputUsed", "reviewer"],
+      "properties": {
+        "authoringMethod": { "const": "fixtureIntentAndExistingRuleContract" },
+        "guideVersion": { "const": "0.1.0" },
+        "implementationOutputUsed": { "const": false },
+        "reviewer": { "const": "maintainerOnly" }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "caseId", "applicabilityGroundTruth", "ruleId", "ruleVersion", "policyProfile", "blockingAuthority", "expectedResultCount", "expectedFailedTargets", "expectedAbsentTargets", "forbidUnexpectedFailures", "rationale", "falsePositiveRisk"],
+        "properties": {
+          "id": { "$ref": "#/$defs/token" },
+          "caseId": { "$ref": "#/$defs/token" },
+          "applicabilityGroundTruth": { "enum": ["applicable", "applicableWithExcludedHardNegative"] },
+          "ruleId": { "const": "visual.bounds.within-canvas" },
+          "ruleVersion": { "const": "0.1.0" },
+          "policyProfile": { "const": "sightlint:base" },
+          "blockingAuthority": { "const": "existingExactSourceRule" },
+          "expectedResultCount": { "type": "integer", "minimum": 1, "maximum": 10000 },
+          "expectedFailedTargets": { "$ref": "#/$defs/targets" },
+          "expectedAbsentTargets": { "$ref": "#/$defs/targets" },
+          "forbidUnexpectedFailures": { "const": true },
+          "rationale": { "$ref": "#/$defs/nonEmptyString" },
+          "falsePositiveRisk": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "token": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$" },
+    "nonEmptyString": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "targets": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  }
+}

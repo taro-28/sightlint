@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "id": "android-atlas-clean",
+    "title": "Atlas Android account settings clean"
+  },
+  "capture": {
+    "reference": "evaluation/android/captures/clean.capture.json",
+    "sha256": "sha256:97735fa0446f07dfbf71f660f1dbab9fd4f736a20ab4a113ba6b6075a896c96f"
+  },
+  "execution": {
+    "maxAttributesPerNode": 32,
+    "maxCaptureBytes": 1048576,
+    "maxDepth": 16,
+    "maxNodes": 64,
+    "maxOutputBytes": 2097152,
+    "maxScreenshotBytes": 4194304,
+    "maxStringBytes": 1024
+  },
+  "privacy": {
+    "contentPolicy": "digestsAndGeometry",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "requestId": "android-atlas-clean",
+  "screenshot": {
+    "reference": "evaluation/android/captures/clean.png",
+    "sha256": "sha256:2b492399b8f2739f9bac0aa19c06db74758806fcf5cc88b26503f01d3a02cfd5"
+  }
+}

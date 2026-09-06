@@ -1,0 +1,68 @@
+{
+  "annotationVersion": "0.1.0",
+  "annotations": [
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "android-atlas-clean",
+      "expectedAbsentTargets": [
+        "android:view:android:id/action_mode_bar_stub"
+      ],
+      "expectedFailedTargets": [],
+      "expectedResultCount": 17,
+      "falsePositiveRisk": "View allocation alone does not establish rendered visibility, touch behavior, or usability; the oracle covers only screen containment for the static fixture state.",
+      "forbidUnexpectedFailures": true,
+      "id": "android-atlas-clean-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "Every admitted exact View allocation is contained by the 1080×2400 screen canvas.",
+      "ruleId": "visual.bounds.within-canvas",
+      "ruleVersion": "0.1.0"
+    },
+    {
+      "applicabilityGroundTruth": "applicable",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "android-atlas-off-canvas-control-mutant",
+      "expectedAbsentTargets": [
+        "android:view:android:id/action_mode_bar_stub"
+      ],
+      "expectedFailedTargets": [
+        "android:view:org.sightlint.fixtures.atlas:id/save_button"
+      ],
+      "expectedResultCount": 17,
+      "falsePositiveRisk": "A partially outside source allocation can be intentional during animation or carousel behavior; this reviewed static fixture declares the named control as a targeted containment mutation only.",
+      "forbidUnexpectedFailures": true,
+      "id": "android-atlas-off-canvas-control-mutant-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "The Save View allocation ends at x=1376 while the declared screen ends at x=1080; platform accessibility clipping is retained separately and cannot repair the source fact.",
+      "ruleId": "visual.bounds.within-canvas",
+      "ruleVersion": "0.1.0"
+    },
+    {
+      "applicabilityGroundTruth": "applicableWithExcludedHardNegative",
+      "blockingAuthority": "existingExactSourceRule",
+      "caseId": "android-atlas-scroll-offscreen-hard-negative",
+      "expectedAbsentTargets": [
+        "android:view:android:id/action_mode_bar_stub",
+        "android:view:org.sightlint.fixtures.atlas:id/archive_spacer",
+        "android:view:org.sightlint.fixtures.atlas:id/archived_label",
+        "android:view:org.sightlint.fixtures.atlas:id/archived_section"
+      ],
+      "expectedFailedTargets": [],
+      "expectedResultCount": 17,
+      "falsePositiveRisk": "Ordinary offscreen scroll content has source allocations below the current screen; mapping it without current global visibility would manufacture failures, and inverted accessibility rectangles are not valid replacement geometry.",
+      "forbidUnexpectedFailures": true,
+      "id": "android-atlas-scroll-offscreen-hard-negative-rules",
+      "policyProfile": "sightlint:base",
+      "rationale": "Visible admitted nodes remain contained; the hidden spacer and offscreen archived nodes produce no core layoutBox or rule result while their native conflict evidence remains in the extension.",
+      "ruleId": "visual.bounds.within-canvas",
+      "ruleVersion": "0.1.0"
+    }
+  ],
+  "kind": "ruleGroundTruth",
+  "provenance": {
+    "authoringMethod": "fixtureIntentAndExistingRuleContract",
+    "guideVersion": "0.1.0",
+    "implementationOutputUsed": false,
+    "reviewer": "maintainerOnly"
+  }
+}

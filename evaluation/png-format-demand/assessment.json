@@ -23,10 +23,44 @@
   "committedAssets": {
     "sourceManifest": "evaluation/image-alpha/corpus.json",
     "additionalSourceManifests": [
+      "evaluation/android/corpus.json",
       "evaluation/pptx/corpus.json",
       "evaluation/pdf/corpus.json"
     ],
     "cases": [
+      {
+        "caseId": "atlas-android-clean",
+        "path": "evaluation/android/captures/clean.png",
+        "byteSha256": "2b492399b8f2739f9bac0aa19c06db74758806fcf5cc88b26503f01d3a02cfd5",
+        "width": 1080,
+        "height": 2400,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-android-off-canvas-control-mutant",
+        "path": "evaluation/android/captures/off-canvas-control-mutant.png",
+        "byteSha256": "d2274785a84c71f80af9e7e9815cf3dc9ff0d9937f68d7b5a40e3b0f03486767",
+        "width": 1080,
+        "height": 2400,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
+      {
+        "caseId": "atlas-android-scroll-offscreen-hard-negative",
+        "path": "evaluation/android/captures/scroll-offscreen-hard-negative.png",
+        "byteSha256": "afe150689f40cbd2e7fdd5cd5e32e7d1bd61a29943228b3fb9a5b744e529d332",
+        "width": 1080,
+        "height": 2400,
+        "bitDepth": 8,
+        "colorType": 2,
+        "interlaceMethod": 0,
+        "currentRasterStatus": "available"
+      },
       {
         "caseId": "atlas-pdf-clean",
         "path": "evaluation/pdf/renders/atlas-clean.png",

@@ -1,0 +1,32 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "org.sightlint.fixtures.atlas"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "org.sightlint.fixtures.atlas"
+        minSdk 28
+        targetSdk 35
+        versionCode 1
+        versionName "0.1.0"
+        testInstrumentationRunner "org.sightlint.fixtures.atlas.CaptureInstrumentation"
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        animationsDisabled true
+    }
+}

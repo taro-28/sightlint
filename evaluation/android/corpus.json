@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "acquisitionAnnotationId": "android-atlas-clean-acquisition",
+      "capture": {
+        "path": "evaluation/android/captures/clean.capture.json",
+        "sha256": "sha256:97735fa0446f07dfbf71f660f1dbab9fd4f736a20ab4a113ba6b6075a896c96f"
+      },
+      "id": "android-atlas-clean",
+      "relation": {
+        "kind": "baseline"
+      },
+      "request": {
+        "path": "evaluation/android/requests/android-atlas-clean.json",
+        "sha256": "sha256:0a07866a1720196ca107e1634c98585a663c317e79fe49e50394b72545a4204a"
+      },
+      "ruleAnnotationId": "android-atlas-clean-rules",
+      "screenshot": {
+        "path": "evaluation/android/captures/clean.png",
+        "sha256": "sha256:2b492399b8f2739f9bac0aa19c06db74758806fcf5cc88b26503f01d3a02cfd5"
+      },
+      "split": "smoke"
+    },
+    {
+      "acquisitionAnnotationId": "android-atlas-off-canvas-control-mutant-acquisition",
+      "capture": {
+        "path": "evaluation/android/captures/off-canvas-control-mutant.capture.json",
+        "sha256": "sha256:0d21e9057760d6c523efd13d198607f8309d657f8001cfdc3657311d0c3291ec"
+      },
+      "id": "android-atlas-off-canvas-control-mutant",
+      "relation": {
+        "baselineId": "android-atlas-clean",
+        "changedProperty": "Only the Save button source layout position changes from x=63 to x=798 device pixels; its 578-pixel allocation crosses the 1080-pixel display while platform accessibility bounds clip to 219 pixels.",
+        "kind": "targetedMutation"
+      },
+      "request": {
+        "path": "evaluation/android/requests/android-atlas-off-canvas-control-mutant.json",
+        "sha256": "sha256:eede22c962f0a354b73e56678c2cf22248db0aed2227e3e0f8fb5ab17e67a2ff"
+      },
+      "ruleAnnotationId": "android-atlas-off-canvas-control-mutant-rules",
+      "screenshot": {
+        "path": "evaluation/android/captures/off-canvas-control-mutant.png",
+        "sha256": "sha256:d2274785a84c71f80af9e7e9815cf3dc9ff0d9937f68d7b5a40e3b0f03486767"
+      },
+      "split": "development"
+    },
+    {
+      "acquisitionAnnotationId": "android-atlas-scroll-offscreen-hard-negative-acquisition",
+      "capture": {
+        "path": "evaluation/android/captures/scroll-offscreen-hard-negative.capture.json",
+        "sha256": "sha256:c98fe9ff92dbeb6b4e9a3da580ce3e2a48a872265b50fef96dcb5a24cf0efdaa"
+      },
+      "id": "android-atlas-scroll-offscreen-hard-negative",
+      "relation": {
+        "baselineId": "android-atlas-clean",
+        "changedProperty": "A valid scroll container adds an offscreen archived section; the View allocations lie below the screen and Android reports inverted accessibility bounds after clipping, so those nodes must not become core layout or hit boxes.",
+        "kind": "hardNegative"
+      },
+      "request": {
+        "path": "evaluation/android/requests/android-atlas-scroll-offscreen-hard-negative.json",
+        "sha256": "sha256:a32b80ef91ae911bbe8d01dfb5d43234000722628433ce6caf4de4a1db4bb27b"
+      },
+      "ruleAnnotationId": "android-atlas-scroll-offscreen-hard-negative-rules",
+      "screenshot": {
+        "path": "evaluation/android/captures/scroll-offscreen-hard-negative.png",
+        "sha256": "sha256:afe150689f40cbd2e7fdd5cd5e32e7d1bd61a29943228b3fb9a5b744e529d332"
+      },
+      "split": "challenge"
+    }
+  ],
+  "corpusVersion": "0.1.0",
+  "fixtureSourceSha256": "sha256:4f16696318bc306910aae37c91c05d73068e9e3aa7d364bc1e03f55cce8bc9d9",
+  "holdout": {
+    "reason": "All fixture source, captures, annotations, and splits are public to implementers and maintainer-authored; no frozen inaccessible application/device sample or leakage-control process exists.",
+    "status": "notEstablished"
+  },
+  "source": {
+    "androidApiLevel": 35,
+    "androidGradlePluginVersion": "8.10.1",
+    "application": "fixtures/android/atlas-app",
+    "avdName": "Pixel_8",
+    "capturePipeline": "instrumentation-view-accessibility-then-ui-automation-screenshot",
+    "emulatorVersion": "36.4.10.0",
+    "gradleVersion": "8.13",
+    "license": "MIT OR Apache-2.0",
+    "origin": "repositoryOwnedFixtureApplication",
+    "ownership": "SightLint project",
+    "privacy": "fictionalNoPersonalOrCustomerData",
+    "redistribution": "permitted",
+    "review": "maintainerAuthoredAndVisuallyReviewedNotIndependent"
+  },
+  "splitPolicy": {
+    "challenge": "Public scroll hard negative used to verify exclusion, conflict preservation, abstention, and false-positive behavior.",
+    "development": "Visible targeted source-layout mutation used for implementation and regression tuning.",
+    "smoke": "Required clean Android native/screenshot adapter and binary path on every change."
+  }
+}

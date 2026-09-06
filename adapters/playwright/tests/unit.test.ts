@@ -121,6 +121,16 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     ["adapters/pdf/schemas/request.schema.json", "evaluation/pdf/requests/atlas-clean.json"],
     ["adapters/pdf/schemas/request.schema.json", "evaluation/pdf/requests/atlas-off-page-mutant.json"],
     ["adapters/pdf/schemas/request.schema.json", "evaluation/pdf/requests/atlas-quadpoints-hard-negative.json"],
+    ["evaluation/android/corpus.schema.json", "evaluation/android/corpus.json"],
+    ["evaluation/android/acquisition-annotation.schema.json", "evaluation/android/annotations/acquisition.json"],
+    ["evaluation/android/rule-annotation.schema.json", "evaluation/android/annotations/rules.json"],
+    ["evaluation/android/metric-contract.schema.json", "evaluation/android/metric-contract.json"],
+    ["adapters/android/schemas/capture.schema.json", "evaluation/android/captures/clean.capture.json"],
+    ["adapters/android/schemas/capture.schema.json", "evaluation/android/captures/off-canvas-control-mutant.capture.json"],
+    ["adapters/android/schemas/capture.schema.json", "evaluation/android/captures/scroll-offscreen-hard-negative.capture.json"],
+    ["adapters/android/schemas/request.schema.json", "evaluation/android/requests/android-atlas-clean.json"],
+    ["adapters/android/schemas/request.schema.json", "evaluation/android/requests/android-atlas-off-canvas-control-mutant.json"],
+    ["adapters/android/schemas/request.schema.json", "evaluation/android/requests/android-atlas-scroll-offscreen-hard-negative.json"],
   ] as const;
 
   for (const [schemaPath, documentPath] of pairs) {
@@ -138,6 +148,8 @@ test("all protocol and oracle examples satisfy their versioned JSON Schemas", as
     "adapters/pptx/schemas/pptx-extension.schema.json",
     "adapters/pdf/schemas/response.schema.json",
     "adapters/pdf/schemas/pdf-extension.schema.json",
+    "adapters/android/schemas/response.schema.json",
+    "adapters/android/schemas/android-extension.schema.json",
   ]) {
     const ajv = new Ajv2020({ allErrors: true, strict: true, validateFormats: false });
     ajv.compile(await json(schemaPath) as AnySchema);

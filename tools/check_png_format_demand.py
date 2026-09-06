@@ -99,9 +99,9 @@ def verify_committed_assets(assessment: dict[str, Any]) -> None:
                 path = manifest_case.get("path")
                 digest = manifest_case.get("byteSha256")
             else:
-                render = manifest_case.get("render", {})
-                path = render.get("path") if isinstance(render, dict) else None
-                value = render.get("sha256") if isinstance(render, dict) else None
+                visual = manifest_case.get("render", manifest_case.get("screenshot", {}))
+                path = visual.get("path") if isinstance(visual, dict) else None
+                value = visual.get("sha256") if isinstance(visual, dict) else None
                 digest = value.removeprefix("sha256:") if isinstance(value, str) else None
             if isinstance(path, str) and isinstance(digest, str):
                 source_assets[path] = digest
@@ -202,7 +202,7 @@ def main() -> None:
     verify_unsupported_controls(assessment)
     verify_decision(assessment)
     print(
-        "PNG format demand: 11/11 committed assets and 9 browser cases use the supported subset; "
+        "PNG format demand: 14/14 committed assets and 9 browser cases use the supported subset; "
         "5 unsupported controls remain conformance-only; broader decoding stays untested"
     )
 
