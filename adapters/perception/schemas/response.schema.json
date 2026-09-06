@@ -33,9 +33,9 @@
     },
     "worker": {
       "type": "object", "additionalProperties": false,
-      "required": ["name", "version", "executableSha256", "runtime", "backend", "model"],
+      "required": ["name", "version", "sourceSha256", "runtime", "backend", "model"],
       "properties": {
-        "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/version" }, "executableSha256": { "$ref": "#/$defs/sha256" },
+        "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/version" }, "sourceSha256": { "$ref": "#/$defs/sha256" },
         "runtime": {
           "type": "object", "additionalProperties": false, "required": ["name", "version"],
           "properties": { "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/text" } }
@@ -76,24 +76,68 @@
       "type": "object", "additionalProperties": false,
       "required": ["id", "family", "status", "value", "confidence", "alternatives", "uncertaintyReasons", "sourceEvidence"],
       "properties": {
-        "id": { "$ref": "#/$defs/token" }, "family": { "const": "region" }, "status": { "const": "observed" },
-        "value": {
-          "type": "object", "additionalProperties": false, "required": ["kind", "bounds", "pixelCount"],
-          "properties": { "kind": { "const": "pixelComponent" }, "bounds": { "$ref": "#/$defs/bounds" }, "pixelCount": { "type": "integer", "minimum": 1 } }
-        },
+        "id": { "$ref": "#/$defs/token" }, "family": { "$ref": "#/$defs/family" }, "status": { "const": "observed" },
+        "value": { "oneOf": [{ "$ref": "#/$defs/regionValue" }, { "$ref": "#/$defs/textValue" }, { "$ref": "#/$defs/roleValue" }, { "$ref": "#/$defs/hierarchyValue" }, { "$ref": "#/$defs/peerGroupValue" }] },
         "confidence": { "$ref": "#/$defs/confidence" },
         "alternatives": { "type": "array", "maxItems": 16, "items": { "$ref": "#/$defs/alternative" } },
         "uncertaintyReasons": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
-        "sourceEvidence": {
-          "type": "object", "additionalProperties": false,
-          "required": ["class", "selector", "hypothesisId", "hypothesisConfirmed", "semanticApplicability"],
-          "properties": {
-            "class": { "const": "visionMeasured" }, "selector": { "$ref": "#/$defs/text" },
-            "hypothesisId": { "$ref": "#/$defs/text" }, "hypothesisConfirmed": { "const": false },
-            "semanticApplicability": { "const": "cantTell" }
-          }
-        }
+        "sourceEvidence": { "$ref": "#/$defs/sourceEvidence" }
+      },
+      "allOf": [
+        { "if": { "type": "object", "properties": { "family": { "const": "region" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/regionValue" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "text" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/textValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "role" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/roleValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "hierarchy" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/hierarchyValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } },
+        { "if": { "type": "object", "properties": { "family": { "const": "peerGroup" } } }, "then": { "type": "object", "properties": { "value": { "$ref": "#/$defs/peerGroupValue" }, "sourceEvidence": { "$ref": "#/$defs/inferredSourceEvidence" }, "confidence": { "$ref": "#/$defs/inferredConfidence" } } } }
+      ]
+    },
+    "regionValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "bounds", "pixelCount"],
+      "properties": { "kind": { "const": "pixelComponent" }, "bounds": { "$ref": "#/$defs/bounds" }, "pixelCount": { "type": "integer", "minimum": 1 } }
+    },
+    "textValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "text", "bounds"],
+      "properties": { "kind": { "const": "text" }, "text": { "$ref": "#/$defs/text" }, "bounds": { "$ref": "#/$defs/bounds" } }
+    },
+    "roleValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "targetObservationId", "role"],
+      "properties": { "kind": { "const": "role" }, "targetObservationId": { "$ref": "#/$defs/token" }, "role": { "$ref": "#/$defs/token" } }
+    },
+    "hierarchyValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "parentObservationId", "childObservationId"],
+      "properties": { "kind": { "const": "hierarchy" }, "parentObservationId": { "$ref": "#/$defs/token" }, "childObservationId": { "$ref": "#/$defs/token" } }
+    },
+    "peerGroupValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "memberObservationIds", "axis"],
+      "properties": {
+        "kind": { "const": "peerGroup" }, "memberObservationIds": { "type": "array", "minItems": 2, "maxItems": 1024, "uniqueItems": true, "items": { "$ref": "#/$defs/token" } },
+        "axis": { "enum": ["horizontal", "vertical", "unordered", "unknown"] }
       }
+    },
+    "sourceEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["class", "selector", "sourceObservationIds", "hypothesisId", "hypothesisConfirmed", "semanticApplicability"],
+      "properties": {
+        "class": { "enum": ["visionMeasured", "visionInferred"] }, "selector": { "$ref": "#/$defs/text" },
+        "sourceObservationIds": { "type": "array", "maxItems": 1024, "uniqueItems": true, "items": { "$ref": "#/$defs/token" } },
+        "hypothesisId": { "$ref": "#/$defs/text" }, "hypothesisConfirmed": { "const": false },
+        "semanticApplicability": { "const": "cantTell" }
+      }
+    },
+    "inferredSourceEvidence": {
+      "allOf": [{ "$ref": "#/$defs/sourceEvidence" }, { "type": "object", "properties": { "class": { "const": "visionInferred" } } }]
+    },
+    "inferredConfidence": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "value", "calibrationId"],
+          "properties": { "status": { "const": "calibratedProbability" }, "value": { "type": "number", "minimum": 0, "maximum": 1 }, "calibrationId": { "$ref": "#/$defs/token" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["status", "reason"],
+          "properties": { "status": { "const": "notProvided" }, "reason": { "$ref": "#/$defs/text" } }
+        }
+      ]
     },
     "agreement": {
       "oneOf": [

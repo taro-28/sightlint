@@ -10,9 +10,9 @@
     "status": { "enum": ["complete", "partial", "unsupported", "ambiguous"] }, "responseSha256": { "$ref": "#/$defs/sha256" },
     "worker": {
       "type": "object", "additionalProperties": false,
-      "required": ["name", "version", "executableSha256", "runtime", "backend", "model"],
+      "required": ["name", "version", "sourceSha256", "runtime", "backend", "model"],
       "properties": {
-        "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/version" }, "executableSha256": { "$ref": "#/$defs/sha256" },
+        "name": { "$ref": "#/$defs/token" }, "version": { "$ref": "#/$defs/version" }, "sourceSha256": { "$ref": "#/$defs/sha256" },
         "runtime": { "$ref": "#/$defs/runtime" }, "backend": { "$ref": "#/$defs/token" }, "model": { "$ref": "#/$defs/model" }
       }
     },
@@ -20,9 +20,10 @@
     "observationIds": { "type": "array", "uniqueItems": true, "maxItems": 1024, "items": { "$ref": "#/$defs/token" } },
     "mapping": {
       "type": "object", "additionalProperties": false,
-      "required": ["mappedRegionCount", "coreSemanticPromotionCount", "unmappedFamilies", "reconciliationStatus"],
+      "required": ["mappedRegionCount", "unmappedObservationCount", "coreSemanticPromotionCount", "unmappedFamilies", "reconciliationStatus"],
       "properties": {
         "mappedRegionCount": { "type": "integer", "minimum": 0, "maximum": 1024 },
+        "unmappedObservationCount": { "type": "integer", "minimum": 0, "maximum": 1024 },
         "coreSemanticPromotionCount": { "const": 0 },
         "unmappedFamilies": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "enum": ["hierarchy", "peerGroup", "role", "text"] } },
         "reconciliationStatus": { "const": "sourcesRetainedSeparately" }

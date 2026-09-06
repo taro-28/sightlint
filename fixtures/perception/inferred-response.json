@@ -1,0 +1,133 @@
+{
+  "$schema": "../schemas/response.schema.json",
+  "protocolVersion": "0.1.0",
+  "requestId": "inferred-conformance",
+  "status": "partial",
+  "worker": {
+    "name": "fixture-inferred-worker",
+    "version": "0.1.0",
+    "sourceSha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "runtime": { "name": "node", "version": "24.0.0" },
+    "backend": "cpu",
+    "model": {
+      "status": "selected",
+      "name": "fixture-model",
+      "version": "1",
+      "sha256": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  },
+  "inputSha256": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "familyStatus": [
+    { "family": "hierarchy", "status": "observed", "reason": "Schema conformance example only." },
+    { "family": "peerGroup", "status": "observed", "reason": "Schema conformance example only." },
+    { "family": "region", "status": "observed", "reason": "Schema conformance example only." },
+    { "family": "role", "status": "observed", "reason": "Schema conformance example only." },
+    { "family": "text", "status": "observed", "reason": "Schema conformance example only." }
+  ],
+  "observations": [
+    {
+      "id": "hierarchy:a",
+      "family": "hierarchy",
+      "status": "observed",
+      "value": { "kind": "hierarchy", "parentObservationId": "region:a", "childObservationId": "text:a" },
+      "confidence": { "status": "notProvided", "reason": "No calibrated probability is available." },
+      "alternatives": [],
+      "uncertaintyReasons": ["This example has no semantic authority."],
+      "sourceEvidence": {
+        "class": "visionInferred",
+        "selector": "hierarchy/a",
+        "sourceObservationIds": ["region:a", "text:a"],
+        "hypothesisId": "fixture/hierarchy-a",
+        "hypothesisConfirmed": false,
+        "semanticApplicability": "cantTell"
+      }
+    },
+    {
+      "id": "peer:a",
+      "family": "peerGroup",
+      "status": "observed",
+      "value": { "kind": "peerGroup", "memberObservationIds": ["region:a", "region:b"], "axis": "horizontal" },
+      "confidence": { "status": "notProvided", "reason": "No calibrated probability is available." },
+      "alternatives": [],
+      "uncertaintyReasons": ["Visual similarity does not establish semantic peers."],
+      "sourceEvidence": {
+        "class": "visionInferred",
+        "selector": "peer/a",
+        "sourceObservationIds": ["region:a", "region:b"],
+        "hypothesisId": "fixture/peer-a",
+        "hypothesisConfirmed": false,
+        "semanticApplicability": "cantTell"
+      }
+    },
+    {
+      "id": "region:a",
+      "family": "region",
+      "status": "observed",
+      "value": { "kind": "pixelComponent", "bounds": { "x": 4, "y": 8, "width": 20, "height": 16, "coordinateSpaceId": "canvas", "unit": "devicePixel", "format": "xywh-half-open" }, "pixelCount": 280 },
+      "confidence": { "status": "notProvided", "reason": "No calibrated probability is available." },
+      "alternatives": [],
+      "uncertaintyReasons": ["The model-proposed region is inferred."],
+      "sourceEvidence": {
+        "class": "visionInferred",
+        "selector": "region/a",
+        "sourceObservationIds": [],
+        "hypothesisId": "fixture/region-a",
+        "hypothesisConfirmed": false,
+        "semanticApplicability": "cantTell"
+      }
+    },
+    {
+      "id": "region:b",
+      "family": "region",
+      "status": "observed",
+      "value": { "kind": "pixelComponent", "bounds": { "x": 30, "y": 8, "width": 20, "height": 16, "coordinateSpaceId": "canvas", "unit": "devicePixel", "format": "xywh-half-open" }, "pixelCount": 280 },
+      "confidence": { "status": "notProvided", "reason": "No calibrated probability is available." },
+      "alternatives": [],
+      "uncertaintyReasons": ["The model-proposed region is inferred."],
+      "sourceEvidence": {
+        "class": "visionInferred",
+        "selector": "region/b",
+        "sourceObservationIds": [],
+        "hypothesisId": "fixture/region-b",
+        "hypothesisConfirmed": false,
+        "semanticApplicability": "cantTell"
+      }
+    },
+    {
+      "id": "role:a",
+      "family": "role",
+      "status": "observed",
+      "value": { "kind": "role", "targetObservationId": "region:a", "role": "button" },
+      "confidence": { "status": "calibratedProbability", "value": 0.6, "calibrationId": "fixture-calibration-v1" },
+      "alternatives": [{ "value": "link", "probability": 0.3 }],
+      "uncertaintyReasons": ["The leading alternatives are materially ambiguous."],
+      "sourceEvidence": {
+        "class": "visionInferred",
+        "selector": "role/a",
+        "sourceObservationIds": ["region:a"],
+        "hypothesisId": "fixture/role-a",
+        "hypothesisConfirmed": false,
+        "semanticApplicability": "cantTell"
+      }
+    },
+    {
+      "id": "text:a",
+      "family": "text",
+      "status": "observed",
+      "value": { "kind": "text", "text": "Synthetic label", "bounds": { "x": 4, "y": 8, "width": 20, "height": 16, "coordinateSpaceId": "canvas", "unit": "devicePixel", "format": "xywh-half-open" } },
+      "confidence": { "status": "notProvided", "reason": "No calibrated probability is available." },
+      "alternatives": [{ "value": "Synthetic labe1", "probability": null }],
+      "uncertaintyReasons": ["The OCR alternative has no calibrated probability."],
+      "sourceEvidence": {
+        "class": "visionInferred",
+        "selector": "text/a",
+        "sourceObservationIds": ["region:a"],
+        "hypothesisId": "fixture/text-a",
+        "hypothesisConfirmed": false,
+        "semanticApplicability": "cantTell"
+      }
+    }
+  ],
+  "repeatedRunAgreement": { "status": "notMeasured", "reason": "One example cannot establish repeated-run agreement." },
+  "limitations": ["This is schema conformance data, not acquisition or rule ground truth."]
+}

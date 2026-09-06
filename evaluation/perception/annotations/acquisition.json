@@ -9,7 +9,7 @@
       "familyExpectations": [
         { "family": "hierarchy", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Exact-color components do not establish parentage." },
         { "family": "peerGroup", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Repeated-looking surfaces do not establish semantic peers." },
-        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The qualified exact-color policy can emit bounded pixel components under an unconfirmed background hypothesis." },
+        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The explicitly selected ranked policy emits bounded components while its two-edge-surface background remains unconfirmed." },
         { "family": "role", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The worker has no semantic classifier." },
         { "family": "text", "expectedStatus": "unsupported", "groundTruthRole": "notAnnotated", "rationale": "The worker performs no OCR." }
       ],
@@ -22,7 +22,7 @@
       "familyExpectations": [
         { "family": "hierarchy", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The pixel worker cannot recover the source hierarchy that separates the promotion." },
         { "family": "peerGroup", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The adjacent promotion is a hard negative for visual peer inference." },
-        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "Pixel components may be measured without a semantic grouping claim." },
+        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The explicitly selected ranked policy may measure components without a semantic grouping claim." },
         { "family": "role", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Complementary versus metric semantics require native or evaluated inferred evidence." },
         { "family": "text", "expectedStatus": "unsupported", "groundTruthRole": "notAnnotated", "rationale": "The worker performs no OCR." }
       ],
@@ -35,7 +35,7 @@
       "familyExpectations": [
         { "family": "hierarchy", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The worker does not infer hierarchy." },
         { "family": "peerGroup", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "Killing a spacing mutation would require a peer relation the worker cannot establish." },
-        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The transformed raster is independently measured as pixel components." },
+        { "family": "region", "expectedStatus": "observed", "groundTruthRole": "acquisition", "rationale": "The transformed raster is independently measured by the explicitly selected ranked policy." },
         { "family": "role", "expectedStatus": "untested", "groundTruthRole": "notAnnotated", "rationale": "The worker has no semantic classifier." },
         { "family": "text", "expectedStatus": "unsupported", "groundTruthRole": "notAnnotated", "rationale": "The worker performs no OCR." }
       ],

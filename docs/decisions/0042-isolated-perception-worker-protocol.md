@@ -39,21 +39,25 @@ families or protocol versions. Requests declare preprocessing, crop/scale/tile/s
 backend, timeout, byte/node budgets, local/remote behavior, retention, and redaction. Version `0.1`
 accepts only local execution with no remote transmission.
 
-Worker responses expose independent family statuses for regions, text, roles, hierarchy, and peer
-groups. `observed`, `partial`, `unsupported`, `ambiguous`, and `untested` are acquisition coverage
-states, not rule outcomes. The public run report is always nonblocking and records semantic rule
-outcome as `untested`.
+Worker responses expose independent family statuses and typed observation records for regions,
+text, roles, hierarchy, and peer groups. Semantic records reference their source region/text
+observations instead of flattening everything into one universal model shape. `observed`,
+`partial`, `unsupported`, `ambiguous`, and `untested` are acquisition coverage states, not rule
+outcomes. The public run report is always nonblocking and records semantic rule outcome as
+`untested`.
 
 ## Reference worker and reachable slice
 
 Ship one dependency-free Node reference worker that consumes the existing
-`benchmark-image-segmentation` report and exposes the qualified 95%-corner row-run regions as
-`visionMeasured` pixel-component observations. It verifies the request/input digest and retains
-the source policy's unconfirmed-background and `cantTell` semantic labels.
+`benchmark-image-segmentation` report and exposes regions from one request-selected, named
+benchmark policy as `visionMeasured` pixel-component observations. It verifies the request/input
+digest and retains the source policy's unconfirmed-background and `cantTell` semantic labels. The
+policy name is part of deterministic preprocessing provenance; the worker never silently falls
+back to another policy.
 
 The reference worker deliberately returns:
 
-- region family: `observed` when the qualified policy produced regions, otherwise its explicit
+- region family: `observed` when the selected policy produced regions, otherwise its explicit
   unavailable status/reason;
 - text family: `unsupported` because it performs no OCR;
 - role, hierarchy, and peer-group families: `untested` because exact-color components do not
@@ -61,11 +65,14 @@ The reference worker deliberately returns:
 - model identity and random seed: `notApplicable`;
 - calibrated confidence: `notApplicable` for deterministic measurements.
 
-The wrapper maps only observed region measurements into a new image Artifact IR. Each becomes an
-`other` node with a device-pixel `renderBox` and its own `visionMeasured` evidence selector. The
-complete worker response remains in `org.sightlint.perception@0.1.0`. No core role, name, parent,
-or relation is created. The mapped candidate is passed through the public Rust `normalize`
-command before it is written, so the Rust kernel validates the resulting IR.
+The wrapper maps only model-free observed region measurements into a new image Artifact IR. Each
+becomes an `other` node with a device-pixel `renderBox` and its own `visionMeasured` evidence
+selector. Inferred regions and every semantic family remain outside core IR. The
+canonical worker response is written as a separate output. Its digest, worker identity, family
+statuses, observation identifiers, and mapping summary remain in
+`org.sightlint.perception@0.1.0`. No core role, name, parent, or relation is created. The mapped
+candidate is passed through the public Rust `normalize` command before it is written, so the Rust
+kernel validates the resulting IR.
 
 This reference worker proves the process, resource, provenance, abstention, canonicalization, and
 mapping boundary. It is not an OCR, component-role, hierarchy, or semantic peer solution.
@@ -78,18 +85,19 @@ Protocol observations use an explicit confidence state:
 - `notProvided` records that a worker has no calibrated probability;
 - `notApplicable` is allowed only for deterministic measurements or explicit unavailable states.
 
-Uncalibrated semantic candidates remain in the perception extension. They do not become core
-`visionInferred` evidence, roles, names, hierarchy, or relations. A later mapper may promote an
-inferred observation only when the core contract's calibrated-confidence requirement and an
-accepted family-specific mapping are both satisfied. Repeated-run agreement is a separate field
-and never substitutes for model confidence.
+Uncalibrated semantic candidates remain in the canonical worker response and are referenced by the
+perception extension. They do not become core `visionInferred` evidence, roles, names, hierarchy,
+or relations. A later mapper may promote an inferred observation only when the core contract's
+calibrated-confidence requirement and an accepted family-specific mapping are both satisfied.
+Repeated-run agreement is a separate field and never substitutes for model confidence.
 
 ## Stable identity and canonicalization
 
 - `requestId` is caller supplied and stable for the evaluated case.
 - An input digest covers the canonical JSON value actually sent to the worker.
-- The wrapper records the selected executable's SHA-256 independently from the worker's claimed
-  name/version/model metadata.
+- The wrapper records the caller-selected worker source artifact's SHA-256 independently from the
+  worker's claimed name/version/model metadata. This does not claim to hash an interpreter or
+  undeclared transitive source files.
 - Reference region identifiers derive from the complete measured tuple rather than collection
   iteration order.
 - Observations, alternatives, family statuses, evidence, nodes, and extension objects are sorted
@@ -103,22 +111,25 @@ and never substitutes for model confidence.
 ## Failure and resource contract
 
 The v0 wrapper enforces reviewed hard limits for request bytes, embedded input bytes, response
-bytes, stderr bytes, observations, geometry, text/alternative lengths, and timeout. It rejects:
+bytes, stderr bytes, observations, geometry, text/alternative lengths, hierarchy depth, and
+timeout. It rejects:
 
-- malformed JSON, unknown fields, duplicate IDs, invalid versions/digests/units/statuses;
+- malformed JSON, unknown fields, duplicate IDs, dangling/self references, cyclic or over-depth
+  hierarchy, invalid versions/digests/units/statuses;
 - worker identity, input digest, backend, or model declarations that differ from the request;
 - non-finite/out-of-canvas geometry and counts that exceed the request budget;
 - nonzero exit, signal, timeout, stderr overflow, stdout overflow, or protocol-invalid output;
+- an output collision; newly created partial pairs are removed without overwriting caller data;
 - an Artifact IR candidate rejected by the public Rust normalizer.
 
 Success, partial coverage, explicit unsupported families, and ambiguity exit `0`. Usage,
 execution, protocol, resource, or mapping failures exit `2`. This command never exits `1` and
 never produces a trusted rule failure.
 
-The process boundary isolates crashes and standard streams; it is not an operating-system sandbox.
-A locally selected worker may still access the caller's account, filesystem, devices, or network
-unless separately sandboxed. The reference worker reads only standard input and writes only
-standard output.
+The process boundary isolates crashes and standard streams; it is not an operating-system sandbox
+and does not enforce a generic memory ceiling. A locally selected worker may still access the
+caller's account, filesystem, devices, or network unless separately sandboxed. The reference
+worker reads only standard input and writes only standard output.
 
 ## Reconciliation and evaluation
 
@@ -126,6 +137,14 @@ Use three repository-owned Northstar Web states from the #22/#23 corpus: clean, 
 offset mutation, and an intentional-grouping hard negative. Capture native Artifact IR and pixels
 synchronously, run the existing public segmentation command, invoke the reference worker through
 the new public wrapper, and validate its mapped IR through the Rust binary.
+
+Pre-implementation execution established that the Atlas fixture intentionally has two top-level
+edge colors (dark sidebar and light content): the qualified policy returns
+`noQualifiedBackgroundCandidate` and the strict policy returns `nonUniformBorder` in all three
+states. The evaluation therefore explicitly selects the ranked policy to exercise the process and
+mapping path while treating its background as unconfirmed. This is negative evidence about the
+reference baseline, not permission to make ranked regions semantic or production-authoritative.
+Conformance fixtures separately cover selected-policy unavailability.
 
 Acquisition annotations and rule annotations remain separate. Evaluation records region coverage,
 native/pixel agreement/conflict categories, family coverage and abstention, repeated-run bytes,

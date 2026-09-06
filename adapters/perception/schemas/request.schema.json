@@ -29,9 +29,10 @@
     },
     "preprocessing": {
       "type": "object", "additionalProperties": false,
-      "required": ["pipeline", "version", "crop", "scale", "tile", "randomSeed"],
+      "required": ["pipeline", "version", "policyId", "crop", "scale", "tile", "randomSeed"],
       "properties": {
         "pipeline": { "const": "sightlint-image-segmentation-report" }, "version": { "const": "0.1.0" },
+        "policyId": { "enum": ["qualified-corner-95-row-runs-v1", "ranked-exact-border-flood-v1", "strict-uniform-perimeter-flood-v1"] },
         "crop": { "type": "null" },
         "scale": {
           "type": "object", "additionalProperties": false, "required": ["x", "y"],
@@ -50,12 +51,14 @@
     },
     "execution": {
       "type": "object", "additionalProperties": false,
-      "required": ["mode", "timeoutMs", "maxOutputBytes", "maxStderrBytes", "maxObservations"],
+      "required": ["mode", "timeoutMs", "maxOutputBytes", "maxStderrBytes", "maxObservations", "maxTextLength", "maxHierarchyDepth"],
       "properties": {
         "mode": { "const": "local" }, "timeoutMs": { "type": "integer", "minimum": 50, "maximum": 30000 },
         "maxOutputBytes": { "type": "integer", "minimum": 1024, "maximum": 4194304 },
         "maxStderrBytes": { "type": "integer", "minimum": 0, "maximum": 65536 },
-        "maxObservations": { "type": "integer", "minimum": 1, "maximum": 1024 }
+        "maxObservations": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "maxTextLength": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "maxHierarchyDepth": { "type": "integer", "minimum": 1, "maximum": 128 }
       }
     },
     "privacy": {
