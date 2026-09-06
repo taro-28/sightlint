@@ -85,7 +85,7 @@
           "parentIdentifier": { "$ref": "#/$defs/nullableIdentifier" },
           "depth": { "type": "integer", "minimum": 0, "maximum": 64 },
           "className": { "$ref": "#/$defs/nonEmptyString" },
-          "mappingStatus": { "enum": ["mappedExactLayout", "notMappedHidden", "notMappedTransparent", "notMappedDetached", "notMappedNotWindowVisible", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
+          "mappingStatus": { "enum": ["mappedExactLayout", "notMappedHidden", "notMappedTransparent", "notMappedDetached", "notMappedNotWindowVisible", "notMappedClippedScrollContent", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
           "layoutBoundsPoints": { "$ref": "#/$defs/rect" },
           "identityTransform": { "type": "boolean" },
           "windowIntersectionPoints": { "$ref": "#/$defs/nullableRect" },

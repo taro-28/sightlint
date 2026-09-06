@@ -13,8 +13,13 @@ For acquisition annotations:
   intersection;
 - use the explicit `notMapped*` reason for hidden, transparent, detached, offscreen, empty, or
   transformed Views;
+- use `notMappedClippedScrollContent` for a direct `UIScrollView` content container whose source
+  extent is validly clipped by the current window; do not turn its scroll extent into a rule
+  failure;
 - never label XCUI frame or `isHittable` as an exact touch region, activation point, or rendered
   ink;
+- keep XCUI frame and hittability null/unavailable when the capture made no query for that source
+  identifier; do not manufacture `false` from absence;
 - record missing pixel identity and hit geometry as `cantTell`; SwiftUI, focus navigation,
   occlusion, and dynamic behavior remain `untested`.
 

@@ -156,7 +156,7 @@
       ],
       "caseId": "ios-atlas-scroll-offscreen-hard-negative",
       "counts": {
-        "mappedCoreNodes": 22,
+        "mappedCoreNodes": 21,
         "sourceNodes": 25,
         "unidentifiedSourceNodes": 15,
         "unmatchedXcuiQueries": 0,
@@ -219,6 +219,18 @@
           "xcuiFrameStatus": "exact",
           "xcuiHittable": true,
           "xcuiReconciliation": "frameAgreement"
+        },
+        {
+          "className": "UIView",
+          "coreKind": null,
+          "identifier": "settings_content",
+          "layoutBoundsPoints": { "height": 1058, "width": 402, "x": 0, "y": 0 },
+          "mappingStatus": "notMappedClippedScrollContent",
+          "windowVisible": true,
+          "xcuiFramePoints": null,
+          "xcuiFrameStatus": "unavailable",
+          "xcuiHittable": null,
+          "xcuiReconciliation": "xcuiUnavailable"
         }
       ],
       "safeAreaInsetsPoints": { "bottom": 34, "left": 0, "right": 0, "top": 62 },

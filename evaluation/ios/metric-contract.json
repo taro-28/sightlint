@@ -21,9 +21,9 @@
       "requiredMinimum": 1.0
     },
     {
-      "denominator": "one reviewed hard-negative excluded target",
+      "denominator": "all reviewed hard-negative excluded targets",
       "id": "abstentionRetention",
-      "numerator": "excluded target receiving no manufactured core box or rule result",
+      "numerator": "excluded targets receiving no manufactured core box or rule result",
       "requiredMinimum": 1.0
     },
     {

@@ -38,15 +38,16 @@
       "expectedAbsentTargets": [
         "ios:view:archived_card",
         "ios:view:archived_detail",
-        "ios:view:archived_title"
+        "ios:view:archived_title",
+        "ios:view:settings_content"
       ],
       "expectedFailedTargets": [],
-      "expectedResultCount": 22,
+      "expectedResultCount": 21,
       "falsePositiveRisk": "Valid scroll content below the current viewport must not be reported as an off-canvas defect merely because XCUI exposes its platform frame.",
       "forbidUnexpectedFailures": true,
       "id": "ios-atlas-scroll-offscreen-hard-negative-rules",
       "policyProfile": "sightlint:base",
-      "rationale": "The three archived source views are outside the current window and remain extension-only; the other 22 admitted source allocations match the clean state and stay contained.",
+      "rationale": "The three archived source views are outside the current window, and the clipped direct UIScrollView content container is a valid scrolling extent; all four remain extension-only while the other 21 source allocations match clean and stay contained.",
       "ruleId": "visual.bounds.within-canvas",
       "ruleVersion": "0.1.0"
     }

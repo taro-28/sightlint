@@ -59,13 +59,13 @@
       "properties": {
         "identifier": { "$ref": "#/$defs/nonEmptyString" },
         "className": { "$ref": "#/$defs/nonEmptyString" },
-        "mappingStatus": { "enum": ["mappedExactLayout", "notMappedHidden", "notMappedTransparent", "notMappedDetached", "notMappedNotWindowVisible", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
+        "mappingStatus": { "enum": ["mappedExactLayout", "notMappedHidden", "notMappedTransparent", "notMappedDetached", "notMappedNotWindowVisible", "notMappedClippedScrollContent", "notMappedEmptyLayout", "notMappedUnsupportedTransform"] },
         "coreKind": { "enum": ["container", "control", "text", "other", null] },
         "layoutBoundsPoints": { "$ref": "#/$defs/rect" },
         "windowVisible": { "type": "boolean" },
         "xcuiFrameStatus": { "enum": ["exact", "unavailable"] },
         "xcuiFramePoints": { "$ref": "#/$defs/nullableRect" },
-        "xcuiHittable": { "type": "boolean" },
+        "xcuiHittable": { "anyOf": [{ "type": "boolean" }, { "type": "null" }] },
         "xcuiReconciliation": { "enum": ["frameAgreement", "frameConflict", "xcuiUnavailable"] },
         "label": { "$ref": "#/$defs/stringFact" },
         "value": { "$ref": "#/$defs/stringFact" }

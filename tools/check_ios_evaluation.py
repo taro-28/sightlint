@@ -90,7 +90,9 @@ def indexed(
     return result
 
 
-def expected_mapping(node: dict[str, Any]) -> str:
+def expected_mapping(
+    node: dict[str, Any], source_nodes: dict[str, dict[str, Any]]
+) -> str:
     """Apply the independently specified ADR 0046 source mapping predicate."""
     state = node["state"]
     bounds = node["layoutBoundsPoints"]
@@ -106,6 +108,13 @@ def expected_mapping(node: dict[str, Any]) -> str:
         return "notMappedEmptyLayout"
     if node["windowIntersectionPoints"] is None:
         return "notMappedNotWindowVisible"
+    parent = node["parentIdentifier"]
+    if (
+        parent is not None
+        and source_nodes[parent]["className"] == "UIScrollView"
+        and node["windowIntersectionPoints"] != bounds
+    ):
+        return "notMappedClippedScrollContent"
     return "mappedExactLayout"
 
 
@@ -137,6 +146,7 @@ def verify_annotation_node(
     expected: dict[str, Any],
     source_node: dict[str, Any],
     xcui_node: dict[str, Any] | None,
+    source_nodes: dict[str, dict[str, Any]],
 ) -> int:
     """Verify one reviewed acquisition node against both native observations."""
     identifier = expected["identifier"]
@@ -146,7 +156,7 @@ def verify_annotation_node(
             f"{case_id} {identifier} source layout drift")
     require(expected["windowVisible"] == (source_node["windowIntersectionPoints"] is not None),
             f"{case_id} {identifier} window visibility drift")
-    mapping = expected_mapping(source_node)
+    mapping = expected_mapping(source_node, source_nodes)
     require(expected["mappingStatus"] == mapping,
             f"{case_id} {identifier} mapping annotation drift")
     core_kind = expected_kind(source_node) if mapping == "mappedExactLayout" else None
@@ -154,18 +164,25 @@ def verify_annotation_node(
             f"{case_id} {identifier} core-kind annotation drift")
     require(expected["xcuiReconciliation"] == xcui_reconciliation(source_node, xcui_node),
             f"{case_id} {identifier} XCUI reconciliation drift")
-    require(xcui_node is not None, f"{case_id} {identifier} lacks reviewed XCUI evidence")
-    require(expected["xcuiFrameStatus"] == xcui_node["frameStatus"],
-            f"{case_id} {identifier} XCUI status drift")
-    require(expected["xcuiFramePoints"] == xcui_node["framePoints"],
-            f"{case_id} {identifier} XCUI frame drift")
-    require(expected["xcuiHittable"] == xcui_node["hittable"],
-            f"{case_id} {identifier} XCUI hittable drift")
+    if xcui_node is None:
+        require(
+            expected["xcuiFrameStatus"] == "unavailable"
+            and expected["xcuiFramePoints"] is None
+            and expected["xcuiHittable"] is None,
+            f"{case_id} {identifier} manufactured unavailable XCUI facts",
+        )
+    else:
+        require(expected["xcuiFrameStatus"] == xcui_node["frameStatus"],
+                f"{case_id} {identifier} XCUI status drift")
+        require(expected["xcuiFramePoints"] == xcui_node["framePoints"],
+                f"{case_id} {identifier} XCUI frame drift")
+        require(expected["xcuiHittable"] == xcui_node["hittable"],
+                f"{case_id} {identifier} XCUI hittable drift")
     for field in ("label", "value"):
         if field in expected:
             require(expected[field] == source_node[field],
                     f"{case_id} {identifier} source {field} drift")
-            require(expected[field] == xcui_node[field],
+            require(xcui_node is not None and expected[field] == xcui_node[field],
                     f"{case_id} {identifier} XCUI {field} drift")
     return 10 + sum(field in expected for field in ("label", "value"))
 
@@ -237,7 +254,10 @@ def verify_case(
     xcui_nodes = indexed(
         capture["xcuiHierarchy"]["nodes"], "identifier", f"{case_id} XCUI nodes"
     )
-    mapped = sum(expected_mapping(node) == "mappedExactLayout" for node in source_nodes.values())
+    mapped = sum(
+        expected_mapping(node, source_nodes) == "mappedExactLayout"
+        for node in source_nodes.values()
+    )
     require(
         acquisition["counts"]
         == {
@@ -257,7 +277,11 @@ def verify_case(
         require(identifier in source_nodes, f"{case_id} annotated source node is absent: {identifier}")
         annotated_ids.add(identifier)
         facts += verify_annotation_node(
-            case_id, expected, source_nodes[identifier], xcui_nodes.get(identifier)
+            case_id,
+            expected,
+            source_nodes[identifier],
+            xcui_nodes.get(identifier),
+            source_nodes,
         )
 
     require(rule["caseId"] == case_id, f"{case_id} rule annotation mismatch")
@@ -272,7 +296,7 @@ def verify_case(
     actual_absent = {
         "ios:view:" + identifier
         for identifier, node in source_nodes.items()
-        if expected_mapping(node) != "mappedExactLayout"
+        if expected_mapping(node, source_nodes) != "mappedExactLayout"
     }
     require(expected_absent == actual_absent, f"{case_id} absent-target contract drift")
     return facts

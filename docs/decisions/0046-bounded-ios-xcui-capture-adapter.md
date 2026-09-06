@@ -110,10 +110,12 @@ simultaneous exact fact.
 
 Only a UIKit source View with a unique identifier, finite nonnegative size, identity transform,
 window attachment, non-hidden state, positive alpha, and nonempty window intersection may become a
-core node. The full source allocation, not the clipped intersection, becomes `layoutBox`, enabling
-the existing canvas-containment rule to detect a partly offscreen fixture mutation. Offscreen or
-unsupported source Views remain extension-only. XCUITest frames never repair or replace source
-geometry.
+core node. A direct `UIScrollView` content container whose source allocation is clipped by the
+window remains extension-only: its oversized allocation is valid scroll content, not evidence of a
+canvas-containment defect. The full source allocation of other admitted Views, not the clipped
+intersection, becomes `layoutBox`, enabling the existing canvas-containment rule to detect the
+partly offscreen fixture button mutation. Other offscreen or unsupported source Views remain
+extension-only. XCUITest frames never repair or replace source geometry.
 
 ## Coordinate spaces and reconciliation
 
@@ -259,6 +261,8 @@ Costs and limitations:
 - authentic recapture requires the pinned macOS/Xcode/simulator environment;
 - the corpus covers one UIKit fixture, device/runtime, locale, content size, and orientation;
 - XCUITest enumeration and simulator rendering may change across Apple toolchains;
+- the bounded mapping recognizes only a direct clipped `UIScrollView` content container; broader
+  scroll-axis and partial-child applicability require additional native facts and evaluation;
 - SwiftUI, custom containers, activation geometry, pixel identity, occlusion, dynamic interaction,
   focus navigation, and production application acquisition remain untested or unsupported;
 - there is no protected holdout or representative accuracy estimate.
