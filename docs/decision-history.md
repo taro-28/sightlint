@@ -429,7 +429,9 @@ Important historical detail:
 - ADR 0036 defines the one-command local Web orchestration and source-navigation report;
 - accepted ADR 0007 selects dual `MIT OR Apache-2.0` licensing;
 - ADR 0037 defines the source-only first alpha release and surface-specific compatibility policy;
-- new ADRs should continue at 0038 or later rather than silently reusing historical numbers.
+- ADR 0038 preserves read-only verification and immutable public tags after the unpublished
+  alpha.1 workflow-transport failure;
+- new ADRs should continue at 0039 or later rather than silently reusing historical numbers.
 
 Historical branch ADRs are useful design references only. Their `Status: Accepted` header applied
 inside an unmerged branch and does not make them accepted repository decisions.
@@ -456,3 +458,7 @@ Administrative issues #19 and #32 are resolved, and the bounded issue #34 alpha 
 complete. GitHub now enforces the documented `main`
 ruleset, squash-only merging, and automatic head-branch deletion; the legacy remote refs were
 removed after their unique intent was preserved in issues and this history.
+
+Release run 34000128047 is negative operational evidence: alpha.1 packaging and draft creation
+succeeded, but read-only verification jobs could not see draft release assets. Issue #47 and ADR
+0038 preserve the failure instead of widening every job to write access or moving the public tag.

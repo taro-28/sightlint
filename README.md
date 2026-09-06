@@ -6,7 +6,7 @@ SightLint is an architecture-first project for finding visual and interaction-qu
 web interfaces, mobile applications, slides, documents, PDFs, and images. It is designed for both
 humans and coding agents.
 
-> **Status: `v0.1.0-alpha.1`.** Do not depend on the current API. General screenshot-only UI/UX defect
+> **Status: `v0.1.0-alpha.2`.** Do not depend on the current API. General screenshot-only UI/UX defect
 > detection is not implemented. Current image inspection supplies a narrow, advisory-only region
 > and gap observation under explicit assumptions; it is not a semantic UX pass/fail verdict. Green
 > synthetic tests are not evidence of real-world design-review accuracy.
@@ -364,7 +364,7 @@ Read:
 | #34 | completed first evidence-backed zero-setup web UI alpha epic |
 
 Issue state alone does not prove implemented behavior. New architecture decisions continue at ADR
-0038 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
+0039 or later. Historical branch-only ADRs 0025–0029 are reference material and are mapped to
 current issues in the ADR index. Administrative issues #19 and #32 are complete: GitHub now
 enforces the documented `main` ruleset and automatically removes merged head branches, and the
 legacy branch set has been pruned.
@@ -413,6 +413,10 @@ documentation use the same terms unless a more specific notice says otherwise. T
 dependencies and browser downloads retain their own licenses; see
 [`docs/dependency-policy.md`](docs/dependency-policy.md).
 
-`v0.1.0-alpha.1` is distributed as a source archive/checksum GitHub prerelease. Rust crates remain
+`v0.1.0-alpha.2` is distributed as a source archive/checksum GitHub prerelease. Rust crates remain
 `publish = false` and the Node package remains private; no prebuilt binary, crates.io/npm package,
 container, signature, or attestation is claimed.
+
+The immutable `v0.1.0-alpha.1` tag is an unpublished failed workflow attempt, not a supported
+release. ADR 0038 records the read-only draft-asset failure and alpha.2 recovery without moving the
+old tag.

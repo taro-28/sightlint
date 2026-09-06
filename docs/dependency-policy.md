@@ -5,7 +5,7 @@ external tools retain their own terms.
 
 ## Current locked review
 
-The `v0.1.0-alpha.1` release candidate contains 36 external Cargo packages and 30 npm lockfile
+The `v0.1.0-alpha.2` release candidate contains 36 external Cargo packages and 30 npm lockfile
 package entries. `tools/check_dependency_licenses.py` reads the complete locked graphs and rejects
 missing declarations or identifiers outside this reviewed permissive set:
 
@@ -35,6 +35,11 @@ and advisory Rust plus JavaScript/TypeScript CodeQL are enabled. The release aud
 unresolved high-severity code-scanning findings and review of all open dependency alerts. Normal
 CI also runs `npm ci --ignore-scripts`, the license check, locked Cargo commands, and the full
 fixture/product test gate.
+
+Repository Actions policy requires immutable full-SHA references and permits only the official
+`actions/checkout`, `actions/upload-artifact`, `actions/download-artifact`, and
+`github/codeql-action` families in addition to owner actions. The artifact actions carry exact
+prepublication files inside the release workflow; they do not write repository source.
 
 The first alpha does not install a second registry scanner into the trusted kernel. GitHub-hosted
 advisory results are external sensor evidence and are read directly before release; a green

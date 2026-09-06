@@ -3,11 +3,14 @@
 SightLint versions each compatibility surface independently. The package version identifies one
 tested bundle; it does not replace schema, protocol, extension, rule, or evaluation versions.
 
-## `v0.1.0-alpha.1` surface inventory
+`v0.1.0-alpha.1` is an immutable, unpublished workflow attempt and has no supported compatibility
+surface. ADR 0038 makes alpha.2 the first published bundle rather than moving the old tag.
+
+## `v0.1.0-alpha.2` surface inventory
 
 | Surface | Current version or contract | Alpha compatibility rule |
 |---|---|---|
-| Rust workspace / `sightlint` binary | `0.1.0-alpha.1` | SemVer prerelease; breaking changes require release notes and a package-version change. |
+| Rust workspace / `sightlint` binary | `0.1.0-alpha.2` | SemVer prerelease; breaking changes require release notes and a package-version change. |
 | Artifact IR | `0.1.0` | Exact recognized core version; unknown namespaced extensions are preserved, while malformed recognized data is rejected. |
 | CheckReport | `0.3.0` | Consumers must inspect `reportSchemaVersion`; incompatible changes require a new report version. |
 | Visual extension | `org.sightlint.visual@0.1.0` | Recognized unsupported versions or malformed payloads are errors. |

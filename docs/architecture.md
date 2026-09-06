@@ -276,8 +276,9 @@ semantic reason, not snapshot blessing.
 - Public behavior needs real binary/process E2E and exact final-head plus post-merge CI.
 - The active `Protect main` ruleset and automatic merged-branch cleanup implement administrative
   issues #19 and #32; exact-head and post-merge verification remain mandatory.
-- Accepted ADR 0007 and ADR 0037 define dual licensing, surface-specific alpha compatibility,
-  source-only packaging, and the first release boundary from issue #33.
+- Accepted ADR 0007, ADR 0037, and ADR 0038 define dual licensing, surface-specific alpha
+  compatibility, source-only packaging, read-only prepublication verification, immutable tags,
+  and the first release boundary from issues #33/#47.
 - MCP, GitHub Checks, editor/browser UI, and other surfaces wrap the same kernel and are issue #31;
   they must not duplicate rule semantics.
 
