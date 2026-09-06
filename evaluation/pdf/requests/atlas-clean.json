@@ -1,0 +1,37 @@
+{
+  "artifact": {
+    "id": "pdf-atlas-clean",
+    "title": "Atlas operating review clean PDF"
+  },
+  "execution": {
+    "maxAnnotations": 16,
+    "maxAnnotationsPerPage": 8,
+    "maxInputBytes": 1048576,
+    "maxObjects": 100,
+    "maxOutputBytes": 1048576,
+    "maxPages": 4,
+    "maxRenderBytes": 4194304
+  },
+  "input": {
+    "reference": "fixtures/pdf/atlas-clean.pdf",
+    "sha256": "sha256:675897c4c1cee2127f5f1e4253f5fb969e4d4c599c1c47caf282724e766dc7f3"
+  },
+  "privacy": {
+    "contentPolicy": "geometryAndTypeOnly",
+    "externalProcessing": false,
+    "retention": "none"
+  },
+  "protocolVersion": "0.1.0",
+  "renders": [
+    {
+      "pageIndex": 1,
+      "pdfPointsPerPixel": {
+        "denominator": 1,
+        "numerator": 1
+      },
+      "reference": "evaluation/pdf/renders/atlas-clean.png",
+      "sha256": "sha256:343ed41c651202cc50243c44fa0cbe3535e95e52d4d671e27fabca3df1e151f3"
+    }
+  ],
+  "requestId": "pdf-atlas-clean"
+}

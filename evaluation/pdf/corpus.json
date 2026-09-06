@@ -1,0 +1,93 @@
+{
+  "cases": [
+    {
+      "acquisitionAnnotationId": "pdf-atlas-clean-acquisition",
+      "id": "pdf-atlas-clean",
+      "input": {
+        "path": "fixtures/pdf/atlas-clean.pdf",
+        "sha256": "sha256:675897c4c1cee2127f5f1e4253f5fb969e4d4c599c1c47caf282724e766dc7f3"
+      },
+      "relation": {
+        "kind": "baseline"
+      },
+      "render": {
+        "path": "evaluation/pdf/renders/atlas-clean.png",
+        "sha256": "sha256:343ed41c651202cc50243c44fa0cbe3535e95e52d4d671e27fabca3df1e151f3"
+      },
+      "request": {
+        "path": "evaluation/pdf/requests/atlas-clean.json",
+        "sha256": "sha256:903b4c76b8e0ea25cd373fba04ba6902ab28a90fbaa7cc725243efe2ba3da8e3"
+      },
+      "ruleAnnotationId": "pdf-atlas-clean-rules",
+      "split": "smoke"
+    },
+    {
+      "acquisitionAnnotationId": "pdf-atlas-off-page-mutant-acquisition",
+      "id": "pdf-atlas-off-page-mutant",
+      "input": {
+        "path": "fixtures/pdf/atlas-off-page-mutant.pdf",
+        "sha256": "sha256:370b77e231e403a96b6cb80652fe57a45ded6d1aabde59e25b3c9f77fd7ac06d"
+      },
+      "relation": {
+        "baselineId": "pdf-atlas-clean",
+        "changedProperty": "Only Link annotation object 9 0 R Rect moves from [430 54 564 90] to [540 54 674 90]; page content and rendered pixels remain identical.",
+        "kind": "targetedMutation"
+      },
+      "render": {
+        "path": "evaluation/pdf/renders/atlas-off-page-mutant.png",
+        "sha256": "sha256:343ed41c651202cc50243c44fa0cbe3535e95e52d4d671e27fabca3df1e151f3"
+      },
+      "request": {
+        "path": "evaluation/pdf/requests/atlas-off-page-mutant.json",
+        "sha256": "sha256:c0a3b7126d53c68a98277b388351d0e6f0617b74f30cb503bfb6c955d739250d"
+      },
+      "ruleAnnotationId": "pdf-atlas-off-page-mutant-rules",
+      "split": "development"
+    },
+    {
+      "acquisitionAnnotationId": "pdf-atlas-quadpoints-hard-negative-acquisition",
+      "id": "pdf-atlas-quadpoints-hard-negative",
+      "input": {
+        "path": "fixtures/pdf/atlas-quadpoints-hard-negative.pdf",
+        "sha256": "sha256:bc450a410dc3b561576770edaeb62ea21410830fb66fde15fc9fbdd725bdf163"
+      },
+      "relation": {
+        "baselineId": "pdf-atlas-clean",
+        "changedProperty": "The page composition is intentionally asymmetric and Link object 9 0 R uses two QuadPoints activation regions inside its Rect; no peer relation is declared.",
+        "kind": "hardNegative"
+      },
+      "render": {
+        "path": "evaluation/pdf/renders/atlas-quadpoints-hard-negative.png",
+        "sha256": "sha256:e6801eb7437bd75989159c009a2e405dd89cca8c24088e2a2e4b599a0b28ae29"
+      },
+      "request": {
+        "path": "evaluation/pdf/requests/atlas-quadpoints-hard-negative.json",
+        "sha256": "sha256:41fec57bc8f9455acb092fd8609cfb2ccafc7a6ce3292ea8025aa4466dc8b685"
+      },
+      "ruleAnnotationId": "pdf-atlas-quadpoints-hard-negative-rules",
+      "split": "challenge"
+    }
+  ],
+  "corpusVersion": "0.1.0",
+  "holdout": {
+    "reason": "All three generated cases and labels are public to implementers and maintainer-authored; no frozen inaccessible sample or leakage-control process exists.",
+    "status": "notEstablished"
+  },
+  "source": {
+    "fixtureGenerator": "tools/generate_pdf_fixtures.py",
+    "license": "MIT OR Apache-2.0",
+    "origin": "repositoryOwnedFixture",
+    "ownership": "SightLint project",
+    "privacy": "fictionalNoPersonalOrCustomerData",
+    "redistribution": "permitted",
+    "renderPipeline": "pdftoppm-cropbox-singlefile-png-r72",
+    "renderer": "pdftoppm",
+    "rendererVersion": "26.05.0",
+    "review": "maintainerAuthoredNotIndependent"
+  },
+  "splitPolicy": {
+    "challenge": "Public hard negative used to test abstention and false-positive behavior; visible during implementation.",
+    "development": "Visible targeted source-only mutation used for implementation and regression tuning.",
+    "smoke": "Required clean baseline for the public adapter and binary path on every change."
+  }
+}
