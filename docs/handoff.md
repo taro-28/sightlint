@@ -5,21 +5,20 @@ another local coding-agent environment. It is intentionally explicit: a new sess
 to determine the trusted source of truth, current capability, next task, decision background,
 quality gates, and historical traps without access to the chat that created the repository.
 
-Last handoff preparation: 2026-09-07.
+Last handoff preparation: 2026-09-08.
 
 ## Start here
 
 The authoritative development line is the latest green commit on `main`.
 
-The branch for issue #78, the source-only review-operation foundation required before a reviewer
-can submit issue #77 in a machine-checkable form, started from this verified green `main`
+The branch for issue #80, the local Harbor review workbench that removes mechanical authoring from
+the first issue #77 pilot, started from this verified green `main`
 baseline:
 
-- commit: `5e85742561f017d8b27b0ae5c050c9a14f9277f9`
-- tree: `f3b5cef20b484f1a7a325fc189d4b2a991a4e272`
-- merged PR: #76
-- main CI: run 34047816219, all six jobs successful
-- main CodeQL: run 34047815983, all four language jobs successful
+- commit: `395dbcef4f0a14dea4ec75d3dd00c4875bd6f096`
+- tree: `beb4a64e13238db1e025f89784765d13fa452891`
+- main CI: run 34063772054, all six jobs successful
+- main CodeQL: run 34063771926, all four language jobs successful
 
 Never hard-code the recorded baseline as a branch base; verify the latest `main`, its exact CI,
 and the release page.
@@ -430,8 +429,9 @@ fixture source files and their 27 local capture requests. Its fixed allowlist re
 Artifact IR, screenshots, reports, diagnostics, implementation output, current acquisition/rule
 oracles, and expected verdicts. `reviewer-submission.blank.json` contains no answers.
 
-`tools/prepare_web_review.py` checks generator drift, validates packet/submission structure, and
-can finalize reviewer-authored answers by changing only lifecycle and canonical SHA-256 digest.
+`tools/prepare_web_review.py` checks generator drift, validates packet/questionnaire/submission
+structure, and can finalize reviewer-authored answers by changing only lifecycle and canonical
+SHA-256 digest.
 Acquisition judgments and rule judgments remain separate; unavailable measurements stay null;
 native and pixel evidence/conflict, confidence, rationale, hard negatives, and all five rule
 outcomes remain explicit. `tools/compare_web_review.py` verifies finalization before opening the
@@ -446,6 +446,23 @@ agreement, disagreement, unresolved, outcome, and hard-negative paths prove prot
 only. These tools do not create human judgment, verify a person or signature, close #77, make #74
 operational, or establish protected-holdout performance, representative accuracy, WCAG
 conformance, or blocking maturity.
+
+ADR 0054 and issue #80 add the preferred first-pass Harbor authoring path. The fixed,
+packet-digest-bound `harbor-review-questionnaire.json` contains exactly four Harbor cases and two
+answer-free questions per case: one browser-native accessible-name observation and one advisory
+interactive-name rule verdict. `tools/run_web_review.py` serves only loopback workbench assets,
+those three fixture files from validated packet bytes, and a bounded same-origin API. It supplies
+IDs, policy metadata, applicability mappings, digests, and serialization, while the reviewer owns
+the eight statuses/outcomes, confidence values, and rationales plus one declaration. Draft state
+is strict, resumable, outside the repository, and not evidence; final output is exclusively
+created and locked before the separate comparator may run.
+
+The browser-process E2E uses an explicitly fictional, fully exposed record and proves all four
+fixture states, save/resume/finalize, byte stability, fail-closed HTTP/state/privacy/path limits,
+and operation from an isolated source tree containing no oracle or comparator. That test is not a
+human review or accuracy result. Issue #77 remains open: Phase A still needs the real eight Harbor
+judgments and governance review; Atlas remains a later Phase B workload decision. Issue #74 still
+requires external protected-data authorities.
 
 ### Playwright Web acquisition and evidence matrix
 
@@ -945,7 +962,7 @@ Do not infer these capabilities from the architecture or closed experimental bra
 - baseline/semantic visual diff beyond current explicit contracts;
 - blocking recommended Web rules, project overrides, or representative real-world rule evidence;
 - completed independent Web annotation review or an operational, externally controlled protected
-  holdout; review packet tooling is not review evidence;
+  holdout; review packet/workbench tooling is not review evidence;
 - broad interaction support beyond the controlled Atlas slice, including offline, permission,
   stale-data, partial success, destructive safeguards, undo, focus/navigation, and mobile traces;
 - MCP, an independent REST-published GitHub App check, editor extension, browser extension, or
@@ -996,13 +1013,17 @@ additional-medium breadth, or more distribution surfaces.
    packet, strict submission schema, digest finalization, fictional conformance record, and
    read-only comparison make issue #77 reviewable without supplying its answers. They are not
    independent-review or holdout evidence.
-4. **#77 — real Atlas/Harbor human review (next human gate).** A qualified reviewer must author
+4. **#80 — minimal Harbor workbench (implemented by ADR 0054).** The local-only, fixed
+   questionnaire removes manual JSON and metadata transcription from the first pilot while
+   leaving all eight substantive judgments human-authored. Fictional E2E is not review evidence.
+5. **#77 — real Atlas/Harbor human review (next human gate).** A qualified reviewer must author
    and finalize the actual submission before seeing the current oracles, then preserve every
-   disagreement and any later independent adjudication. Tooling cannot perform this role.
-5. **#74 — protected holdout operation (externally gated).** Use a
+   disagreement and any later independent adjudication. Start with the four-case Harbor workbench;
+   decide the Atlas Phase B workload separately. Tooling cannot perform this role.
+6. **#74 — protected holdout operation (externally gated).** Use a
    separately controlled bundle, qualified independent evaluator, second verifier, exposure log,
    and detached signatures; do not relabel public fixtures or fictional identities as evidence.
-6. **Later focused children — rule and adapter expansion.** Select one evidence-backed candidate
+7. **Later focused children — rule and adapter expansion.** Select one evidence-backed candidate
    at a time only after the earlier evaluation gate supplies its applicability and false-positive
    evidence.
 
@@ -1146,6 +1167,7 @@ python3 tools/check_web_evaluation_v1.py
 python3 tools/check_web_holdout_foundation.py
 python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
 python3 tools/prepare_web_review.py --check
+python3 tools/prepare_web_review.py --validate-questionnaire evaluation/web/harbor-review-questionnaire.json
 python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
 python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
 python3 tools/check_perception_evaluation.py

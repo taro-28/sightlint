@@ -1,7 +1,7 @@
 # Public Web review operations guide v1
 
 - Guide version: `1.0.0`
-- Governing decision: ADR 0053
+- Governing decisions: ADR 0053 and ADR 0054
 - Human task: issue #77
 - Operational holdout: issue #74, separately gated
 
@@ -31,12 +31,47 @@ the review.
 The packet's screenshot field is only the logical output reference already present in a capture
 request. No screenshot bytes are embedded.
 
-## Authoring a submission
+## Preferred minimal Harbor pilot
+
+For the first #77 phase, use the local workbench rather than hand-authoring the general submission
+schema. Choose an existing private working directory outside this repository, then run:
+
+```bash
+python3 tools/run_web_review.py \
+  --scope harbor \
+  --draft /outside/the/repository/harbor-draft.json \
+  --final /outside/the/repository/harbor-final.json \
+  --no-open
+```
+
+Paste the printed loopback URL into a clean local browser profile with extensions and browser sync
+disabled. The capability token stays in the URL fragment and browser memory; do not share it. The
+server exposes only the fixed workbench, three repository-owned Harbor fixture files from the
+validated packet bytes, and the four admitted fixture states. It has no arbitrary URL, file, or
+command input and sends no data externally.
+
+Complete the reviewer declaration once. Then inspect the fixed send-action target with native
+browser accessibility tools and supply only two substantive judgments per case:
+
+1. whether its native accessible name is observed as text, observed as absent, `cantTell`, or
+   `untested`, with confidence and a short factual rationale; and
+2. the advisory interactive-name rule outcome plus evidence sufficiency, confidence, and a short
+   rationale.
+
+That is eight substantive judgments total. The workbench supplies identifiers, packet and
+questionnaire bindings, rule metadata, policy text, compatible applicability mapping, canonical
+serialization, and digests. It does not suggest an answer. Save can persist an incomplete draft;
+restart the same command with `--resume` to reopen it. Finalize requires every declaration and
+judgment, exclusively creates the final file, locks the process, and only then displays the
+separate comparison command. Keep both files outside the repository until governance and privacy
+review are complete.
+
+## General or Atlas submission authoring
 
 Copy `evaluation/web/reviewer-submission.blank.json` to a working location outside the repository.
-Do not edit the generated blank file in place. For a Harbor pilot, keep only the four Harbor cases,
-set `reviewScope.familyIds` and `reviewScope.caseIds` to exactly that sorted scope, and set
-`completeForDeclaredScope` only after every retained case has at least one reviewed judgment.
+Do not edit the generated blank file in place. This manual path remains available for Atlas,
+non-workbench scopes, and schema development; it is no longer the preferred Harbor pilot path.
+Set `completeForDeclaredScope` only after every retained case has at least one reviewed judgment.
 
 Replace every reviewer placeholder factually:
 

@@ -65,9 +65,9 @@ Every question names metadata that follows from the public source and executable
 The questionnaire records the exact source-packet ID and digest, its own canonical SHA-256 digest,
 the four case/request/source bindings, public fictional provenance, dual-license basis, local-only
 processing requirement, and pilot limitations. Generator drift and strict validation bind the
-tool to those reviewed bytes. The questionnaire does not classify a case as clean, mutation,
-hard negative, or ambiguous for the reviewer; the generated submission uses a neutral case
-context.
+tool to those reviewed bytes. It adds no case-classification or expected-verdict field; the
+source-first reviewer can still see the pre-existing packet case/state identifiers, including
+their descriptive names. The generated submission uses a neutral case context.
 
 ## Human-supplied and mechanical fields
 

@@ -118,7 +118,7 @@ perception protocol foundation without semantic promotion or model-accuracy clai
 0043–0046 add bounded PPTX, PDF, instrumented Android, and UIKit/XCUITest iOS slices under #29.
 They establish public regression paths, not representative medium accuracy.
 
-### Current evidence expansion — #71 / #72 / #75 / #78 / #77 / #74
+### Current evidence expansion — #71 / #72 / #75 / #78 / #80 / #77 / #74
 
 Issue #71 is the post-alpha evidence-first roadmap epic. Its first child, #72, adds ADR 0051 and an
 additive multi-family Web registry without changing the historical `0.1.0` declared-IR corpus.
@@ -147,8 +147,14 @@ keeps acquisition and rule judgments separate, canonical finalization locks revi
 bytes, and a separate read-only process compares only after that lock. Fictional conformance data
 exercises agreement, disagreement, unresolved, abstention, hard-negative, and all five outcome
 states but is explicitly ineligible evidence. The tools cannot supply human judgment or verify
-reviewer identity, qualification, independence, conflicts, or signatures. Issue #77 remains the
-next human gate; issue #74 remains separately gated on protected data and external authorities.
+reviewer identity, qualification, independence, conflicts, or signatures. Issue #80 and ADR 0054
+then narrow the first Harbor pass to eight substantive human judgments in a local-only workbench:
+one native accessible-name observation and one advisory rule verdict for each of four packet-bound
+cases. The tool automates only metadata, persistence, digest locking, and serialization. It does
+not perform the review, expose an oracle before lock, or turn fictional E2E answers into evidence.
+Issue #77 remains the next human gate in two phases: the minimal Harbor pilot first, followed by an
+explicit Atlas workload decision. Issue #74 remains separately gated on protected data and
+external authorities.
 
 ## Scope-selection rules
 

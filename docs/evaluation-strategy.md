@@ -192,6 +192,20 @@ The committed reviewer and answers are fictional conformance data with full labe
 they measure protocol behavior rather than human agreement. Actual review remains issue #77;
 protected execution and external governance remain issue #74.
 
+ADR 0054 adds a smaller Harbor-only authoring path for the first #77 pilot. Its generated
+questionnaire fixes four cases and exactly two answer-free questions per case, keeps acquisition
+truth separate from rule-verdict truth, and binds the displayed repository-owned fixture bytes to
+the existing packet digest. A loopback-only workbench automates metadata, draft persistence,
+canonical finalization, and the post-lock comparison command; it never opens an oracle, runs
+SightLint, or generates a substantive answer before finalization. Observed missing names remain
+distinct from `cantTell`, hard-negative risk stays explicit in the rule contract, and all five
+rule outcomes remain available.
+
+The workbench conformance E2E deliberately declares full expected-label exposure and is
+permanently evidence-ineligible. It proves process/security behavior, not reviewer agreement or
+product validity. The real Phase A record still requires a qualified reviewer to provide eight
+Harbor judgments; Atlas review and the protected-holdout operation remain separate later gates.
+
 ADR 0036 adds a separate public agent-workflow oracle and E2E. The test runs one combined local
 capture/check command, joins the reviewed finding to a native selector and source bundle, applies
 one human-authored edit only in a temporary fixture copy, and requires the named finding to
