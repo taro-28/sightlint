@@ -20,6 +20,7 @@ const stateSchemaPath = resolve(repositoryRoot, "evaluation/web/harbor-review-wo
 const submissionSchemaPath = resolve(repositoryRoot, "evaluation/web/reviewer-submission.schema.json");
 const questionnaireSchemaPath = resolve(repositoryRoot, "evaluation/web/harbor-review-questionnaire.schema.json");
 const python = process.env["PYTHON"] ?? (process.platform === "win32" ? "python" : "python3");
+const platformNewline = process.platform === "win32" ? "\r\n" : "\n";
 
 type JsonObject = Record<string, unknown>;
 
@@ -562,8 +563,13 @@ test("the workbench process fails closed at HTTP, state, privacy, and output bou
 
     const common = ["--scope", "harbor", "--draft", join(directory, "cli-draft.json"), "--final", join(directory, "cli-final.json"), "--no-open"];
     const nonLoopback = await run(python, [runWorkbench, ...common, "--host", "0.0.0.0"]);
+    const repeatedNonLoopback = await run(python, [runWorkbench, ...common, "--host", "0.0.0.0"]);
+    assert.deepEqual(repeatedNonLoopback, nonLoopback, "failure process behavior must be byte-stable per platform");
     assert.equal(nonLoopback.code, 2);
-    assert.equal(nonLoopback.stderr.toString("utf8"), "web-review-workbench: host: workbench host must be exactly 127.0.0.1\n");
+    assert.equal(
+      nonLoopback.stderr.toString("utf8"),
+      `web-review-workbench: host: workbench host must be exactly 127.0.0.1${platformNewline}`,
+    );
 
     const inside = await run(python, [runWorkbench, "--scope", "harbor", "--draft", resolve(repositoryRoot, "forbidden-draft.json"), "--final", join(directory, "unused-final.json"), "--no-open"]);
     assert.equal(inside.code, 2);
