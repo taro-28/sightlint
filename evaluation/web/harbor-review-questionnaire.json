@@ -1,0 +1,269 @@
+{
+  "$schema": "./harbor-review-questionnaire.schema.json",
+  "schemaVersion": "1.0.0",
+  "documentType": "harborReviewQuestionnaire",
+  "questionnaireId": "sightlint-harbor-accessible-name-pilot-v1",
+  "questionnaireDigest": "sha256:87869e143ed2c3987425d227d63167e84ea48f7d9895d48acdd798c11eede841",
+  "recordPurpose": "publicSourceOnlyReviewQuestions",
+  "evidenceEligible": false,
+  "packetBinding": {
+    "packetId": "sightlint-atlas-harbor-source-review-v1",
+    "packetDigest": "sha256:1a3d68b377ab30681d71e0cb0b3634a341c8d0b899fae70079c6f935e02652a3"
+  },
+  "scope": {
+    "familyId": "harbor-support-inbox-v1",
+    "caseIds": [
+      "support-inbox-ambiguous-control",
+      "support-inbox-clean",
+      "support-inbox-labelledby-hard-negative",
+      "support-inbox-unnamed-control"
+    ],
+    "substantiveJudgmentCount": 8
+  },
+  "source": {
+    "fixturePaths": [
+      "evaluation/web/support-inbox-app/app.js",
+      "evaluation/web/support-inbox-app/index.html",
+      "evaluation/web/support-inbox-app/styles.css"
+    ],
+    "targetSelector": "[data-testid=\"reply-send\"]",
+    "targetNodeId": "web-reply-send",
+    "renderedFromPacketBytes": true
+  },
+  "questions": [
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "requestPath": "evaluation/web/requests/support-inbox-ambiguous-control.json",
+      "requestDigest": "sha256:807e3fd1fc98b15e3f0c8c779f980f972f38c6a0e2a9da8da883a49fc9d506f2",
+      "fixtureState": "ambiguous-control",
+      "questionId": "support-inbox-ambiguous-control.acquisition.name",
+      "authority": "acquisition",
+      "prompt": "Inspect browser-native accessibility information for the fixed send-action target. Is its accessible name observed as text, observed as absent, unavailable, or untested?",
+      "subject": {
+        "kind": "node",
+        "id": "web-reply-send"
+      },
+      "aspect": "name",
+      "allowedStatuses": [
+        "cantTell",
+        "observed",
+        "untested"
+      ],
+      "allowedObservedValueKinds": [
+        "absent",
+        "text"
+      ],
+      "evidenceSource": "browserNativeAccessibility"
+    },
+    {
+      "caseId": "support-inbox-ambiguous-control",
+      "requestPath": "evaluation/web/requests/support-inbox-ambiguous-control.json",
+      "requestDigest": "sha256:807e3fd1fc98b15e3f0c8c779f980f972f38c6a0e2a9da8da883a49fc9d506f2",
+      "fixtureState": "ambiguous-control",
+      "questionId": "support-inbox-ambiguous-control.rule.interactive-name",
+      "authority": "rule",
+      "prompt": "Using the independently reviewed native evidence, what is the outcome of the advisory interactive-name rule for the fixed send-action target?",
+      "ruleId": "web.accessibility.interactive-name",
+      "ruleVersion": "0.1.0",
+      "targetKind": "node",
+      "targetId": "web-reply-send",
+      "targetAspect": null,
+      "allowedOutcomes": [
+        "cantTell",
+        "failed",
+        "inapplicable",
+        "passed",
+        "untested"
+      ],
+      "allowedRequiredEvidence": [
+        "conflicting",
+        "insufficient",
+        "sufficient",
+        "untested"
+      ],
+      "policyBasis": "sightlint:recommended; wcag:4.1.2-name-role-value version 2.2; docs/rules.md",
+      "falsePositiveRisk": "A valid native name source or a role outside the conservative applicability set could be overlooked.",
+      "falseNegativeRisk": "Source intent or visible iconography could be mistaken for an observed native programmatic name."
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "requestPath": "evaluation/web/requests/support-inbox-clean.json",
+      "requestDigest": "sha256:93e4f2d81d38acf7e13ebaa7c0f88b7e50fbffe41378a160868e07046edb4d1b",
+      "fixtureState": "clean",
+      "questionId": "support-inbox-clean.acquisition.name",
+      "authority": "acquisition",
+      "prompt": "Inspect browser-native accessibility information for the fixed send-action target. Is its accessible name observed as text, observed as absent, unavailable, or untested?",
+      "subject": {
+        "kind": "node",
+        "id": "web-reply-send"
+      },
+      "aspect": "name",
+      "allowedStatuses": [
+        "cantTell",
+        "observed",
+        "untested"
+      ],
+      "allowedObservedValueKinds": [
+        "absent",
+        "text"
+      ],
+      "evidenceSource": "browserNativeAccessibility"
+    },
+    {
+      "caseId": "support-inbox-clean",
+      "requestPath": "evaluation/web/requests/support-inbox-clean.json",
+      "requestDigest": "sha256:93e4f2d81d38acf7e13ebaa7c0f88b7e50fbffe41378a160868e07046edb4d1b",
+      "fixtureState": "clean",
+      "questionId": "support-inbox-clean.rule.interactive-name",
+      "authority": "rule",
+      "prompt": "Using the independently reviewed native evidence, what is the outcome of the advisory interactive-name rule for the fixed send-action target?",
+      "ruleId": "web.accessibility.interactive-name",
+      "ruleVersion": "0.1.0",
+      "targetKind": "node",
+      "targetId": "web-reply-send",
+      "targetAspect": null,
+      "allowedOutcomes": [
+        "cantTell",
+        "failed",
+        "inapplicable",
+        "passed",
+        "untested"
+      ],
+      "allowedRequiredEvidence": [
+        "conflicting",
+        "insufficient",
+        "sufficient",
+        "untested"
+      ],
+      "policyBasis": "sightlint:recommended; wcag:4.1.2-name-role-value version 2.2; docs/rules.md",
+      "falsePositiveRisk": "A valid native name source or a role outside the conservative applicability set could be overlooked.",
+      "falseNegativeRisk": "Source intent or visible iconography could be mistaken for an observed native programmatic name."
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "requestPath": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json",
+      "requestDigest": "sha256:5bdffed88c1c87eeb6550d3efc8bcbac6515bc102dd19fb69729773402a3e25d",
+      "fixtureState": "labelledby-hard-negative",
+      "questionId": "support-inbox-labelledby-hard-negative.acquisition.name",
+      "authority": "acquisition",
+      "prompt": "Inspect browser-native accessibility information for the fixed send-action target. Is its accessible name observed as text, observed as absent, unavailable, or untested?",
+      "subject": {
+        "kind": "node",
+        "id": "web-reply-send"
+      },
+      "aspect": "name",
+      "allowedStatuses": [
+        "cantTell",
+        "observed",
+        "untested"
+      ],
+      "allowedObservedValueKinds": [
+        "absent",
+        "text"
+      ],
+      "evidenceSource": "browserNativeAccessibility"
+    },
+    {
+      "caseId": "support-inbox-labelledby-hard-negative",
+      "requestPath": "evaluation/web/requests/support-inbox-labelledby-hard-negative.json",
+      "requestDigest": "sha256:5bdffed88c1c87eeb6550d3efc8bcbac6515bc102dd19fb69729773402a3e25d",
+      "fixtureState": "labelledby-hard-negative",
+      "questionId": "support-inbox-labelledby-hard-negative.rule.interactive-name",
+      "authority": "rule",
+      "prompt": "Using the independently reviewed native evidence, what is the outcome of the advisory interactive-name rule for the fixed send-action target?",
+      "ruleId": "web.accessibility.interactive-name",
+      "ruleVersion": "0.1.0",
+      "targetKind": "node",
+      "targetId": "web-reply-send",
+      "targetAspect": null,
+      "allowedOutcomes": [
+        "cantTell",
+        "failed",
+        "inapplicable",
+        "passed",
+        "untested"
+      ],
+      "allowedRequiredEvidence": [
+        "conflicting",
+        "insufficient",
+        "sufficient",
+        "untested"
+      ],
+      "policyBasis": "sightlint:recommended; wcag:4.1.2-name-role-value version 2.2; docs/rules.md",
+      "falsePositiveRisk": "A valid native name source or a role outside the conservative applicability set could be overlooked.",
+      "falseNegativeRisk": "Source intent or visible iconography could be mistaken for an observed native programmatic name."
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "requestPath": "evaluation/web/requests/support-inbox-unnamed-control.json",
+      "requestDigest": "sha256:575d03c6c77024cbf536c8c6254530b10a21c2577eb578d900b54961aab14925",
+      "fixtureState": "unnamed-control-mutant",
+      "questionId": "support-inbox-unnamed-control.acquisition.name",
+      "authority": "acquisition",
+      "prompt": "Inspect browser-native accessibility information for the fixed send-action target. Is its accessible name observed as text, observed as absent, unavailable, or untested?",
+      "subject": {
+        "kind": "node",
+        "id": "web-reply-send"
+      },
+      "aspect": "name",
+      "allowedStatuses": [
+        "cantTell",
+        "observed",
+        "untested"
+      ],
+      "allowedObservedValueKinds": [
+        "absent",
+        "text"
+      ],
+      "evidenceSource": "browserNativeAccessibility"
+    },
+    {
+      "caseId": "support-inbox-unnamed-control",
+      "requestPath": "evaluation/web/requests/support-inbox-unnamed-control.json",
+      "requestDigest": "sha256:575d03c6c77024cbf536c8c6254530b10a21c2577eb578d900b54961aab14925",
+      "fixtureState": "unnamed-control-mutant",
+      "questionId": "support-inbox-unnamed-control.rule.interactive-name",
+      "authority": "rule",
+      "prompt": "Using the independently reviewed native evidence, what is the outcome of the advisory interactive-name rule for the fixed send-action target?",
+      "ruleId": "web.accessibility.interactive-name",
+      "ruleVersion": "0.1.0",
+      "targetKind": "node",
+      "targetId": "web-reply-send",
+      "targetAspect": null,
+      "allowedOutcomes": [
+        "cantTell",
+        "failed",
+        "inapplicable",
+        "passed",
+        "untested"
+      ],
+      "allowedRequiredEvidence": [
+        "conflicting",
+        "insufficient",
+        "sufficient",
+        "untested"
+      ],
+      "policyBasis": "sightlint:recommended; wcag:4.1.2-name-role-value version 2.2; docs/rules.md",
+      "falsePositiveRisk": "A valid native name source or a role outside the conservative applicability set could be overlooked.",
+      "falseNegativeRisk": "Source intent or visible iconography could be mistaken for an observed native programmatic name."
+    }
+  ],
+  "governance": {
+    "ownership": "sightlintRepository",
+    "license": "MIT OR Apache-2.0",
+    "privacyReview": "syntheticNoPersonalData",
+    "containsPersonalOrCustomerData": false,
+    "containsCredentials": false,
+    "externalAssets": false,
+    "externalNetwork": false,
+    "externalProcessing": false,
+    "exposure": "publicTuningVisible",
+    "answerSource": "independentHumanOnly"
+  },
+  "limitations": [
+    "The questionnaire contains no expected observation, expected verdict, or suggested answer.",
+    "This is a source-first public Harbor pilot, not a blind review or protected holdout.",
+    "The pilot reviews one native accessible-name observation and one advisory rule outcome per case.",
+    "Pixels, geometry, other rules, Atlas, reviewer identity, and representative accuracy remain outside this pilot."
+  ]
+}
