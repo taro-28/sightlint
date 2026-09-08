@@ -212,7 +212,10 @@ test("generation, finalization, and comparison are byte-stable and comparison is
   const secondCheck = await pythonRun(prepare, ["--check"]);
   assert.deepEqual(secondCheck, firstCheck);
   assert.equal(firstCheck.code, 0, firstCheck.stderr.toString("utf8"));
-  assert.equal(firstCheck.stdout.toString("utf8"), "web review prepare: packet=valid, blank_submission=valid, drift=false\n");
+  assert.equal(
+    firstCheck.stdout.toString("utf8"),
+    "web review prepare: packet=valid, questionnaire=valid, blank_submission=valid, drift=false\n",
+  );
 
   const directory = await mkdtemp(join(tmpdir(), "sightlint-web-review-"));
   try {

@@ -70,6 +70,7 @@ jobs:
           python3 tools/check_web_holdout_foundation.py
           python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
           python3 tools/prepare_web_review.py --check
+          python3 tools/prepare_web_review.py --validate-questionnaire evaluation/web/harbor-review-questionnaire.json
           python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
           python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json > /dev/null
       - name: Verify perception evaluation governance
@@ -299,8 +300,14 @@ jobs:
       - name: Verify source-only Web review operations
         run: |
           ${{ matrix.python }} tools/prepare_web_review.py --check
+          ${{ matrix.python }} tools/prepare_web_review.py --validate-questionnaire evaluation/web/harbor-review-questionnaire.json
           ${{ matrix.python }} tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
           ${{ matrix.python }} tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
+      - name: Verify local Harbor workbench process
+        run: |
+          npm run build
+          node --test --test-name-pattern="workbench process fails closed|source-only tree" dist/tests/review-workbench-e2e.test.js
+        working-directory: adapters/playwright
       - name: Run tests, including CLI E2E and product evaluation
         run: cargo test --workspace --all-features --locked
       - name: Run perception protocol and public-process E2E
