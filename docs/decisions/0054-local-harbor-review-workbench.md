@@ -83,8 +83,8 @@ The reviewer supplies the declaration once:
 
 For each of the four cases, the reviewer supplies exactly two substantive judgment records:
 
-1. acquisition status (`observed`, `cantTell`, or `untested`), an accessible-name value only when
-   observed, confidence, and a short factual rationale; and
+1. acquisition status (`observed`, `cantTell`, or `untested`), an explicit observed-value kind,
+   confidence, and a short factual rationale; and
 2. rule outcome, required-evidence state, confidence, and a short rationale.
 
 The workbench may derive only mechanically forced fields. It supplies IDs, bindings, rule and
@@ -94,11 +94,14 @@ rule outcome to the only compatible applicability value: pass/fail to `applicabl
 `inapplicable` to `inapplicable`, `cantTell` to `cantTell`, and `untested` to `untested`. It rejects
 an incompatible required-evidence combination instead of repairing or guessing it.
 
-For the acquisition record, `observed` requires a reviewer value and maps native evidence to
-available. `cantTell` and `untested` require a null value and reuse the reviewer's rationale as the
-unavailable-evidence explanation. Pixel evidence is `notApplicable` and the native/pixel
-relationship is `notCompared`; the programmatic name is not inferred from pixels. These mappings
-are serialization consequences of the human choice, not additional observations.
+For the acquisition record, an observed value kind distinguishes `text` from `absent`. `text`
+requires a non-empty reviewer string. `absent` serializes to an observed null value, representing
+native evidence that no accessible name exists; it is not an evidence-insufficient `cantTell`.
+`cantTell` and `untested` require no value kind and serialize a null value while reusing the
+reviewer's rationale as the unavailable-evidence explanation. Observed states map native evidence
+to available. Pixel evidence is `notApplicable` and the native/pixel relationship is
+`notCompared`; the programmatic name is not inferred from pixels. These mappings are serialization
+consequences of the human choice, not additional observations.
 
 The generated submission remains version `1.0.0`. The existing validator and comparator remain
 the authorities, and handwritten/general submissions remain supported. The workbench records its
@@ -157,6 +160,12 @@ limit is a protocol constant and is tested at the boundary and one byte over. St
 ADR 0053 bounds, case and question inventories are fixed, JSON numbers are finite, and unknown
 fields, duplicate keys, duplicate cases, invalid enum combinations, invalid dates, guessed
 unavailable values, privacy leakage, URL/path material, and credential-like content fail closed.
+
+A strict workbench-state schema represents incomplete local progress without pretending that it is
+a reviewer submission. It binds the packet and questionnaire, keeps exactly four answer slots,
+allows null or empty draft fields, carries a canonical state digest, and is never evidence. This
+separate draft contract prevents placeholder values or half-entered answers from being promoted
+into the existing submission schema.
 
 A draft can be saved while incomplete. Finalization requires complete reviewer declarations and
 all eight judgments, converts the minimal state to a reviewer submission, validates it, and calls
