@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SightLint Harbor review workbench</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Local source-only review</p>
+        <h1>Harbor accessible-name pilot</h1>
+        <p>Four cases, two human judgments per case. No oracle or SightLint output is available here.</p>
+      </div>
+      <div class="progress" aria-live="polite">
+        <strong id="progress-count">0 / 8</strong>
+        <span>complete judgments</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="card declaration-card" aria-labelledby="declaration-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">One-time record</p>
+            <h2 id="declaration-heading">Reviewer declaration</h2>
+          </div>
+          <button id="toggle-declaration" class="secondary" type="button" aria-expanded="true">
+            Hide declaration
+          </button>
+        </div>
+        <div id="declaration-fields">
+          <div class="field-grid">
+            <label>Submission ID<input id="submission-id" autocomplete="off" /></label>
+            <label>Stable project reviewer ID<input id="reviewer-id" autocomplete="off" /></label>
+            <label>
+              Qualification category
+              <select id="qualification-category">
+                <option value="">Choose…</option>
+                <option value="accessibility">Accessibility</option>
+                <option value="webUi">Web UI</option>
+                <option value="productReview">Product review</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>Review date<input id="reviewed-on" type="date" /></label>
+          </div>
+          <label>
+            Qualification rationale
+            <textarea id="qualification-rationale" rows="2"></textarea>
+          </label>
+          <div class="field-grid">
+            <label>
+              Independent from annotation authors
+              <select id="independence">
+                <option value="">Choose…</option>
+                <option value="declaredTrue">Yes</option>
+                <option value="declaredFalse">No</option>
+              </select>
+            </label>
+            <label>
+              Conflict of interest
+              <select id="conflict-status">
+                <option value="">Choose…</option>
+                <option value="noneDeclared">None declared</option>
+                <option value="declared">Conflict declared</option>
+              </select>
+            </label>
+          </div>
+          <label>Independence rationale<textarea id="independence-rationale" rows="2"></textarea></label>
+          <label>Conflict rationale<textarea id="conflict-rationale" rows="2"></textarea></label>
+          <div class="field-grid">
+            <label>
+              Prior expected-label exposure
+              <select id="exposure-status">
+                <option value="">Choose…</option>
+                <option value="none">None</option>
+                <option value="partial">Partial</option>
+                <option value="full">Full</option>
+              </select>
+            </label>
+            <fieldset id="exposure-cases">
+              <legend>Cases whose expected labels were previously seen</legend>
+            </fieldset>
+          </div>
+          <label>Prior-exposure rationale<textarea id="exposure-rationale" rows="2"></textarea></label>
+          <fieldset id="confirmations" class="confirmation-list">
+            <legend>Source-only confirmations</legend>
+          </fieldset>
+        </div>
+      </section>
+
+      <nav id="case-navigation" class="case-navigation" aria-label="Harbor cases"></nav>
+
+      <section class="review-grid">
+        <div class="card fixture-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Repository-owned fixture</p>
+              <h2 id="case-heading">Case</h2>
+            </div>
+            <code>[data-testid="reply-send"]</code>
+          </div>
+          <p class="notice">
+            Inspect the target with the browser’s Accessibility panel. Source intent and the arrow icon
+            are not proof of a native accessible name.
+          </p>
+          <iframe id="fixture-frame" title="Current Harbor fixture case"></iframe>
+          <details>
+            <summary>Inspect source included in the signed packet</summary>
+            <label>
+              Source file
+              <select id="source-select"></select>
+            </label>
+            <pre id="source-view"></pre>
+          </details>
+        </div>
+
+        <form id="judgment-form" class="card judgment-card">
+          <div>
+            <p class="eyebrow">Judgment 1 of 2</p>
+            <h2>Native acquisition</h2>
+            <p id="acquisition-prompt"></p>
+            <label>
+              Observation status
+              <select id="acquisition-status">
+                <option value="">Choose…</option>
+                <option value="observed">Observed</option>
+                <option value="cantTell">Can’t tell</option>
+                <option value="untested">Untested</option>
+              </select>
+            </label>
+            <label>
+              Observed value kind
+              <select id="acquisition-value-kind">
+                <option value="">Choose…</option>
+                <option value="text">Non-empty text</option>
+                <option value="absent">Observed as absent</option>
+              </select>
+            </label>
+            <label>Observed text<input id="acquisition-value" autocomplete="off" /></label>
+            <label>
+              Confidence
+              <select id="acquisition-confidence">
+                <option value="">Choose…</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label>Short factual rationale<textarea id="acquisition-rationale" rows="3"></textarea></label>
+          </div>
+
+          <hr />
+
+          <div>
+            <p class="eyebrow">Judgment 2 of 2</p>
+            <h2>Advisory rule verdict</h2>
+            <p id="rule-prompt"></p>
+            <label>
+              Outcome
+              <select id="rule-outcome">
+                <option value="">Choose…</option>
+                <option value="passed">Passed</option>
+                <option value="failed">Failed</option>
+                <option value="cantTell">Can’t tell</option>
+                <option value="inapplicable">Inapplicable</option>
+                <option value="untested">Untested</option>
+              </select>
+            </label>
+            <label>
+              Required evidence
+              <select id="rule-evidence">
+                <option value="">Choose…</option>
+                <option value="sufficient">Sufficient</option>
+                <option value="insufficient">Insufficient</option>
+                <option value="conflicting">Conflicting</option>
+                <option value="untested">Untested</option>
+              </select>
+            </label>
+            <label>
+              Confidence
+              <select id="rule-confidence">
+                <option value="">Choose…</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label>Short rationale, including any valid alternative<textarea id="rule-rationale" rows="3"></textarea></label>
+          </div>
+        </form>
+      </section>
+
+      <section class="action-bar">
+        <p id="status" role="status">Not saved in this session.</p>
+        <div>
+          <button id="save" class="secondary" type="button">Save local draft</button>
+          <button id="finalize" type="button">Finalize and lock all 8 judgments</button>
+        </div>
+      </section>
+
+      <section id="completion" class="card completion" hidden>
+        <p class="eyebrow">Locked locally</p>
+        <h2>First-pass answers are finalized</h2>
+        <p id="completion-summary"></p>
+        <pre id="comparison-command"></pre>
+        <p>Run comparison only now. It remains read-only and does not adjudicate disagreements.</p>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

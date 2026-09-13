@@ -34,8 +34,9 @@ The source tree after `v0.1.0-alpha.2` adds evaluation-only image segmentation, 
 source-alpha geometry, the PNG format-demand decision, the local perception protocol foundation,
 the first bounded PPTX, PDF, Android, and iOS source/capture-adapter slices, deterministic
 interaction contracts, managed loopback Web capture, and a local GitHub Actions report
-projection. They are not part
-of the published alpha.2 archive and therefore do not retroactively change that release.
+projection, external Web-evaluation handoff contracts, and local source-only review operations.
+They are not part of the published alpha.2 archive and therefore do not retroactively change that
+release.
 
 | Surface | Version or contract | Compatibility rule |
 |---|---|---|
@@ -84,6 +85,9 @@ of the published alpha.2 archive and therefore do not retroactively change that 
 | Interaction evaluation contracts | `0.1.0` | Public acquisition and rule truth remain separate; all cases are visible development data and no protected holdout is claimed. |
 | Protected Web holdout external manifests | `1.0.0` | Strict bundle, separate oracle, invocation/environment, and private-result shapes; real records stay outside the repository and incompatible fields require a new version. |
 | Sanitized Web holdout run attestation | `1.0.0` | Public lifecycle, admission binding, assurance declarations, integer metric publication/suppression, and non-claim contract; conformance examples are never evidence eligible. |
+| Public Web review packet, reviewer submission, and comparison | `1.0.0` | Strict source-only input, immutable finalized answer, and read-only post-lock comparison remain separate; incompatible shapes or semantics require new versions. |
+| Harbor review questionnaire and local draft state | `1.0.0` | The fixed four-case/eight-question inventory, packet binding, answer-free boundary, draft semantics, and mechanical projection are versioned independently from reviewer answers. |
+| Local Harbor review workbench | evaluation-only command | Python serves exact loopback assets and packet bytes, persists only explicit outside-repository paths, and never makes a product or independent-review claim. |
 | Playwright interaction request/response protocol | `0.1.0` | Strict repository-local controlled steps, fixed environment, denied external network, bounded resources, digest-only screenshots, and fail-closed errors. |
 | Playwright interaction adapter | `0.1.0` | Unreleased private Node process; exact runtime/browser versions are provenance and cross-platform screenshot byte identity is not claimed. |
 | Private Playwright Node package after ADR 0047 | `0.5.0` | Adds `sightlint-interaction`; existing capture/workflow protocols and their adapter versions remain independent compatibility surfaces. |
@@ -110,8 +114,10 @@ normalized inputs and compatibility environment documented by the applicable ada
 `sightlint-web`, `sightlint-web-check`, `sightlint-interaction`, and `sightlint-perception` require
 Node `>=20 <25`.
 `sightlint-pptx`, `sightlint-android`, and `sightlint-ios` require Python 3.9+.
-`sightlint-pdf` requires Python 3.9+ and exactly pypdf 6.17.0. All report the exact runtime patch
-version; repeated canonical bytes are guaranteed for the same declared input and compatibility
+`sightlint-pdf` requires Python 3.9+ and exactly pypdf 6.17.0. The source-only Web review tools and
+local Harbor workbench require Python 3.10+; their contract and process tests run on the hosted
+Linux, macOS, and Windows environments. For Python processes, the exact runtime patch is
+provenance; repeated canonical bytes are guaranteed for the same declared input and compatibility
 environment, not across different Python/runtime versions. The evaluated browser path uses
 the lockfile's Playwright/Chromium build on Linux. The private Node package can build on the hosted
 macOS arm64 and Windows x64 runners, but cross-platform screenshot byte identity and browser E2E

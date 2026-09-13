@@ -442,6 +442,15 @@ span environments.
 
 Do not hide model/browser variability. Version and measure it before the deterministic kernel.
 
+The Harbor review-workbench E2E is intentionally fictional conformance. It starts the real
+loopback process, renders all four packet-bound fixture states, exercises save/resume/finalize,
+validates strict questionnaire/state/submission schemas, repeats identical input for byte
+stability, and runs comparison only after lock. Negative cases cover HTTP capability/origin/host/
+method/body boundaries, inconsistent acquisition/rule states, privacy leakage, unsafe output
+paths, and explicit resume. A separate isolated source tree contains packet inputs but no oracle
+or comparator, proving they are not pre-finalization dependencies. None of these assertions count
+as human agreement or product accuracy.
+
 ## Current committed suites
 
 At handoff time, normal CI requires:
@@ -460,6 +469,7 @@ python3 tools/check_web_evaluation_v1.py
 python3 tools/check_web_holdout_foundation.py
 python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
 python3 tools/prepare_web_review.py --check
+python3 tools/prepare_web_review.py --validate-questionnaire evaluation/web/harbor-review-questionnaire.json
 python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
 python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
 python3 tools/check_perception_evaluation.py

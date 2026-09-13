@@ -172,6 +172,7 @@ identity, or accessing an external store:
 python3 tools/check_web_holdout_foundation.py
 python3 tools/check_web_holdout_foundation.py --conformance-dir evaluation/web/conformance/holdout
 python3 tools/prepare_web_review.py --check
+python3 tools/prepare_web_review.py --validate-questionnaire evaluation/web/harbor-review-questionnaire.json
 python3 tools/prepare_web_review.py --validate-submission evaluation/web/conformance/review/fictional-submission.json
 python3 tools/compare_web_review.py --submission evaluation/web/conformance/review/fictional-submission.json
 ```
@@ -181,18 +182,31 @@ separation, bounded integer metrics, small-cell suppression, and stable fail-clo
 Operationalization still requires issue #74's external authority, qualified independent evaluator,
 second verifier, protected bundle, exposure log, and detached signature process.
 
-For issue #77, copy the generated blank submission outside the repository, reduce its declared
-scope if reviewing Harbor first, replace every placeholder, fill judgments from packet source,
-and finalize it before opening current oracle files:
+For the first issue #77 Harbor phase, use the fixed local workbench from a clean browser profile.
+Both output paths must be in an existing directory outside the repository:
 
 ```bash
-python3 tools/prepare_web_review.py --finalize-submission REVIEWER-DRAFT.json > REVIEWER-FINAL.json
+python3 tools/run_web_review.py \
+  --scope harbor \
+  --draft /outside/the/repository/harbor-draft.json \
+  --final /outside/the/repository/harbor-final.json \
+  --no-open
+```
+
+It reduces the substantive human work to one native accessible-name observation and one advisory
+rule verdict for each of four cases. It automates only fixed metadata, persistence, compatible
+field mapping, canonical bytes, and digest locking. It neither opens current oracles nor runs
+SightLint before finalization. The general blank-submission path remains available for Atlas and
+non-workbench scopes. Only after finalization may either path run:
+
+```bash
 python3 tools/compare_web_review.py --submission REVIEWER-FINAL.json > REVIEW-COMPARISON.json
 ```
 
 The reviewer owns the answers. Finalization supplies only lifecycle and digest; comparison does
 not edit or adjudicate either record. Do not commit a real review if it contains private data, and
-do not treat structural validation as proof of the reviewer's identity or independence.
+do not treat structural validation or the fictional workbench E2E as proof of the reviewer's
+identity, independence, or product accuracy.
 
 ## Evaluation command
 

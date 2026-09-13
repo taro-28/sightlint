@@ -11,14 +11,17 @@ from web_review_contract import (
     BLANK_SUBMISSION_PATH,
     MAX_PACKET_BYTES,
     PACKET_PATH,
+    QUESTIONNAIRE_PATH,
     ContractError,
     build_blank_submission,
+    build_harbor_questionnaire,
     build_packet,
     canonical_bytes,
     finalize_submission,
     load_json,
     pretty_bytes,
     validate_packet,
+    validate_harbor_questionnaire,
     validate_submission,
 )
 
@@ -29,6 +32,7 @@ def parser() -> argparse.ArgumentParser:
     actions.add_argument("--check", action="store_true", help="check committed generated records")
     actions.add_argument("--write", action="store_true", help="write committed generated records")
     actions.add_argument("--validate-packet", type=Path, metavar="PATH")
+    actions.add_argument("--validate-questionnaire", type=Path, metavar="PATH")
     actions.add_argument("--validate-submission", type=Path, metavar="PATH")
     actions.add_argument("--finalize-submission", type=Path, metavar="PATH")
     root.add_argument("--packet", type=Path, default=PACKET_PATH)
@@ -38,16 +42,19 @@ def parser() -> argparse.ArgumentParser:
 def check_or_write(write: bool) -> None:
     packet = build_packet()
     validate_packet(packet)
+    questionnaire = build_harbor_questionnaire(packet)
+    validate_harbor_questionnaire(questionnaire, packet)
     blank = build_blank_submission(packet)
     validate_submission(blank, packet)
     generated = (
         (PACKET_PATH, pretty_bytes(packet)),
+        (QUESTIONNAIRE_PATH, pretty_bytes(questionnaire)),
         (BLANK_SUBMISSION_PATH, pretty_bytes(blank)),
     )
     if write:
         for path, raw in generated:
             path.write_bytes(raw)
-        print("web review prepare: wrote packet=1, blank_submission=1")
+        print("web review prepare: wrote packet=1, questionnaire=1, blank_submission=1")
         return
     for path, expected in generated:
         try:
@@ -56,7 +63,7 @@ def check_or_write(write: bool) -> None:
             raise ContractError("drift", f"generated file is missing: {path.name}")
         if observed != expected:
             raise ContractError("drift", f"generated file is stale: {path.name}")
-    print("web review prepare: packet=valid, blank_submission=valid, drift=false")
+    print("web review prepare: packet=valid, questionnaire=valid, blank_submission=valid, drift=false")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -68,6 +75,11 @@ def main(argv: list[str] | None = None) -> int:
             packet = load_json(arguments.validate_packet, "review packet", MAX_PACKET_BYTES)
             validate_packet(packet)
             print("web review prepare: packet=valid, evidence_eligible=false")
+        elif arguments.validate_questionnaire is not None:
+            packet = load_json(arguments.packet, "review packet", MAX_PACKET_BYTES)
+            questionnaire = load_json(arguments.validate_questionnaire, "Harbor review questionnaire")
+            validate_harbor_questionnaire(questionnaire, packet)
+            print("web review prepare: questionnaire=valid, questions=8, evidence_eligible=false")
         elif arguments.validate_submission is not None:
             packet = load_json(arguments.packet, "review packet", MAX_PACKET_BYTES)
             submission = load_json(arguments.validate_submission, "reviewer submission")

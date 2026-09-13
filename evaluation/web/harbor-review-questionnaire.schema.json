@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sightlint:schema:harbor-review-questionnaire:1.0.0",
+  "title": "SightLint answer-free Harbor review questionnaire",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "documentType",
+    "questionnaireId",
+    "questionnaireDigest",
+    "recordPurpose",
+    "evidenceEligible",
+    "packetBinding",
+    "scope",
+    "source",
+    "questions",
+    "governance",
+    "limitations"
+  ],
+  "properties": {
+    "$schema": { "const": "./harbor-review-questionnaire.schema.json" },
+    "schemaVersion": { "const": "1.0.0" },
+    "documentType": { "const": "harborReviewQuestionnaire" },
+    "questionnaireId": { "const": "sightlint-harbor-accessible-name-pilot-v1" },
+    "questionnaireDigest": { "$ref": "#/$defs/sha256" },
+    "recordPurpose": { "const": "publicSourceOnlyReviewQuestions" },
+    "evidenceEligible": { "const": false },
+    "packetBinding": { "$ref": "#/$defs/packetBinding" },
+    "scope": { "$ref": "#/$defs/scope" },
+    "source": { "$ref": "#/$defs/source" },
+    "questions": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": { "oneOf": [{ "$ref": "#/$defs/acquisitionQuestion" }, { "$ref": "#/$defs/ruleQuestion" }] }
+    },
+    "governance": { "$ref": "#/$defs/governance" },
+    "limitations": { "$ref": "#/$defs/textList" }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "relativePath": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[A-Za-z0-9._/-]+$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "textList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": { "$ref": "#/$defs/text" }
+    },
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "packetBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packetId", "packetDigest"],
+      "properties": {
+        "packetId": { "$ref": "#/$defs/id" },
+        "packetDigest": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["familyId", "caseIds", "substantiveJudgmentCount"],
+      "properties": {
+        "familyId": { "const": "harbor-support-inbox-v1" },
+        "caseIds": { "$ref": "#/$defs/idList" },
+        "substantiveJudgmentCount": { "const": 8 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixturePaths", "targetSelector", "targetNodeId", "renderedFromPacketBytes"],
+      "properties": {
+        "fixturePaths": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "targetSelector": { "const": "[data-testid=\"reply-send\"]" },
+        "targetNodeId": { "const": "web-reply-send" },
+        "renderedFromPacketBytes": { "const": true }
+      }
+    },
+    "questionBase": {
+      "type": "object",
+      "required": ["questionId", "caseId", "authority", "prompt", "requestPath", "requestDigest", "fixtureState"],
+      "properties": {
+        "questionId": { "$ref": "#/$defs/id" },
+        "caseId": { "$ref": "#/$defs/id" },
+        "authority": { "enum": ["acquisition", "rule"] },
+        "prompt": { "$ref": "#/$defs/text" },
+        "requestPath": { "$ref": "#/$defs/relativePath" },
+        "requestDigest": { "$ref": "#/$defs/sha256" },
+        "fixtureState": { "$ref": "#/$defs/id" }
+      }
+    },
+    "acquisitionQuestion": {
+      "allOf": [
+        { "$ref": "#/$defs/questionBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "questionId",
+            "caseId",
+            "authority",
+            "prompt",
+            "requestPath",
+            "requestDigest",
+            "fixtureState",
+            "subject",
+            "aspect",
+            "allowedStatuses",
+            "allowedObservedValueKinds",
+            "evidenceSource"
+          ],
+          "properties": {
+            "questionId": { "$ref": "#/$defs/id" },
+            "caseId": { "$ref": "#/$defs/id" },
+            "authority": { "const": "acquisition" },
+            "prompt": { "$ref": "#/$defs/text" },
+            "requestPath": { "$ref": "#/$defs/relativePath" },
+            "requestDigest": { "$ref": "#/$defs/sha256" },
+            "fixtureState": { "$ref": "#/$defs/id" },
+            "subject": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "id"],
+              "properties": {
+                "kind": { "const": "node" },
+                "id": { "const": "web-reply-send" }
+              }
+            },
+            "aspect": { "const": "name" },
+            "allowedStatuses": {
+              "const": ["cantTell", "observed", "untested"]
+            },
+            "allowedObservedValueKinds": {
+              "const": ["absent", "text"]
+            },
+            "evidenceSource": { "const": "browserNativeAccessibility" }
+          }
+        }
+      ]
+    },
+    "ruleQuestion": {
+      "allOf": [
+        { "$ref": "#/$defs/questionBase" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "questionId",
+            "caseId",
+            "authority",
+            "prompt",
+            "requestPath",
+            "requestDigest",
+            "fixtureState",
+            "ruleId",
+            "ruleVersion",
+            "targetKind",
+            "targetId",
+            "targetAspect",
+            "allowedOutcomes",
+            "allowedRequiredEvidence",
+            "policyBasis",
+            "falsePositiveRisk",
+            "falseNegativeRisk"
+          ],
+          "properties": {
+            "questionId": { "$ref": "#/$defs/id" },
+            "caseId": { "$ref": "#/$defs/id" },
+            "authority": { "const": "rule" },
+            "prompt": { "$ref": "#/$defs/text" },
+            "requestPath": { "$ref": "#/$defs/relativePath" },
+            "requestDigest": { "$ref": "#/$defs/sha256" },
+            "fixtureState": { "$ref": "#/$defs/id" },
+            "ruleId": { "const": "web.accessibility.interactive-name" },
+            "ruleVersion": { "const": "0.1.0" },
+            "targetKind": { "const": "node" },
+            "targetId": { "const": "web-reply-send" },
+            "targetAspect": { "type": "null" },
+            "allowedOutcomes": {
+              "const": ["cantTell", "failed", "inapplicable", "passed", "untested"]
+            },
+            "allowedRequiredEvidence": {
+              "const": ["conflicting", "insufficient", "sufficient", "untested"]
+            },
+            "policyBasis": { "$ref": "#/$defs/text" },
+            "falsePositiveRisk": { "$ref": "#/$defs/text" },
+            "falseNegativeRisk": { "$ref": "#/$defs/text" }
+          }
+        }
+      ]
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ownership",
+        "license",
+        "privacyReview",
+        "containsPersonalOrCustomerData",
+        "containsCredentials",
+        "externalAssets",
+        "externalNetwork",
+        "externalProcessing",
+        "exposure",
+        "answerSource"
+      ],
+      "properties": {
+        "ownership": { "const": "sightlintRepository" },
+        "license": { "const": "MIT OR Apache-2.0" },
+        "privacyReview": { "const": "syntheticNoPersonalData" },
+        "containsPersonalOrCustomerData": { "const": false },
+        "containsCredentials": { "const": false },
+        "externalAssets": { "const": false },
+        "externalNetwork": { "const": false },
+        "externalProcessing": { "const": false },
+        "exposure": { "const": "publicTuningVisible" },
+        "answerSource": { "const": "independentHumanOnly" }
+      }
+    }
+  }
+}

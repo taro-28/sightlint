@@ -15,9 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "evaluation" / "web"
 PACKET_PATH = WEB / "review-packet.json"
 BLANK_SUBMISSION_PATH = WEB / "reviewer-submission.blank.json"
+QUESTIONNAIRE_PATH = WEB / "harbor-review-questionnaire.json"
 PACKET_SCHEMA = "./review-packet.schema.json"
 SUBMISSION_SCHEMA = "./reviewer-submission.schema.json"
 COMPARISON_SCHEMA = "./review-comparison.schema.json"
+QUESTIONNAIRE_SCHEMA = "./harbor-review-questionnaire.schema.json"
 VERSION = "1.0.0"
 
 MAX_INPUT_BYTES = 1_048_576
@@ -83,6 +85,11 @@ HARBOR_CASES = (
     "support-inbox-labelledby-hard-negative",
     "support-inbox-unnamed-control",
 )
+
+HARBOR_SOURCE_FILES = SOURCE_FILES[3:]
+HARBOR_QUESTIONNAIRE_ID = "sightlint-harbor-accessible-name-pilot-v1"
+HARBOR_TARGET_SELECTOR = '[data-testid="reply-send"]'
+HARBOR_TARGET_NODE_ID = "web-reply-send"
 
 FAMILIES = (
     {
@@ -617,6 +624,150 @@ def validate_packet(packet: dict[str, Any]) -> None:
         fail("ordering", "review packet cases must be unique and sorted")
 
 
+def build_harbor_questionnaire(packet: dict[str, Any]) -> dict[str, Any]:
+    """Build the fixed answer-free Harbor pilot questionnaire."""
+    validate_packet(packet)
+    packet_cases = {case["caseId"]: case for case in packet["cases"]}
+    questions: list[dict[str, Any]] = []
+    for case_id in sorted(HARBOR_CASES):
+        case = packet_cases[case_id]
+        shared = {
+            "caseId": case_id,
+            "requestPath": case["requestPath"],
+            "requestDigest": case["requestDigest"],
+            "fixtureState": case["fixtureState"],
+        }
+        questions.extend(
+            [
+                {
+                    **shared,
+                    "questionId": f"{case_id}.acquisition.name",
+                    "authority": "acquisition",
+                    "prompt": (
+                        "Inspect browser-native accessibility information for the fixed send-action "
+                        "target. Is its accessible name observed as text, observed as absent, "
+                        "unavailable, or untested?"
+                    ),
+                    "subject": {"kind": "node", "id": HARBOR_TARGET_NODE_ID},
+                    "aspect": "name",
+                    "allowedStatuses": ["cantTell", "observed", "untested"],
+                    "allowedObservedValueKinds": ["absent", "text"],
+                    "evidenceSource": "browserNativeAccessibility",
+                },
+                {
+                    **shared,
+                    "questionId": f"{case_id}.rule.interactive-name",
+                    "authority": "rule",
+                    "prompt": (
+                        "Using the independently reviewed native evidence, what is the outcome of "
+                        "the advisory interactive-name rule for the fixed send-action target?"
+                    ),
+                    "ruleId": "web.accessibility.interactive-name",
+                    "ruleVersion": "0.1.0",
+                    "targetKind": "node",
+                    "targetId": HARBOR_TARGET_NODE_ID,
+                    "targetAspect": None,
+                    "allowedOutcomes": ["cantTell", "failed", "inapplicable", "passed", "untested"],
+                    "allowedRequiredEvidence": ["conflicting", "insufficient", "sufficient", "untested"],
+                    "policyBasis": (
+                        "sightlint:recommended; wcag:4.1.2-name-role-value version 2.2; docs/rules.md"
+                    ),
+                    "falsePositiveRisk": (
+                        "A valid native name source or a role outside the conservative applicability "
+                        "set could be overlooked."
+                    ),
+                    "falseNegativeRisk": (
+                        "Source intent or visible iconography could be mistaken for an observed "
+                        "native programmatic name."
+                    ),
+                },
+            ]
+        )
+    questionnaire: dict[str, Any] = {
+        "$schema": QUESTIONNAIRE_SCHEMA,
+        "schemaVersion": VERSION,
+        "documentType": "harborReviewQuestionnaire",
+        "questionnaireId": HARBOR_QUESTIONNAIRE_ID,
+        "questionnaireDigest": None,
+        "recordPurpose": "publicSourceOnlyReviewQuestions",
+        "evidenceEligible": False,
+        "packetBinding": {
+            "packetId": packet["packetId"],
+            "packetDigest": packet["packetDigest"],
+        },
+        "scope": {
+            "familyId": "harbor-support-inbox-v1",
+            "caseIds": sorted(HARBOR_CASES),
+            "substantiveJudgmentCount": len(questions),
+        },
+        "source": {
+            "fixturePaths": sorted(HARBOR_SOURCE_FILES),
+            "targetSelector": HARBOR_TARGET_SELECTOR,
+            "targetNodeId": HARBOR_TARGET_NODE_ID,
+            "renderedFromPacketBytes": True,
+        },
+        "questions": questions,
+        "governance": {
+            "ownership": "sightlintRepository",
+            "license": "MIT OR Apache-2.0",
+            "privacyReview": "syntheticNoPersonalData",
+            "containsPersonalOrCustomerData": False,
+            "containsCredentials": False,
+            "externalAssets": False,
+            "externalNetwork": False,
+            "externalProcessing": False,
+            "exposure": "publicTuningVisible",
+            "answerSource": "independentHumanOnly",
+        },
+        "limitations": [
+            "The questionnaire contains no expected observation, expected verdict, or suggested answer.",
+            "This is a source-first public Harbor pilot, not a blind review or protected holdout.",
+            "The pilot reviews one native accessible-name observation and one advisory rule outcome per case.",
+            "Pixels, geometry, other rules, Atlas, reviewer identity, and representative accuracy remain outside this pilot.",
+        ],
+    }
+    questionnaire["questionnaireDigest"] = digest(questionnaire, "questionnaireDigest")
+    return questionnaire
+
+
+def validate_harbor_questionnaire(questionnaire: dict[str, Any], packet: dict[str, Any]) -> None:
+    """Validate the exact answer-free Harbor questionnaire and packet binding."""
+    validate_packet(packet)
+    exact(
+        questionnaire,
+        {
+            "$schema",
+            "schemaVersion",
+            "documentType",
+            "questionnaireId",
+            "questionnaireDigest",
+            "recordPurpose",
+            "evidenceEligible",
+            "packetBinding",
+            "scope",
+            "source",
+            "questions",
+            "governance",
+            "limitations",
+        },
+        "Harbor review questionnaire",
+    )
+    if (
+        questionnaire["$schema"] != QUESTIONNAIRE_SCHEMA
+        or questionnaire["schemaVersion"] != VERSION
+        or questionnaire["documentType"] != "harborReviewQuestionnaire"
+        or questionnaire["questionnaireId"] != HARBOR_QUESTIONNAIRE_ID
+        or questionnaire["recordPurpose"] != "publicSourceOnlyReviewQuestions"
+        or questionnaire["evidenceEligible"] is not False
+    ):
+        fail("version", "Harbor review questionnaire uses an unsupported identity or evidence state")
+    recorded = sha256(questionnaire["questionnaireDigest"], "Harbor questionnaire digest")
+    if recorded != digest(questionnaire, "questionnaireDigest"):
+        fail("digest", "Harbor review questionnaire digest does not match its canonical projection")
+    if questionnaire != build_harbor_questionnaire(packet):
+        fail("questionnaire", "Harbor review questionnaire differs from the fixed answer-free contract")
+
+
 def build_blank_submission(packet: dict[str, Any]) -> dict[str, Any]:
     """Build a no-answer draft template bound to one packet."""
     cases = [
@@ -704,6 +855,11 @@ def _validate_privacy_text(value: Any, label: str) -> None:
             fail("privacy", f"{label} must not contain absolute private paths")
         if CREDENTIAL.search(value):
             fail("privacy", f"{label} must not contain credential-like material")
+
+
+def validate_privacy_text(value: Any, label: str) -> None:
+    """Reject URL, private-path, and credential-like text in a review document."""
+    _validate_privacy_text(value, label)
 
 
 def _evidence(value: Any, label: str) -> None:
