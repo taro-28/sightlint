@@ -22,10 +22,10 @@
     "test:segmentation-evaluation": "npm run build && node --test dist/tests/segmentation-evaluation.test.js"
   },
   "dependencies": {
-    "playwright": "1.63.0"
+    "playwright": "1.64.0"
   },
   "devDependencies": {
-    "@types/node": "24.13.3",
+    "@types/node": "24.19.2",
     "ajv": "8.20.0",
     "typescript": "7.0.2"
   },
